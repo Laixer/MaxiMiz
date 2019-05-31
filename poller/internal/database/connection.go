@@ -9,10 +9,10 @@ import (
 	_ "github.com/lib/pq"
 )
 
-const databaseType = "postgres"
-const databaseUsername = "david"
-const databaseName = "maximiz"
-const sslMode = "disable"
+const databaseType = ""
+const databaseUsername = ""
+const databaseName = ""
+const sslMode = ""
 
 // ConnectToDatabase connects to the database
 func ConnectToDatabase() (db *sql.DB) {

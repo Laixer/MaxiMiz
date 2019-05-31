@@ -1,21 +1,24 @@
 package server
 
 import (
-	"github.com/Zanhos/MaxiMiz/poller/internal/database"
-	"github.com/Zanhos/MaxiMiz/poller/internal/logger"
+	// "github.com/Zanhos/MaxiMiz/poller/internal/database"
+	// "github.com/Zanhos/MaxiMiz/poller/internal/logger"
 	"net/http"
+
+	"github.com/Zanhos/MaxiMiz/poller/internal/poller"
 )
 
 // StartServer starts the server
 func StartServer() {
-	database.ConnectToDatabase()
-	print("test")
+	// database.ConnectToDatabase()
+	// registerHandlers()
+	poller.NewGooglePoller().GetCampaignBudget()
+	// print("test")
 }
 
 func registerHandlers() {
 	handlers := make(map[string]http.HandlerFunc)
 	for pattern, handlerFunc := range handlers {
-		logger.Info("")
 		http.HandleFunc(pattern, handlerFunc)
 	}
 }
