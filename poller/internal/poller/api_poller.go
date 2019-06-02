@@ -1,53 +1,35 @@
 package poller
 
 import (
-	"fmt"
-	"io/ioutil"
+	// "fmt"
+	// "io/ioutil"
+	"context"
 	"net/http"
-	"net/url"
+	// "encoding/json"
 
 	"golang.org/x/oauth2"
-	"golang.org/x/oauth2/google"
 )
 
-const googleAdsBaseURL = ""
+// // Poller ...
+// type Poller struct {
+// 	httpClient *http.Client
+// }
 
-type poller interface {
-	getCPM() int
-}
-
-// GooglePoller ...
-type GooglePoller struct {
-	baseURL          *url.URL
-	clientCustomerID int64 
-	oAuth2Config     oauth2.Config
-}
-
-// NewGooglePoller ...
-func NewGooglePoller() GooglePoller {
-	url, _ := url.Parse(googleAdsBaseURL)
-	oAuth2Config := oauth2.Config{
-		ClientID:     "",
-		ClientSecret: "",
-		Endpoint:     google.Endpoint,
+// NewPoller ...
+func NewPoller(ctx context.Context, clientID string, clientSecret string, endpoint oauth2.Endpoint, redirectURL string, authToken string, scopes ...string) (p *http.Client) {
+	config := &oauth2.Config{
+		ClientID:     clientID,
+		ClientSecret: clientSecret,
+		Endpoint:     endpoint,
+		RedirectURL:  redirectURL,
+		Scopes:       scopes,
 	}
-	return GooglePoller{url, 0, oAuth2Config}
-}
 
-type TaboolaPoller struct {
-}
+	initialToken, err := config.Exchange(ctx, authToken)
 
-type OutbrainPoller struct {
-}
+	if err != nil {
+		panic(err)
+	}
 
-type RevcontentPoller struct {
-}
-
-func (gp GooglePoller) GetCampaignBudget() (budget int) {
-	url := fmt.Sprintf("%s/customers/%d/campaignBudgets/%d", gp.baseURL, gp.clientCustomerID, 1)
-	println(url)
-	resp, _ := http.Get(url)
-	respBody, _ := ioutil.ReadAll(resp.Body)
-	println(string(respBody))
-	return
+	return config.Client(ctx, initialToken)
 }

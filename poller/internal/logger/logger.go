@@ -5,6 +5,7 @@ import (
 	"time"
 )
 
+
 func Info(message string) {
 	logMessage("info", message)
 }
