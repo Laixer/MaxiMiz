@@ -5,23 +5,27 @@ import (
 	"time"
 )
 
-
+// Info ...
 func Info(message string) {
 	logMessage("info", message)
 }
 
+// Debug ...
 func Debug(message string) {
 	logMessage("debug", message)
 }
 
+// Warn ...
 func Warn(message string) {
 	logMessage("warn", message)
 }
 
+// Error ...
 func Error(message string) {
 	logMessage("error", message)
 }
 
+// Fatal ...
 func Fatal(message string) {
 	logMessage("fatal", message)
 }

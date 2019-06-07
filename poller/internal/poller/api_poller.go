@@ -1,22 +1,19 @@
 package poller
 
 import (
-	// "fmt"
-	// "io/ioutil"
 	"context"
 	"net/http"
-	// "encoding/json"
+	"net/url"
 
 	"golang.org/x/oauth2"
 )
 
-// // Poller ...
-// type Poller struct {
-// 	httpClient *http.Client
-// }
+type Poller struct {
+	baseURL    string
+	httpClient *http.Client
+}
 
-// NewPoller ...
-func NewPoller(ctx context.Context, clientID string, clientSecret string, endpoint oauth2.Endpoint, redirectURL string, authToken string, scopes ...string) (p *http.Client) {
+func New(ctx context.Context, baseURL string, clientID string, clientSecret string, endpoint oauth2.Endpoint, redirectURL string, authToken string, scopes ...string) Poller {
 	config := &oauth2.Config{
 		ClientID:     clientID,
 		ClientSecret: clientSecret,
@@ -25,11 +22,25 @@ func NewPoller(ctx context.Context, clientID string, clientSecret string, endpoi
 		Scopes:       scopes,
 	}
 
+	println(authToken)
+
 	initialToken, err := config.Exchange(ctx, authToken)
+	print(initialToken)
 
 	if err != nil {
 		panic(err)
 	}
 
-	return config.Client(ctx, initialToken)
+	return Poller{baseURL, config.Client(ctx, initialToken)}
+}
+
+func (p *Poller) Do(req *http.Request) (*http.Response, error) {
+	var err error
+	req.URL, err = url.Parse(p.baseURL + req.URL.String())
+
+	if err != nil {
+		return nil, err
+	}
+
+	return p.httpClient.Do(req)
 }
