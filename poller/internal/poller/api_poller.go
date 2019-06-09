@@ -5,15 +5,38 @@ import (
 	"net/http"
 	"net/url"
 
+	"github.com/google/logger"
+
 	"golang.org/x/oauth2"
 )
 
-type Poller struct {
-	baseURL    string
-	httpClient *http.Client
+// Poller defines a poller that contains a client to poll webservices for advertisement data
+type Poller interface {
+	getBaseURL() string
+	getHTTPClient() *http.Client
+	do(req *http.Request) (*http.Response, error)
+
+	//TODO make this a list of handlerfuncs instead of declaring them seperately
+	GetCPMHandler() http.HandlerFunc
 }
 
-func New(ctx context.Context, baseURL string, clientID string, clientSecret string, endpoint oauth2.Endpoint, redirectURL string, authToken string, scopes ...string) Poller {
+// GetPollers returns all the pollers that need to be registered
+func GetPollers(ctx context.Context) []Poller {
+	return []Poller{newGooglePoller(ctx)}
+}
+
+// SaveTokens saves the auth token to the config file to prevent having to manually request a new token
+func SaveTokens() {
+
+}
+
+// ReadTokens reads the previously token from file to prevent manually getting the token again.
+func readTokensFromFile() []string {
+	return make([]string, 1)
+}
+
+func httpClientFromOAuth2(ctx context.Context, baseURL string, clientID string, clientSecret string, endpoint oauth2.Endpoint, redirectURL string, authToken string, scopes ...string) *http.Client {
+
 	config := &oauth2.Config{
 		ClientID:     clientID,
 		ClientSecret: clientSecret,
@@ -21,26 +44,24 @@ func New(ctx context.Context, baseURL string, clientID string, clientSecret stri
 		RedirectURL:  redirectURL,
 		Scopes:       scopes,
 	}
-
-	println(authToken)
-
 	initialToken, err := config.Exchange(ctx, authToken)
-	print(initialToken)
 
 	if err != nil {
+		logger.Fatalf("could not exchange authtoken for OAuth2 token. the server responded as follows:\n %v", err)
 		panic(err)
 	}
 
-	return Poller{baseURL, config.Client(ctx, initialToken)}
+	return config.Client(ctx, initialToken)
 }
 
-func (p *Poller) Do(req *http.Request) (*http.Response, error) {
+func do(req *http.Request, p Poller) (*http.Response, error) {
 	var err error
-	req.URL, err = url.Parse(p.baseURL + req.URL.String())
+	urlString := p.getBaseURL() + req.URL.String()
+	req.URL, err = url.Parse(urlString)
 
 	if err != nil {
-		return nil, err
+		logger.Fatalf("could not parse url: %s\n%v", urlString, err)
 	}
 
-	return p.httpClient.Do(req)
+	return p.getHTTPClient().Do(req)
 }

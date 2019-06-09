@@ -1,0 +1,22 @@
+# Fill in and change name to config.toml to use. alternatively use environment variables
+
+google_ads_account_id = 0
+google_developer_token = ""
+google_ads_endpoint = ""
+google_oauth2_client_id = ""
+google_oauth2_client_secret = ""
+google_redirect_url = ""
+google_oauth2_scope = ""
+google_initial_token = ""
+
+database_type = ""
+database_username = ""
+database_name = ""
+database_ssl_mode = ""
+
+server_address = ""
+server_port = 0
+server_write_timeout_in_milliseconds = ""
+server_idle_timeout_in_milliseconds = ""
+server_read_timeout_in_milliseconds = ""
+server_log_location = ""

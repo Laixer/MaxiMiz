@@ -16,4 +16,5 @@ vendor/
 
 *.ignore
 
-conf.json
+config.toml
+*.log
