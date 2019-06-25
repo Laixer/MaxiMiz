@@ -3,10 +3,10 @@ package main
 import (
 	"context"
 
-	"github.com/Zanhos/MaxiMiz/poller/internal/server"
+	"github.com/Zanhos/MaxiMiz/poller/internal/executor"
 )
 
 func main() {
 	ctx := context.Background()
-	server.StartServer(ctx)
+	executor.ExecuteTasks(ctx)
 }

@@ -12,17 +12,15 @@ import (
 
 // Poller defines a poller that contains a client to poll webservices for advertisement data
 type Poller interface {
-	getBaseURL() string
+	Name() string
+	baseURL() string
 	getHTTPClient() *http.Client
 	do(req *http.Request) (*http.Response, error)
-
-	//TODO make this a list of handlerfuncs instead of declaring them seperately
-	GetCPMHandler() http.HandlerFunc
 }
 
 // GetPollers returns all the pollers that need to be registered
 func GetPollers(ctx context.Context) []Poller {
-	return []Poller{newGooglePoller(ctx)}
+	return []Poller{NewTaboolaPoller(ctx)}
 }
 
 // SaveTokens saves the auth token to the config file to prevent having to manually request a new token
@@ -30,37 +28,32 @@ func SaveTokens() {
 
 }
 
-// ReadTokens reads the previously token from file to prevent manually getting the token again.
-func readTokensFromFile() []string {
-	return make([]string, 1)
-}
-
-func httpClientFromOAuth2(ctx context.Context, baseURL string, clientID string, clientSecret string, endpoint oauth2.Endpoint, redirectURL string, authToken string, scopes ...string) *http.Client {
-
-	config := &oauth2.Config{
-		ClientID:     clientID,
-		ClientSecret: clientSecret,
-		Endpoint:     endpoint,
-		RedirectURL:  redirectURL,
-		Scopes:       scopes,
-	}
-	initialToken, err := config.Exchange(ctx, authToken)
+func httpClientFromOAuth2PasswordCredentials(ctx context.Context, config *oauth2.Config, username string, password string) *http.Client {
+	initialToken, err := config.PasswordCredentialsToken(ctx, username, password)
 
 	if err != nil {
-		logger.Fatalf("could not exchange authtoken for OAuth2 token. the server responded as follows:\n %v", err)
-		panic(err)
+		logger.Errorf("could not exchange username and password for OAuth2 token. the OAuth2 server responded as follows:\n %v", err)
 	}
 
 	return config.Client(ctx, initialToken)
 }
 
+func httpClientFromOAuth2Authorization(ctx context.Context, config *oauth2.Config, authToken string) *http.Client {
+	initialToken, err := config.Exchange(ctx, authToken)
+	if err != nil {
+		logger.Errorf("could not exchange authtoken for OAuth2 token. the OAuth2 server responded as follows:\n %v", err)
+	}
+	return config.Client(ctx, initialToken)
+
+}
+
 func do(req *http.Request, p Poller) (*http.Response, error) {
 	var err error
-	urlString := p.getBaseURL() + req.URL.String()
+	urlString := p.baseURL() + req.URL.String()
 	req.URL, err = url.Parse(urlString)
 
 	if err != nil {
-		logger.Fatalf("could not parse url: %s\n%v", urlString, err)
+		logger.Errorf("could not parse url: %s\n%v", urlString, err)
 	}
 
 	return p.getHTTPClient().Do(req)

@@ -18,3 +18,4 @@ vendor/
 
 config.toml
 *.log
+service_account.json

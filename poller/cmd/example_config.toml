@@ -1,3 +1,4 @@
+# TODO place this in a resources folder somewhere
 # Fill in and change name to config.toml to use. alternatively use environment variables
 
 google_ads_account_id = 0
@@ -14,9 +15,13 @@ database_username = ""
 database_name = ""
 database_ssl_mode = ""
 
-server_address = ""
-server_port = 0
-server_write_timeout_in_milliseconds = ""
-server_idle_timeout_in_milliseconds = ""
-server_read_timeout_in_milliseconds = ""
-server_log_location = ""
+taboola_backstage_endpoint = ""
+taboola_oauth2_client_id = ""
+taboola_oauth2_client_secret = ""
+taboola_redirect_url = ""
+taboola_oauth2_scope = ""
+taboola_oauth2_token = ""
+taboola_oauth2_auth_url= ""
+taboola_oauth2_token_url = ""
+taboola_oauth2_username = ""
+taboola_oauth2_password = ""
