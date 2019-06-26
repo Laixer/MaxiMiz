@@ -1,6 +1,7 @@
 package executor
 
 import (
+	"io/ioutil"
 	"os"
 
 	"github.com/Zanhos/MaxiMiz/poller/internal/database"
@@ -10,15 +11,17 @@ import (
 	"context"
 )
 
-// ExecuteTasks starts the poller to get the corresponding data and executes the pending tasks
+// Start the poller to get the corresponding data and executes the pending tasks
 func ExecuteTasks(ctx context.Context) {
-	lf, err := os.OpenFile("/dev/null", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0660)
+	tmpfile, err := ioutil.TempFile("", "poller")
 	if err != nil {
 		logger.Fatalf("Failed to open log file: %v", err)
 	}
-	defer lf.Close()
+	defer os.Remove(tmpfile.Name())
 
-	pollerLogger := logger.Init("poller", true, false, lf)
+	// Initialize the logger
+	pollerLogger := logger.Init("poller", true, false, tmpfile)
+	logger.Infof("Logging to %s", tmpfile.Name())
 	defer pollerLogger.Close()
 	db := database.Open()
 	defer db.Close()
