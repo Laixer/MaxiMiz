@@ -4,6 +4,7 @@ import (
 	"io/ioutil"
 	"os"
 
+	"github.com/Zanhos/MaxiMiz/poller/internal/config"
 	"github.com/Zanhos/MaxiMiz/poller/internal/database"
 	"github.com/Zanhos/MaxiMiz/poller/internal/poller"
 	"github.com/google/logger"
@@ -23,6 +24,12 @@ func ExecuteTasks(ctx context.Context, configFile *string) {
 	pollerLogger := logger.Init("poller", true, false, tmpfile)
 	logger.Infof("Logging to %s", tmpfile.Name())
 	defer pollerLogger.Close()
+
+	// Configure configuration file
+	if *configFile != "" {
+		logger.Infof("Read configuration from %s", *configFile)
+		config.SetConfigFile(configFile)
+	}
 
 	// Open database connection
 	db := database.Open()

@@ -9,15 +9,17 @@ import (
 	"github.com/Zanhos/MaxiMiz/poller/internal/executor"
 )
 
-const prog_ver = "0.2"
+const (
+	prog_ver = "0.2"
+)
 
 func main() {
-	var config = flag.String("config", "config.toml", "Provide the configuration file")
-	var version = flag.Bool("version", false, "Show version")
+	config := flag.String("config", "", "Provide the configuration file")
+	version := flag.Bool("version", false, "Show version")
 	flag.Parse()
 
 	// Show version and exit
-	if *version != false {
+	if *version {
 		fmt.Println("Version:", prog_ver)
 		os.Exit(0)
 	}

@@ -10,8 +10,13 @@ import (
 	"github.com/google/logger"
 )
 
-//TODO this should be passed as an argument
-const configFileLocation = "example_config.toml"
+var (
+	configFileLocation = "poller_config.toml"
+)
+
+func SetConfigFile(file *string) {
+	configFileLocation = *file
+}
 
 func setEnvVar(key string) error {
 	value, err := parseFromConfigFile(key)
@@ -28,7 +33,7 @@ func StringEnv(key string) string {
 	if !ok {
 		err := setEnvVar(key)
 		if err != nil {
-			return ""
+			return "" // TODO: We cannot *just* continue the flow, this is a critical operation. Either return an error or bail
 		}
 		value := StringEnv(key)
 
