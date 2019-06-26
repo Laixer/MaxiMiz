@@ -12,7 +12,7 @@ import (
 )
 
 // Start the poller to get the corresponding data and executes the pending tasks
-func ExecuteTasks(ctx context.Context) {
+func ExecuteTasks(ctx context.Context, configFile *string) {
 	tmpfile, err := ioutil.TempFile("", "poller")
 	if err != nil {
 		logger.Fatalf("Failed to open log file: %v", err)
@@ -23,6 +23,8 @@ func ExecuteTasks(ctx context.Context) {
 	pollerLogger := logger.Init("poller", true, false, tmpfile)
 	logger.Infof("Logging to %s", tmpfile.Name())
 	defer pollerLogger.Close()
+
+	// Open database connection
 	db := database.Open()
 	defer db.Close()
 
