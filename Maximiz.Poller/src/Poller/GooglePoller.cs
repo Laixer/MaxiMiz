@@ -5,7 +5,7 @@ using Google.Ads.GoogleAds.V1.Errors;
 using Google.Ads.GoogleAds.V1.Services;
 using Google.Api.Gax;
 
-namespace poller
+namespace MaxiMiz.Poller.Poller
 {
     internal class GooglePoller
     {

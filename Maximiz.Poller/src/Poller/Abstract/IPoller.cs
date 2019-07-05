@@ -1,4 +1,4 @@
-namespace poller
+namespace MaxiMiz.Poller.Poller.Abstract
 {
 
     internal interface IPoller

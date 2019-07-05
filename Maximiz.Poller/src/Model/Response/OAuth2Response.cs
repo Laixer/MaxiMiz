@@ -1,6 +1,6 @@
 using System.Runtime.Serialization;
 
-namespace model.response
+namespace MaxiMiz.Poller.Model.Response
 {
     [DataContract]
     internal class OAuth2Response

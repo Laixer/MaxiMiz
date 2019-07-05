@@ -1,0 +1,1 @@
+"git update-index --assume-unchanged App.config" was executed to keep file in repo with no tokens but allow developers to add tokens and not check them into git
