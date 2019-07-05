@@ -7,23 +7,22 @@ using System.Collections.Specialized;
 using System.Collections.Generic;
 using System.Web;
 using System.Text;
-using model.response;
+using Model.Response;
 using MaxiMiz.Poller.Poller.Abstract;
 using MaxiMiz.Poller.Model.Config;
 using MaxiMiz.Poller.Helper;
 
 namespace MaxiMiz.Poller.Poller
 {
-    internal class TaboolaPoller : ITaboolaPoller
+    internal class TaboolaPoller : ITaboolaPoller, IDisposable
     {
-        public string ServiceName { get => "Taboola"; }
+        public string ServiceName { get; } = "Taboola";
 
         public HttpClient Client { get; private set; }
 
         private OAuth2Config OAuth2Config { get; }
 
         private readonly NameValueCollection apiConfig = ConfigurationManager.GetSection("TaboolaApi") as NameValueCollection;
-
 
         public TaboolaPoller()
         {
@@ -38,6 +37,7 @@ namespace MaxiMiz.Poller.Poller
             Client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiConfig["OAuth2AccessToken"]);
             Client.DefaultRequestHeaders.Host = new Uri("https://backstage.taboola.com").Host;
         }
+
         public async Task<TopCampaignReport> GetTopCampaignReport()
         {
             var query = HttpUtility.ParseQueryString(string.Empty);
@@ -58,7 +58,6 @@ namespace MaxiMiz.Poller.Poller
 
         }
 
-
         public async Task<string> GetOAuth2Response()
         {
             var query = HttpUtility.ParseQueryString(string.Empty);
@@ -77,5 +76,9 @@ namespace MaxiMiz.Poller.Poller
             }
         }
 
+        public void Dispose()
+        {
+            Client.Dispose();
+        }
     }
 }
