@@ -1,12 +1,11 @@
-﻿
-using System;
+﻿using System;
 using System.Threading.Tasks;
 using MaxiMiz.Poller.Poller;
 using MaxiMiz.Poller.Poller.Abstract;
 
 namespace MaxiMiz.Poller.Main
 {
-    static class Programe
+    static class Program
     {
         internal static async Task Main()
         {
@@ -15,7 +14,6 @@ namespace MaxiMiz.Poller.Main
             var result = await taboolaPoller.GetTopCampaignReport();
             Console.WriteLine();
         }
-
     }
 }
 
