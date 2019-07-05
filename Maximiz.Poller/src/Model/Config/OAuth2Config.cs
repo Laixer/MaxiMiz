@@ -1,5 +1,6 @@
 namespace MaxiMiz.Poller.Model.Config
 {
+    // TODO: All items should be properties
     internal class OAuth2Config
     {
         public OAuth2Config(string OAuth2ClientId, string OAuth2ClientSecret, string OAuth2RefreshToken, string OAuth2AccessToken, string grantType, string username = "", string password = "")
@@ -26,6 +27,5 @@ namespace MaxiMiz.Poller.Model.Config
         internal string username;
 
         internal string password;
-
     }
 }

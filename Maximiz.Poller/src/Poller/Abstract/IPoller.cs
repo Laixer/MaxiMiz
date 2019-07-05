@@ -1,10 +1,6 @@
 namespace MaxiMiz.Poller.Poller.Abstract
 {
-
-    internal interface IPoller
+    public interface IPoller
     {
-        string ServiceName { get; }
     }
 }
-
-

@@ -7,27 +7,28 @@ using System.Collections.Specialized;
 using System.Collections.Generic;
 using System.Web;
 using System.Text;
-using Model.Response;
-using MaxiMiz.Poller.Poller.Abstract;
 using MaxiMiz.Poller.Model.Config;
+using MaxiMiz.Poller.Model.Response;
 using MaxiMiz.Poller.Helper;
 
 namespace MaxiMiz.Poller.Poller
 {
-    internal class TaboolaPoller : ITaboolaPoller, IDisposable
+    internal class TaboolaPoller : PollerBase
     {
-        public string ServiceName { get; } = "Taboola";
-
-        public HttpClient Client { get; private set; }
-
         private OAuth2Config OAuth2Config { get; }
 
         private readonly NameValueCollection apiConfig = ConfigurationManager.GetSection("TaboolaApi") as NameValueCollection;
 
         public TaboolaPoller()
         {
-
-            OAuth2Config = new OAuth2Config(apiConfig["OAuth2ClientId"], apiConfig["OAuth2ClientSecret"], apiConfig["OAuth2RefreshToken"], apiConfig["OAuth2AccessToken"], apiConfig["OAuth2GrantType"], apiConfig["OAuth2Username"], apiConfig["OAuth2Password"]);
+            OAuth2Config = new OAuth2Config(
+                apiConfig["OAuth2ClientId"],
+                apiConfig["OAuth2ClientSecret"],
+                apiConfig["OAuth2RefreshToken"],
+                apiConfig["OAuth2AccessToken"],
+                apiConfig["OAuth2GrantType"],
+                apiConfig["OAuth2Username"],
+                apiConfig["OAuth2Password"]);
 
             Client = new HttpClient
             {
@@ -38,7 +39,7 @@ namespace MaxiMiz.Poller.Poller
             Client.DefaultRequestHeaders.Host = new Uri("https://backstage.taboola.com").Host;
         }
 
-        public async Task<TopCampaignReport> GetTopCampaignReport()
+        public async override Task<TopCampaignReport> GetTopCampaignReportAsync()
         {
             var query = HttpUtility.ParseQueryString(string.Empty);
             query["start_date"] = "2019-06-20";
@@ -53,12 +54,11 @@ namespace MaxiMiz.Poller.Poller
             })
             using (var res = await Client.SendAsync(request))
             {
-                return await Json.Deserialize<TopCampaignReport>(res);
+                return await Json.DeserializeAsync<TopCampaignReport>(res);
             }
-
         }
 
-        public async Task<string> GetOAuth2Response()
+        public async override Task<string> GetOAuth2ResponseAsync()
         {
             var query = HttpUtility.ParseQueryString(string.Empty);
             query["client_id"] = OAuth2Config.OAuth2ClientId;
@@ -70,15 +70,10 @@ namespace MaxiMiz.Poller.Poller
             var urlString = $"oauth/token?{query.ToString()}";
 
             using (var content = new FormUrlEncodedContent(new Dictionary<string, string>()))
-            using (HttpResponseMessage res = await Client.PostAsync(urlString, content))
+            using (var res = await Client.PostAsync(urlString, content))
             {
                 return await res.Content.ReadAsStringAsync();
             }
-        }
-
-        public void Dispose()
-        {
-            Client.Dispose();
         }
     }
 }

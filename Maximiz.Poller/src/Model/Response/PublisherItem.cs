@@ -1,12 +1,11 @@
 using System;
 using System.Runtime.Serialization;
 
-namespace model.response
+namespace MaxiMiz.Poller.Model.Response
 {
     [DataContract]
     internal class PublisherItem
     {
-
         [DataMember(Name = "id")]
         internal readonly Guid id;
 
@@ -27,8 +26,5 @@ namespace model.response
 
         [DataMember(Name = "actions")]
         internal ulong actions;
-
-
-        
     }
 }

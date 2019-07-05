@@ -1,10 +1,10 @@
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 
-namespace model.response
+namespace MaxiMiz.Poller.Model.Response
 {
     [DataContract]
-    internal class TopCampaignReport
+    public class TopCampaignReport
     {
         [DataMember(Name = "last-used-rawdata-update-time-gmt-millisec")]
         internal readonly ulong lastUpdateTimeEpochGmtInMillis;

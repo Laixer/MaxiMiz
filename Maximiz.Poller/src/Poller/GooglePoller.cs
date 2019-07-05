@@ -4,18 +4,14 @@ using Google.Ads.GoogleAds.Lib;
 using Google.Ads.GoogleAds.V1.Errors;
 using Google.Ads.GoogleAds.V1.Services;
 using Google.Api.Gax;
+using MaxiMiz.Poller.Poller.Abstract;
 
 namespace MaxiMiz.Poller.Poller
 {
-    internal class GooglePoller
+    internal class GooglePoller : IPoller
     {
-        private const string ServiceName = "Google";
-        public GooglePoller() { }
-
-
         public void RunExample()
         {
-            Console.WriteLine(GetServiceName());
             long customerId = -1L;
 
             Run(new GoogleAdsClient(), customerId);
@@ -74,11 +70,6 @@ namespace MaxiMiz.Poller.Poller
                 Console.WriteLine($"Failure: {e.Failure}");
                 Console.WriteLine($"Request ID: {e.RequestId}");
             }
-        }
-
-        public string GetServiceName()
-        {
-            return ServiceName;
         }
     }
 }
