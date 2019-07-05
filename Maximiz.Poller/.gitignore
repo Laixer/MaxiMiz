@@ -38,4 +38,3 @@ msbuild.wrn
 requirements_for_laixer.md
 *.ignore
 mock.json
-App.config
