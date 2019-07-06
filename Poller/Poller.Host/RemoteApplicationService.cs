@@ -42,7 +42,14 @@ namespace Poller.Host
 
                 foreach (var remotePublishers in _remotePublishers)
                 {
-                    await remotePublishers.GetTopCampaignReportAsync();
+                    try
+                    {
+                        await remotePublishers.GetTopCampaignReportAsync();
+                    }
+                    catch (Exception e) when (e as OperationCanceledException == null)
+                    {
+                        Logger.LogCritical(e.Message);
+                    }
                 }
 
                 Logger.LogDebug($"Sleeping for {serviceInterval}");
