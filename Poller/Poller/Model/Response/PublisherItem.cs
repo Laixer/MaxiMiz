@@ -19,7 +19,7 @@ namespace MaxiMiz.Poller.Model.Response
         internal readonly ulong impressions;
 
         [DataMember(Name = "spent")]
-        internal readonly double spent;
+        internal readonly decimal spent;
 
         [DataMember(Name = "currency")]
         internal readonly string currency;
