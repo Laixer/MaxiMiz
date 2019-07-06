@@ -12,6 +12,13 @@ namespace MaxiMiz.Poller.Model.Response
         [DataMember(Name = "publisher_item_id")]
         public long PublisherItemId { get; set; }
 
+        [DataMember(Name = "campaign")]
+        public long Campaign { get; set; }
+
+        public string ContentUrl { get; set; }
+
+        public string Url { get; set; }
+
         [DataMember(Name = "clicks")]
         public long Clicks { get; set; }
 
