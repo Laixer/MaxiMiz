@@ -1,14 +1,16 @@
 using System;
+using System.Threading.Tasks;
 using Google.Ads.GoogleAds;
 using Google.Ads.GoogleAds.Lib;
 using Google.Ads.GoogleAds.V1.Errors;
 using Google.Ads.GoogleAds.V1.Services;
 using Google.Api.Gax;
-using MaxiMiz.Poller.Poller.Abstract;
+using MaxiMiz.Poller.Model.Response;
+using Poller.Publisher;
 
-namespace MaxiMiz.Poller.Poller
+namespace Poller.GoogleAds
 {
-    internal class GooglePoller : IPoller
+    public class GooglePoller : IRemotePublisher
     {
         public void RunExample()
         {
@@ -25,8 +27,7 @@ namespace MaxiMiz.Poller.Poller
         public void Run(GoogleAdsClient client, long customerId)
         {
             // Get the GoogleAdsService.
-            GoogleAdsServiceClient googleAdsService = client.GetService(
-                Services.V1.GoogleAdsService);
+            GoogleAdsServiceClient googleAdsService = client.GetService(Services.V1.GoogleAdsService);
 
             SearchGoogleAdsRequest request = new SearchGoogleAdsRequest()
             {
@@ -70,6 +71,11 @@ namespace MaxiMiz.Poller.Poller
                 Console.WriteLine($"Failure: {e.Failure}");
                 Console.WriteLine($"Request ID: {e.RequestId}");
             }
+        }
+
+        public Task<TopCampaignReport> GetTopCampaignReportAsync()
+        {
+            return Task.FromResult<TopCampaignReport>(null);
         }
     }
 }

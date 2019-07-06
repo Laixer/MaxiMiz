@@ -3,11 +3,11 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 
-namespace MaxiMiz.Poller.Helper
+namespace Poller.Helper
 {
-    static internal class Json
+    public static class Json
     {
-        internal static T Deserialize<T>(Stream stream)
+        public static T Deserialize<T>(Stream stream)
             where T : class
         {
             using (var streamReader = new StreamReader(stream))
@@ -17,7 +17,7 @@ namespace MaxiMiz.Poller.Helper
             }
         }
 
-        internal static async Task<T> DeserializeAsync<T>(HttpResponseMessage message)
+        public static async Task<T> DeserializeAsync<T>(HttpResponseMessage message)
             where T : class
         {
             using (var stream = await message.Content.ReadAsStreamAsync())
