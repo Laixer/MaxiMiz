@@ -34,6 +34,7 @@ namespace Poller.Host
                 })
                 .ConfigureLogging((hostContext, configLogging) =>
                 {
+                    configLogging.AddConfiguration(hostContext.Configuration.GetSection("Logging"));
                     configLogging.AddConsole();
                 })
                 .UseConsoleLifetime()
