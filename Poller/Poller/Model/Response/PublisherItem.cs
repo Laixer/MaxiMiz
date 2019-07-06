@@ -4,27 +4,27 @@ using System.Runtime.Serialization;
 namespace MaxiMiz.Poller.Model.Response
 {
     [DataContract]
-    internal class PublisherItem
+    public class PublisherItem
     {
         [DataMember(Name = "id")]
-        internal readonly Guid id;
+        public Guid Id { get; set; }
 
         [DataMember(Name = "publisher_item_id")]
-        internal readonly ulong publisherItemId;
+        public long PublisherItemId { get; set; }
 
         [DataMember(Name = "clicks")]
-        internal readonly ulong clicks;
+        public long Clicks { get; set; }
 
         [DataMember(Name = "impressions")]
-        internal readonly ulong impressions;
+        public long Impressions { get; set; }
 
         [DataMember(Name = "spent")]
-        internal readonly decimal spent;
+        public decimal Spent { get; set; }
 
         [DataMember(Name = "currency")]
-        internal readonly string currency;
+        public string Currency { get; set; }
 
         [DataMember(Name = "actions")]
-        internal ulong actions;
+        public long Actions { get; set; }
     }
 }
