@@ -18,12 +18,12 @@ namespace Poller.Host
         static async Task Main(string[] args)
         {
             var host = new HostBuilder()
-                .ConfigureAppConfiguration((hostContext, configApp) =>
+                .ConfigureHostConfiguration(configHost =>
                 {
-                    configApp.SetBasePath(Directory.GetCurrentDirectory());
-                    configApp.AddJsonFile("appsettings.json", optional: true);
-                    configApp.AddEnvironmentVariables(prefix: "POLLER_");
-                    configApp.AddCommandLine(args);
+                    configHost.SetBasePath(Directory.GetCurrentDirectory());
+                    configHost.AddJsonFile("appsettings2.json", optional: true);
+                    configHost.AddEnvironmentVariables(prefix: "POLLER_");
+                    configHost.AddCommandLine(args);
                 })
                 .ConfigureServices((hostContext, services) =>
                 {
