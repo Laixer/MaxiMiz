@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -40,21 +41,34 @@ namespace Poller.Host
             {
                 Logger.LogInformation("Running publishers.");
 
+                int index = 0;
+                var taskCollection = new Task[_remotePublishers.Count()];
                 foreach (var remotePublishers in _remotePublishers)
                 {
-                    try
-                    {
-                        await remotePublishers.GetTopCampaignReportAsync();
-                    }
-                    catch (Exception e) when (e as OperationCanceledException == null)
-                    {
-                        Logger.LogCritical(e.Message);
-                    }
+                    taskCollection[index++] = ExecutePublisher(remotePublishers, cancellationToken);
                 }
+
+                await Task.WhenAll(taskCollection).ConfigureAwait(false);
 
                 Logger.LogDebug($"Sleeping for {serviceInterval}");
 
                 await Task.Delay(serviceInterval, cancellationToken);
+            }
+        }
+
+        private async Task ExecutePublisher(IRemotePublisher publisher, CancellationToken cancellationToken)
+        {
+            if (cancellationToken.IsCancellationRequested) { return; }
+
+            await Task.Yield();
+
+            try
+            {
+                await publisher.GetTopCampaignReportAsync();
+            }
+            catch (Exception e) when (e as OperationCanceledException == null)
+            {
+                Logger.LogCritical(e.Message);
             }
         }
 
