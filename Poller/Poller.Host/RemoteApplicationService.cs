@@ -92,11 +92,16 @@ namespace Poller.Host
 
             try
             {
+                Logger.LogDebug($"Start {publisher.GetType().FullName}.");
                 await publisher.GetTopCampaignReportAsync();
             }
             catch (Exception e) when (e as OperationCanceledException == null)
             {
-                Logger.LogCritical(e.Message);
+                Logger.LogError(e.Message);
+            }
+            finally
+            {
+                Logger.LogDebug($"Finish {publisher.GetType().FullName}.");
             }
         }
 

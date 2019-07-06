@@ -1,4 +1,5 @@
 using System;
+using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
@@ -14,22 +15,18 @@ using Poller.Publisher;
 using Poller.Helper;
 using System.Data.Common;
 using Dapper;
-using System.Net;
 
 namespace Poller.Taboola
 {
     [Publisher("Taboola")]
     public class TaboolaPoller : RemotePublisher, IDisposable
     {
-        const string TokenType = "Bearer";
+        private static readonly string TokenType = "Bearer";
 
         private HttpClient client;
-
-        private readonly TaboolaPollerOptions options;
-
-        private readonly DbConnection connection;
-
         private OAuth2Response OAuth2Session;
+        private readonly DbConnection connection;
+        private readonly TaboolaPollerOptions options;
 
         /// <summary>
         /// Creates a TaboolaPoller for fetching Data from Taboola.
@@ -48,11 +45,10 @@ namespace Poller.Taboola
         {
             get
             {
-                //TODO implement his logic
+                // TODO: Implement logic
                 return false;
             }
         }
-
 
         private HttpClient BuildHttpClient(bool newInstance = false)
         {
@@ -72,7 +68,7 @@ namespace Poller.Taboola
 
         private Task RefreshAccessToken()
         {
-            //TODO Implement this as per the manual from backstage
+            // TODO: Implement this as per the manual from backstage
             throw new NotImplementedException();
         }
 
@@ -97,11 +93,13 @@ namespace Poller.Taboola
                 try
                 {
                     await connection.OpenAsync();
-                    await connection.ExecuteAsync(@"INSERT INTO public.item(ad_group, campaign, clicks, impressions, spent, currency, publisher_id, content_url, url)
-                VALUES (1, @Campaign, @Clicks, @Impressions, @Spent, @Currency, @PublisherItemId, @ContentUrl, @Url)", result.Items);
+                    await connection.ExecuteAsync(
+                        @"INSERT INTO public.item(ad_group, campaign, clicks, impressions, spent, currency, publisher_id, content_url, url)
+                          VALUES (1, @Campaign, @Clicks, @Impressions, @Spent, @Currency, @PublisherItemId, @ContentUrl, @Url)", result.Items);
                 }
                 finally
                 {
+                    // TODO: This should not be required
                     connection.Close();
                 }
             }
@@ -130,18 +128,16 @@ namespace Poller.Taboola
 
         private async Task<HttpResponseMessage> SendAsync(HttpRequestMessage message)
         {
-            var res = await BuildHttpClient().SendAsync(message);
+            try
             {
-                try
-                {
-                    res.EnsureSuccessStatusCode();
-                    return res;
-                }
-                catch (HttpRequestException hre)
-                {
-                    Logger.LogError($"{message.Method} request to {message.RequestUri} had non {HttpStatusCode.OK} status code.{Environment.NewLine}{hre.StackTrace}");
-                    throw hre;
-                }
+                var response = await BuildHttpClient().SendAsync(message);
+                response.EnsureSuccessStatusCode();
+                return response;
+            }
+            catch (HttpRequestException hre)
+            {
+                Logger.LogError($"{message.Method} request to {message.RequestUri} had non {HttpStatusCode.OK} status code.{Environment.NewLine}{hre.StackTrace}");
+                throw hre;
             }
         }
 
@@ -155,6 +151,7 @@ namespace Poller.Taboola
             {
                 await RefreshAccessToken();
             }
+
             message.Headers.Authorization = new AuthenticationHeaderValue(TokenType, OAuth2Session.AccessToken);
 
             return await SendAsync(message);
