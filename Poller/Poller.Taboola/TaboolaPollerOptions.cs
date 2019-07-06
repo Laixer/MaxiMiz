@@ -1,22 +1,22 @@
-﻿namespace Poller.Taboola
+﻿using Poller.Model;
+
+namespace Poller.Taboola
 {
-    public class OAuth2
-    {
-        public string ClientId { get; set; }
-
-        public string ClientSecret { get; set; }
-
-        public string Username { get; set; }
-
-        public string Password { get; set; }
-    }
-
     public class TaboolaPollerOptions
     {
+        /// <summary>
+        /// API domain.
+        /// </summary>
         public string BaseUrl { get; set; }
 
+        /// <summary>
+        /// Account identifier.
+        /// </summary>
         public string AccountId { get; set; }
 
+        /// <summary>
+        /// Authentication settings.
+        /// </summary>
         public OAuth2 OAuth2 { get; set; }
     }
 }
