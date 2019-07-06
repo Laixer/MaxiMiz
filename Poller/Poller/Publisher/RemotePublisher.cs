@@ -8,12 +8,10 @@ namespace Poller.Publisher
     public abstract class RemotePublisher : IRemotePublisher
     {
         public ILogger Logger { get; }
-        public IConfiguration Configuration { get; }
 
-        public RemotePublisher(ILogger<RemotePublisher> logger, IConfiguration configuration)
+        public RemotePublisher(ILogger<RemotePublisher> logger)
         {
             Logger = logger;
-            Configuration = configuration;
         }
 
         public abstract Task<TopCampaignReport> GetTopCampaignReportAsync();

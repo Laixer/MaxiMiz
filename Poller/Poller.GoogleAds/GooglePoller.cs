@@ -10,6 +10,7 @@ using Poller.Publisher;
 
 namespace Poller.GoogleAds
 {
+    [Publisher("GoogleAds")]
     public class GooglePoller : IRemotePublisher
     {
         public void RunExample()
