@@ -28,7 +28,7 @@ namespace Poller.Host
                 .ConfigureServices((hostContext, services) =>
                 {
                     services.AddRemotePublisher<GooglePoller>();
-                    services.AddRemotePublisher<TaboolaPoller>();
+                    services.AddRemotePublisher<TaboolaPoller, TaboolaPollerOptions>();
                     services.AddHostedService<RemoteApplicationService>();
                 })
                 .ConfigureLogging((hostContext, configLogging) =>
