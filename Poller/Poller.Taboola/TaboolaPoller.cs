@@ -83,13 +83,13 @@ namespace Poller.Taboola
             query["end_date"] = "2019-07-06";
 
             string urlString = $"api/1.0/{options.AccountId}/reports/top-campaign-content/dimensions/item_breakdown?{query.ToString()}";
-            using (var req = new HttpRequestMessage(HttpMethod.Get, urlString)
+            using (var httpRequest = new HttpRequestMessage(HttpMethod.Get, urlString)
             {
                 Content = new StringContent("", Encoding.UTF8, "application/json")
             })
-            using (HttpResponseMessage res = await SendWithAuthAsync(req))
+            using (HttpResponseMessage httpResult = await SendWithAuthAsync(httpRequest))
             {
-                var result = await Json.DeserializeAsync<TopCampaignReport>(res);
+                var result = await Json.DeserializeAsync<TopCampaignReport>(httpResult);
                 try
                 {
                     await connection.OpenAsync();
@@ -134,10 +134,10 @@ namespace Poller.Taboola
                 response.EnsureSuccessStatusCode();
                 return response;
             }
-            catch (HttpRequestException hre)
+            catch (HttpRequestException e)
             {
-                Logger.LogError($"{message.Method} request to {message.RequestUri} had non {HttpStatusCode.OK} status code.{Environment.NewLine}{hre.StackTrace}");
-                throw hre;
+                Logger.LogError($"{message.Method} request to {message.RequestUri} had non {HttpStatusCode.OK} status code.{Environment.NewLine}{e.StackTrace}");
+                throw e;
             }
         }
 
