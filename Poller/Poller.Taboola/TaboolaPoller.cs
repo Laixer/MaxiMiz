@@ -12,25 +12,51 @@ using MaxiMiz.Poller.Model.Response;
 
 using Poller.Publisher;
 using Poller.Helper;
+using System.Data.Common;
+using Dapper;
+using System.Net;
 
 namespace Poller.Taboola
 {
     [Publisher("Taboola")]
     public class TaboolaPoller : RemotePublisher, IDisposable
     {
+        const string TokenType = "Bearer";
+
         private HttpClient client;
 
         private readonly TaboolaPollerOptions options;
 
-        public TaboolaPoller(ILogger<TaboolaPoller> logger, IOptions<TaboolaPollerOptions> options)
+        private readonly DbConnection connection;
+
+        private OAuth2Response OAuth2Session;
+
+        /// <summary>
+        /// Creates a TaboolaPoller for fetching Data from Taboola.
+        /// </summary>
+        /// <param name="logger">A logger for this poller.</typeparam>
+        /// <param name="options">An instance of options required for requests.</param>
+        /// <param name="connection">The database connections to use for inserting fetched data.</param>
+        public TaboolaPoller(ILogger<TaboolaPoller> logger, IOptions<TaboolaPollerOptions> options, DbConnection connection)
             : base(logger)
         {
             this.options = options?.Value;
+            this.connection = connection;
         }
 
-        private HttpClient BuildHttpClient(bool newInstane = false)
+        private bool IsTokenExpired
         {
-            if (client != null && !newInstane)
+            get
+            {
+                //TODO implement his logic
+                return false;
+            }
+        }
+
+
+        private HttpClient BuildHttpClient(bool newInstance = false)
+        {
+            if (client != null && !newInstance)
             {
                 return client;
             }
@@ -40,48 +66,98 @@ namespace Poller.Taboola
                 BaseAddress = new Uri(options.BaseUrl),
             };
 
-            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", "sometoken"); // TODO: set access token
-            client.DefaultRequestHeaders.Host = new Uri("https://backstage.taboola.com").Host;
-
+            client.DefaultRequestHeaders.Host = new Uri(options.BaseUrl).Host;
             return client;
         }
 
+        private Task RefreshAccessToken()
+        {
+            //TODO Implement this as per the manual from backstage
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Gets the Top Campaign Reports for a specific date as specified
+        /// in the Backstage documentation, deserializes them and  inserts them into the database
+        /// </summary>
         public async override Task<TopCampaignReport> GetTopCampaignReportAsync()
         {
-            Logger.LogInformation("Hi there");
-
             var query = HttpUtility.ParseQueryString(string.Empty);
-            query["start_date"] = "2019-06-20";
-            query["end_date"] = "2019-06-20";
+            query["start_date"] = "2019-07-06";
+            query["end_date"] = "2019-07-06";
 
             string urlString = $"api/1.0/{options.AccountId}/reports/top-campaign-content/dimensions/item_breakdown?{query.ToString()}";
-
-            using (var request = new HttpRequestMessage(HttpMethod.Get, urlString)
+            using (var req = new HttpRequestMessage(HttpMethod.Get, urlString)
             {
                 Content = new StringContent("", Encoding.UTF8, "application/json")
             })
-            using (var res = await BuildHttpClient().SendAsync(request))
+            using (HttpResponseMessage res = await SendWithAuthAsync(req))
             {
-                return await Json.DeserializeAsync<TopCampaignReport>(res);
+                var result = await Json.DeserializeAsync<TopCampaignReport>(res);
+                try
+                {
+                    await connection.OpenAsync();
+                    await connection.ExecuteAsync(@"INSERT INTO public.item(ad_group, campaign, clicks, impressions, spent, currency, publisher_id, content_url, url)
+                VALUES (1, @Campaign, @Clicks, @Impressions, @Spent, @Currency, @PublisherItemId, @ContentUrl, @Url)", result.Items);
+                }
+                finally
+                {
+                    connection.Close();
+                }
             }
+            return null;
         }
 
-        public async Task<string> GetOAuth2ResponseAsync()
+        private async Task AuthenticateWithPasswordAsync()
         {
             var query = HttpUtility.ParseQueryString(string.Empty);
             query["client_id"] = options.OAuth2.ClientId;
             query["client_secret"] = options.OAuth2.ClientSecret;
             query["username"] = options.OAuth2.Username;
             query["password"] = options.OAuth2.Password;
-            query["grant_type"] = ""; // TODO: Set some grand type
-
+            query["grant_type"] = options.OAuth2.GrantType;
             var urlString = $"oauth/token?{query.ToString()}";
 
-            using (var content = new FormUrlEncodedContent(new Dictionary<string, string>()))
-            using (var res = await BuildHttpClient().PostAsync(urlString, content))
+            using (var req = new HttpRequestMessage(HttpMethod.Post, urlString)
             {
-                return await res.Content.ReadAsStringAsync();
+                Content = new FormUrlEncodedContent(new Dictionary<string, string>())
+            })
+            using (var res = await SendAsync(req))
+            {
+                OAuth2Session = await Json.DeserializeAsync<OAuth2Response>(res);
             }
+        }
+
+        private async Task<HttpResponseMessage> SendAsync(HttpRequestMessage message)
+        {
+            var res = await BuildHttpClient().SendAsync(message);
+            {
+                try
+                {
+                    res.EnsureSuccessStatusCode();
+                    return res;
+                }
+                catch (HttpRequestException hre)
+                {
+                    Logger.LogError($"{message.Method} request to {message.RequestUri} had non {HttpStatusCode.OK} status code.{Environment.NewLine}{hre.StackTrace}");
+                    throw hre;
+                }
+            }
+        }
+
+        private async Task<HttpResponseMessage> SendWithAuthAsync(HttpRequestMessage message)
+        {
+            if (OAuth2Session == null)
+            {
+                await AuthenticateWithPasswordAsync();
+            }
+            else if (IsTokenExpired)
+            {
+                await RefreshAccessToken();
+            }
+            message.Headers.Authorization = new AuthenticationHeaderValue(TokenType, OAuth2Session.AccessToken);
+
+            return await SendAsync(message);
         }
 
         #region IDisposable Support

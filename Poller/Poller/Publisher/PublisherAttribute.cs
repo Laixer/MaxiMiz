@@ -8,6 +8,9 @@ namespace Poller.Publisher
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = false)]
     public sealed class PublisherAttribute : Attribute
     {
+        /// <summary>
+        /// The name of a publisher.
+        /// </summary>
         public string Name { get; set; }
 
         public PublisherAttribute(string name)

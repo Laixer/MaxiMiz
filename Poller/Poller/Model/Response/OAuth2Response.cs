@@ -3,26 +3,30 @@ using System.Runtime.Serialization;
 namespace MaxiMiz.Poller.Model.Response
 {
     [DataContract]
-    internal class OAuth2Response
+    public class OAuth2Response
     {
-        public OAuth2Response(string accessToken, string tokenType, string refreshToken, int expiresIn)
-        {
-            this.accessToken = accessToken;
-            this.tokenType = tokenType;
-            this.refreshToken = refreshToken;
-            this.expiresIn = expiresIn;
-        }
-
+        /// <summary>
+        /// The acces token used for requests.
+        /// </summary>
         [DataMember(Name = "access_token")]
-        internal readonly string accessToken;
-        
+        public string AccessToken { get; set; }
+
+        /// <summary>
+        /// The token type e.g. bearer
+        /// </summary>
         [DataMember(Name = "token_type")]
-        internal readonly string tokenType;
+        public string TokenType { get; set; }
 
+        /// <summary>
+        /// The token used for refreshing the access token
+        /// </summary>
         [DataMember(Name = "refresh_token")]
-        internal readonly string refreshToken;
+        public string RefreshToken { get; set; }
 
+        /// <summary>
+        /// Amount of time in millis from which the token was issued until it expires
+        /// </summary>
         [DataMember(Name = "expires_in")]
-        internal readonly int expiresIn;
+        public int ExpiresIn { get; set; }
     }
 }

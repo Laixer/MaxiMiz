@@ -6,10 +6,16 @@ namespace MaxiMiz.Poller.Model.Response
     [DataContract]
     public class TopCampaignReport
     {
+        /// <summary>
+        /// Epoch timestamp in milliseconds for when this data was last updated
+        /// </summary>
         [DataMember(Name = "last-used-rawdata-update-time-gmt-millisec")]
-        internal readonly ulong lastUpdateTimeEpochGmtInMillis;
+        public ulong LastUpdateTimeEpochGmtInMillis { get; set; }
 
+        /// <summary>
+        /// The items in this result.
+        /// </summary>
         [DataMember(Name = "results")]
-        internal readonly List<PublisherItem> items;
+        public IEnumerable<PublisherItem> Items { get; set; }
     }
 }
