@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Web;
 using System.Text;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Configuration;
 
 using MaxiMiz.Poller.Model.Response;
@@ -18,8 +19,8 @@ namespace Poller.Taboola
     {
         private HttpClient client;
 
-        public TaboolaPoller(IConfiguration configuration)
-            : base(configuration)
+        public TaboolaPoller(ILogger<TaboolaPoller> logger, IConfiguration configuration)
+            : base(logger, configuration)
         { }
 
         private HttpClient BuildHttpClient(bool newInstane = false)
