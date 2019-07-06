@@ -12,10 +12,10 @@ namespace Poller.Host
 {
     internal class RemoteApplicationService : IHostedService, IDisposable
     {
-        private readonly static TimeSpan publisherWaitInterval = TimeSpan.FromMinutes(1);
-        private readonly static double refreshInterval = 10 * 1000;
+        private readonly static double refreshInterval = 60 * 1000;
         private ICollection<IRemotePublisher> _remotePublishers;
         private System.Timers.Timer _timer;
+        private object executionLock = new object();
 
         public ILogger Logger { get; }
         public IServiceProvider Services { get; }
@@ -43,8 +43,7 @@ namespace Poller.Host
             _remotePublishers = Services.GetService<IEnumerable<IRemotePublisher>>().ToArray();
             if (_remotePublishers.Count() > 0)
             {
-                _timer.Elapsed += async (s, e) => await RunAllPublishers(cancellationToken);
-                _timer.AutoReset = false;
+                _timer.Elapsed += (s, e) => RunAllPublishers(cancellationToken);
                 _timer.Start();
             }
 
@@ -55,32 +54,34 @@ namespace Poller.Host
         /// Run all publishers.
         /// </summary>
         /// <remarks>
-        /// Only one session will run at all time. The autoreset functions as a
-        /// locking object.
+        /// Only one session will run at all time. All following threads will skip
+        /// execution if the lock is hold.
         /// </remarks>
         /// <param name="cancellationToken">Cancellation token.</param>
-        private async Task RunAllPublishers(CancellationToken cancellationToken)
+        private void RunAllPublishers(CancellationToken cancellationToken)
         {
-            _timer.AutoReset = false;
-
             if (cancellationToken.IsCancellationRequested) { return; }
 
-            Logger.LogInformation("Running publishers.");
-
-            int index = 0;
-            var taskCollection = new Task[_remotePublishers.Count()];
-            foreach (var remotePublishers in _remotePublishers)
+            if (Monitor.TryEnter(executionLock))
             {
-                taskCollection[index++] = ExecutePublisher(remotePublishers, cancellationToken);
+                try
+                {
+                    Logger.LogInformation("Running publishers.");
+
+                    int index = 0;
+                    var taskCollection = new Task[_remotePublishers.Count()];
+                    foreach (var remotePublishers in _remotePublishers)
+                    {
+                        taskCollection[index++] = ExecutePublisher(remotePublishers, cancellationToken);
+                    }
+
+                    Task.WhenAll(taskCollection).Wait(cancellationToken);
+                }
+                finally
+                {
+                    Monitor.Exit(executionLock);
+                }
             }
-
-            await Task.WhenAll(taskCollection).ConfigureAwait(false);
-
-            Logger.LogDebug($"Sleeping for {publisherWaitInterval}");
-
-            await Task.Delay(publisherWaitInterval, cancellationToken);
-
-            _timer.AutoReset = true;
         }
 
         private async Task ExecutePublisher(IRemotePublisher publisher, CancellationToken cancellationToken)
