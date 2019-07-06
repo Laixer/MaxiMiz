@@ -12,7 +12,7 @@ namespace Poller.Host
 {
     internal class RemoteApplicationService : IHostedService, IDisposable
     {
-        private readonly static double refreshInterval = 60 * 1000;
+        private readonly static double refreshInterval = 2 * 60 * 1000;
         private ICollection<IRemotePublisher> _remotePublishers;
         private System.Timers.Timer _timer;
         private object executionLock = new object();
@@ -29,7 +29,7 @@ namespace Poller.Host
             Logger = logger ?? throw new ArgumentNullException(nameof(logger));
             Services = services ?? throw new ArgumentNullException(nameof(services));
 
-            _timer = new System.Timers.Timer(refreshInterval);
+            _timer = new System.Timers.Timer(5 * 1000);
         }
 
         /// <summary>
@@ -79,6 +79,7 @@ namespace Poller.Host
                 }
                 finally
                 {
+                    _timer.Interval = refreshInterval;
                     Monitor.Exit(executionLock);
                 }
             }

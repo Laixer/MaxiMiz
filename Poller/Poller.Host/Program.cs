@@ -1,4 +1,4 @@
-﻿using System.IO;
+using System.IO;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -21,7 +21,7 @@ namespace Poller.Host
                 .ConfigureHostConfiguration(configHost =>
                 {
                     configHost.SetBasePath(Directory.GetCurrentDirectory());
-                    configHost.AddJsonFile("appsettings2.json", optional: true);
+                    configHost.AddJsonFile("appsettings.json", optional: true);
                     configHost.AddEnvironmentVariables(prefix: "POLLER_");
                     configHost.AddCommandLine(args);
                 })
