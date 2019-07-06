@@ -21,5 +21,10 @@
         /// Authentication password.
         /// </summary>
         public string Password { get; set; }
+
+        /// <summary>
+        /// Grant type.
+        /// </summary>
+        public string GrantType { get; set; }
     }
 }
