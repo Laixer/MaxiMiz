@@ -5,7 +5,7 @@ using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Web;
-using System.Text;
+using System.Linq;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Logging;
 
@@ -23,7 +23,7 @@ namespace Poller.Taboola
     {
         private static readonly string TokenType = "Bearer";
 
-        private HttpClient client;
+        private static OAuthHttpClient _client;
         private OAuth2Response OAuth2Session;
         private readonly DbConnection connection;
         private readonly TaboolaPollerOptions options;
@@ -50,26 +50,22 @@ namespace Poller.Taboola
             }
         }
 
-        private HttpClient BuildHttpClient(bool newInstance = false)
+        /// <summary>
+        /// Create or reuse an OAuthHttpClient.
+        /// </summary>
+        private OAuthHttpClient BuildHttpClient(bool newInstance = false)
         {
-            if (client != null && !newInstance)
+            if (_client != null && !newInstance)
             {
-                return client;
+                return _client;
             }
 
-            client = new HttpClient
+            return _client = new OAuthHttpClient
             {
                 BaseAddress = new Uri(options.BaseUrl),
+                TokenUri = "oauth/token",
+                RefreshUri = "oauth/refresh",
             };
-
-            client.DefaultRequestHeaders.Host = new Uri(options.BaseUrl).Host;
-            return client;
-        }
-
-        private Task RefreshAccessToken()
-        {
-            // TODO: Implement this as per the manual from backstage
-            throw new NotImplementedException();
         }
 
         /// <summary>
@@ -78,51 +74,60 @@ namespace Poller.Taboola
         /// </summary>
         public async override Task<TopCampaignReport> GetTopCampaignReportAsync()
         {
+            await GetCampaign();
+            
             var query = HttpUtility.ParseQueryString(string.Empty);
-            query["start_date"] = "2019-07-06";
-            query["end_date"] = "2019-07-06";
+            query["start_date"] = DateTime.Now.ToString("yyyy-MM-dd");
+            query["end_date"] = DateTime.Now.ToString("yyyy-MM-dd");
 
-            string urlString = $"api/1.0/{options.AccountId}/reports/top-campaign-content/dimensions/item_breakdown?{query.ToString()}";
-            using (var httpRequest = new HttpRequestMessage(HttpMethod.Get, urlString)
+            var url = $"api/1.0/{options.AccountId}/reports/top-campaign-content/dimensions/item_breakdown?{query}";
+
+            var result = await RemoteQueryAsync<TopCampaignReport>(HttpMethod.Get, url);
+            if (result.Items.Count() <= 0)
             {
-                Content = new StringContent("", Encoding.UTF8, "application/json")
-            })
-            using (HttpResponseMessage httpResult = await SendWithAuthAsync(httpRequest))
-            {
-                var result = await Json.DeserializeAsync<TopCampaignReport>(httpResult);
-                try
-                {
-                    await connection.OpenAsync();
-                    await connection.ExecuteAsync(
-                        @"INSERT INTO public.item(ad_group, campaign, clicks, impressions, spent, currency, publisher_id, content_url, url)
-                          VALUES (1, @Campaign, @Clicks, @Impressions, @Spent, @Currency, @PublisherItemId, @ContentUrl, @Url)", result.Items);
-                }
-                finally
-                {
-                    // TODO: This should not be required
-                    connection.Close();
-                }
+                return null;
             }
+
+            try
+            {
+                await connection.OpenAsync();
+                await connection.ExecuteAsync(
+                    @"INSERT INTO public.item(ad_group, campaign, clicks, impressions, spent, currency, publisher_id, content_url, url)
+                          VALUES (1, @Campaign, @Clicks, @Impressions, @Spent, @Currency, @PublisherItemId, @ContentUrl, @Url)", result.Items);
+            }
+            finally
+            {
+                // TODO: This should not be required
+                connection.Close();
+            }
+
             return null;
         }
 
-        private async Task AuthenticateWithPasswordAsync()
+        public async Task GetCampaign()
         {
-            var query = HttpUtility.ParseQueryString(string.Empty);
-            query["client_id"] = options.OAuth2.ClientId;
-            query["client_secret"] = options.OAuth2.ClientSecret;
-            query["username"] = options.OAuth2.Username;
-            query["password"] = options.OAuth2.Password;
-            query["grant_type"] = options.OAuth2.GrantType;
-            var urlString = $"oauth/token?{query.ToString()}";
+            // var campaign = "2404044";
+            var url = $"api/1.0/{options.AccountId}/campaigns";
 
-            using (var req = new HttpRequestMessage(HttpMethod.Post, urlString)
+            var result = await RemoteQueryAsync<TopCampaignReport>(HttpMethod.Get, url);
+        }
+
+        private async Task<OAuth2Response> AuthenticateWithPasswordAsync()
+        {
+            using (var httpRequest = new HttpRequestMessage(HttpMethod.Post, "oauth/token")
             {
-                Content = new FormUrlEncodedContent(new Dictionary<string, string>())
+                Content = new FormUrlEncodedContent(new Dictionary<string, string>
+                {
+                    {"client_id", options.OAuth2.ClientId},
+                    {"client_secret", options.OAuth2.ClientSecret},
+                    {"username", options.OAuth2.Username},
+                    {"password", options.OAuth2.Password},
+                    {"grant_type", options.OAuth2.GrantType},
+                })
             })
-            using (var res = await SendAsync(req))
+            using (var httpResponse = await SendAsync(httpRequest))
             {
-                OAuth2Session = await Json.DeserializeAsync<OAuth2Response>(res);
+                return await Json.DeserializeAsync<OAuth2Response>(httpResponse);
             }
         }
 
@@ -130,7 +135,7 @@ namespace Poller.Taboola
         {
             try
             {
-                var response = await BuildHttpClient().SendAsync(message);
+                var response = await BuildHttpClient().SendAsync(message).ConfigureAwait(false);
                 response.EnsureSuccessStatusCode();
                 return response;
             }
@@ -141,15 +146,24 @@ namespace Poller.Taboola
             }
         }
 
+        private async Task<TResult> RemoteQueryAsync<TResult>(HttpMethod method, string url)
+            where TResult : class
+        {
+            using (var httpResult = await SendWithAuthAsync(new HttpRequestMessage(method, url)))
+            {
+                return await Json.DeserializeAsync<TResult>(httpResult);
+            }
+        }
+
         private async Task<HttpResponseMessage> SendWithAuthAsync(HttpRequestMessage message)
         {
             if (OAuth2Session == null)
             {
-                await AuthenticateWithPasswordAsync();
+                OAuth2Session = await AuthenticateWithPasswordAsync();
             }
             else if (IsTokenExpired)
             {
-                await RefreshAccessToken();
+                // OAuth2Session = await RefreshAccessTokenAsync();
             }
 
             message.Headers.Authorization = new AuthenticationHeaderValue(TokenType, OAuth2Session.AccessToken);
@@ -169,8 +183,8 @@ namespace Poller.Taboola
                     // TODO: dispose managed state (managed objects).
                 }
 
-                client?.Dispose();
-                client = null;
+                _client?.Dispose();
+                _client = null;
 
                 disposedValue = true;
             }

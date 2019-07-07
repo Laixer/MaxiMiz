@@ -33,7 +33,7 @@ namespace Poller.Helper
         public static async Task<T> DeserializeAsync<T>(HttpResponseMessage message)
             where T : class
         {
-            using (var stream = await message.Content.ReadAsStreamAsync())
+            using (var stream = await message.Content.ReadAsStreamAsync().ConfigureAwait(false))
             {
                 return Deserialize<T>(stream);
             }

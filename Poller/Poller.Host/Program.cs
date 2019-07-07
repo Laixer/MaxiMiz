@@ -1,4 +1,4 @@
-using System.IO;
+﻿using System.IO;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -27,7 +27,7 @@ namespace Poller.Host
                 })
                 .ConfigureServices((hostContext, services) =>
                 {
-                    services.AddRemotePublisher<GooglePoller>();
+                    // services.AddRemotePublisher<GooglePoller>();
                     services.AddRemotePublisher<TaboolaPoller, TaboolaPollerOptions>();
                     services.AddHostedService<RemoteApplicationService>();
                     services.AddNpgsql("MaxiMizDatabase");
