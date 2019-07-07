@@ -74,8 +74,6 @@ namespace Poller.Taboola
         /// </summary>
         public async override Task<TopCampaignReport> GetTopCampaignReportAsync()
         {
-            await GetCampaign();
-            
             var query = HttpUtility.ParseQueryString(string.Empty);
             query["start_date"] = DateTime.Now.ToString("yyyy-MM-dd");
             query["end_date"] = DateTime.Now.ToString("yyyy-MM-dd");
@@ -104,12 +102,26 @@ namespace Poller.Taboola
             return null;
         }
 
-        public async Task GetCampaign()
+        public async Task GetAllCampaigns()
         {
-            // var campaign = "2404044";
             var url = $"api/1.0/{options.AccountId}/campaigns";
 
             var result = await RemoteQueryAsync<TopCampaignReport>(HttpMethod.Get, url);
+        }
+
+        public async Task GetCampaign()
+        {
+            var campaign = "2404044";
+            var url = $"api/1.0/{options.AccountId}/campaigns/{campaign}";
+
+            var result = await RemoteQueryAsync<TopCampaignReport>(HttpMethod.Get, url);
+        }
+
+        public async Task CreateCampaign()
+        {
+            var url = $"api/1.0/{options.AccountId}/campaigns/";
+
+            var result = await RemoteQueryAsync<TopCampaignReport>(HttpMethod.Post, url);
         }
 
         private async Task<OAuth2Response> AuthenticateWithPasswordAsync()
