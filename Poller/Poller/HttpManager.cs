@@ -41,6 +41,9 @@ namespace Poller
         /// <summary>
         /// Execute API call and return result.
         /// </summary>
+        /// <remarks>
+        /// This operations throws an exception when status is not HTTP.OK.
+        /// </remarks>
         /// <param name="method">HTTP method.</param>
         /// <param name="url">Endpoint.</param>
         public async Task<TResult> RemoteQueryAsync<TResult>(HttpMethod method, string url)
@@ -58,7 +61,7 @@ namespace Poller
         /// </summary>
         /// <param name="method">HTTP method.</param>
         /// <param name="url">Endpoint.</param>
-        public async Task RemoteExecuteAsync(HttpMethod method, string url) 
+        public async Task RemoteExecuteAsync(HttpMethod method, string url)
         {
             using (var httpResponse = await BuildHttpClient().SendAsync(new HttpRequestMessage(method, url)))
             {
@@ -66,6 +69,9 @@ namespace Poller
             }
         }
 
+        /// <summary>
+        /// Dispose objects.
+        /// </summary>
         public void Dispose()
         {
             _client?.Dispose();

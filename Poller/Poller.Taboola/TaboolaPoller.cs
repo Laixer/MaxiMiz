@@ -36,6 +36,7 @@ namespace Poller.Taboola
             this.options = options?.Value;
             this.connection = connection;
 
+            // Lazy initialization prevent performance hit on process start.
             _client = new Lazy<HttpManager>(() =>
             {
                 return new HttpManager(this.options.BaseUrl)
@@ -53,11 +54,21 @@ namespace Poller.Taboola
             });
         }
 
-        public async Task<TResult> RemoteQueryAndLogAsync<TResult>(HttpMethod method, string url)
+        /// <summary>
+        /// Run the remote query and catch all exceptions where before letting
+        /// them propagate upwards.
+        /// </summary>
+        /// <typeparam name="TResult"></typeparam>
+        /// <param name="method"></param>
+        /// <param name="url"></param>
+        /// <returns></returns>
+        protected async Task<TResult> RemoteQueryAndLogAsync<TResult>(HttpMethod method, string url)
             where TResult : class
         {
             try
             {
+                Logger.LogTrace($"Executing {method} {url}");
+
                 return await HttpManager.RemoteQueryAsync<TResult>(method, url);
             }
             catch (Exception e)
