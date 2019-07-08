@@ -4,6 +4,10 @@
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp2.2</TargetFramework>
     <LangVersion>latest</LangVersion>
+    <Authors>Laixer</Authors>
+    <Company>Laixer B.V.</Company>
+    <Product>Maximiz Poller</Product>
+    <Description>Remote publisher poller and communicator</Description>
   </PropertyGroup>
 
   <ItemGroup>
@@ -21,6 +25,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="appsettings2.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="appsettings.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
