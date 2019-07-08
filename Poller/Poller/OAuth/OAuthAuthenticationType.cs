@@ -1,4 +1,7 @@
-public static class OAuthAuthenticationType
+namespace Poller.OAuth
 {
-    public const string Bearer = "Bearer";
+    public static class OAuthAuthenticationType
+    {
+        public const string Bearer = "Bearer";
+    }
 }

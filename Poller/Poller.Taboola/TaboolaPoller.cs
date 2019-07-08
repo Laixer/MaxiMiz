@@ -11,6 +11,7 @@ using Microsoft.Extensions.Logging;
 
 using MaxiMiz.Poller.Model.Response;
 
+using Poller.OAuth;
 using Poller.Publisher;
 using Poller.Helper;
 using System.Data.Common;
@@ -21,10 +22,7 @@ namespace Poller.Taboola
     [Publisher("Taboola")]
     public class TaboolaPoller : RemotePublisher, IDisposable
     {
-        private static readonly string TokenType = "Bearer";
-
         private static OAuthHttpClient _client;
-        private OAuth2Response OAuth2Session;
         private readonly DbConnection connection;
         private readonly TaboolaPollerOptions options;
 
@@ -51,32 +49,13 @@ namespace Poller.Taboola
         }
 
         /// <summary>
-        /// Create or reuse an OAuthHttpClient.
-        /// </summary>
-        private OAuthHttpClient BuildHttpClient(bool newInstance = false)
-        {
-            if (_client != null && !newInstance)
-            {
-                return _client;
-            }
-
-            return _client = new OAuthHttpClient
-            {
-                BaseAddress = new Uri(options.BaseUrl),
-                TokenUri = "oauth/token",
-                RefreshUri = "oauth/refresh",
-            };
-        }
-
-        /// <summary>
         /// Gets the Top Campaign Reports for a specific date as specified
         /// in the Backstage documentation, deserializes them and  inserts them into the database
         /// </summary>
         public async override Task<TopCampaignReport> GetTopCampaignReportAsync()
         {
             var query = HttpUtility.ParseQueryString(string.Empty);
-            query["start_date"] = DateTime.Now.ToString("yyyy-MM-dd");
-            query["end_date"] = DateTime.Now.ToString("yyyy-MM-dd");
+            query["start_date"] = query["end_date"] = DateTime.Now.ToString("yyyy-MM-dd");
 
             var url = $"api/1.0/{options.AccountId}/reports/top-campaign-content/dimensions/item_breakdown?{query}";
 
@@ -124,63 +103,48 @@ namespace Poller.Taboola
             var result = await RemoteQueryAsync<TopCampaignReport>(HttpMethod.Post, url);
         }
 
-        private async Task<OAuth2Response> AuthenticateWithPasswordAsync()
+        /// <summary>
+        /// Create or reuse an OAuthHttpClient.
+        /// </summary>
+        private OAuthHttpClient BuildHttpClient(bool newInstance = false)
         {
-            using (var httpRequest = new HttpRequestMessage(HttpMethod.Post, "oauth/token")
+            if (_client != null && !newInstance)
             {
-                Content = new FormUrlEncodedContent(new Dictionary<string, string>
-                {
-                    {"client_id", options.OAuth2.ClientId},
-                    {"client_secret", options.OAuth2.ClientSecret},
-                    {"username", options.OAuth2.Username},
-                    {"password", options.OAuth2.Password},
-                    {"grant_type", options.OAuth2.GrantType},
-                })
-            })
-            using (var httpResponse = await SendAsync(httpRequest))
-            {
-                return await Json.DeserializeAsync<OAuth2Response>(httpResponse);
+                return _client;
             }
-        }
 
-        private async Task<HttpResponseMessage> SendAsync(HttpRequestMessage message)
-        {
-            try
+            return _client = new OAuthHttpClient
             {
-                var response = await BuildHttpClient().SendAsync(message).ConfigureAwait(false);
-                response.EnsureSuccessStatusCode();
-                return response;
-            }
-            catch (HttpRequestException e)
-            {
-                Logger.LogError($"{message.Method} request to {message.RequestUri} had non {HttpStatusCode.OK} status code.{Environment.NewLine}{e.StackTrace}");
-                throw e;
-            }
+                BaseAddress = new Uri(options.BaseUrl),
+                TokenUri = "oauth/token",
+                RefreshUri = "oauth/token",
+                AuthorizationProvider = new OAuthAuthorizationProvider
+                {
+                    ClientId = options.OAuth2.ClientId,
+                    ClientSecret = options.OAuth2.ClientSecret,
+                    Username = options.OAuth2.Username,
+                    Password = options.OAuth2.Password,
+                }
+            };
         }
 
         private async Task<TResult> RemoteQueryAsync<TResult>(HttpMethod method, string url)
             where TResult : class
         {
-            using (var httpResult = await SendWithAuthAsync(new HttpRequestMessage(method, url)))
+            try
             {
-                return await Json.DeserializeAsync<TResult>(httpResult);
+                using (var httpResponse = await BuildHttpClient().SendAsync(new HttpRequestMessage(method, url)))
+                {
+                    httpResponse.EnsureSuccessStatusCode();
+                    return await Json.DeserializeAsync<TResult>(httpResponse);
+                }
             }
-        }
-
-        private async Task<HttpResponseMessage> SendWithAuthAsync(HttpRequestMessage message)
-        {
-            if (OAuth2Session == null)
+            catch (HttpRequestException e)
             {
-                OAuth2Session = await AuthenticateWithPasswordAsync();
+                Logger.LogError($"{method} request to {url}: {e.Message}");
+                Logger.LogTrace(e.StackTrace);
+                throw e;
             }
-            else if (IsTokenExpired)
-            {
-                // OAuth2Session = await RefreshAccessTokenAsync();
-            }
-
-            message.Headers.Authorization = new AuthenticationHeaderValue(TokenType, OAuth2Session.AccessToken);
-
-            return await SendAsync(message);
         }
 
         #region IDisposable Support
