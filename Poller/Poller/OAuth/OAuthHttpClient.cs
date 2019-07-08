@@ -9,7 +9,6 @@ namespace Poller.OAuth
 {
     public partial class OAuthHttpClient : HttpClient
     {
-        private System.Timers.Timer timer;
         protected OAuthTicket ticket;
 
         public string AuthorizeUri { get; set; }
@@ -77,10 +76,10 @@ namespace Poller.OAuth
         protected virtual Dictionary<string, string> BuildAuthorizeRequest()
         {
             return new Dictionary<string, string>
-        {
-            {OAuthGrantType.ClientId, AuthorizationProvider.ClientId},
-            {OAuthGrantType.ClientSecret, AuthorizationProvider.ClientSecret},
-        };
+            {
+                {OAuthGrantType.ClientId, AuthorizationProvider.ClientId},
+                {OAuthGrantType.ClientSecret, AuthorizationProvider.ClientSecret},
+            };
         }
 
         /// <summary>
@@ -94,11 +93,11 @@ namespace Poller.OAuth
             using (var httpRequest = new HttpRequestMessage(HttpMethod.Post, tokenUri ?? TokenUri)
             {
                 Content = new FormUrlEncodedContent(new Dictionary<string, string>(BuildAuthorizeRequest())
-            {
-                {OAuthGrantType.Username, AuthorizationProvider.Username},
-                {OAuthGrantType.Password, AuthorizationProvider.Password},
-                {OAuthGrantType.GrantType, grantType},
-            })
+                {
+                    {OAuthGrantType.Username, AuthorizationProvider.Username},
+                    {OAuthGrantType.Password, AuthorizationProvider.Password},
+                    {OAuthGrantType.GrantType, grantType},
+                })
             })
             using (var httpResponse = await base.SendAsync(httpRequest))
             {
@@ -117,10 +116,10 @@ namespace Poller.OAuth
             using (var httpRequest = new HttpRequestMessage(HttpMethod.Post, refreshUri ?? RefreshUri)
             {
                 Content = new FormUrlEncodedContent(new Dictionary<string, string>(BuildAuthorizeRequest())
-            {
-                {OAuthGrantType.RefreshToken, ticket.RefreshToken},
-                {OAuthGrantType.GrantType, grantType},
-            })
+                {
+                    {OAuthGrantType.RefreshToken, ticket.RefreshToken},
+                    {OAuthGrantType.GrantType, grantType},
+                })
             })
             using (var httpResponse = await base.SendAsync(httpRequest))
             {

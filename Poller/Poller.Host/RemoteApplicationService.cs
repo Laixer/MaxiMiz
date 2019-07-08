@@ -100,6 +100,7 @@ namespace Poller.Host
             catch (Exception e) when (e as OperationCanceledException == null)
             {
                 Logger.LogError(e.Message);
+                Logger.LogTrace(e.StackTrace);
             }
             finally
             {
