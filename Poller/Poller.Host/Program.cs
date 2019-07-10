@@ -21,9 +21,13 @@ namespace Poller.Host
                 .ConfigureHostConfiguration(configHost =>
                 {
                     configHost.SetBasePath(Directory.GetCurrentDirectory());
-                    configHost.AddJsonFile("appsettings.json", optional: true);
+                    configHost.AddJsonFile("appsettings2.json", optional: true);
                     configHost.AddEnvironmentVariables(prefix: "POLLER_");
                     configHost.AddCommandLine(args);
+                })
+                .ConfigureAppConfiguration((hostContext, configApp) =>
+                {
+                    hostContext.HostingEnvironment.ApplicationName = "Poller.Host";
                 })
                 .ConfigureServices((hostContext, services) =>
                 {
@@ -31,6 +35,11 @@ namespace Poller.Host
                     services.AddRemotePublisher<TaboolaPoller, TaboolaPollerOptions>();
                     services.AddHostedService<RemoteApplicationService>();
                     services.AddNpgsql("MaxiMizDatabase");
+
+                    services.Configure<RemoteApplicationServiceOptions>(options =>
+                    {
+                        options.PublisherRefreshInterval = 15;
+                    });
                 })
                 .ConfigureLogging((hostContext, configLogging) =>
                 {

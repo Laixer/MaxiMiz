@@ -3,6 +3,7 @@ using System.Linq;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.DependencyInjection;
@@ -12,7 +13,7 @@ namespace Poller.Host
 {
     internal class RemoteApplicationService : IHostedService, IDisposable
     {
-        private readonly static double refreshInterval = 5 * 60 * 1000;
+        private readonly RemoteApplicationServiceOptions _options;
         private ICollection<IRemotePublisher> _remotePublishers;
         private System.Timers.Timer _timer;
         private object executionLock = new object();
@@ -24,12 +25,14 @@ namespace Poller.Host
         /// Create new instance.
         /// </summary>
         /// <param name="services">Service provider.</param>
-        public RemoteApplicationService(ILogger<RemoteApplicationService> logger, IServiceProvider services)
+        public RemoteApplicationService(ILogger<RemoteApplicationService> logger, IServiceProvider services, IOptions<RemoteApplicationServiceOptions> options)
         {
             Logger = logger ?? throw new ArgumentNullException(nameof(logger));
             Services = services ?? throw new ArgumentNullException(nameof(services));
 
-            _timer = new System.Timers.Timer(5 * 1000);
+            _options = options.Value ?? throw new ArgumentNullException(nameof(options));
+
+            _timer = new System.Timers.Timer(_options.StartupDelay * 1000);
         }
 
         /// <summary>
@@ -43,7 +46,7 @@ namespace Poller.Host
             _remotePublishers = Services.GetService<IEnumerable<IRemotePublisher>>().ToArray();
             if (_remotePublishers.Count() > 0)
             {
-                _timer.Elapsed += (s, e) => RunAllPublishers(cancellationToken);
+                _timer.Elapsed += (s, e) => RunAllPublishers();
                 _timer.Start();
             }
 
@@ -58,7 +61,7 @@ namespace Poller.Host
         /// execution if the lock is hold.
         /// </remarks>
         /// <param name="cancellationToken">Cancellation token.</param>
-        private void RunAllPublishers(CancellationToken cancellationToken)
+        private void RunAllPublishers(CancellationToken cancellationToken = default)
         {
             if (cancellationToken.IsCancellationRequested) { return; }
 
@@ -79,12 +82,18 @@ namespace Poller.Host
                 }
                 finally
                 {
-                    _timer.Interval = refreshInterval;
+                    _timer.Interval = _options.PublisherRefreshInterval * 60 * 1000;
                     Monitor.Exit(executionLock);
                 }
             }
         }
 
+        /// <summary>
+        /// Run each publisher.
+        /// </summary>
+        /// <param name="publisher">Executing publisher.</param>
+        /// <param name="cancellationToken">Cancellation token.</param>
+        /// <returns></returns>
         private async Task ExecutePublisher(IRemotePublisher publisher, CancellationToken cancellationToken)
         {
             if (cancellationToken.IsCancellationRequested) { return; }
@@ -94,7 +103,7 @@ namespace Poller.Host
             try
             {
                 Logger.LogDebug($"Start {publisher.GetType().FullName}.");
-                
+
                 await publisher.GetTopCampaignReportAsync().ConfigureAwait(false);
             }
             catch (Exception e) when (e as OperationCanceledException == null)
