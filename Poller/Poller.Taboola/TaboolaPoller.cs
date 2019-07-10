@@ -6,10 +6,11 @@ using System.Linq;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Logging;
 
-using MaxiMiz.Poller.Model.Response;
-
 using Poller.OAuth;
 using Poller.Publisher;
+using Poller.Model;
+using Poller.Model.Response;
+
 using System.Data.Common;
 using Dapper;
 
@@ -78,11 +79,35 @@ namespace Poller.Taboola
             }
         }
 
+        public async Task GetAllAccounts()
+        {
+            var url = $"api/1.0/users/current/allowed-accounts/";
+
+            var accounts = await RemoteQueryAndLogAsync<AllowedAccounts>(HttpMethod.Get, url);
+            if (accounts == null || accounts.Items.Count() <= 0)
+            {
+                return;
+            }
+
+            try
+            {
+                await connection.OpenAsync();
+                await connection.ExecuteAsync(
+                    @"INSERT INTO public.account_integration(publisher_id, name, type, currency, account)
+                          VALUES (@Id, @Name, @Type, @Currency, @AccountId)", accounts.Items);
+            }
+            finally
+            {
+                // TODO: This should not be required
+                connection.Close();
+            }
+        }
+
         /// <summary>
         /// Gets the Top Campaign Reports for a specific date as specified
         /// in the Backstage documentation, deserializes them and  inserts them into the database
         /// </summary>
-        public async override Task<TopCampaignReport> GetTopCampaignReportAsync()
+        public async override Task GetTopCampaignReportAsync()
         {
             var query = HttpUtility.ParseQueryString(string.Empty);
             query["start_date"] = query["end_date"] = DateTime.Now.ToString("yyyy-MM-dd");
@@ -90,9 +115,9 @@ namespace Poller.Taboola
             var url = $"api/1.0/{options.AccountId}/reports/top-campaign-content/dimensions/item_breakdown?{query}";
 
             var result = await RemoteQueryAndLogAsync<TopCampaignReport>(HttpMethod.Get, url);
-            if (result.Items.Count() <= 0)
+            if (result == null || result.RecordCount <= 0)
             {
-                return null;
+                return;
             }
 
             try
@@ -100,30 +125,33 @@ namespace Poller.Taboola
                 await connection.OpenAsync();
                 await connection.ExecuteAsync(
                     @"INSERT INTO public.item(ad_group, campaign, clicks, impressions, spent, currency, publisher_id, content_url, url)
-                          VALUES (1, @Campaign, @Clicks, @Impressions, @Spent, @Currency, @PublisherItemId, @ContentUrl, @Url)", result.Items);
+                      VALUES (1, @Campaign, @Clicks, @Impressions, @Spent, @Currency, @PublisherItemId, @ContentUrl, @Url)
+                      ON CONFLICT (publisher_id) DO UPDATE
+                      SET
+                        clicks = @Clicks,
+                        impressions = @Impressions,
+                        spent = @Spent", result.Items);
             }
             finally
             {
                 // TODO: This should not be required
                 connection.Close();
             }
-
-            return null;
         }
 
         public async Task GetAllCampaigns()
         {
             var url = $"api/1.0/{options.AccountId}/campaigns";
 
-            await RemoteQueryAndLogAsync<TopCampaignReport>(HttpMethod.Get, url);
+            var campaigns = await RemoteQueryAndLogAsync<Campaign>(HttpMethod.Get, url);
         }
 
         public async Task GetCampaign()
         {
-            var campaign = "2404044";
+            var campaign = "2162154";
             var url = $"api/1.0/{options.AccountId}/campaigns/{campaign}";
 
-            await RemoteQueryAndLogAsync<TopCampaignReport>(HttpMethod.Get, url);
+            var campaigns = await RemoteQueryAndLogAsync<TopCampaignReport>(HttpMethod.Get, url);
         }
 
         public async Task CreateCampaign()

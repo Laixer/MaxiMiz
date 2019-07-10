@@ -1,8 +1,7 @@
 using System.IO;
 using System.Threading.Tasks;
-
-using MaxiMiz.Poller.Model.Response;
 using Poller.Helper;
+using Poller.Model.Response;
 using Poller.Publisher;
 
 namespace Poller.Taboola
@@ -13,11 +12,11 @@ namespace Poller.Taboola
         /// <summary>
         /// Mocks the request to taboola for testing purposes by using a JSON file with a mock response.
         /// </summary>  
-        public async Task<TopCampaignReport> GetTopCampaignReportAsync()
+        public async Task GetTopCampaignReportAsync()
         {
             using (var stream = File.Create(@"mock.json"))
             {
-                return await Task.Run(() => Json.Deserialize<TopCampaignReport>(stream));
+                await Task.Run(() => Json.Deserialize<TopCampaignReport>(stream));
             }
         }
     }

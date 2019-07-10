@@ -5,7 +5,6 @@ using Google.Ads.GoogleAds.Lib;
 using Google.Ads.GoogleAds.V1.Errors;
 using Google.Ads.GoogleAds.V1.Services;
 using Google.Api.Gax;
-using MaxiMiz.Poller.Model.Response;
 using Poller.Publisher;
 
 namespace Poller.GoogleAds
@@ -74,9 +73,9 @@ namespace Poller.GoogleAds
             }
         }
 
-        public Task<TopCampaignReport> GetTopCampaignReportAsync()
+        public Task GetTopCampaignReportAsync()
         {
-            return Task.FromResult<TopCampaignReport>(null);
+            return Task.CompletedTask;
         }
     }
 }

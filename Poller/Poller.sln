@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Poller.Host", "Poller.Host\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Poller.GoogleAds", "Poller.GoogleAds\Poller.GoogleAds.csproj", "{FABAF71A-FF76-4F1D-A886-96B4FB55C5BB}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Poller.Test", "Poller.Test\Poller.Test.csproj", "{0DC64F12-5E05-433A-B4E6-0699F08198DB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{FABAF71A-FF76-4F1D-A886-96B4FB55C5BB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FABAF71A-FF76-4F1D-A886-96B4FB55C5BB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FABAF71A-FF76-4F1D-A886-96B4FB55C5BB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0DC64F12-5E05-433A-B4E6-0699F08198DB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0DC64F12-5E05-433A-B4E6-0699F08198DB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0DC64F12-5E05-433A-B4E6-0699F08198DB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0DC64F12-5E05-433A-B4E6-0699F08198DB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

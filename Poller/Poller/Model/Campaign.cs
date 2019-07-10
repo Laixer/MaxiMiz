@@ -1,7 +1,6 @@
-using System.Collections.Generic;
 using System.Runtime.Serialization;
 
-namespace MaxiMiz.Poller.Model.Response
+namespace Poller.Model
 {
     [DataContract]
     public class Campaign

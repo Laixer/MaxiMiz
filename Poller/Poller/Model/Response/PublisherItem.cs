@@ -1,7 +1,7 @@
 using System;
 using System.Runtime.Serialization;
 
-namespace MaxiMiz.Poller.Model.Response
+namespace Poller.Model.Response
 {
     [DataContract]
     public class PublisherItem
@@ -24,10 +24,16 @@ namespace MaxiMiz.Poller.Model.Response
         public long PublisherItemId { get; set; }
 
         /// <summary>
-        /// The id of the campaign this item belongs to
+        /// The id of the campaign this item belongs to.
         /// </summary>
         [DataMember(Name = "campaign")]
         public long Campaign { get; set; }
+
+        /// <summary>
+        /// The name the campaign this item belongs to.
+        /// </summary>
+        [DataMember(Name = "campaign_name")]
+        public string CampaignName { get; set; }
 
         /// <summary>
         /// The url for the thumbnail of this item.

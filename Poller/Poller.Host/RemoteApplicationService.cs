@@ -12,7 +12,7 @@ namespace Poller.Host
 {
     internal class RemoteApplicationService : IHostedService, IDisposable
     {
-        private readonly static double refreshInterval = 2 * 60 * 1000;
+        private readonly static double refreshInterval = 5 * 60 * 1000;
         private ICollection<IRemotePublisher> _remotePublishers;
         private System.Timers.Timer _timer;
         private object executionLock = new object();

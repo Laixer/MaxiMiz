@@ -1,6 +1,4 @@
 ﻿using System.Threading.Tasks;
-using MaxiMiz.Poller.Model.Response;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
 namespace Poller.Publisher
@@ -14,6 +12,6 @@ namespace Poller.Publisher
             Logger = logger;
         }
 
-        public abstract Task<TopCampaignReport> GetTopCampaignReportAsync();
+        public abstract Task GetTopCampaignReportAsync();
     }
 }
