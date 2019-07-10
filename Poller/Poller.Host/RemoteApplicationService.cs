@@ -76,7 +76,7 @@ namespace Poller.Host
             {
                 try
                 {
-                    Logger.LogInformation("Running publishers.");
+                    Logger.LogInformation("Running publishers");
 
                     int index = 0;
                     var taskCollection = new Task[_remotePublishers.Count()];
@@ -110,7 +110,7 @@ namespace Poller.Host
 
             try
             {
-                Logger.LogDebug($"Start {publisher.GetType().FullName}.");
+                Logger.LogDebug($"Start {publisher.GetType().FullName}");
 
                 // Link the cancellation tokens into one new cancellation token
                 var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
@@ -131,7 +131,7 @@ namespace Poller.Host
             }
             finally
             {
-                Logger.LogDebug($"Finish {publisher.GetType().FullName}.");
+                Logger.LogDebug($"Finish {publisher.GetType().FullName}");
             }
         }
 
@@ -141,6 +141,8 @@ namespace Poller.Host
         /// <param name="cancellationToken">Cancellation token.</param>
         public Task StopAsync(CancellationToken cancellationToken)
         {
+            if (cancellationToken.IsCancellationRequested) { return Task.CompletedTask; }
+
             Logger.LogInformation("Services stopping");
 
             _cancellationTokenSource.Cancel();
