@@ -2,17 +2,15 @@
 
 namespace Poller.Taboola
 {
+    /// <summary>
+    /// Taboola configuration options.
+    /// </summary>
     public class TaboolaPollerOptions
     {
         /// <summary>
         /// API domain.
         /// </summary>
         public string BaseUrl { get; set; }
-
-        /// <summary>
-        /// Account identifier.
-        /// </summary>
-        public string AccountId { get; set; }
 
         /// <summary>
         /// Authentication settings.

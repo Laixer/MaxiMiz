@@ -3,7 +3,8 @@
 ###############################################################################
 *            text=auto
 
-*.cs         text diff=csharp
+*.cs         text eol=crlf diff=csharp
+*.json       text eol=crlf
 
 ###############################################################################
 # Set the merge driver for project and solution files
