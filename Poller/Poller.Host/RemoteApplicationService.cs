@@ -14,12 +14,14 @@ namespace Poller.Host
     internal class RemoteApplicationService : IHostedService, IDisposable
     {
         private readonly RemoteApplicationServiceOptions _options;
+        private readonly CancellationTokenSource _cancellationTokenSource;
+        private readonly object executionLock = new object();
         private ICollection<IRemotePublisher> _remotePublishers;
         private System.Timers.Timer _timer;
-        private object executionLock = new object();
 
         public ILogger Logger { get; }
         public IServiceProvider Services { get; }
+        public CancellationToken CancellationToken { get => _cancellationTokenSource.Token; }
 
         /// <summary>
         /// Create new instance.
@@ -31,8 +33,13 @@ namespace Poller.Host
             Services = services ?? throw new ArgumentNullException(nameof(services));
 
             _options = options.Value ?? throw new ArgumentNullException(nameof(options));
-
             _timer = new System.Timers.Timer(_options.StartupDelay * 1000);
+            _cancellationTokenSource = new CancellationTokenSource();
+
+            CancellationToken.Register(() =>
+            {
+                _timer.Stop();
+            });
         }
 
         /// <summary>
@@ -46,7 +53,7 @@ namespace Poller.Host
             _remotePublishers = Services.GetService<IEnumerable<IRemotePublisher>>().ToArray();
             if (_remotePublishers.Count() > 0)
             {
-                _timer.Elapsed += (s, e) => RunAllPublishers();
+                _timer.Elapsed += (s, e) => RunAllPublishers(CancellationToken);
                 _timer.Start();
             }
 
@@ -80,6 +87,7 @@ namespace Poller.Host
 
                     Task.WhenAll(taskCollection).Wait(cancellationToken);
                 }
+                catch (OperationCanceledException) { }
                 finally
                 {
                     _timer.Interval = _options.PublisherRefreshInterval * 60 * 1000;
@@ -104,7 +112,17 @@ namespace Poller.Host
             {
                 Logger.LogDebug($"Start {publisher.GetType().FullName}.");
 
-                await publisher.GetTopCampaignReportAsync().ConfigureAwait(false);
+                // Link the cancellation tokens into one new cancellation token
+                var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+                cts.CancelAfter(TimeSpan.FromMinutes(_options.PublisherOperationTimeout));
+
+                var cancelToken = cts.Token;
+                cancelToken.Register(() =>
+                {
+                    Logger.LogWarning("Operation timeout, task killed");
+                });
+
+                await Task.Run(async () => await publisher.GetTopCampaignReportAsync().ConfigureAwait(false), cancelToken);
             }
             catch (Exception e) when (e as OperationCanceledException == null)
             {
@@ -118,14 +136,14 @@ namespace Poller.Host
         }
 
         /// <summary>
-        /// Stop service.
+        /// Stop service by cancelling all tokens.
         /// </summary>
         /// <param name="cancellationToken">Cancellation token.</param>
         public Task StopAsync(CancellationToken cancellationToken)
         {
-            Logger.LogInformation("Stopping service...");
+            Logger.LogInformation("Services stopping");
 
-            _timer.Stop();
+            _cancellationTokenSource.Cancel();
 
             return Task.CompletedTask;
         }
