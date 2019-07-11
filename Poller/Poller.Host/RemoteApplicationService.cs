@@ -3,6 +3,7 @@ using System.Linq;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Diagnostics;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Hosting;
@@ -19,9 +20,9 @@ namespace Poller.Host
         private ICollection<IRemotePublisher> _remotePublishers;
         private System.Timers.Timer _timer;
 
-        public ILogger Logger { get; }
-        public IServiceProvider Services { get; }
-        public CancellationToken CancellationToken { get => _cancellationTokenSource.Token; }
+        protected ILogger Logger { get; }
+        protected IServiceProvider Services { get; }
+        protected CancellationToken CancellationToken { get => _cancellationTokenSource.Token; }
 
         /// <summary>
         /// Create new instance.
@@ -108,9 +109,13 @@ namespace Poller.Host
 
             await Task.Yield();
 
+            var watch = new Stopwatch();
+
             try
             {
-                Logger.LogDebug($"Start {publisher.GetType().FullName}");
+                Logger.LogDebug($"Start {publisher.GetType().FullName} at {DateTime.Now}");
+
+                watch.Start();
 
                 // Link the cancellation tokens into one new cancellation token
                 var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
@@ -131,7 +136,9 @@ namespace Poller.Host
             }
             finally
             {
-                Logger.LogDebug($"Finish {publisher.GetType().FullName}");
+                watch.Stop();
+
+                Logger.LogDebug($"Finished {publisher.GetType().FullName} in {watch.Elapsed}");
             }
         }
 
@@ -152,6 +159,7 @@ namespace Poller.Host
 
         public void Dispose()
         {
+            _cancellationTokenSource?.Dispose();
             _timer?.Dispose();
         }
     }

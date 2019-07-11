@@ -1,17 +1,16 @@
 using System;
 using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
 using System.Linq;
+using System.Data.Common;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Logging;
-
 using Poller.OAuth;
 using Poller.Publisher;
 using Poller.Model;
 using Poller.Model.Response;
-
-using System.Data.Common;
 using Dapper;
 
 namespace Poller.Taboola
@@ -62,8 +61,8 @@ namespace Poller.Taboola
         /// <typeparam name="TResult"></typeparam>
         /// <param name="method"></param>
         /// <param name="url"></param>
-        /// <returns></returns>
-        protected async Task<TResult> RemoteQueryAndLogAsync<TResult>(HttpMethod method, string url)
+        /// <returns>Object of TResult.</returns>
+        protected async Task<TResult> RemoteQueryAndLogAsync<TResult>(HttpMethod method, string url, CancellationToken cancellationToken = default)
             where TResult : class
         {
             try
