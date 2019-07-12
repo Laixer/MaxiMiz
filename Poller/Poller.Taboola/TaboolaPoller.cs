@@ -110,8 +110,8 @@ namespace Poller.Taboola
         {
             var query = HttpUtility.ParseQueryString(string.Empty);
             query["start_date"] = query["end_date"] = DateTime.Now.ToString("yyyy-MM-dd");
-
-            var url = $"api/1.0/{options.AccountId}/reports/top-campaign-content/dimensions/item_breakdown?{query}";
+            //TODO use fetched accountId
+            var url = $"api/1.0/{options/*.AccountId*/}/reports/top-campaign-content/dimensions/item_breakdown?{query}";
 
             var result = await RemoteQueryAndLogAsync<TopCampaignReport>(HttpMethod.Get, url);
             if (result == null || result.RecordCount <= 0)
@@ -123,13 +123,21 @@ namespace Poller.Taboola
             {
                 await connection.OpenAsync();
                 await connection.ExecuteAsync(
-                    @"INSERT INTO public.item(ad_group, campaign, clicks, impressions, spent, currency, publisher_id, content_url, url)
-                      VALUES (1, @Campaign, @Clicks, @Impressions, @Spent, @Currency, @PublisherItemId, @ContentUrl, @Url)
-                      ON CONFLICT (publisher_id) DO UPDATE
-                      SET
-                        clicks = @Clicks,
-                        impressions = @Impressions,
-                        spent = @Spent", result.Items);
+                    @"INSERT INTO public.item(ad_group, campaign, clicks, impressions, spent, currency, publisher_id, content_url, url) 
+                      VALUES (1, 
+                        @Campaign, 
+                        @Clicks, 
+                        @Impressions, 
+                        @Spent, 
+                        @Currency, 
+                        @PublisherItemId, 
+                        @ContentUrl, 
+                        @Url) ON CONFLICT (publisher_id) DO
+                      UPDATE 
+                      SET clicks = @Clicks, 
+                          impressions = @Impressions, 
+                          spent = @Spent",
+                        result.Items);
             }
             finally
             {
@@ -140,7 +148,8 @@ namespace Poller.Taboola
 
         public async Task GetAllCampaigns()
         {
-            var url = $"api/1.0/{options.AccountId}/campaigns";
+            //TODO use fetched accountId
+            var url = $"api/1.0/{options/*.AccountId*/}/campaigns";
 
             var campaigns = await RemoteQueryAndLogAsync<Campaign>(HttpMethod.Get, url);
         }
@@ -148,14 +157,16 @@ namespace Poller.Taboola
         public async Task GetCampaign()
         {
             var campaign = "2162154";
-            var url = $"api/1.0/{options.AccountId}/campaigns/{campaign}";
+            //TODO use fetched accountId
+            var url = $"api/1.0/{options/*.AccountId*/}/campaigns/{campaign}";
 
             var campaigns = await RemoteQueryAndLogAsync<TopCampaignReport>(HttpMethod.Get, url);
         }
 
         public async Task CreateCampaign()
         {
-            var url = $"api/1.0/{options.AccountId}/campaigns/";
+            //TODO use fetched accountId
+            var url = $"api/1.0/{options/*.AccountId*/}/campaigns/";
 
             await RemoteQueryAndLogAsync<TopCampaignReport>(HttpMethod.Post, url);
         }

@@ -13,7 +13,8 @@ namespace Poller.Model.Response
         public Guid Id { get; set; }
 
         /// <summary>
-        /// The id issued by the publisher, this is issued as a string by the publisher but we want an int so we need to supply a setter.
+        /// The id issued by the publisher, this is issued as a string by the publisher
+        /// but we want an int so we need to supply a setter.
         /// </summary>
         [DataMember(Name = "item")]
         public string Item { set => PublisherItemId = long.Parse(value); }

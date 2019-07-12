@@ -26,5 +26,10 @@
         /// Grant type.
         /// </summary>
         public string GrantType { get; set; }
+
+        /// <summary>
+        /// Refresh token.
+        /// </summary>
+        public string RefreshToken { get; set; }
     }
 }

@@ -33,7 +33,7 @@ namespace Poller.Host
                 })
                 .ConfigureServices((hostContext, services) =>
                 {
-                    // services.AddRemotePublisher<GooglePoller>();
+                    services.AddRemotePublisher<GoogleAdsPoller, GoogleAdsPollerOptions>();
                     services.AddRemotePublisher<TaboolaPoller, TaboolaPollerOptions>();
                     services.AddHostedService<RemoteApplicationService>();
                     services.AddNpgsql("MaxiMizDatabase");
