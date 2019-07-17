@@ -110,7 +110,8 @@ namespace Poller.Taboola
         {
             var query = HttpUtility.ParseQueryString(string.Empty);
             query["start_date"] = query["end_date"] = DateTime.Now.ToString("yyyy-MM-dd");
-            //TODO use fetched accountId
+
+            // TODO: use fetched accountId
             var url = $"api/1.0/{options/*.AccountId*/}/reports/top-campaign-content/dimensions/item_breakdown?{query}";
 
             var result = await RemoteQueryAndLogAsync<TopCampaignReport>(HttpMethod.Get, url);
@@ -160,7 +161,7 @@ namespace Poller.Taboola
             //TODO use fetched accountId
             var url = $"api/1.0/{options/*.AccountId*/}/campaigns/{campaign}";
 
-            var campaigns = await RemoteQueryAndLogAsync<TopCampaignReport>(HttpMethod.Get, url);
+            var campaigns = await RemoteQueryAndLogAsync<Campaign>(HttpMethod.Get, url);
         }
 
         public async Task CreateCampaign()

@@ -22,7 +22,7 @@ namespace Poller.GoogleAds
 
         private readonly GoogleAdsPollerOptions options;
 
-        protected GoogleAdsClient client { get => _client.Value; }
+        protected GoogleAdsClient Client { get => _client.Value; }
 
         /// <summary>
         /// Creates a TaboolaPoller for fetching Data from Taboola.
@@ -40,10 +40,9 @@ namespace Poller.GoogleAds
             _client = new Lazy<GoogleAdsClient>(() => new GoogleAdsClient(options.Value.Config));
         }
 
-
-        public async override Task GetTopCampaignReportAsync()
+        public override Task GetTopCampaignReportAsync()
         {
-            GoogleAdsServiceClient googleAdsService = client.GetService(Services.V1.GoogleAdsService);
+            GoogleAdsServiceClient googleAdsService = Client.GetService(Services.V1.GoogleAdsService);
             SearchGoogleAdsRequest request = new SearchGoogleAdsRequest()
             {
                 PageSize = 1000,
@@ -60,16 +59,14 @@ namespace Poller.GoogleAds
                 CustomerId = getAccount(),
             };
 
-            //TODO get accountid from endpoint.
+            // TODO: get accountid from endpoint.
             string getAccount()
             {
-                //https://developers.google.com/google-ads/api/docs/account-management/overview
+                /// https://developers.google.com/google-ads/api/docs/account-management/overview
                 throw new NotImplementedException();
             }
 
-            PagedEnumerable<SearchGoogleAdsResponse, GoogleAdsRow> searchPagedResponse =
-                            googleAdsService.Search(request); // TODO change to SearchAsync
-
+            var searchPagedResponse = googleAdsService.Search(request);
             var results = searchPagedResponse.Select(row =>
             {
                 var ad = row.AdGroupAd.Ad;
@@ -84,21 +81,23 @@ namespace Poller.GoogleAds
                         Campaign = campaign.Id.Value,
                         CampaignName = campaign.Name,
                         ContentUrl = ad.ImageAd.ImageUrl,
-                        Url = ad.DisplayUrl, //TODO is this the correct one?
+                        Url = ad.DisplayUrl, // TODO: is this the correct one?
                         Clicks = metrics.Clicks.Value,
                         Impressions = metrics.Impressions.Value,
                         Spent = Convert.ToDecimal(metrics.CostMicros.Value) / 1000000M,
-                        Currency = null, // TODO fetch from account that is fetching this data.
+                        Currency = null, // TODO: fetch from account that is fetching this data.
                         Actions = Convert.ToInt64(metrics.Conversions.Value)
                     };
                 }
                 catch (NullReferenceException nre)
-                {   //TODO finer error control so it does not do nothing when for example metrics is null.
+                {
+                    // TODO: finer error control so it does not do nothing when for example metrics is null.
                     Logger.LogError($"Attribute from server was null, item could not be created");
                     throw nre;
                 };
             }).ToList();
+
+            return Task.CompletedTask;
         }
     }
 }
-
