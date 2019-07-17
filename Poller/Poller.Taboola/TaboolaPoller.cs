@@ -180,6 +180,30 @@ namespace Poller.Taboola
             await RemoteQueryAndLogAsync<TopCampaignReport>(HttpMethod.Post, url);
         }
 
+        public async Task UpdateCampaignStatus()
+        {
+            var campaign = "2404044";
+            var url = $"api/1.0/{options/*.AccountId*/}/campaigns/{campaign}";
+
+            var result = await RemoteQueryAndLogAsync<TopCampaignReport>(HttpMethod.Put, url);
+        }
+
+        public async Task DeleteCampaign()
+        {
+            var campaign = "2404044";
+            var url = $"api/1.0/{options/*.AccountId*/}/campaigns/{campaign}";
+
+            var result = await RemoteQueryAndLogAsync<TopCampaignReport>(HttpMethod.Delete, url);
+        }
+
+        public async Task CopyCampaign()
+        {
+            var campaign = "2404044";
+            var url = $"api/1.0/{options/*.AccountId*/}/campaigns/{campaign}/duplicate";
+
+            var result = await RemoteQueryAndLogAsync<TopCampaignReport>(HttpMethod.Post, url);
+        }
+
         public void Dispose()
         {
             _client?.Value?.Dispose();
