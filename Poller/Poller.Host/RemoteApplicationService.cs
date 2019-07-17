@@ -12,6 +12,9 @@ using Poller.Publisher;
 
 namespace Poller.Host
 {
+    /// <summary>
+    /// Run the remote services.
+    /// </summary>
     internal class RemoteApplicationService : IHostedService, IDisposable
     {
         private readonly RemoteApplicationServiceOptions _options;
@@ -37,6 +40,7 @@ namespace Poller.Host
             _timer = new System.Timers.Timer(_options.StartupDelay * 1000);
             _cancellationTokenSource = new CancellationTokenSource();
 
+            // Stop the timer when cancel is called
             CancellationToken.Register(() =>
             {
                 _timer.Stop();
@@ -77,7 +81,7 @@ namespace Poller.Host
             {
                 try
                 {
-                    Logger.LogInformation("Running publishers");
+                    Logger.LogInformation("Running services");
 
                     int index = 0;
                     var taskCollection = new Task[_remotePublishers.Count()];
@@ -121,13 +125,12 @@ namespace Poller.Host
                 var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
                 cts.CancelAfter(TimeSpan.FromMinutes(_options.PublisherOperationTimeout));
 
-                var cancelToken = cts.Token;
-                cancelToken.Register(() =>
+                cts.Token.Register(() =>
                 {
                     Logger.LogWarning("Operation timeout, task killed");
                 });
 
-                await Task.Run(async () => await publisher.GetTopCampaignReportAsync().ConfigureAwait(false), cancelToken);
+                await Task.Run(async () => await publisher.GetTopCampaignReportAsync().ConfigureAwait(false), cts.Token);
             }
             catch (Exception e) when (e as OperationCanceledException == null)
             {
