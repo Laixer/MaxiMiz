@@ -63,14 +63,16 @@ namespace Poller.Taboola
         /// <param name="url"></param>
         /// <param name="cancellationToken">Cancellation token.</param>
         /// <returns>Object of TResult.</returns>
-        protected async Task<TResult> RemoteQueryAndLogAsync<TResult>(HttpMethod method, string url, CancellationToken cancellationToken = default)
+        protected async Task<TResult> RemoteQueryAndLogAsync<TResult>(HttpMethod method, string url, CancellationToken cancellationToken = default) // TODO: remove default
             where TResult : class
         {
+            cancellationToken.ThrowIfCancellationRequested();
+
             try
             {
                 Logger.LogTrace($"Executing {method} {url}");
 
-                return await HttpManager.RemoteQueryAsync<TResult>(method, url);
+                return await HttpManager.RemoteQueryAsync<TResult>(method, url, cancellationToken);
             }
             catch (Exception e)
             {
@@ -81,9 +83,11 @@ namespace Poller.Taboola
 
         public async Task GetAllAccounts()
         {
+            var cts = new CancellationTokenSource();
+
             var url = $"api/1.0/users/current/allowed-accounts/";
 
-            var accounts = await RemoteQueryAndLogAsync<AllowedAccounts>(HttpMethod.Get, url);
+            var accounts = await RemoteQueryAndLogAsync<AllowedAccounts>(HttpMethod.Get, url, cts.Token);
             if (accounts == null || accounts.Items.Count() <= 0)
             {
                 return;
@@ -204,9 +208,9 @@ namespace Poller.Taboola
             var result = await RemoteQueryAndLogAsync<TopCampaignReport>(HttpMethod.Post, url);
         }
 
-        public void Dispose()
-        {
-            _client?.Value?.Dispose();
-        }
+        /// <summary>
+        /// Dispose objects.
+        /// </summary>
+        public void Dispose() => _client?.Value?.Dispose();
     }
 }
