@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 using Poller.Helper;
 using Poller.OAuth;
@@ -14,10 +15,7 @@ namespace Poller
         public string RefreshUri { get; set; }
         public OAuthAuthorizationProvider AuthorizationProvider { get; set; }
 
-        public HttpManager(string baseUrl)
-        {
-            _baseUrl = baseUrl;
-        }
+        public HttpManager(string baseUrl) => _baseUrl = baseUrl;
 
         /// <summary>
         /// Create or reuse an OAuthHttpClient.
@@ -46,10 +44,10 @@ namespace Poller
         /// </remarks>
         /// <param name="method">HTTP method.</param>
         /// <param name="url">Endpoint.</param>
-        public async Task<TResult> RemoteQueryAsync<TResult>(HttpMethod method, string url)
+        public async Task<TResult> RemoteQueryAsync<TResult>(HttpMethod method, string url, CancellationToken cancellationToken)
             where TResult : class
         {
-            using (var httpResponse = await BuildHttpClient().SendAsync(new HttpRequestMessage(method, url)))
+            using (var httpResponse = await BuildHttpClient().SendAsync(new HttpRequestMessage(method, url), cancellationToken))
             {
                 httpResponse.EnsureSuccessStatusCode();
                 return await Json.DeserializeAsync<TResult>(httpResponse);
@@ -61,9 +59,9 @@ namespace Poller
         /// </summary>
         /// <param name="method">HTTP method.</param>
         /// <param name="url">Endpoint.</param>
-        public async Task RemoteExecuteAsync(HttpMethod method, string url)
+        public async Task RemoteExecuteAsync(HttpMethod method, string url, CancellationToken cancellationToken)
         {
-            using (var httpResponse = await BuildHttpClient().SendAsync(new HttpRequestMessage(method, url)))
+            using (var httpResponse = await BuildHttpClient().SendAsync(new HttpRequestMessage(method, url), cancellationToken))
             {
                 httpResponse.EnsureSuccessStatusCode();
             }
@@ -72,9 +70,6 @@ namespace Poller
         /// <summary>
         /// Dispose objects.
         /// </summary>
-        public void Dispose()
-        {
-            _client?.Dispose();
-        }
+        public void Dispose() => _client?.Dispose();
     }
 }
