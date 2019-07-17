@@ -49,6 +49,12 @@ namespace Poller.Model.Response
         public string Url { get; set; }
 
         /// <summary>
+        /// The ad title.
+        /// </summary>
+        [DataMember(Name = "title")]
+        public string Title { get; set; }
+
+        /// <summary>
         /// The amount of clicks on this item.
         /// </summary>
         [DataMember(Name = "clicks")]
