@@ -69,8 +69,14 @@ namespace Poller.Host
         /// Run all publishers.
         /// </summary>
         /// <remarks>
-        /// Only one session will run at all time. All following threads will skip
-        /// execution if the lock is hold.
+        ///     <para>
+        ///         Only one session will run at all time. All following threads will skip
+        ///         execution if the lock is hold.
+        ///     </para>
+        ///     <para>
+        ///         All exceptions are caught and ignored here. Nothing can be thrown from
+        ///         this method to prevent the host from shutting down.
+        ///     </para>
         /// </remarks>
         /// <param name="cancellationToken">Cancellation token.</param>
         private void RunAllPublishers(CancellationToken cancellationToken = default)
@@ -92,7 +98,7 @@ namespace Poller.Host
 
                     Task.WhenAll(taskCollection).Wait(cancellationToken);
                 }
-                catch (OperationCanceledException) { }
+                catch { }
                 finally
                 {
                     _timer.Interval = _options.PublisherRefreshInterval * 60 * 1000;
