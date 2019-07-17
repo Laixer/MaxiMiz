@@ -20,8 +20,8 @@ namespace Poller.Host
         private readonly RemoteApplicationServiceOptions _options;
         private readonly CancellationTokenSource _cancellationTokenSource;
         private readonly object executionLock = new object();
+        private readonly System.Timers.Timer _timer;
         private ICollection<IRemotePublisher> _remotePublishers;
-        private System.Timers.Timer _timer;
 
         protected ILogger Logger { get; }
         protected IServiceProvider Services { get; }
@@ -106,7 +106,6 @@ namespace Poller.Host
         /// </summary>
         /// <param name="publisher">Executing publisher.</param>
         /// <param name="cancellationToken">Cancellation token.</param>
-        /// <returns></returns>
         private async Task ExecutePublisher(IRemotePublisher publisher, CancellationToken cancellationToken)
         {
             if (cancellationToken.IsCancellationRequested) { return; }

@@ -6,7 +6,6 @@ using Poller.Publisher;
 
 namespace Poller.Taboola
 {
-
     public class TaboolaPollerMock : IRemotePublisher
     {
         /// <summary>
