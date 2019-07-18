@@ -120,19 +120,21 @@ namespace Poller.Host
                 watch.Start();
 
                 // Link the cancellation tokens into one new cancellation token
-                var combinedCTS = CancellationTokenSource.CreateLinkedTokenSource(CancellationToken);
-                combinedCTS.CancelAfter(TimeSpan.FromMinutes(_options.PublisherOperationTimeout));
-
-                combinedCTS.Token.Register(() =>
+                using (var combinedCTS = CancellationTokenSource.CreateLinkedTokenSource(CancellationToken))
                 {
-                    Logger.LogWarning("Operation timeout or canceled, task killed");
-                });
+                    combinedCTS.CancelAfter(TimeSpan.FromMinutes(_options.PublisherOperationTimeout));
 
-                // TODO: Does ex propagate?
-                Task.Run(async () =>
-                {
-                    await context.Provider.InvokeAsync(combinedCTS.Token).ConfigureAwait(false);
-                }, combinedCTS.Token).Wait(combinedCTS.Token);
+                    combinedCTS.Token.Register(() =>
+                    {
+                        Logger.LogWarning("Operation timeout or canceled, task killed");
+                    });
+
+                    // TODO: Does ex propagate?
+                    Task.Run(async () =>
+                    {
+                        await context.Provider.InvokeAsync(combinedCTS.Token).ConfigureAwait(false);
+                    }, combinedCTS.Token).Wait();
+                }
             }
             catch (Exception e) when (e as OperationCanceledException == null)
             {

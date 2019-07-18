@@ -14,7 +14,7 @@ using Poller.Poller;
 
 namespace Poller.Taboola
 {
-    internal class TaboolaPoller : IPollerRefreshAdvertisementData, IPollerDataSyncback, IPollerCreateOrUpdateObjects
+    internal class TaboolaPoller : IPollerRefreshAdvertisementData, IPollerDataSyncback, IPollerCreateOrUpdateObjects, IDisposable
     {
         private readonly ILogger _logger;
         private readonly DbConnection _connection;
@@ -72,67 +72,21 @@ namespace Poller.Taboola
         /// Gets the Top Campaign Reports for a specific date as specified
         /// in the Backstage documentation, deserializes them and  inserts them into the database
         /// </summary>
-        private async Task GetTopCampaignReportAsync(string account, CancellationToken token)
+        private Task<TopCampaignReport> GetTopCampaignReportAsync(string account, CancellationToken token)
         {
             var query = HttpUtility.ParseQueryString(string.Empty);
             query["start_date"] = query["end_date"] = DateTime.Now.ToString("yyyy-MM-dd");
 
             var url = $"api/1.0/{account}/reports/top-campaign-content/dimensions/item_breakdown?{query}";
 
-            var result = await RemoteQueryAndLogAsync<TopCampaignReport>(HttpMethod.Get, url, token);
-            if (result == null || result.RecordCount <= 0) { return; }
-
-            try
-            {
-                var sql = @"
-                    INSERT INTO
-	                    public.item(ad_group, campaign, clicks, impressions, spent, currency, publisher_id, content_url, url)
-                    VALUES
-                        (
-                            1,
-                            @Campaign,
-                            @Clicks,
-                            @Impressions,
-                            @Spent,
-                            @Currency,
-                            @PublisherItemId,
-                            @ContentUrl,
-                            @Url
-                        )
-                        ON CONFLICT (publisher_id) DO
-                        UPDATE
-                        SET
-                            clicks = excluded.clicks, impressions = excluded.impressions, spent = excluded.spent";
-
-                await _connection.OpenAsync();
-                await _connection.ExecuteAsync(new CommandDefinition(sql, result.Items, cancellationToken: token));
-            }
-            finally
-            {
-                // TODO: This should not be required
-                _connection.Close();
-            }
+            return RemoteQueryAndLogAsync<TopCampaignReport>(HttpMethod.Get, url, token);
         }
 
-        private async Task GetAllAccounts(CancellationToken token)
+        private Task<AllowedAccounts> GetAllAccounts(CancellationToken token)
         {
             var url = $"api/1.0/users/current/allowed-accounts/";
 
-            var accounts = await RemoteQueryAndLogAsync<AllowedAccounts>(HttpMethod.Get, url, token);
-            if (accounts == null || accounts.Items.Count() <= 0) { return; }
-
-            try
-            {
-                await _connection.OpenAsync();
-                await _connection.ExecuteAsync(
-                    @"INSERT INTO public.account_integration(publisher_id, name, type, currency, account)
-                          VALUES (@Id, @Name, @Type, @Currency, @AccountId)", accounts.Items);
-            }
-            finally
-            {
-                // TODO: This should not be required
-                _connection.Close();
-            }
+            return RemoteQueryAndLogAsync<AllowedAccounts>(HttpMethod.Get, url, token);
         }
 
         private async Task GetAllCampaigns(string account, CancellationToken token)
@@ -184,14 +138,59 @@ namespace Poller.Taboola
             var result = await RemoteQueryAndLogAsync<Campaign>(HttpMethod.Get, url, token);
         }
 
+
+
+
+        private async Task CommitCampaignItems(TopCampaignReport report, CancellationToken token)
+        {
+            if (report == null || report.RecordCount <= 0) { return; }
+
+            try
+            {
+                var sql = @"
+                    INSERT INTO
+	                    public.item(ad_group, campaign, clicks, impressions, spent, currency, publisher_id, content_url, url)
+                    VALUES
+                        (
+                            1,
+                            @Campaign,
+                            @Clicks,
+                            @Impressions,
+                            @Spent,
+                            @Currency,
+                            @PublisherItemId,
+                            @ContentUrl,
+                            @Url
+                        )
+                        ON CONFLICT (publisher_id) DO
+                        UPDATE
+                        SET
+                            clicks = excluded.clicks, impressions = excluded.impressions, spent = excluded.spent";
+
+                await _connection.OpenAsync();
+                await _connection.ExecuteAsync(new CommandDefinition(sql, report.Items, cancellationToken: token));
+            }
+            finally
+            {
+                // TODO: This should not be required
+                _connection.Close();
+            }
+        }
+
+
+
+
         public async Task RefreshAdvertisementDataAsync(PollerContext context, CancellationToken token)
         {
-            await GetTopCampaignReportAsync("socialentertainment-network", token);
+            var result = await GetTopCampaignReportAsync("socialentertainment-network", token);
+            await CommitCampaignItems(result, token);
+
+            context.Interval = TimeSpan.FromMinutes(15);
         }
 
         public async Task DataSyncbackAsync(CancellationToken token)
         {
-            await GetAllAccounts(token);
+            var result = await GetAllAccounts(token);
         }
 
         public Task CreateOrUpdateObjectsAsync(CancellationToken token)
@@ -199,6 +198,11 @@ namespace Poller.Taboola
             //
 
             return Task.CompletedTask;
+        }
+
+        public void Dispose()
+        {
+            _client?.Dispose();
         }
     }
 }
