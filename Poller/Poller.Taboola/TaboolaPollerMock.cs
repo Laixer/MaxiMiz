@@ -11,7 +11,7 @@ namespace Poller.Taboola
         /// <summary>
         /// Mocks the request to taboola for testing purposes by using a JSON file with a mock response.
         /// </summary>  
-        public async Task GetTopCampaignReportAsync()
+        public async Task RefreshAdvertisementDataAsync()
         {
             using (var stream = File.Create(@"mock.json"))
             {

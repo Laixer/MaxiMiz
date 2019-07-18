@@ -12,6 +12,6 @@ namespace Poller.Publisher
             Logger = logger;
         }
 
-        public abstract Task GetTopCampaignReportAsync();
+        public abstract Task RefreshAdvertisementDataAsync();
     }
 }

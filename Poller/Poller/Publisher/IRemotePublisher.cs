@@ -4,6 +4,6 @@ namespace Poller.Publisher
 {
     public interface IRemotePublisher
     {
-        Task GetTopCampaignReportAsync();
+        Task RefreshAdvertisementDataAsync();
     }
 }

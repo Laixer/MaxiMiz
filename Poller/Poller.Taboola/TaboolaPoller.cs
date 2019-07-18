@@ -81,6 +81,15 @@ namespace Poller.Taboola
             }
         }
 
+        public override async Task RefreshAdvertisementDataAsync()
+        {
+            // 1. Fetch account data from database (optional)
+            // 2. Fetch all campaigns from database
+            // 3. Per campaign fetch item data from report call
+
+            await Task.CompletedTask;
+        }
+
         public async Task GetAllAccounts()
         {
             var cts = new CancellationTokenSource();
@@ -111,7 +120,7 @@ namespace Poller.Taboola
         /// Gets the Top Campaign Reports for a specific date as specified
         /// in the Backstage documentation, deserializes them and  inserts them into the database
         /// </summary>
-        public async override Task GetTopCampaignReportAsync()
+        public async Task GetTopCampaignReportAsync()
         {
             var cts = new CancellationTokenSource();
 
@@ -198,6 +207,25 @@ namespace Poller.Taboola
             var url = $"api/1.0/{options/*.AccountId*/}/campaigns/{campaign}";
 
             var result = await RemoteQueryAndLogAsync<TopCampaignReport>(HttpMethod.Delete, url);
+        }
+
+        public async Task GetCampaignAllItems()
+        {
+            var campaignId = "2162154";
+            //TODO use fetched accountId
+            var url = $"api/1.0/{options/*.AccountId*/}/campaigns/{campaignId}/items";
+
+            var campaign = await RemoteQueryAndLogAsync<Campaign>(HttpMethod.Get, url);
+        }
+
+        public async Task GetCampaignItem()
+        {
+            var campaignId = "2162154";
+            var itemId = "253076575";
+            //TODO use fetched accountId
+            var url = $"api/1.0/{options/*.AccountId*/}/campaigns/{campaignId}/items/{itemId}";
+
+            var campaign = await RemoteQueryAndLogAsync<Campaign>(HttpMethod.Get, url);
         }
 
         public async Task CopyCampaign()

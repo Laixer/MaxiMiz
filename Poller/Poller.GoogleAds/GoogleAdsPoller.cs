@@ -40,7 +40,7 @@ namespace Poller.GoogleAds
             _client = new Lazy<GoogleAdsClient>(() => new GoogleAdsClient(options.Value.Config));
         }
 
-        public override Task GetTopCampaignReportAsync()
+        public override Task RefreshAdvertisementDataAsync()
         {
             GoogleAdsServiceClient googleAdsService = Client.GetService(Services.V1.GoogleAdsService);
             SearchGoogleAdsRequest request = new SearchGoogleAdsRequest()
