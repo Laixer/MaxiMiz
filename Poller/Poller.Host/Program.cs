@@ -41,7 +41,6 @@ namespace Poller.Host
 
                     services.Configure<RemoteApplicationServiceOptions>(options =>
                     {
-                        options.PublisherRefreshInterval = 15;
                     });
                 })
                 .ConfigureLogging((hostContext, configLogging) =>

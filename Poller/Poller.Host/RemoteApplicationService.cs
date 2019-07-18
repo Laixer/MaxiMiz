@@ -9,6 +9,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Poller.Publisher;
+using Poller.Scheduler;
 
 namespace Poller.Host
 {
@@ -18,10 +19,8 @@ namespace Poller.Host
     internal class RemoteApplicationService : IHostedService, IDisposable
     {
         private readonly RemoteApplicationServiceOptions _options;
-        private readonly CancellationTokenSource _cancellationTokenSource;
-        private readonly object executionLock = new object();
-        private readonly System.Timers.Timer _timer;
-        private ICollection<IRemotePublisher> _remotePublishers;
+        private readonly CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
+        private readonly ICollection<Timer> _timers = new List<Timer>();
 
         protected ILogger Logger { get; }
         protected IServiceProvider Services { get; }
@@ -35,107 +34,105 @@ namespace Poller.Host
         {
             Logger = logger ?? throw new ArgumentNullException(nameof(logger));
             Services = services ?? throw new ArgumentNullException(nameof(services));
-
             _options = options.Value ?? throw new ArgumentNullException(nameof(options));
-            _timer = new System.Timers.Timer(_options.StartupDelay * 1000);
-            _cancellationTokenSource = new CancellationTokenSource();
-
-            // Stop the timer when cancel is called
-            CancellationToken.Register(() =>
-            {
-                _timer.Stop();
-            });
         }
 
         /// <summary>
-        /// Start service.
+        /// Schedule the timer for next interval.
+        /// </summary>
+        /// <remarks>
+        /// The scheduler will add a bias offset to the timer
+        /// for a more overal balanced scheme.
+        /// </remarks>
+        /// <param name="timer">Configurable timer.</param>
+        /// <param name="timeSpan">Requested interval.</param>
+        /// <returns>Timer object passed in.</returns>
+        private Timer ScheduleTimer(Timer timer, TimeSpan timeSpan)
+        {
+            Random rand = new Random();
+            var timerOffset = TimeSpan.FromSeconds(rand.Next(15, 45));
+
+            timer.Change(timeSpan.Add(timerOffset), TimeSpan.FromMilliseconds(-1));
+            return timer;
+        }
+
+        /// <summary>
+        /// Context for each scheduled provider.
+        /// </summary>
+        internal class ProviderContext
+        {
+            public IOperationDelegate Provider { get; set; }
+            public Timer Timer { get; set; }
+        }
+
+        /// <summary>
+        /// Start service and schedule all operations to run.
         /// </summary>
         /// <param name="cancellationToken">Cancellation token.</param>
         public Task StartAsync(CancellationToken cancellationToken)
         {
             if (cancellationToken.IsCancellationRequested) { return Task.CompletedTask; }
 
-            _remotePublishers = Services.GetService<IEnumerable<IRemotePublisher>>().ToArray();
-            if (_remotePublishers.Count() > 0)
+            Logger.LogInformation("Services starting");
+
+            try
             {
-                _timer.Elapsed += (s, e) => RunAllPublishers(CancellationToken);
-                _timer.Start();
+                foreach (var remotePublishers in Services.GetService<IEnumerable<IRemotePublisher>>().ToArray())
+                {
+                    foreach (var provider in remotePublishers.CreateSchedulerScheme(cancellationToken).AsParallel())
+                    {
+                        var context = new ProviderContext
+                        {
+                            Provider = provider,
+                        };
+
+                        context.Timer = new Timer(ExecuteProvider,
+                            context,
+                            TimeSpan.FromMilliseconds(-1),
+                            TimeSpan.FromMilliseconds(-1));
+
+                        _timers.Add(ScheduleTimer(context.Timer, provider.Interval));
+                    }
+                }
             }
+            catch { }
 
             return Task.CompletedTask;
         }
 
         /// <summary>
-        /// Run all publishers.
+        /// Run an operation delegate.
         /// </summary>
-        /// <remarks>
-        ///     <para>
-        ///         Only one session will run at all time. All following threads will skip
-        ///         execution if the lock is hold.
-        ///     </para>
-        ///     <para>
-        ///         All exceptions are caught and ignored here. Nothing can be thrown from
-        ///         this method to prevent the host from shutting down.
-        ///     </para>
-        /// </remarks>
-        /// <param name="cancellationToken">Cancellation token.</param>
-        private void RunAllPublishers(CancellationToken cancellationToken = default)
+        /// <param name="state">An object of <see cref="ProviderContext"/>.</param>
+        protected virtual void ExecuteProvider(object state)
         {
-            if (cancellationToken.IsCancellationRequested) { return; }
+            var context = state as ProviderContext;
 
-            if (Monitor.TryEnter(executionLock))
-            {
-                try
-                {
-                    Logger.LogInformation("Running services");
-
-                    int index = 0;
-                    var taskCollection = new Task[_remotePublishers.Count()];
-                    foreach (var remotePublishers in _remotePublishers)
-                    {
-                        taskCollection[index++] = ExecutePublisher(remotePublishers, cancellationToken);
-                    }
-
-                    Task.WhenAll(taskCollection).Wait(cancellationToken);
-                }
-                catch { }
-                finally
-                {
-                    _timer.Interval = _options.PublisherRefreshInterval * 60 * 1000;
-                    Monitor.Exit(executionLock);
-                }
-            }
-        }
-
-        /// <summary>
-        /// Run each publisher.
-        /// </summary>
-        /// <param name="publisher">Executing publisher.</param>
-        /// <param name="cancellationToken">Cancellation token.</param>
-        private async Task ExecutePublisher(IRemotePublisher publisher, CancellationToken cancellationToken)
-        {
-            if (cancellationToken.IsCancellationRequested) { return; }
-
-            await Task.Yield();
+            if (CancellationToken.IsCancellationRequested) { return; }
 
             var watch = new Stopwatch();
 
             try
             {
-                Logger.LogDebug($"Start {publisher.GetType().FullName} at {DateTime.Now}");
+                Logger.LogInformation($"Start {context.Provider.GetType().FullName}");
+                Logger.LogDebug($"Start {context.Provider.GetType().FullName} at {DateTime.Now}");
 
                 watch.Start();
 
                 // Link the cancellation tokens into one new cancellation token
-                var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
-                cts.CancelAfter(TimeSpan.FromMinutes(_options.PublisherOperationTimeout));
+                var combinedCTS = CancellationTokenSource.CreateLinkedTokenSource(CancellationToken);
+                combinedCTS.CancelAfter(TimeSpan.FromMinutes(_options.PublisherOperationTimeout));
 
-                cts.Token.Register(() =>
+                combinedCTS.Token.Register(() =>
                 {
-                    Logger.LogWarning("Operation timeout, task killed");
+                    Logger.LogWarning("Operation timeout or canceled, task killed");
                 });
 
-                await Task.Run(async () => await publisher.GetTopCampaignReportAsync().ConfigureAwait(false), cts.Token);
+                // TODO: Does ex propagate?
+                Task.Run(async () =>
+                {
+                    await context.Provider.InvokeAsync(combinedCTS.Token).ConfigureAwait(false);
+                }, combinedCTS.Token).Wait(combinedCTS.Token);
             }
             catch (Exception e) when (e as OperationCanceledException == null)
             {
@@ -146,7 +143,12 @@ namespace Poller.Host
             {
                 watch.Stop();
 
-                Logger.LogDebug($"Finished {publisher.GetType().FullName} in {watch.Elapsed}");
+                Logger.LogInformation($"Finished {context.Provider.GetType().FullName}");
+                Logger.LogDebug($"Finished {context.Provider.GetType().FullName} in {watch.Elapsed}");
+
+                ScheduleTimer(context.Timer, context.Provider.Interval);
+
+                Logger.LogDebug($"Rerun {context.Provider.GetType().FullName} in ~{context.Provider.Interval}");
             }
         }
 
@@ -168,7 +170,11 @@ namespace Poller.Host
         public void Dispose()
         {
             _cancellationTokenSource?.Dispose();
-            _timer?.Dispose();
+
+            foreach (var timer in _timers)
+            {
+                timer.Dispose();
+            }
         }
     }
 }

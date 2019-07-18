@@ -1,57 +1,44 @@
-using System;
+﻿using System;
+using System.Data.Common;
+using System.Linq;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
-using System.Linq;
-using System.Data.Common;
-using Microsoft.Extensions.Options;
+using Dapper;
 using Microsoft.Extensions.Logging;
-using Poller.OAuth;
-using Poller.Publisher;
 using Poller.Model;
 using Poller.Model.Response;
-using Dapper;
+using Poller.OAuth;
+using Poller.Poller;
 
 namespace Poller.Taboola
 {
-    [Publisher("Taboola")]
-    public class TaboolaPoller : RemotePublisher, IDisposable
+    internal class TaboolaPoller : IPollerRefreshAdvertisementData, IPollerDataSyncback, IPollerCreateOrUpdateObjects
     {
-        private readonly Lazy<HttpManager> _client;
-        private readonly DbConnection connection;
-        private readonly TaboolaPollerOptions options;
+        private readonly ILogger _logger;
+        private readonly DbConnection _connection;
+        private readonly HttpManager _client;
+        private readonly TaboolaPollerOptions _options;
 
-        protected HttpManager HttpManager { get => _client.Value; }
-
-        /// <summary>
-        /// Creates a TaboolaPoller for fetching Data from Taboola.
-        /// </summary>
-        /// <param name="logger">A logger for this poller.</typeparam>
-        /// <param name="options">An instance of options required for requests.</param>
-        /// <param name="connection">The database connections to use for inserting fetched data.</param>
-        public TaboolaPoller(ILogger<TaboolaPoller> logger, IOptions<TaboolaPollerOptions> options, DbConnection connection)
-            : base(logger)
+        public TaboolaPoller(ILogger logger, TaboolaPollerOptions options, DbConnection connection)
         {
-            this.options = options?.Value;
-            this.connection = connection;
+            _logger = logger;
+            _options = options;
+            _connection = connection;
 
-            // Lazy initialization prevent performance hit on process start.
-            _client = new Lazy<HttpManager>(() =>
+            _client = new HttpManager(_options.BaseUrl)
             {
-                return new HttpManager(this.options.BaseUrl)
+                TokenUri = "oauth/token",
+                RefreshUri = "oauth/token",
+                AuthorizationProvider = new OAuthAuthorizationProvider
                 {
-                    TokenUri = "oauth/token",
-                    RefreshUri = "oauth/token",
-                    AuthorizationProvider = new OAuthAuthorizationProvider
-                    {
-                        ClientId = this.options.OAuth2.ClientId,
-                        ClientSecret = this.options.OAuth2.ClientSecret,
-                        Username = this.options.OAuth2.Username,
-                        Password = this.options.OAuth2.Password,
-                    }
-                };
-            });
+                    ClientId = _options.OAuth2.ClientId,
+                    ClientSecret = _options.OAuth2.ClientSecret,
+                    Username = _options.OAuth2.Username,
+                    Password = _options.OAuth2.Password,
+                }
+            };
         }
 
         /// <summary>
@@ -70,49 +57,14 @@ namespace Poller.Taboola
 
             try
             {
-                Logger.LogTrace($"Executing {method} {url}");
+                _logger.LogTrace($"Executing {method} {url}");
 
-                return await HttpManager.RemoteQueryAsync<TResult>(method, url, cancellationToken);
+                return await _client.RemoteQueryAsync<TResult>(method, url, cancellationToken);
             }
             catch (Exception e)
             {
-                Logger.LogError($"{url}: {e.Message}");
+                _logger.LogError($"{url}: {e.Message}");
                 throw e;
-            }
-        }
-
-        public override async Task RefreshAdvertisementDataAsync()
-        {
-            // 1. Fetch account data from database (optional)
-            // 2. Fetch all campaigns from database
-            // 3. Per campaign fetch item data from report call
-
-            await Task.CompletedTask;
-        }
-
-        public async Task GetAllAccounts()
-        {
-            var cts = new CancellationTokenSource();
-
-            var url = $"api/1.0/users/current/allowed-accounts/";
-
-            var accounts = await RemoteQueryAndLogAsync<AllowedAccounts>(HttpMethod.Get, url, cts.Token);
-            if (accounts == null || accounts.Items.Count() <= 0)
-            {
-                return;
-            }
-
-            try
-            {
-                await connection.OpenAsync();
-                await connection.ExecuteAsync(
-                    @"INSERT INTO public.account_integration(publisher_id, name, type, currency, account)
-                          VALUES (@Id, @Name, @Type, @Currency, @AccountId)", accounts.Items);
-            }
-            finally
-            {
-                // TODO: This should not be required
-                connection.Close();
             }
         }
 
@@ -120,21 +72,15 @@ namespace Poller.Taboola
         /// Gets the Top Campaign Reports for a specific date as specified
         /// in the Backstage documentation, deserializes them and  inserts them into the database
         /// </summary>
-        public async Task GetTopCampaignReportAsync()
+        private async Task GetTopCampaignReportAsync(string account, CancellationToken token)
         {
-            var cts = new CancellationTokenSource();
-
             var query = HttpUtility.ParseQueryString(string.Empty);
             query["start_date"] = query["end_date"] = DateTime.Now.ToString("yyyy-MM-dd");
 
-            // TODO: use fetched accountId
-            var url = $"api/1.0/{options/*.AccountId*/}/reports/top-campaign-content/dimensions/item_breakdown?{query}";
+            var url = $"api/1.0/{account}/reports/top-campaign-content/dimensions/item_breakdown?{query}";
 
-            var result = await RemoteQueryAndLogAsync<TopCampaignReport>(HttpMethod.Get, url, cts.Token);
-            if (result == null || result.RecordCount <= 0)
-            {
-                return;
-            }
+            var result = await RemoteQueryAndLogAsync<TopCampaignReport>(HttpMethod.Get, url, token);
+            if (result == null || result.RecordCount <= 0) { return; }
 
             try
             {
@@ -158,87 +104,101 @@ namespace Poller.Taboola
                         SET
                             clicks = excluded.clicks, impressions = excluded.impressions, spent = excluded.spent";
 
-                await connection.OpenAsync();
-                await connection.ExecuteAsync(new CommandDefinition(sql, result.Items, cancellationToken: cts.Token));
+                await _connection.OpenAsync();
+                await _connection.ExecuteAsync(new CommandDefinition(sql, result.Items, cancellationToken: token));
             }
             finally
             {
                 // TODO: This should not be required
-                connection.Close();
+                _connection.Close();
             }
         }
 
-        public async Task GetAllCampaigns()
+        private async Task GetAllAccounts(CancellationToken token)
         {
-            //TODO use fetched accountId
-            var url = $"api/1.0/{options/*.AccountId*/}/campaigns";
+            var url = $"api/1.0/users/current/allowed-accounts/";
 
-            var campaigns = await RemoteQueryAndLogAsync<Campaign>(HttpMethod.Get, url);
+            var accounts = await RemoteQueryAndLogAsync<AllowedAccounts>(HttpMethod.Get, url, token);
+            if (accounts == null || accounts.Items.Count() <= 0) { return; }
+
+            try
+            {
+                await _connection.OpenAsync();
+                await _connection.ExecuteAsync(
+                    @"INSERT INTO public.account_integration(publisher_id, name, type, currency, account)
+                          VALUES (@Id, @Name, @Type, @Currency, @AccountId)", accounts.Items);
+            }
+            finally
+            {
+                // TODO: This should not be required
+                _connection.Close();
+            }
         }
 
-        public async Task GetCampaign()
+        private async Task GetAllCampaigns(string account, CancellationToken token)
         {
-            var campaignId = "2162154";
-            //TODO use fetched accountId
-            var url = $"api/1.0/{options/*.AccountId*/}/campaigns/{campaignId}";
+            var url = $"api/1.0/{account}/campaigns";
 
-            var campaign = await RemoteQueryAndLogAsync<Campaign>(HttpMethod.Get, url);
+            var result = await RemoteQueryAndLogAsync<Campaign>(HttpMethod.Get, url, token);
         }
 
-        public async Task CreateCampaign()
+        private async Task GetCampaign(string account, string campaign, CancellationToken token)
         {
-            //TODO use fetched accountId
-            var url = $"api/1.0/{options/*.AccountId*/}/campaigns/";
+            var url = $"api/1.0/{account}/campaigns/{campaign}";
 
-            await RemoteQueryAndLogAsync<TopCampaignReport>(HttpMethod.Post, url);
+            var result = await RemoteQueryAndLogAsync<Campaign>(HttpMethod.Get, url, token);
         }
 
-        public async Task UpdateCampaignStatus()
+        private async Task CreateCampaign(string account, CancellationToken token)
         {
-            var campaign = "2404044";
-            var url = $"api/1.0/{options/*.AccountId*/}/campaigns/{campaign}";
+            var url = $"api/1.0/{account}/campaigns/";
 
-            var result = await RemoteQueryAndLogAsync<TopCampaignReport>(HttpMethod.Put, url);
+            await RemoteQueryAndLogAsync<TopCampaignReport>(HttpMethod.Post, url, token);
         }
 
-        public async Task DeleteCampaign()
+        private async Task UpdateCampaignStatus(string account, string campaign, CancellationToken token)
         {
-            var campaign = "2404044";
-            var url = $"api/1.0/{options/*.AccountId*/}/campaigns/{campaign}";
+            var url = $"api/1.0/{account}/campaigns/{campaign}";
 
-            var result = await RemoteQueryAndLogAsync<TopCampaignReport>(HttpMethod.Delete, url);
+            var result = await RemoteQueryAndLogAsync<TopCampaignReport>(HttpMethod.Put, url, token);
         }
 
-        public async Task GetCampaignAllItems()
+        private async Task DeleteCampaign(string account, string campaign, CancellationToken token)
         {
-            var campaignId = "2162154";
-            //TODO use fetched accountId
-            var url = $"api/1.0/{options/*.AccountId*/}/campaigns/{campaignId}/items";
+            var url = $"api/1.0/{account}/campaigns/{campaign}";
 
-            var campaign = await RemoteQueryAndLogAsync<Campaign>(HttpMethod.Get, url);
+            var result = await RemoteQueryAndLogAsync<TopCampaignReport>(HttpMethod.Delete, url, token);
         }
 
-        public async Task GetCampaignItem()
+        private async Task GetCampaignAllItems(string account, string campaign, CancellationToken token)
         {
-            var campaignId = "2162154";
-            var itemId = "253076575";
-            //TODO use fetched accountId
-            var url = $"api/1.0/{options/*.AccountId*/}/campaigns/{campaignId}/items/{itemId}";
+            var url = $"api/1.0/{account}/campaigns/{campaign}/items";
 
-            var campaign = await RemoteQueryAndLogAsync<Campaign>(HttpMethod.Get, url);
+            var result = await RemoteQueryAndLogAsync<Campaign>(HttpMethod.Get, url, token);
         }
 
-        public async Task CopyCampaign()
+        private async Task GetCampaignItem(string account, string campaign, string item, CancellationToken token)
         {
-            var campaign = "2404044";
-            var url = $"api/1.0/{options/*.AccountId*/}/campaigns/{campaign}/duplicate";
+            var url = $"api/1.0/{account}/campaigns/{campaign}/items/{item}";
 
-            var result = await RemoteQueryAndLogAsync<TopCampaignReport>(HttpMethod.Post, url);
+            var result = await RemoteQueryAndLogAsync<Campaign>(HttpMethod.Get, url, token);
         }
 
-        /// <summary>
-        /// Dispose objects.
-        /// </summary>
-        public void Dispose() => _client?.Value?.Dispose();
+        public async Task RefreshAdvertisementDataAsync(PollerContext context, CancellationToken token)
+        {
+            await GetTopCampaignReportAsync("socialentertainment-network", token);
+        }
+
+        public async Task DataSyncbackAsync(CancellationToken token)
+        {
+            await GetAllAccounts(token);
+        }
+
+        public Task CreateOrUpdateObjectsAsync(CancellationToken token)
+        {
+            //
+
+            return Task.CompletedTask;
+        }
     }
 }

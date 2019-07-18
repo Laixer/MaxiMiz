@@ -1,5 +1,6 @@
-﻿using System.Threading.Tasks;
+﻿using System.Threading;
 using Microsoft.Extensions.Logging;
+using Poller.Scheduler;
 
 namespace Poller.Publisher
 {
@@ -12,6 +13,6 @@ namespace Poller.Publisher
             Logger = logger;
         }
 
-        public abstract Task RefreshAdvertisementDataAsync();
+        public abstract ScheduleCollection CreateSchedulerScheme(CancellationToken cancellationToken);
     }
 }

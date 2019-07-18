@@ -1,9 +1,10 @@
-﻿using System.Threading.Tasks;
+﻿using Poller.Scheduler;
+using System.Threading;
 
 namespace Poller.Publisher
 {
     public interface IRemotePublisher
     {
-        Task RefreshAdvertisementDataAsync();
+        ScheduleCollection CreateSchedulerScheme(CancellationToken cancellationToken = default);
     }
 }
