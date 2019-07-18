@@ -10,10 +10,9 @@ using Poller.Scheduler.Delegate;
 namespace Poller.Taboola
 {
     [Publisher("Taboola")]
-    public class TaboolaPublisher : RemotePublisher
+    public class TaboolaPublisher : RemotePublisher, IDisposable
     {
-        private readonly DbConnection connection;
-        private readonly TaboolaPollerOptions options;
+        private readonly TaboolaPoller poller;
 
         /// <summary>
         /// Creates a TaboolaPoller for fetching Data from Taboola.
@@ -24,21 +23,21 @@ namespace Poller.Taboola
         public TaboolaPublisher(ILogger<TaboolaPublisher> logger, IOptions<TaboolaPollerOptions> options, DbConnection connection)
             : base(logger)
         {
-            this.options = options?.Value;
-            this.connection = connection;
+            poller = new TaboolaPoller(Logger, options?.Value, connection);
         }
 
         public override ScheduleCollection CreateSchedulerScheme(CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
 
-            var poller = new TaboolaPoller(Logger, options, connection);
             return new ScheduleCollection
             {
-                RefreshAdvertisementDataProvider = new RefreshAdvertisementDataDelegate(poller, TimeSpan.FromMinutes(10)),
+                RefreshAdvertisementDataProvider = new RefreshAdvertisementDataDelegate(poller, TimeSpan.FromSeconds(10)),
                 //DataSyncbackProvider = new DataSyncbackDelegate(poller, TimeSpan.FromMinutes(3)),
                 //CreateOrUpdateObjectsProvider = new CreateOrUpdateObjectsDelegate(poller, TimeSpan.FromMinutes(10)),
             };
         }
+
+        public void Dispose() => poller?.Dispose();
     }
 }
