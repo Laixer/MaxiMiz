@@ -7,10 +7,12 @@ using System.Threading.Tasks;
 using System.Web;
 using Dapper;
 using Microsoft.Extensions.Logging;
+using Poller.Helper;
 using Poller.Model;
 using Poller.Model.Response;
 using Poller.OAuth;
 using Poller.Poller;
+using Poller.Taboola.Model;
 
 namespace Poller.Taboola
 {
@@ -82,11 +84,11 @@ namespace Poller.Taboola
             return RemoteQueryAndLogAsync<TopCampaignReport>(HttpMethod.Get, url, token);
         }
 
-        private Task<AllowedAccounts> GetAllAccounts(CancellationToken token)
+        private Task<AccountList> GetAllAccounts(CancellationToken token)
         {
             var url = $"api/1.0/users/current/allowed-accounts/";
 
-            return RemoteQueryAndLogAsync<AllowedAccounts>(HttpMethod.Get, url, token);
+            return RemoteQueryAndLogAsync<AccountList>(HttpMethod.Get, url, token);
         }
 
         private async Task GetAllCampaigns(string account, CancellationToken token)
@@ -162,10 +164,9 @@ namespace Poller.Taboola
                             @ContentUrl,
                             @Url
                         )
-                        ON CONFLICT (publisher_id) DO
-                        UPDATE
-                        SET
-                            clicks = excluded.clicks, impressions = excluded.impressions, spent = excluded.spent";
+                    ON CONFLICT (publisher_id) DO UPDATE
+                    SET
+                        clicks = excluded.clicks, impressions = excluded.impressions, spent = excluded.spent";
 
                 await _connection.OpenAsync();
                 await _connection.ExecuteAsync(new CommandDefinition(sql, report.Items, cancellationToken: token));
@@ -177,8 +178,38 @@ namespace Poller.Taboola
             }
         }
 
+        private async Task CommitAccounts(AccountList accounts, CancellationToken token)
+        {
+            if (accounts == null || accounts.Items.Count() <= 0) { return; }
 
+            foreach (var item in accounts.Items)
+            {
+                item.Details = Json.Serialize(new AccountDetails
+                {
+                    PartnerTypes = item.PartnerTypes,
+                    Type = item.Type,
+                    CampaignTypes = item.CampaignTypes,
+                });
+            }
 
+            try
+            {
+                var sql = @"
+                    INSERT INTO
+	                    public.account(publisher, name, currency, details)
+                    VALUES
+                        ('taboola', @AccountId, @Currency, @Details::json)
+                    ON CONFLICT (name) DO NOTHING";
+
+                await _connection.OpenAsync();
+                await _connection.ExecuteAsync(new CommandDefinition(sql, accounts.Items, cancellationToken: token));
+            }
+            finally
+            {
+                // TODO: This should not be required
+                _connection.Close();
+            }
+        }
 
         public async Task RefreshAdvertisementDataAsync(PollerContext context, CancellationToken token)
         {
@@ -191,6 +222,7 @@ namespace Poller.Taboola
         public async Task DataSyncbackAsync(CancellationToken token)
         {
             var result = await GetAllAccounts(token);
+            await CommitAccounts(result, token);
         }
 
         public Task CreateOrUpdateObjectsAsync(CancellationToken token)

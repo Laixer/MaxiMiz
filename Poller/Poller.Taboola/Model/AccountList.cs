@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Runtime.Serialization;
 
-namespace Poller.Model
+namespace Poller.Taboola.Model
 {
     [DataContract]
-    public class AllowedAccounts
+    public class AccountList
     {
         /// <summary>
         /// The items in this result.
