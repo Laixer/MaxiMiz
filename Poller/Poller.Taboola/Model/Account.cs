@@ -1,4 +1,5 @@
-﻿using System.Runtime.Serialization;
+﻿using System;
+using System.Runtime.Serialization;
 
 namespace Poller.Taboola.Model
 {
@@ -19,7 +20,7 @@ namespace Poller.Taboola.Model
     public class Account
     {
         [DataMember(Name = "id")]
-        public int Id { get; set; }
+        public Guid Id { get; set; }
 
         [DataMember(Name = "name")]
         public string Name { get; set; }
