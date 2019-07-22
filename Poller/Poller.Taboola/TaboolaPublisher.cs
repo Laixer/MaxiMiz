@@ -3,6 +3,7 @@ using System.Threading;
 using System.Data.Common;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Caching.Memory;
 using Poller.Publisher;
 using Poller.Scheduler;
 using Poller.Scheduler.Delegate;
@@ -20,10 +21,10 @@ namespace Poller.Taboola
         /// <param name="logger">A logger for this poller.</typeparam>
         /// <param name="options">An instance of options required for requests.</param>
         /// <param name="connection">The database connections to use for inserting fetched data.</param>
-        public TaboolaPublisher(ILogger<TaboolaPublisher> logger, IOptions<TaboolaPollerOptions> options, DbConnection connection)
+        public TaboolaPublisher(ILogger<TaboolaPublisher> logger, IOptions<TaboolaPollerOptions> options, DbConnection connection, IMemoryCache cache)
             : base(logger)
         {
-            poller = new TaboolaPoller(Logger, options?.Value, connection);
+            poller = new TaboolaPoller(Logger, options?.Value, connection, cache);
         }
 
         public override ScheduleCollection CreateSchedulerScheme(CancellationToken cancellationToken)
