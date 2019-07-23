@@ -10,6 +10,10 @@ namespace Poller.Scheduler
         public DataSyncbackDelegate DataSyncbackProvider { get; set; }
         public CreateOrUpdateObjectsDelegate CreateOrUpdateObjectsProvider { get; set; }
 
+        /// <summary>
+        /// Test if any data provider is set.
+        /// </summary>
+        /// <returns>Bool if at least one data provider is set.</returns>
         public bool Any()
         {
             return RefreshAdvertisementDataProvider != null
@@ -17,6 +21,10 @@ namespace Poller.Scheduler
                 || CreateOrUpdateObjectsProvider != null;
         }
 
+        /// <summary>
+        /// Return the data providers as an ennumerable collection.
+        /// </summary>
+        /// <returns><see cref="IEnumerator<IOperationDelegate>"/>.</returns>
         public IEnumerator<IOperationDelegate> GetEnumerator()
         {
             if (RefreshAdvertisementDataProvider != null)
@@ -33,6 +41,10 @@ namespace Poller.Scheduler
             }
         }
 
+        /// <summary>
+        /// Return the data providers as an ennumerable collection.
+        /// </summary>
+        /// <returns><see cref="IEnumerator"/>.</returns>
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     }
 }
