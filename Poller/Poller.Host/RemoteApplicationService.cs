@@ -126,17 +126,28 @@ namespace Poller.Host
 
                 // Link the cancellation tokens into one new cancellation token, but only for local scope.
                 using (var combinedCts = CancellationTokenSource.CreateLinkedTokenSource(CancellationToken))
-                using (var deadlineTimer = new Timer((s) => combinedCts.Cancel()))
+                using (var deadlineTimer = new Timer((_) => combinedCts.Cancel()))
                 {
-                    // Use timespan if timeout is set by provider.
-                    deadlineTimer.Change(context.Provider.Timeout.TotalMilliseconds > 0
-                        ? context.Provider.Timeout
-                        : TimeSpan.FromMinutes(_options.PublisherOperationTimeout), TimeSpan.FromMilliseconds(-1));
-
                     combinedCts.Token.Register(() =>
                     {
                         Logger.LogWarning("Operation timeout or canceled, task killed");
                     });
+
+                    // Restart the timeout from this point.
+                    context.Provider.OnSlidingWindowChange += (s, e) =>
+                    {
+                        // _options.PublisherOperationTimeout
+                        // Use provider timespan if timeout is set by provider.
+                        deadlineTimer.Change(context.Provider.Timeout.TotalMilliseconds > 0
+                            ? context.Provider.Timeout
+                            : TimeSpan.FromMinutes(1), TimeSpan.FromMilliseconds(-1));
+                    };
+
+                    // _options.PublisherOperationTimeout
+                    // Use provider timespan if timeout is set by provider.
+                    deadlineTimer.Change(context.Provider.Timeout.TotalMilliseconds > 0
+                        ? context.Provider.Timeout
+                        : TimeSpan.FromMinutes(1), TimeSpan.FromMilliseconds(-1));
 
                     // Run synchronous
                     Task.Run(async () =>

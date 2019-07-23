@@ -4,6 +4,8 @@ namespace Poller.Poller
 {
     public class PollerContext
     {
+        protected Action _progressCallback;
+
         public TimeSpan Interval { get; set; }
         public int RunCount { get; }
         public DateTime? LastRun { get; }
@@ -13,19 +15,16 @@ namespace Poller.Poller
         /// </summary>
         /// <param name="runCount">Number of successful runs.</param>
         /// <param name="lastRun">Last sucessful run.</param>
-        public PollerContext(int runCount, DateTime? lastRun)
+        public PollerContext(int runCount, DateTime? lastRun, Action progressCallback = null)
         {
             RunCount = runCount;
             LastRun = lastRun;
+            _progressCallback = progressCallback;
         }
 
         /// <summary>
-        /// Notify the runner service the callee is still alive.
-        /// This reset the timeout counter from this point onwards.
+        /// Notify the runner service of the operation progress.
         /// </summary>
-        public virtual void MarkProgress()
-        {
-            //
-        }
+        public virtual void MarkProgress() => _progressCallback?.Invoke();
     }
 }

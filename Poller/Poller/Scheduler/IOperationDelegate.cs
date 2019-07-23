@@ -12,9 +12,14 @@ namespace Poller.Scheduler
         TimeSpan Interval { get; }
 
         /// <summary>
-        /// Operation timeout.
+        /// Timeout after which the operation is canceled.
         /// </summary>
         TimeSpan Timeout { get; }
+
+        /// <summary>
+        /// Timeout window is changed event.
+        /// </summary>
+        event EventHandler OnSlidingWindowChange;
 
         /// <summary>
         /// Run the registered operation.

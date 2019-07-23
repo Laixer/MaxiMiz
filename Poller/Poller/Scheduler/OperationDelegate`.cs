@@ -15,6 +15,8 @@ namespace Poller.Scheduler
         public TimeSpan Interval { get; protected set; }
         public TimeSpan Timeout { get; protected set; }
 
+        public event EventHandler OnSlidingWindowChange;
+
         /// <summary>
         /// Create a new instance.
         /// </summary>
@@ -36,14 +38,20 @@ namespace Poller.Scheduler
         {
         }
 
+        private void ProgressUpdate()
+        {
+            OnSlidingWindowChange?.Invoke(this, null);
+        }
+
         /// <summary>
         /// Build the poller context from operation delegate.
         /// </summary>
         /// <returns><see cref="PollerContext"/>.</returns>
-        protected virtual PollerContext BuildPollerContext() => new PollerContext(runCount, runLast)
-        {
-            Interval = Interval,
-        };
+        protected virtual PollerContext BuildPollerContext()
+            => new PollerContext(runCount, runLast, ProgressUpdate)
+            {
+                Interval = Interval,
+            };
 
         /// <summary>
         /// Update operation delegate from context.
