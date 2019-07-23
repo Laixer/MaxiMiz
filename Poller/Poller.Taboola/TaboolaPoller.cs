@@ -223,13 +223,13 @@ namespace Poller.Taboola
             context.Interval = TimeSpan.FromMinutes(15);
         }
 
-        public async Task DataSyncbackAsync(CancellationToken token)
+        public async Task DataSyncbackAsync(PollerContext context, CancellationToken token)
         {
             var result = await GetAllAccounts(token);
             await CommitAccounts(result, token);
         }
 
-        public Task CreateOrUpdateObjectsAsync(CancellationToken token)
+        public Task CreateOrUpdateObjectsAsync(PollerContext context, CancellationToken token)
         {
             //
 

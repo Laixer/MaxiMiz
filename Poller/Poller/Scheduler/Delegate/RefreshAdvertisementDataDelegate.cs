@@ -12,16 +12,13 @@ namespace Poller.Scheduler.Delegate
         {
         }
 
-        public override async Task InvokeAsync(CancellationToken token)
+        protected override async Task InvokeDelegateAsync(CancellationToken token)
         {
-            var pollerContext = new PollerContext
-            {
-                Interval = Interval,
-            };
+            var pollerContext = BuildPollerContext();
 
             await _poller.RefreshAdvertisementDataAsync(pollerContext, token);
 
-            Interval = pollerContext.Interval;
+            DigestPollerContext(pollerContext);
         }
     }
 }

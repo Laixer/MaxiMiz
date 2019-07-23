@@ -41,18 +41,21 @@ namespace Poller.Host
         /// Schedule the timer for next interval.
         /// </summary>
         /// <remarks>
-        /// The scheduler will add a bias offset to the timer
-        /// for a more overal balanced scheme.
+        /// The scheduler will add a bias offset to the timer for a more 
+        /// overal balanced scheme, if the function is configured to do so.
         /// </remarks>
         /// <param name="timer">Configurable timer.</param>
         /// <param name="timeSpan">Requested interval.</param>
+        /// <param name="withBias">Optional timespan bias.</param>
         /// <returns>Timer object passed in.</returns>
-        private Timer ScheduleTimer(Timer timer, TimeSpan timeSpan)
+        private static Timer ScheduleTimer(Timer timer, TimeSpan timeSpan, bool withBias = true)
         {
             Random rand = new Random();
             var timerOffset = TimeSpan.FromSeconds(rand.Next(15, 45));
 
-            timer.Change(timeSpan.Add(timerOffset), TimeSpan.FromMilliseconds(-1));
+            timer.Change(withBias
+                ? timeSpan.Add(timerOffset)
+                : timeSpan, TimeSpan.FromMilliseconds(-1));
             return timer;
         }
 
@@ -68,6 +71,7 @@ namespace Poller.Host
         /// <summary>
         /// Start service and schedule all operations to run.
         /// </summary>
+        /// <remarks>This method will catch *all* exceptions.</remarks>
         /// <param name="cancellationToken">Cancellation token.</param>
         public Task StartAsync(CancellationToken cancellationToken)
         {
@@ -91,6 +95,7 @@ namespace Poller.Host
                             TimeSpan.FromMilliseconds(-1),
                             TimeSpan.FromMilliseconds(-1));
 
+                        // Add the timer to the list for later disposal.
                         _timers.Add(ScheduleTimer(context.Timer, provider.Interval));
                     }
                 }
@@ -119,21 +124,25 @@ namespace Poller.Host
 
                 watch.Start();
 
-                // Link the cancellation tokens into one new cancellation token
-                using (var combinedCTS = CancellationTokenSource.CreateLinkedTokenSource(CancellationToken))
+                // Link the cancellation tokens into one new cancellation token, but only for local scope.
+                using (var combinedCts = CancellationTokenSource.CreateLinkedTokenSource(CancellationToken))
+                using (var deadlineTimer = new Timer((s) => combinedCts.Cancel()))
                 {
-                    combinedCTS.CancelAfter(TimeSpan.FromMinutes(_options.PublisherOperationTimeout));
+                    // Use timespan if timeout is set by provider.
+                    deadlineTimer.Change(context.Provider.Timeout.TotalMilliseconds > 0
+                        ? context.Provider.Timeout
+                        : TimeSpan.FromMinutes(_options.PublisherOperationTimeout), TimeSpan.FromMilliseconds(-1));
 
-                    combinedCTS.Token.Register(() =>
+                    combinedCts.Token.Register(() =>
                     {
                         Logger.LogWarning("Operation timeout or canceled, task killed");
                     });
 
-                    // TODO: Does ex propagate?
+                    // Run synchronous
                     Task.Run(async () =>
                     {
-                        await context.Provider.InvokeAsync(combinedCTS.Token).ConfigureAwait(false);
-                    }, combinedCTS.Token).Wait();
+                        await context.Provider.InvokeAsync(combinedCts.Token).ConfigureAwait(false);
+                    }, combinedCts.Token).Wait();
                 }
             }
             catch (Exception e) when (e as OperationCanceledException == null)

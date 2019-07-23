@@ -12,6 +12,13 @@ namespace Poller.Scheduler.Delegate
         {
         }
 
-        public override Task InvokeAsync(CancellationToken token) => _poller.CreateOrUpdateObjectsAsync(token);
+        protected override async Task InvokeDelegateAsync(CancellationToken token)
+        {
+            var pollerContext = BuildPollerContext();
+
+            await _poller.CreateOrUpdateObjectsAsync(BuildPollerContext(), token);
+
+            DigestPollerContext(pollerContext);
+        }
     }
 }
