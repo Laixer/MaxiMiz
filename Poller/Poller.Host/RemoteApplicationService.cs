@@ -105,6 +105,12 @@ namespace Poller.Host
             return Task.CompletedTask;
         }
 
+        private void LogException(Exception e)
+        {
+            Logger.LogError(e.Message);
+            Logger.LogTrace(e.StackTrace);
+        }
+
         /// <summary>
         /// Run an operation delegate.
         /// </summary>
@@ -149,22 +155,28 @@ namespace Poller.Host
                         ? context.Provider.Timeout
                         : TimeSpan.FromMinutes(1), TimeSpan.FromMilliseconds(-1));
 
-                    // Run synchronous
-                    Task.Run(async () =>
-                    {
-                        await context.Provider.InvokeAsync(combinedCts.Token).ConfigureAwait(false);
-                    }, combinedCts.Token).Wait();
+                    // Run operation synchronous.
+                    context.Provider.InvokeAsync(combinedCts.Token).Wait(combinedCts.Token);
                 }
             }
             catch (AggregateException e)
             {
-                e.Handle((_e) => _e is TaskCanceledException);
+                e.Handle((_e) =>
+                {
+                    if (_e is TaskCanceledException || _e is OperationCanceledException)
+                    {
+                        return true;
+                    }
+
+                    LogException(_e);
+                    return true;
+                });
             }
             catch (Exception e) when (e as OperationCanceledException == null)
             {
-                Logger.LogError(e.Message);
-                Logger.LogTrace(e.StackTrace);
+                LogException(e);
             }
+            catch { }
             finally
             {
                 watch.Stop();
