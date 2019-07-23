@@ -5,7 +5,7 @@ using Poller.Model;
 namespace Poller.Taboola.Model
 {
     [DataContract]
-    public class CampaignList
+    internal class CampaignList
     {
         /// <summary>
         /// The items in this result.

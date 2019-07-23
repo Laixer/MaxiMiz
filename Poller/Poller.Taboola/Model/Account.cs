@@ -4,7 +4,7 @@ using System.Runtime.Serialization;
 namespace Poller.Taboola.Model
 {
     [DataContract]
-    public class AccountDetails
+    internal class AccountDetails
     {
         [DataMember(Name = "partner_types")]
         public string[] PartnerTypes { get; set; }
@@ -17,7 +17,7 @@ namespace Poller.Taboola.Model
     }
 
     [DataContract]
-    public class Account
+    internal class Account
     {
         [DataMember(Name = "id")]
         public Guid Id { get; set; }
