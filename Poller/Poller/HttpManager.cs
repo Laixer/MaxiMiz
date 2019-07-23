@@ -11,6 +11,7 @@ namespace Poller
     {
         private static OAuthHttpClient _client;
         private readonly string _baseUrl;
+
         public string TokenUri { get; set; }
         public string RefreshUri { get; set; }
         public OAuthAuthorizationProvider AuthorizationProvider { get; set; }

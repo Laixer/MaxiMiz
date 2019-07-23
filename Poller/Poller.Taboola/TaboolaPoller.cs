@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Data.Common;
 using System.Linq;
 using System.Net.Http;
@@ -6,12 +7,13 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
 using Dapper;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using Poller.Helper;
-using Poller.Model;
 using Poller.Model.Response;
 using Poller.OAuth;
 using Poller.Poller;
+using Poller.Taboola.Extensions;
 using Poller.Taboola.Model;
 
 namespace Poller.Taboola
@@ -20,14 +22,16 @@ namespace Poller.Taboola
     {
         private readonly ILogger _logger;
         private readonly DbConnection _connection;
+        private readonly IMemoryCache _cache;
         private readonly HttpManager _client;
         private readonly TaboolaPollerOptions _options;
 
-        public TaboolaPoller(ILogger logger, TaboolaPollerOptions options, DbConnection connection)
+        public TaboolaPoller(ILogger logger, TaboolaPollerOptions options, DbConnection connection, IMemoryCache cache)
         {
             _logger = logger;
             _options = options;
             _connection = connection;
+            _cache = cache;
 
             _client = new HttpManager(_options.BaseUrl)
             {
@@ -63,7 +67,7 @@ namespace Poller.Taboola
 
                 return await _client.RemoteQueryAsync<TResult>(method, url, cancellationToken);
             }
-            catch (Exception e)
+            catch (Exception e) when (e as OperationCanceledException == null && e as TaskCanceledException == null)
             {
                 _logger.LogError($"{url}: {e.Message}");
                 throw e;
@@ -91,11 +95,11 @@ namespace Poller.Taboola
             return RemoteQueryAndLogAsync<AccountList>(HttpMethod.Get, url, token);
         }
 
-        private async Task GetAllCampaigns(string account, CancellationToken token)
+        private Task<CampaignList> GetAllCampaigns(string account, CancellationToken token)
         {
             var url = $"api/1.0/{account}/campaigns";
 
-            var result = await RemoteQueryAndLogAsync<Campaign>(HttpMethod.Get, url, token);
+            return RemoteQueryAndLogAsync<CampaignList>(HttpMethod.Get, url, token);
         }
 
         private async Task GetCampaign(string account, string campaign, CancellationToken token)
@@ -105,11 +109,11 @@ namespace Poller.Taboola
             var result = await RemoteQueryAndLogAsync<Campaign>(HttpMethod.Get, url, token);
         }
 
-        private async Task CreateCampaign(string account, CancellationToken token)
+        private Task<Campaign> CreateCampaign(string account, CancellationToken token)
         {
             var url = $"api/1.0/{account}/campaigns/";
 
-            await RemoteQueryAndLogAsync<TopCampaignReport>(HttpMethod.Post, url, token);
+            return RemoteQueryAndLogAsync<Campaign>(HttpMethod.Post, url, token);
         }
 
         private async Task UpdateCampaignStatus(string account, string campaign, CancellationToken token)
@@ -119,18 +123,18 @@ namespace Poller.Taboola
             var result = await RemoteQueryAndLogAsync<TopCampaignReport>(HttpMethod.Put, url, token);
         }
 
-        private async Task DeleteCampaign(string account, string campaign, CancellationToken token)
+        private Task<Campaign> DeleteCampaign(string account, string campaign, CancellationToken token)
         {
             var url = $"api/1.0/{account}/campaigns/{campaign}";
 
-            var result = await RemoteQueryAndLogAsync<TopCampaignReport>(HttpMethod.Delete, url, token);
+            return RemoteQueryAndLogAsync<Campaign>(HttpMethod.Delete, url, token);
         }
 
-        private async Task GetCampaignAllItems(string account, string campaign, CancellationToken token)
+        private Task<AdItemList> GetCampaignAllItems(string account, string campaign, CancellationToken token)
         {
             var url = $"api/1.0/{account}/campaigns/{campaign}/items";
 
-            var result = await RemoteQueryAndLogAsync<Campaign>(HttpMethod.Get, url, token);
+            return RemoteQueryAndLogAsync<AdItemList>(HttpMethod.Get, url, token);
         }
 
         private async Task GetCampaignItem(string account, string campaign, string item, CancellationToken token)
@@ -232,9 +236,6 @@ namespace Poller.Taboola
             return Task.CompletedTask;
         }
 
-        public void Dispose()
-        {
-            _client?.Dispose();
-        }
+        public void Dispose() => _client?.Dispose();
     }
 }
