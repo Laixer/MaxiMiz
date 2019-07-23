@@ -156,6 +156,10 @@ namespace Poller.Host
                     }, combinedCts.Token).Wait();
                 }
             }
+            catch (AggregateException e)
+            {
+                e.Handle((_e) => _e is TaskCanceledException);
+            }
             catch (Exception e) when (e as OperationCanceledException == null)
             {
                 Logger.LogError(e.Message);
