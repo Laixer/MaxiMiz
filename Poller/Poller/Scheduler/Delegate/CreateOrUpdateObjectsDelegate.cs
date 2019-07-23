@@ -7,8 +7,8 @@ namespace Poller.Scheduler.Delegate
 {
     public class CreateOrUpdateObjectsDelegate : OperationDelegate<IPollerCreateOrUpdateObjects>
     {
-        public CreateOrUpdateObjectsDelegate(IPollerCreateOrUpdateObjects poller, TimeSpan timeSpan)
-            : base(poller, timeSpan)
+        public CreateOrUpdateObjectsDelegate(IPollerCreateOrUpdateObjects poller)
+            : base(poller, TimeSpan.FromMilliseconds(0))
         {
         }
 

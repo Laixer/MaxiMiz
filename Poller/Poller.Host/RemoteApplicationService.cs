@@ -105,6 +105,10 @@ namespace Poller.Host
             return Task.CompletedTask;
         }
 
+        /// <summary>
+        /// Log the exception.
+        /// </summary>
+        /// <param name="e">Exception.</param>
         private void LogException(Exception e)
         {
             Logger.LogError(e.Message);
@@ -134,10 +138,7 @@ namespace Poller.Host
                 using (var combinedCts = CancellationTokenSource.CreateLinkedTokenSource(CancellationToken))
                 using (var deadlineTimer = new Timer((_) => combinedCts.Cancel()))
                 {
-                    combinedCts.Token.Register(() =>
-                    {
-                        Logger.LogWarning("Operation timeout or canceled, task killed");
-                    });
+                    combinedCts.Token.Register(() => Logger.LogWarning("Operation timeout or canceled, task killed"));
 
                     // Restart the timeout from this point.
                     context.Provider.OnSlidingWindowChange += (s, e) =>
@@ -163,6 +164,7 @@ namespace Poller.Host
             {
                 e.Handle((_e) =>
                 {
+                    // Ignore cancelation related exceptions.
                     if (_e is TaskCanceledException || _e is OperationCanceledException)
                     {
                         return true;
