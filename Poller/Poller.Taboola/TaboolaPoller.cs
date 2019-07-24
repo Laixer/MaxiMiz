@@ -9,11 +9,11 @@ using System.Web;
 using Dapper;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
+using Poller.Extensions;
 using Poller.Helper;
 using Poller.Model.Response;
 using Poller.OAuth;
 using Poller.Poller;
-using Poller.Taboola.Extensions;
 using Poller.Taboola.Model;
 
 namespace Poller.Taboola
@@ -137,15 +137,12 @@ namespace Poller.Taboola
             return RemoteQueryAndLogAsync<AdItemList>(HttpMethod.Get, url, token);
         }
 
-        private async Task GetCampaignItem(string account, string campaign, string item, CancellationToken token)
+        private Task<AdItem> GetCampaignItem(string account, string campaign, string item, CancellationToken token)
         {
             var url = $"api/1.0/{account}/campaigns/{campaign}/items/{item}";
 
-            var result = await RemoteQueryAndLogAsync<Campaign>(HttpMethod.Get, url, token);
+            return RemoteQueryAndLogAsync<AdItem>(HttpMethod.Get, url, token);
         }
-
-
-
 
         private async Task CommitCampaignItems(TopCampaignReport report, CancellationToken token)
         {
@@ -174,6 +171,53 @@ namespace Poller.Taboola
 
                 await _connection.OpenAsync();
                 await _connection.ExecuteAsync(new CommandDefinition(sql, report.Items, cancellationToken: token));
+            }
+            finally
+            {
+                // TODO: This should not be required
+                _connection.Close();
+            }
+        }
+
+        private async Task CommitCampaignItems2(AdItemList aditems, CancellationToken token)
+        {
+            if (aditems == null || aditems.Items.Count() <= 0) { return; }
+
+            foreach (var item in aditems.Items)
+            {
+                if (string.IsNullOrEmpty(item.Title))
+                {
+                    item.Title = "INVALID";
+                }
+            }
+
+            try
+            {
+                var sql = @"
+                    INSERT INTO
+	                    public.ad_item(secondary_id, ad_group, title, url, content, cpc, spent, clicks, impressions, actions, details, status)
+                    VALUES
+                        (
+                            @Id,
+                            2,
+                            LEFT(@Title, 128),
+                            @Url,
+                            @Content,
+                            @Cpc,
+                            @Spent,
+                            @Clicks,
+                            @Impressions,
+                            @Actions,
+                            NULL,
+                            CAST ((enum_range(CAST (NULL AS ad_item_status)))[4] AS ad_item_status)
+                        )
+                    ON CONFLICT (secondary_id) DO UPDATE
+                    SET
+                        title = excluded.title,
+                        details = excluded.details";
+
+                await _connection.OpenAsync();
+                await _connection.ExecuteAsync(new CommandDefinition(sql, aditems.Items, cancellationToken: token));
             }
             finally
             {
@@ -215,6 +259,69 @@ namespace Poller.Taboola
             }
         }
 
+        private async Task CommitCampaigns(CampaignList campaigns, CancellationToken token)
+        {
+            if (campaigns == null || campaigns.Items.Count() <= 0) { return; }
+
+            foreach (var item in campaigns.Items)
+            {
+                if (item.Cpc > item.DailyCap)
+                {
+                    item.DailyCap = null;
+                }
+            }
+
+            var item2 = campaigns.Items.First();
+            item2.Delivery2 = AdDelivery.Accelerated;
+
+            try
+            {
+                var sql = @"
+                    INSERT INTO
+	                    public.campaign(name, branding_text, location_include, language, initial_cpc, budget, budget_daily, delivery, start_date, end_date, utm, campaign_group, note, publisher_id)
+                    VALUES
+                        (@Name, @Branding, '{0}', '{XXX}', @Cpc, @SpendingLimit, @Delivery2::delivery, @DailyCap, COALESCE(@StartDate, CURRENT_TIMESTAMP), @EndDate, @Utm, 48389, @Note, @Id)
+                    ON CONFLICT (publisher_id) DO NOTHING";
+
+                await _connection.OpenAsync();
+                await _connection.ExecuteAsync(new CommandDefinition(sql, item2, cancellationToken: token));
+            }
+            finally
+            {
+                // TODO: This should not be required
+                _connection.Close();
+            }
+        }
+
+        private async Task<IEnumerable<Account>> FetchAdvertiserAccounts(CancellationToken token)
+        {
+            try
+            {
+                var sql = @"
+                    SELECT id, publisher, name, currency FROM
+	                    public.account
+                    WHERE
+                        (details::json#>>'{partner_types}')::jsonb ? 'ADVERTISER'";
+
+                await _connection.OpenAsync();
+                return await _connection.QueryAsync<Account>(new CommandDefinition(sql, cancellationToken: token));
+            }
+            finally
+            {
+                // TODO: This should not be required
+                _connection.Close();
+            }
+        }
+
+        private Task<IEnumerable<Account>> FetchAdvertiserAccountsForCache(CancellationToken token)
+        {
+            return _cache.GetOrCreateAsync("AdvertiserAccounts", async entry =>
+            {
+                entry.SlidingExpiration = TimeSpan.FromDays(1);
+                return await FetchAdvertiserAccounts(token);
+            });
+        }
+
         public async Task RefreshAdvertisementDataAsync(PollerContext context, CancellationToken token)
         {
             var result = await GetTopCampaignReportAsync("socialentertainment-network", token);
@@ -225,8 +332,40 @@ namespace Poller.Taboola
 
         public async Task DataSyncbackAsync(PollerContext context, CancellationToken token)
         {
-            var result = await GetAllAccounts(token);
-            await CommitAccounts(result, token);
+            // Accounts almmost never change.
+            if (context.RunCount % 4 == 0 && false)
+            {
+                _logger.LogInformation("Syncback account information");
+
+                var result = await GetAllAccounts(token);
+                await CommitAccounts(result, token);
+            }
+
+            var accounts = await FetchAdvertiserAccountsForCache(token);
+            foreach (var account in accounts.ToList().Shuffle().Take(2))
+            {
+                var result = await GetAllCampaigns(account.Name, token);
+                await CommitCampaigns(result, token);
+
+                // Reorder the items with the idea of risk spreading.
+                foreach (var item in result.Items.ToList().Shuffle().Take(100))
+                {
+                    try
+                    {
+                        var result2 = await GetCampaignAllItems(account.Name, item.Id, token);
+                        await CommitCampaignItems2(result2, token);
+
+                        // Prevent spamming.
+                        await Task.Delay(250, token);
+
+                        context.MarkProgress(token);
+                    }
+                    catch (TaskCanceledException)
+                    {
+                        token.ThrowIfCancellationRequested();
+                    }
+                }
+            }
         }
 
         public Task CreateOrUpdateObjectsAsync(PollerContext context, CancellationToken token)
