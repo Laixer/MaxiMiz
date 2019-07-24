@@ -1,10 +1,11 @@
-﻿using Poller.Scheduler;
-using System.Threading;
+﻿using System.Threading;
+using Poller.Scheduler.Activator;
+using System.Collections.Generic;
 
 namespace Poller.Publisher
 {
     public interface IRemotePublisher
     {
-        ScheduleCollection CreateSchedulerScheme(CancellationToken cancellationToken = default);
+        IEnumerable<ActivatorBase> CreateSchedulerScheme(CancellationToken cancellationToken = default);
     }
 }

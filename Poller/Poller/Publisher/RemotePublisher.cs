@@ -1,6 +1,7 @@
-﻿using System.Threading;
+﻿using System.Collections.Generic;
+using System.Threading;
 using Microsoft.Extensions.Logging;
-using Poller.Scheduler;
+using Poller.Scheduler.Activator;
 
 namespace Poller.Publisher
 {
@@ -13,6 +14,6 @@ namespace Poller.Publisher
             Logger = logger;
         }
 
-        public abstract ScheduleCollection CreateSchedulerScheme(CancellationToken cancellationToken);
+        public abstract IEnumerable<ActivatorBase> CreateSchedulerScheme(CancellationToken cancellationToken);
     }
 }

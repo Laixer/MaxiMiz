@@ -1,16 +1,12 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Poller.Scheduler.Activator;
 
 namespace Poller.Scheduler
 {
     public interface IOperationDelegate
     {
-        /// <summary>
-        /// Next interval when the operation must be called.
-        /// </summary>
-        TimeSpan Interval { get; }
-
         /// <summary>
         /// Timeout after which the operation is canceled.
         /// </summary>

@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Poller.GoogleAds;
+using Poller.Scheduler.Activator;
 using Poller.Taboola;
 
 namespace Poller.Host
@@ -37,11 +38,8 @@ namespace Poller.Host
                     services.AddRemotePublisher<TaboolaPublisher, TaboolaPollerOptions>();
                     services.AddHostedService<RemoteApplicationService>();
                     services.AddNpgsql("MaxiMizDatabase");
+                    services.AddActivatorFactory();
                     services.AddMemoryCache();
-
-                    services.Configure<RemoteApplicationServiceOptions>(options =>
-                    {
-                    });
                 })
                 .ConfigureLogging((hostContext, configLogging) =>
                 {

@@ -1,6 +1,7 @@
 ﻿using System;
+using Poller.Scheduler;
 
-namespace Poller.Host.Extensions
+namespace Poller.Extensions
 {
     public static class DeadlineTimerExtensions
     {

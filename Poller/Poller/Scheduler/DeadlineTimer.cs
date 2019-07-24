@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading;
 
-namespace Poller.Host
+namespace Poller.Scheduler
 {
     /// <summary>
     /// A timer that cancels the tokensource when time up.

@@ -7,8 +7,8 @@ namespace Poller.Scheduler.Delegate
 {
     public class RefreshAdvertisementDataDelegate : OperationDelegate<IPollerRefreshAdvertisementData>
     {
-        public RefreshAdvertisementDataDelegate(IPollerRefreshAdvertisementData poller, TimeSpan timeSpan)
-            : base(poller, timeSpan)
+        public RefreshAdvertisementDataDelegate(IPollerRefreshAdvertisementData poller)
+            : base(poller)
         {
         }
 

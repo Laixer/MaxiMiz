@@ -12,7 +12,6 @@ namespace Poller.Scheduler
         private DateTime? runLast;
         protected TPoller _poller;
 
-        public TimeSpan Interval { get; protected set; }
         public TimeSpan Timeout { get; protected set; }
 
         public event EventHandler OnSlidingWindowChange;
@@ -21,21 +20,9 @@ namespace Poller.Scheduler
         /// Create a new instance.
         /// </summary>
         /// <param name="poller">Instance of an <see cref="IPoller"/>.</param>
-        /// <param name="timeSpan">Operation invoke interval.</param>
-        public OperationDelegate(TPoller poller, TimeSpan timeSpan)
+        public OperationDelegate(TPoller poller)
         {
-            Interval = timeSpan;
             _poller = poller;
-        }
-
-        /// <summary>
-        /// Create a new instance.
-        /// </summary>
-        /// <param name="poller">Instance of an <see cref="IPoller"/>.</param>
-        /// <param name="milliseconds">Operation invoke interval in miliseconds.</param>
-        public OperationDelegate(TPoller poller, double milliseconds)
-            : this(poller, TimeSpan.FromMilliseconds(milliseconds))
-        {
         }
 
         private void ProgressUpdate()
@@ -50,7 +37,7 @@ namespace Poller.Scheduler
         protected virtual PollerContext BuildPollerContext()
             => new PollerContext(runCount, runLast, ProgressUpdate)
             {
-                Interval = Interval,
+                Interval = TimeSpan.MaxValue,
             };
 
         /// <summary>
@@ -59,7 +46,7 @@ namespace Poller.Scheduler
         /// <param name="context"></param>
         protected virtual void DigestPollerContext(PollerContext context)
         {
-            Interval = context.Interval;
+            //
         }
 
         public void UnsubscribeAllEvents()

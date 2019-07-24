@@ -7,8 +7,8 @@ namespace Poller.Scheduler.Delegate
 {
     public class DataSyncbackDelegate : OperationDelegate<IPollerDataSyncback>
     {
-        public DataSyncbackDelegate(IPollerDataSyncback poller, TimeSpan timeSpan)
-            : base(poller, timeSpan)
+        public DataSyncbackDelegate(IPollerDataSyncback poller)
+            : base(poller)
         {
         }
 

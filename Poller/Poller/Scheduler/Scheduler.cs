@@ -1,50 +1,30 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using Poller.Scheduler.Delegate;
+﻿using System;
+using System.Threading;
 
 namespace Poller.Scheduler
 {
-    public sealed class ScheduleCollection : IEnumerable<IOperationDelegate>
+    public static class Scheduler
     {
-        public RefreshAdvertisementDataDelegate RefreshAdvertisementDataProvider { get; set; }
-        public DataSyncbackDelegate DataSyncbackProvider { get; set; }
-        public CreateOrUpdateObjectsDelegate CreateOrUpdateObjectsProvider { get; set; }
-
         /// <summary>
-        /// Test if any data provider is set.
+        /// Schedule the timer for next interval.
         /// </summary>
-        /// <returns>Bool if at least one data provider is set.</returns>
-        public bool Any()
+        /// <remarks>
+        /// The scheduler will add a bias offset to the timer for a more 
+        /// overal balanced scheme, if the function is configured to do so.
+        /// </remarks>
+        /// <param name="timer">Configurable timer.</param>
+        /// <param name="timeSpan">Requested interval.</param>
+        /// <param name="withBias">Optional timespan bias.</param>
+        /// <returns>Timer object passed in.</returns>
+        public static Timer ScheduleTimer(Timer timer, TimeSpan timeSpan, bool withBias = true)
         {
-            return RefreshAdvertisementDataProvider != null
-                || DataSyncbackProvider != null
-                || CreateOrUpdateObjectsProvider != null;
-        }
+            Random rand = new Random();
+            var timerOffset = TimeSpan.FromSeconds(rand.Next(15, 45));
 
-        /// <summary>
-        /// Return the data providers as an ennumerable collection.
-        /// </summary>
-        /// <returns><see cref="IEnumerator<IOperationDelegate>"/>.</returns>
-        public IEnumerator<IOperationDelegate> GetEnumerator()
-        {
-            if (RefreshAdvertisementDataProvider != null)
-            {
-                yield return RefreshAdvertisementDataProvider;
-            }
-            if (DataSyncbackProvider != null)
-            {
-                yield return DataSyncbackProvider;
-            }
-            if (CreateOrUpdateObjectsProvider != null)
-            {
-                yield return CreateOrUpdateObjectsProvider;
-            }
+            timer.Change(withBias
+                ? timeSpan.Add(timerOffset)
+                : timeSpan, TimeSpan.FromMilliseconds(-1));
+            return timer;
         }
-
-        /// <summary>
-        /// Return the data providers as an ennumerable collection.
-        /// </summary>
-        /// <returns><see cref="IEnumerator"/>.</returns>
-        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     }
 }
