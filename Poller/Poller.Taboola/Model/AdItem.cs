@@ -12,18 +12,9 @@ namespace Poller.Taboola.Model
         [DataMember(Name = "id")]
         public string Id { get; set; }
 
-        /// <summary>
-        /// The id issued by the publisher, this is issued as a string by the publisher
-        /// but we want an int so we need to supply a setter.
         /// </summary>
         [DataMember(Name = "item")]
-        public string Item { set => Id = value; }
-
-        /// <summary>
-        /// The ad title.
-        /// </summary>
-        [DataMember(Name = "item_name")]
-        public string ItemName { set => Title = value; }
+        public string _Id { set => Id = value; }
 
         /// <summary>
         /// The id of the campaign this item belongs to.
@@ -60,6 +51,12 @@ namespace Poller.Taboola.Model
         /// </summary>
         [DataMember(Name = "title")]
         public string Title { get; set; }
+
+        /// <summary>
+        /// The ad title.
+        /// </summary>
+        [DataMember(Name = "item_name")]
+        public string _Title { set => Title = value; }
 
         /// <summary>
         /// The amount of clicks on this item.
@@ -107,6 +104,6 @@ namespace Poller.Taboola.Model
         /// Ad item status.
         /// </summary>
         [DataMember(Name = "status")]
-        public string StatusText { get; set; }
+        public Status Status { get; set; }
     }
 }
