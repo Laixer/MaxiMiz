@@ -327,7 +327,7 @@ namespace Poller.Taboola
             var result = await GetTopCampaignReportAsync("socialentertainment-network", token);
             await CommitCampaignItems(result, token);
 
-            context.Interval = TimeSpan.FromMinutes(15);
+            //context.Interval = TimeSpan.FromMinutes(15);
         }
 
         public async Task DataSyncbackAsync(PollerContext context, CancellationToken token)

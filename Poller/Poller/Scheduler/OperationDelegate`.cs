@@ -20,10 +20,7 @@ namespace Poller.Scheduler
         /// Create a new instance.
         /// </summary>
         /// <param name="poller">Instance of an <see cref="IPoller"/>.</param>
-        public OperationDelegate(TPoller poller)
-        {
-            _poller = poller;
-        }
+        public OperationDelegate(TPoller poller) => _poller = poller;
 
         private void ProgressUpdate()
         {
@@ -35,15 +32,12 @@ namespace Poller.Scheduler
         /// </summary>
         /// <returns><see cref="PollerContext"/>.</returns>
         protected virtual PollerContext BuildPollerContext()
-            => new PollerContext(runCount, runLast, ProgressUpdate)
-            {
-                Interval = TimeSpan.MaxValue,
-            };
+            => new PollerContext(runCount, runLast, ProgressUpdate);
 
         /// <summary>
         /// Update operation delegate from context.
         /// </summary>
-        /// <param name="context"></param>
+        /// <param name="context"><see cref="PollerContext"/>.</param>
         protected virtual void DigestPollerContext(PollerContext context)
         {
             //

@@ -7,8 +7,14 @@ namespace Poller.Poller
     {
         protected Action _progressCallback;
 
-        public TimeSpan Interval { get; set; }
+        /// <summary>
+        /// Number of successful runs.
+        /// </summary>
         public int RunCount { get; }
+
+        /// <summary>
+        /// Last successful run.
+        /// </summary>
         public DateTime? LastRun { get; }
 
         /// <summary>

@@ -33,9 +33,6 @@ namespace Poller.Scheduler.Activator
             Logger.LogDebug($"Rerun {OperationName} in ~{_interval}");
         }
 
-        public override void Dispose()
-        {
-            _timer.Dispose();
-        }
+        public override void Dispose() => _timer.Dispose();
     }
 }
