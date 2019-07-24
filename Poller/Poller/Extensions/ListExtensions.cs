@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Poller.Taboola.Extensions
+namespace Poller.Extensions
 {
     public static class ListExtensions
     {

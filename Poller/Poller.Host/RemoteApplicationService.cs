@@ -10,6 +10,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Poller.Publisher;
 using Poller.Scheduler;
+using Poller.Host.Extensions;
 
 namespace Poller.Host
 {
@@ -140,21 +141,19 @@ namespace Poller.Host
                 {
                     combinedCts.Token.Register(() => Logger.LogWarning("Operation timeout or canceled, task killed"));
 
-                    // Restart the timeout from this point.
-                    context.Provider.OnSlidingWindowChange += (s, e) =>
+                    void SetDeadlineTimer()
                     {
                         // _options.PublisherOperationTimeout
                         // Use provider timespan if timeout is set by provider.
-                        deadlineTimer.Change(context.Provider.Timeout.TotalMilliseconds > 0
+                        deadlineTimer.Reset(context.Provider.Timeout.TotalMilliseconds > 0
                             ? context.Provider.Timeout
-                            : TimeSpan.FromMinutes(1), TimeSpan.FromMilliseconds(-1));
-                    };
+                            : TimeSpan.FromMinutes(1));
+                    }
 
-                    // _options.PublisherOperationTimeout
-                    // Use provider timespan if timeout is set by provider.
-                    deadlineTimer.Change(context.Provider.Timeout.TotalMilliseconds > 0
-                        ? context.Provider.Timeout
-                        : TimeSpan.FromMinutes(1), TimeSpan.FromMilliseconds(-1));
+                    // Restart the timeout from this point.
+                    context.Provider.OnSlidingWindowChange += (s, e) => SetDeadlineTimer();
+
+                    SetDeadlineTimer();
 
                     // Run operation synchronous.
                     context.Provider.InvokeAsync(combinedCts.Token).Wait(combinedCts.Token);
