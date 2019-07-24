@@ -6,6 +6,6 @@ namespace Poller.Publisher
 {
     public interface IRemotePublisher
     {
-        IEnumerable<ActivatorBase> CreateSchedulerScheme(CancellationToken cancellationToken = default);
+        IEnumerable<ActivatorBase> GetActivators(CancellationToken cancellationToken = default);
     }
 }

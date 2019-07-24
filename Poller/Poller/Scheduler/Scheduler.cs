@@ -5,6 +5,8 @@ namespace Poller.Scheduler
 {
     public static class Scheduler
     {
+        private static readonly Random rand = new Random();
+
         /// <summary>
         /// Schedule the timer for next interval.
         /// </summary>
@@ -18,7 +20,6 @@ namespace Poller.Scheduler
         /// <returns>Timer object passed in.</returns>
         public static Timer ScheduleTimer(Timer timer, TimeSpan timeSpan, bool withBias = true)
         {
-            Random rand = new Random();
             var timerOffset = TimeSpan.FromSeconds(rand.Next(15, 45));
 
             timer.Change(withBias

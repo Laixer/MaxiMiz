@@ -57,7 +57,7 @@ namespace Poller.Host
             {
                 foreach (var remotePublishers in ServiceProvider.GetService<IEnumerable<IRemotePublisher>>().ToArray())
                 {
-                    foreach (var activator in remotePublishers.CreateSchedulerScheme(token).AsParallel())
+                    foreach (var activator in remotePublishers.GetActivators(token).AsParallel())
                     {
                         activator.Initialize(CancellationToken);
                     }
@@ -76,7 +76,7 @@ namespace Poller.Host
             {
                 foreach (var remotePublishers in ServiceProvider.GetService<IEnumerable<IRemotePublisher>>().ToArray())
                 {
-                    foreach (var activator in remotePublishers.CreateSchedulerScheme(token).AsParallel())
+                    foreach (var activator in remotePublishers.GetActivators(token).AsParallel())
                     {
                         activator.Dispose();
                     }

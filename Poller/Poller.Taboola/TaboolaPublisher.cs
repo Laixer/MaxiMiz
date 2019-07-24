@@ -13,7 +13,7 @@ using System.Collections.Generic;
 namespace Poller.Taboola
 {
     [Publisher("Taboola")]
-    public class TaboolaPublisher : RemotePublisher, IDisposable
+    public class TaboolaPublisher : IRemotePublisher, IDisposable
     {
         private readonly TaboolaPoller _poller;
         private readonly ActivatorFactory _activatorFactory;
@@ -30,13 +30,12 @@ namespace Poller.Taboola
             DbConnection connection,
             IMemoryCache cache,
             ActivatorFactory activatorFactory)
-            : base(logger)
         {
-            _poller = new TaboolaPoller(Logger, options?.Value, connection, cache);
+            _poller = new TaboolaPoller(logger, options?.Value, connection, cache);
             _activatorFactory = activatorFactory;
         }
 
-        public override IEnumerable<ActivatorBase> CreateSchedulerScheme(CancellationToken cancellationToken)
+        public IEnumerable<ActivatorBase> GetActivators(CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
 
