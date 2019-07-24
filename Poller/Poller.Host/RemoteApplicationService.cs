@@ -182,6 +182,8 @@ namespace Poller.Host
             {
                 watch.Stop();
 
+                context.Provider.UnsubscribeAllEvents();
+
                 Logger.LogInformation($"Finished {context.Provider.GetType().FullName}");
                 Logger.LogDebug($"Finished {context.Provider.GetType().FullName} in {watch.Elapsed}");
 

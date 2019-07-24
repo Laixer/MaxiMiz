@@ -62,6 +62,11 @@ namespace Poller.Scheduler
             Interval = context.Interval;
         }
 
+        public void UnsubscribeAllEvents()
+        {
+            OnSlidingWindowChange = null;
+        }
+
         public async Task InvokeAsync(CancellationToken token)
         {
             await InvokeDelegateAsync(token);

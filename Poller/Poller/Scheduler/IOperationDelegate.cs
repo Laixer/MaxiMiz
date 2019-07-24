@@ -22,6 +22,11 @@ namespace Poller.Scheduler
         event EventHandler OnSlidingWindowChange;
 
         /// <summary>
+        /// Remove all listeners from all event.
+        /// </summary>
+        void UnsubscribeAllEvents();
+
+        /// <summary>
         /// Run the registered operation.
         /// </summary>
         /// <param name="token">Cancellation token.</param>

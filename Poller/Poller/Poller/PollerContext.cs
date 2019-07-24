@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 
 namespace Poller.Poller
 {
@@ -25,6 +26,11 @@ namespace Poller.Poller
         /// <summary>
         /// Notify the runner service of the operation progress.
         /// </summary>
-        public virtual void MarkProgress() => _progressCallback?.Invoke();
+        public virtual void MarkProgress(CancellationToken cancellationToken)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+
+            _progressCallback?.Invoke();
+        }
     }
 }
