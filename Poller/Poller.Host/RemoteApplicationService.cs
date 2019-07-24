@@ -136,7 +136,7 @@ namespace Poller.Host
 
                 // Link the cancellation tokens into one new cancellation token, but only for local scope.
                 using (var combinedCts = CancellationTokenSource.CreateLinkedTokenSource(CancellationToken))
-                using (var deadlineTimer = new Timer((_) => combinedCts.Cancel()))
+                using (var deadlineTimer = new DeadlineTimer(combinedCts))
                 {
                     combinedCts.Token.Register(() => Logger.LogWarning("Operation timeout or canceled, task killed"));
 
