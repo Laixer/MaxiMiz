@@ -5,7 +5,7 @@ using Newtonsoft.Json.Converters;
 namespace Poller.Taboola.Model
 {
     [JsonConverter(typeof(StringEnumConverter))]
-    internal enum Status
+    internal enum CampaignItemStatus
     {
         [EnumMember(Value = "running")]
         Running,

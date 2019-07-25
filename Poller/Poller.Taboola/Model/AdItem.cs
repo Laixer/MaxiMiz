@@ -104,6 +104,6 @@ namespace Poller.Taboola.Model
         /// Ad item status.
         /// </summary>
         [DataMember(Name = "status")]
-        public Status Status { get; set; }
+        public CampaignItemStatus Status { get; set; }
     }
 }

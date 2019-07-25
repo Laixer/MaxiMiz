@@ -26,7 +26,7 @@ namespace Poller.Scheduler.Activator
         /// </summary>
         /// <param name="operation">Operator instance.</param>
         /// <returns><see cref="ActivatorBase"/>.</returns>
-        public ActivatorBase EventActivator(IOperationDelegate operation)
-            => new EventActivator(ServiceProvider, operation);
+        public ActivatorBase EventActivator(IOperationDelegate operation, string queueName)
+            => new EventActivator(ServiceProvider, operation, queueName);
     }
 }

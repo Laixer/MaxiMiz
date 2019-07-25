@@ -63,7 +63,11 @@ namespace Poller.Host
                     }
                 }
             }
-            catch { }
+            catch (Exception e)
+            {
+                Logger.LogCritical(e.Message);
+                // TODO: Request shutdown
+            }
         }
 
         /// <summary>
@@ -82,7 +86,11 @@ namespace Poller.Host
                     }
                 }
             }
-            catch { }
+            catch (Exception e)
+            {
+                Logger.LogCritical(e.Message);
+                // TODO: Request shutdown
+            }
         }
 
         /// <summary>
