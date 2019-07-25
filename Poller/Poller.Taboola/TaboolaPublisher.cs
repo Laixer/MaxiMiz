@@ -1,14 +1,14 @@
 using System;
 using System.Threading;
-using System.Data.Common;
+using System.Collections.ObjectModel;
+using System.Collections.Generic;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Caching.Memory;
 using Poller.Publisher;
+using Poller.Database;
 using Poller.Scheduler.Activator;
 using Poller.Scheduler.Delegate;
-using System.Collections.ObjectModel;
-using System.Collections.Generic;
 
 namespace Poller.Taboola
 {
@@ -17,6 +17,7 @@ namespace Poller.Taboola
     {
         private readonly TaboolaPoller _poller;
         private readonly ActivatorFactory _activatorFactory;
+        private readonly TaboolaPollerOptions _options;
 
         /// <summary>
         /// Creates a TaboolaPoller for fetching Data from Taboola.
@@ -27,12 +28,13 @@ namespace Poller.Taboola
         public TaboolaPublisher(
             ILogger<TaboolaPublisher> logger,
             IOptions<TaboolaPollerOptions> options,
-            DbConnection connection,
+            DbProvider provider,
             IMemoryCache cache,
             ActivatorFactory activatorFactory)
         {
-            _poller = new TaboolaPoller(logger, options?.Value, connection, cache);
+            _poller = new TaboolaPoller(logger, options?.Value, provider, cache);
             _activatorFactory = activatorFactory;
+            _options = options?.Value;
         }
 
         public IEnumerable<ActivatorBase> GetActivators(CancellationToken cancellationToken)
@@ -41,9 +43,8 @@ namespace Poller.Taboola
 
             return new Collection<ActivatorBase>
             {
-                _activatorFactory.TimeActivator(new RefreshAdvertisementDataDelegate(_poller), TimeSpan.FromSeconds(10)),
-                _activatorFactory.TimeActivator(new DataSyncbackDelegate(_poller), TimeSpan.FromSeconds(10)),
-                _activatorFactory.EventActivator(new CreateOrUpdateObjectsDelegate(_poller)),
+                _activatorFactory.TimeActivator(new RefreshAdvertisementDataDelegate(_poller), TimeSpan.FromMinutes(_options.RefreshAdvertisementDataInterval)),
+                _activatorFactory.TimeActivator(new DataSyncbackDelegate(_poller), TimeSpan.FromMinutes(_options.DataSyncbackInterval)),
             };
         }
 

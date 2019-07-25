@@ -6,13 +6,19 @@ namespace Poller.Extensions
 {
     public static class EnumExtensions
     {
+        /// <summary>
+        /// Get name from enum if attribute is set.
+        /// </summary>
+        /// <typeparam name="TEnum">Enum type.</typeparam>
+        /// <param name="enumerationValue">Enum value.</param>
+        /// <returns>String representation of enum value.</returns>
         public static string GetEnumMemberName<TEnum>(this TEnum enumerationValue)
             where TEnum : struct
         {
             Type type = enumerationValue.GetType();
             if (!type.IsEnum)
             {
-                throw new ArgumentException("EnumerationValue must be of Enum type", "enumerationValue");
+                throw new ArgumentException("TEnum must be of Enum type");
             }
 
             MemberInfo[] memberInfo = type.GetMember(enumerationValue.ToString());

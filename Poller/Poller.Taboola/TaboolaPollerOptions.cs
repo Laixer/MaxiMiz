@@ -16,5 +16,15 @@ namespace Poller.Taboola
         /// Authentication settings.
         /// </summary>
         public OAuth2 OAuth2 { get; set; }
+
+        /// <summary>
+        /// Interval (in minutes) for operation.
+        /// </summary>
+        public int RefreshAdvertisementDataInterval { get; set; } = 60;
+
+        /// <summary>
+        /// Interval (in minutes) for operation.
+        /// </summary>
+        public int DataSyncbackInterval { get; set; } = 6 * 60;
     }
 }

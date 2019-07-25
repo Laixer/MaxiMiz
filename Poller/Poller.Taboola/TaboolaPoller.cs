@@ -20,30 +20,27 @@ namespace Poller.Taboola
 {
     internal class TaboolaPoller : IPollerRefreshAdvertisementData, IPollerDataSyncback, IPollerCreateOrUpdateObjects, IDisposable
     {
-        private readonly object dbLock = new object();
         private readonly ILogger _logger;
         private readonly DbProvider _provider;
         private readonly IMemoryCache _cache;
         private readonly HttpManager _client;
-        private readonly TaboolaPollerOptions _options;
 
         public TaboolaPoller(ILogger logger, TaboolaPollerOptions options, DbProvider provider, IMemoryCache cache)
         {
             _logger = logger;
-            _options = options;
             _provider = provider;
             _cache = cache;
 
-            _client = new HttpManager(_options.BaseUrl)
+            _client = new HttpManager(options.BaseUrl)
             {
                 TokenUri = "oauth/token",
                 RefreshUri = "oauth/token",
                 AuthorizationProvider = new OAuthAuthorizationProvider
                 {
-                    ClientId = _options.OAuth2.ClientId,
-                    ClientSecret = _options.OAuth2.ClientSecret,
-                    Username = _options.OAuth2.Username,
-                    Password = _options.OAuth2.Password,
+                    ClientId = options.OAuth2.ClientId,
+                    ClientSecret = options.OAuth2.ClientSecret,
+                    Username = options.OAuth2.Username,
+                    Password = options.OAuth2.Password,
                 }
             };
         }
@@ -203,7 +200,12 @@ namespace Poller.Taboola
                 INSERT INTO
 	                public.account(publisher, name, currency, details)
                 VALUES
-                    ('taboola', @AccountId, @Currency, @Details::json)
+                    (
+                        'taboola',
+                        @AccountId,
+                        @Currency,
+                        @Details::json
+                    )
                 ON CONFLICT (name) DO NOTHING";
 
             using (var connection = _provider.ConnectionScope())
@@ -231,7 +233,22 @@ namespace Poller.Taboola
                 INSERT INTO
 	                public.campaign(name, branding_text, location_include, language, initial_cpc, budget, budget_daily, delivery, start_date, end_date, utm, campaign_group, note, publisher_id)
                 VALUES
-                    (@Name, @Branding, '{0}', '{XXX}', @Cpc, @SpendingLimit, @Delivery2::delivery, @DailyCap, COALESCE(@StartDate, CURRENT_TIMESTAMP), @EndDate, @Utm, 48389, @Note, @Id)
+                    (
+                        @Name,
+                        @Branding,
+                        '{0}',
+                        '{XXX}',
+                        @Cpc,
+                        @SpendingLimit,
+                        @Delivery2::delivery,
+                        @DailyCap,
+                        COALESCE(@StartDate, CURRENT_TIMESTAMP),
+                        @EndDate,
+                        @Utm,
+                        48389,
+                        @Note,
+                        @Id
+                    )
                 ON CONFLICT (publisher_id) DO NOTHING";
 
             using (var connection = _provider.ConnectionScope())
@@ -248,7 +265,7 @@ namespace Poller.Taboola
 	            FROM
                     public.account
                 WHERE
-                    (details::json#>>'{partner_types}')::jsonb ? 'ADVERTISER'";
+                    (details::json #>> '{partner_types}')::jsonb ? 'ADVERTISER'";
 
             using (var connection = _provider.ConnectionScope())
             {
@@ -256,14 +273,13 @@ namespace Poller.Taboola
             }
         }
 
+        // TODO: Return account model according to database scheme.
         private Task<IEnumerable<Account>> FetchAdvertiserAccountsForCache(CancellationToken token)
-        {
-            return _cache.GetOrCreateAsync("AdvertiserAccounts", async entry =>
+            => _cache.GetOrCreateAsync("AdvertiserAccounts", async entry =>
             {
                 entry.SlidingExpiration = TimeSpan.FromDays(1);
                 return await FetchAdvertiserAccounts(token);
             });
-        }
 
         public async Task RefreshAdvertisementDataAsync(PollerContext context, CancellationToken token)
         {
@@ -273,13 +289,11 @@ namespace Poller.Taboola
                 var result = await GetTopCampaignReportAsync(account.Name, token);
                 await CommitCampaignItems(result, token);
             }
-
-            //context.Interval = TimeSpan.FromMinutes(15);
         }
 
         public async Task DataSyncbackAsync(PollerContext context, CancellationToken token)
         {
-            // Accounts almmost never change.
+            // Accounts almost never change.
             if (context.RunCount % 4 == 0 && false)
             {
                 _logger.LogInformation("Syncback account information");
