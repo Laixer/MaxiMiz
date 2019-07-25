@@ -145,6 +145,9 @@ namespace Poller.Taboola
         {
             if (aditems == null || aditems.Items.Count() <= 0) { return; }
 
+            // TODO: List in 'details':
+            // - approval_state
+            // - currency
             var sql = @"
                 INSERT INTO
 	                public.ad_item AS INCLUDED (secondary_id, ad_group, title, url, content, cpc, spent, clicks, impressions, actions, details, status)
@@ -287,6 +290,9 @@ namespace Poller.Taboola
             {
                 var result = await GetTopCampaignReportAsync(account.Name, token);
                 await CommitCampaignItems(result, token);
+
+                // Prevent spamming.
+                await Task.Delay(250, token);
             }
         }
 
