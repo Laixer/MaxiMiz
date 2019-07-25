@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data.Common;
 using System.Linq;
 using System.Net.Http;
 using System.Threading;
@@ -9,6 +8,7 @@ using System.Web;
 using Dapper;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
+using Poller.Database;
 using Poller.Extensions;
 using Poller.Helper;
 using Poller.Model.Response;
@@ -20,17 +20,18 @@ namespace Poller.Taboola
 {
     internal class TaboolaPoller : IPollerRefreshAdvertisementData, IPollerDataSyncback, IPollerCreateOrUpdateObjects, IDisposable
     {
+        private readonly object dbLock = new object();
         private readonly ILogger _logger;
-        private readonly DbConnection _connection;
+        private readonly DbProvider _provider;
         private readonly IMemoryCache _cache;
         private readonly HttpManager _client;
         private readonly TaboolaPollerOptions _options;
 
-        public TaboolaPoller(ILogger logger, TaboolaPollerOptions options, DbConnection connection, IMemoryCache cache)
+        public TaboolaPoller(ILogger logger, TaboolaPollerOptions options, DbProvider provider, IMemoryCache cache)
         {
             _logger = logger;
             _options = options;
-            _connection = connection;
+            _provider = provider;
             _cache = cache;
 
             _client = new HttpManager(_options.BaseUrl)
@@ -78,14 +79,14 @@ namespace Poller.Taboola
         /// Gets the Top Campaign Reports for a specific date as specified
         /// in the Backstage documentation, deserializes them and  inserts them into the database
         /// </summary>
-        private Task<TopCampaignReport> GetTopCampaignReportAsync(string account, CancellationToken token)
+        private Task<AdItemList> GetTopCampaignReportAsync(string account, CancellationToken token)
         {
             var query = HttpUtility.ParseQueryString(string.Empty);
-            query["start_date"] = query["end_date"] = DateTime.Now.ToString("yyyy-MM-dd");
+            query["end_date"] = query["start_date"] = DateTime.Now.ToString("yyyy-MM-dd");
 
             var url = $"api/1.0/{account}/reports/top-campaign-content/dimensions/item_breakdown?{query}";
 
-            return RemoteQueryAndLogAsync<TopCampaignReport>(HttpMethod.Get, url, token);
+            return RemoteQueryAndLogAsync<AdItemList>(HttpMethod.Get, url, token);
         }
 
         private Task<AccountList> GetAllAccounts(CancellationToken token)
@@ -144,85 +145,42 @@ namespace Poller.Taboola
             return RemoteQueryAndLogAsync<AdItem>(HttpMethod.Get, url, token);
         }
 
-        private async Task CommitCampaignItems(TopCampaignReport report, CancellationToken token)
-        {
-            if (report == null || report.RecordCount <= 0) { return; }
-
-            try
-            {
-                var sql = @"
-                    INSERT INTO
-	                    public.item(ad_group, campaign, clicks, impressions, spent, currency, publisher_id, content_url, url)
-                    VALUES
-                        (
-                            1,
-                            @Campaign,
-                            @Clicks,
-                            @Impressions,
-                            @Spent,
-                            @Currency,
-                            @PublisherItemId,
-                            @ContentUrl,
-                            @Url
-                        )
-                    ON CONFLICT (publisher_id) DO UPDATE
-                    SET
-                        clicks = excluded.clicks, impressions = excluded.impressions, spent = excluded.spent";
-
-                await _connection.OpenAsync();
-                await _connection.ExecuteAsync(new CommandDefinition(sql, report.Items, cancellationToken: token));
-            }
-            finally
-            {
-                // TODO: This should not be required
-                _connection.Close();
-            }
-        }
-
-        private async Task CommitCampaignItems2(AdItemList aditems, CancellationToken token)
+        private async Task CommitCampaignItems(AdItemList aditems, CancellationToken token)
         {
             if (aditems == null || aditems.Items.Count() <= 0) { return; }
 
-            foreach (var item in aditems.Items)
-            {
-                if (string.IsNullOrEmpty(item.Title))
-                {
-                    item.Title = "INVALID";
-                }
-            }
+            var sql = @"
+                INSERT INTO
+	                public.ad_item AS INCLUDED (secondary_id, ad_group, title, url, content, cpc, spent, clicks, impressions, actions, details, status)
+                VALUES
+                    (
+                        @Id,
+                        2,
+                        LEFT(@Title, 128),
+                        @Url,
+                        @Content,
+                        @Cpc,
+                        @Spent,
+                        @Clicks,
+                        @Impressions,
+                        @Actions,
+                        NULL,
+                        CAST (@StatusText AS ad_item_status)
+                    )
+                ON CONFLICT (secondary_id) DO UPDATE
+                SET
+                    title = EXCLUDED.title,
+	                cpc = GREATEST(INCLUDED.cpc, EXCLUDED.cpc),
+	                spent = GREATEST(INCLUDED.spent, EXCLUDED.spent),
+	                clicks = GREATEST(INCLUDED.clicks, EXCLUDED.clicks),
+	                impressions = GREATEST(INCLUDED.impressions, EXCLUDED.impressions),
+	                actions = GREATEST(INCLUDED.actions, EXCLUDED.actions),
+                    details = EXCLUDED.details,
+                    status = EXCLUDED.status";
 
-            try
+            using (var connection = _provider.ConnectionScope())
             {
-                var sql = @"
-                    INSERT INTO
-	                    public.ad_item(secondary_id, ad_group, title, url, content, cpc, spent, clicks, impressions, actions, details, status)
-                    VALUES
-                        (
-                            @Id,
-                            2,
-                            LEFT(@Title, 128),
-                            @Url,
-                            @Content,
-                            @Cpc,
-                            @Spent,
-                            @Clicks,
-                            @Impressions,
-                            @Actions,
-                            NULL,
-                            CAST ((enum_range(CAST (NULL AS ad_item_status)))[4] AS ad_item_status)
-                        )
-                    ON CONFLICT (secondary_id) DO UPDATE
-                    SET
-                        title = excluded.title,
-                        details = excluded.details";
-
-                await _connection.OpenAsync();
-                await _connection.ExecuteAsync(new CommandDefinition(sql, aditems.Items, cancellationToken: token));
-            }
-            finally
-            {
-                // TODO: This should not be required
-                _connection.Close();
+                await connection.ExecuteAsync(new CommandDefinition(sql, aditems.Items, cancellationToken: token));
             }
         }
 
@@ -232,6 +190,7 @@ namespace Poller.Taboola
 
             foreach (var item in accounts.Items)
             {
+                // FUTURE: Improve
                 item.Details = Json.Serialize(new AccountDetails
                 {
                     PartnerTypes = item.PartnerTypes,
@@ -240,22 +199,16 @@ namespace Poller.Taboola
                 });
             }
 
-            try
-            {
-                var sql = @"
-                    INSERT INTO
-	                    public.account(publisher, name, currency, details)
-                    VALUES
-                        ('taboola', @AccountId, @Currency, @Details::json)
-                    ON CONFLICT (name) DO NOTHING";
+            var sql = @"
+                INSERT INTO
+	                public.account(publisher, name, currency, details)
+                VALUES
+                    ('taboola', @AccountId, @Currency, @Details::json)
+                ON CONFLICT (name) DO NOTHING";
 
-                await _connection.OpenAsync();
-                await _connection.ExecuteAsync(new CommandDefinition(sql, accounts.Items, cancellationToken: token));
-            }
-            finally
+            using (var connection = _provider.ConnectionScope())
             {
-                // TODO: This should not be required
-                _connection.Close();
+                await connection.ExecuteAsync(new CommandDefinition(sql, accounts.Items, cancellationToken: token));
             }
         }
 
@@ -274,42 +227,32 @@ namespace Poller.Taboola
             var item2 = campaigns.Items.First();
             item2.Delivery2 = AdDelivery.Accelerated;
 
-            try
-            {
-                var sql = @"
-                    INSERT INTO
-	                    public.campaign(name, branding_text, location_include, language, initial_cpc, budget, budget_daily, delivery, start_date, end_date, utm, campaign_group, note, publisher_id)
-                    VALUES
-                        (@Name, @Branding, '{0}', '{XXX}', @Cpc, @SpendingLimit, @Delivery2::delivery, @DailyCap, COALESCE(@StartDate, CURRENT_TIMESTAMP), @EndDate, @Utm, 48389, @Note, @Id)
-                    ON CONFLICT (publisher_id) DO NOTHING";
+            var sql = @"
+                INSERT INTO
+	                public.campaign(name, branding_text, location_include, language, initial_cpc, budget, budget_daily, delivery, start_date, end_date, utm, campaign_group, note, publisher_id)
+                VALUES
+                    (@Name, @Branding, '{0}', '{XXX}', @Cpc, @SpendingLimit, @Delivery2::delivery, @DailyCap, COALESCE(@StartDate, CURRENT_TIMESTAMP), @EndDate, @Utm, 48389, @Note, @Id)
+                ON CONFLICT (publisher_id) DO NOTHING";
 
-                await _connection.OpenAsync();
-                await _connection.ExecuteAsync(new CommandDefinition(sql, item2, cancellationToken: token));
-            }
-            finally
+            using (var connection = _provider.ConnectionScope())
             {
-                // TODO: This should not be required
-                _connection.Close();
+                await connection.ExecuteAsync(new CommandDefinition(sql, item2, cancellationToken: token));
             }
         }
 
         private async Task<IEnumerable<Account>> FetchAdvertiserAccounts(CancellationToken token)
         {
-            try
-            {
-                var sql = @"
-                    SELECT id, publisher, name, currency FROM
-	                    public.account
-                    WHERE
-                        (details::json#>>'{partner_types}')::jsonb ? 'ADVERTISER'";
+            var sql = @"
+                SELECT
+                    id, publisher, name, currency
+	            FROM
+                    public.account
+                WHERE
+                    (details::json#>>'{partner_types}')::jsonb ? 'ADVERTISER'";
 
-                await _connection.OpenAsync();
-                return await _connection.QueryAsync<Account>(new CommandDefinition(sql, cancellationToken: token));
-            }
-            finally
+            using (var connection = _provider.ConnectionScope())
             {
-                // TODO: This should not be required
-                _connection.Close();
+                return await connection.QueryAsync<Account>(new CommandDefinition(sql, cancellationToken: token));
             }
         }
 
@@ -324,8 +267,12 @@ namespace Poller.Taboola
 
         public async Task RefreshAdvertisementDataAsync(PollerContext context, CancellationToken token)
         {
-            var result = await GetTopCampaignReportAsync("socialentertainment-network", token);
-            await CommitCampaignItems(result, token);
+            var accounts = await FetchAdvertiserAccountsForCache(token);
+            foreach (var account in accounts.ToList().Shuffle())
+            {
+                var result = await GetTopCampaignReportAsync(account.Name, token);
+                await CommitCampaignItems(result, token);
+            }
 
             //context.Interval = TimeSpan.FromMinutes(15);
         }
@@ -345,7 +292,7 @@ namespace Poller.Taboola
             foreach (var account in accounts.ToList().Shuffle().Take(2))
             {
                 var result = await GetAllCampaigns(account.Name, token);
-                await CommitCampaigns(result, token);
+                //await CommitCampaigns(result, token);
 
                 // Reorder the items with the idea of risk spreading.
                 foreach (var item in result.Items.ToList().Shuffle().Take(100))
@@ -353,7 +300,7 @@ namespace Poller.Taboola
                     try
                     {
                         var result2 = await GetCampaignAllItems(account.Name, item.Id, token);
-                        await CommitCampaignItems2(result2, token);
+                        await CommitCampaignItems(result2, token);
 
                         // Prevent spamming.
                         await Task.Delay(250, token);
@@ -375,6 +322,9 @@ namespace Poller.Taboola
             return Task.CompletedTask;
         }
 
-        public void Dispose() => _client?.Dispose();
+        public void Dispose()
+        {
+            _client?.Dispose();
+        }
     }
 }
