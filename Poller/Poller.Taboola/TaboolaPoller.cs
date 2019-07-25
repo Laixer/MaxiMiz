@@ -11,7 +11,6 @@ using Microsoft.Extensions.Logging;
 using Poller.Database;
 using Poller.Extensions;
 using Poller.Helper;
-using Poller.Model.Response;
 using Poller.OAuth;
 using Poller.Poller;
 using Poller.Taboola.Model;
@@ -76,28 +75,28 @@ namespace Poller.Taboola
         /// Gets the Top Campaign Reports for a specific date as specified
         /// in the Backstage documentation, deserializes them and  inserts them into the database
         /// </summary>
-        private Task<AdItemList> GetTopCampaignReportAsync(string account, CancellationToken token)
+        private Task<EntityList<AdItem>> GetTopCampaignReportAsync(string account, CancellationToken token)
         {
             var query = HttpUtility.ParseQueryString(string.Empty);
             query["end_date"] = query["start_date"] = DateTime.Now.ToString("yyyy-MM-dd");
 
             var url = $"api/1.0/{account}/reports/top-campaign-content/dimensions/item_breakdown?{query}";
 
-            return RemoteQueryAndLogAsync<AdItemList>(HttpMethod.Get, url, token);
+            return RemoteQueryAndLogAsync<EntityList<AdItem>>(HttpMethod.Get, url, token);
         }
 
-        private Task<AccountList> GetAllAccounts(CancellationToken token)
+        private Task<EntityList<Account>> GetAllAccounts(CancellationToken token)
         {
             var url = $"api/1.0/users/current/allowed-accounts/";
 
-            return RemoteQueryAndLogAsync<AccountList>(HttpMethod.Get, url, token);
+            return RemoteQueryAndLogAsync<EntityList<Account>>(HttpMethod.Get, url, token);
         }
 
-        private Task<CampaignList> GetAllCampaigns(string account, CancellationToken token)
+        private Task<EntityList<Campaign>> GetAllCampaigns(string account, CancellationToken token)
         {
             var url = $"api/1.0/{account}/campaigns";
 
-            return RemoteQueryAndLogAsync<CampaignList>(HttpMethod.Get, url, token);
+            return RemoteQueryAndLogAsync<EntityList<Campaign>>(HttpMethod.Get, url, token);
         }
 
         private async Task GetCampaign(string account, string campaign, CancellationToken token)
@@ -118,7 +117,7 @@ namespace Poller.Taboola
         {
             var url = $"api/1.0/{account}/campaigns/{campaign}";
 
-            var result = await RemoteQueryAndLogAsync<TopCampaignReport>(HttpMethod.Put, url, token);
+            var result = await RemoteQueryAndLogAsync<Campaign>(HttpMethod.Put, url, token);
         }
 
         private Task<Campaign> DeleteCampaign(string account, string campaign, CancellationToken token)
@@ -128,11 +127,11 @@ namespace Poller.Taboola
             return RemoteQueryAndLogAsync<Campaign>(HttpMethod.Delete, url, token);
         }
 
-        private Task<AdItemList> GetCampaignAllItems(string account, string campaign, CancellationToken token)
+        private Task<EntityList<AdItem>> GetCampaignAllItems(string account, string campaign, CancellationToken token)
         {
             var url = $"api/1.0/{account}/campaigns/{campaign}/items";
 
-            return RemoteQueryAndLogAsync<AdItemList>(HttpMethod.Get, url, token);
+            return RemoteQueryAndLogAsync<EntityList<AdItem>>(HttpMethod.Get, url, token);
         }
 
         private Task<AdItem> GetCampaignItem(string account, string campaign, string item, CancellationToken token)
@@ -142,7 +141,7 @@ namespace Poller.Taboola
             return RemoteQueryAndLogAsync<AdItem>(HttpMethod.Get, url, token);
         }
 
-        private async Task CommitCampaignItems(AdItemList aditems, CancellationToken token)
+        private async Task CommitCampaignItems(EntityList<AdItem> aditems, CancellationToken token)
         {
             if (aditems == null || aditems.Items.Count() <= 0) { return; }
 
@@ -153,7 +152,7 @@ namespace Poller.Taboola
                     (
                         @Id,
                         2,
-                        LEFT(@Title, 128),
+                        LEFT(@TitleText, 128),
                         @Url,
                         @Content,
                         @Cpc,
@@ -181,7 +180,7 @@ namespace Poller.Taboola
             }
         }
 
-        private async Task CommitAccounts(AccountList accounts, CancellationToken token)
+        private async Task CommitAccounts(EntityList<Account> accounts, CancellationToken token)
         {
             if (accounts == null || accounts.Items.Count() <= 0) { return; }
 
@@ -214,7 +213,7 @@ namespace Poller.Taboola
             }
         }
 
-        private async Task CommitCampaigns(CampaignList campaigns, CancellationToken token)
+        private async Task CommitCampaigns(EntityList<Campaign> campaigns, CancellationToken token)
         {
             if (campaigns == null || campaigns.Items.Count() <= 0) { return; }
 

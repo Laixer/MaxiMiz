@@ -1,5 +1,6 @@
-using System;
 using System.Runtime.Serialization;
+using Poller.Extensions;
+using Poller.Model.Data;
 
 namespace Poller.Taboola.Model
 {
@@ -51,6 +52,8 @@ namespace Poller.Taboola.Model
         /// </summary>
         [DataMember(Name = "title")]
         public string Title { get; set; }
+
+        public string TitleText { get => string.IsNullOrEmpty(Title) ? "INVALID" : Title; }
 
         /// <summary>
         /// The ad title.
@@ -104,6 +107,54 @@ namespace Poller.Taboola.Model
         /// Ad item status.
         /// </summary>
         [DataMember(Name = "status")]
-        public CampaignItemStatus Status { get; set; }
+        public CampaignItemStatus CampaignItemStatus
+        {
+            get
+            {
+                switch (Status)
+                {
+                    case AdItemStatus.Running:
+                        return CampaignItemStatus.Running;
+                    case AdItemStatus.Paused:
+                        return CampaignItemStatus.Paused;
+                    case AdItemStatus.Stopped:
+                        return CampaignItemStatus.Stopped;
+                    case AdItemStatus.Pending:
+                        return CampaignItemStatus.PendingApproval;
+                    case AdItemStatus.Rejected:
+                        return CampaignItemStatus.Rejected;
+                    default:
+                        return CampaignItemStatus.PendingApproval;
+                }
+            }
+
+            set
+            {
+                switch (value)
+                {
+                    case CampaignItemStatus.Running:
+                        Status = AdItemStatus.Running;
+                        break;
+                    case CampaignItemStatus.Crawling:
+                    case CampaignItemStatus.CrawlingError:
+                    case CampaignItemStatus.NeedToEdit:
+                    case CampaignItemStatus.PendingApproval:
+                        Status = AdItemStatus.Pending;
+                        break;
+                    case CampaignItemStatus.Paused:
+                        Status = AdItemStatus.Paused;
+                        break;
+                    case CampaignItemStatus.Stopped:
+                        Status = AdItemStatus.Stopped;
+                        break;
+                    case CampaignItemStatus.Rejected:
+                        Status = AdItemStatus.Rejected;
+                        break;
+                }
+            }
+        }
+
+        public AdItemStatus Status { get; set; }
+        public string StatusText { get => Status.GetEnumMemberName(); }
     }
 }
