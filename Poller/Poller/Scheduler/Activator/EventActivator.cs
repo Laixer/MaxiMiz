@@ -11,14 +11,26 @@ namespace Poller.Scheduler.Activator
         private const string QueueName = "<your_queue_name>";
         private readonly IQueueClient queueClient;
 
-        public EventActivator(IServiceProvider serviceProvider, IOperationDelegate operation)
+        public EventActivator(IServiceProvider serviceProvider, IOperationDelegate operation, string queueName)
             : base(serviceProvider, operation)
         {
-            queueClient = new QueueClient(ServiceBusConnectionString, QueueName);
-            queueClient.RegisterMessageHandler(ProcessMessagesAsync, new MessageHandlerOptions(null));
+            queueClient = new QueueClient(ServiceBusConnectionString, queueName);
+            queueClient.RegisterMessageHandler(MessageCallbackAsync, new MessageHandlerOptions(ExceptionReceivedHandler));
         }
 
-        private async Task ProcessMessagesAsync(Message message, CancellationToken token)
+        private Task ExceptionReceivedHandler(ExceptionReceivedEventArgs exceptionReceivedEventArgs)
+        {
+            Logger.LogError(exceptionReceivedEventArgs.Exception.Message);
+
+            var context = exceptionReceivedEventArgs.ExceptionReceivedContext;
+            Logger.LogTrace($"Endpoint: {context.Endpoint}");
+            Logger.LogTrace($"Entity Path: {context.EntityPath}");
+            Logger.LogTrace($"Executing Action: {context.Action}");
+
+            return Task.CompletedTask;
+        }
+
+        private async Task MessageCallbackAsync(Message message, CancellationToken token)
         {
             ExecuteProvider();
 

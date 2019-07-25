@@ -7,6 +7,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Poller.Publisher;
+using Poller.Scheduler.Activator;
 
 namespace Poller.Host
 {
@@ -16,6 +17,7 @@ namespace Poller.Host
     internal class RemoteApplicationService : IHostedService, IDisposable
     {
         private readonly CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
+        private readonly ICollection<ActivatorBase> _activatorBases = new List<ActivatorBase>();
 
         protected ILogger Logger { get; }
         protected IServiceProvider ServiceProvider { get; }
@@ -60,6 +62,7 @@ namespace Poller.Host
                     foreach (var activator in remotePublishers.GetActivators(token).AsParallel())
                     {
                         activator.Initialize(CancellationToken);
+                        _activatorBases.Add(activator);
                     }
                 }
             }
@@ -78,12 +81,9 @@ namespace Poller.Host
         {
             try
             {
-                foreach (var remotePublishers in ServiceProvider.GetService<IEnumerable<IRemotePublisher>>().ToArray())
+                foreach (var activator in _activatorBases.AsParallel())
                 {
-                    foreach (var activator in remotePublishers.GetActivators(token).AsParallel())
-                    {
-                        activator.Dispose();
-                    }
+                    activator.Dispose();
                 }
             }
             catch (Exception e)
