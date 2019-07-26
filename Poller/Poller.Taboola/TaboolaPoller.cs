@@ -245,7 +245,7 @@ namespace Poller.Taboola
                         @Branding,
                         '{0}',
                         '{0}',
-                        '{XYZ}',
+                        '{AB}',
                         @Cpc,
                         @SpendingLimit,
                         @DailyCap,
@@ -296,6 +296,8 @@ namespace Poller.Taboola
             foreach (var account in accounts.ToList().Shuffle())
             {
                 var result = await GetTopCampaignReportAsync(account.Name, token);
+
+                // TODO: UpdateCampaignItems
                 await CommitCampaignItems(result, token);
 
                 // Prevent spamming.
