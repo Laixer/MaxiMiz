@@ -141,16 +141,14 @@ namespace Poller.Taboola
             return RemoteQueryAndLogAsync<AdItem>(HttpMethod.Get, url, token);
         }
 
-        private async Task CommitCampaignItems(EntityList<AdItem> aditems, CancellationToken token)
+        // TODO: ad_group
+        private async Task CommitCampaignItems(EntityList<AdItem> aditems, CancellationToken token, bool updateStatus = false)
         {
             if (aditems == null || aditems.Items.Count() <= 0) { return; }
 
-            // TODO: List in 'details':
-            // - approval_state
-            // - currency
             var sql = @"
                 INSERT INTO
-	                public.ad_item AS INCLUDED (secondary_id, ad_group, title, url, content, cpc, spent, clicks, impressions, actions, details, status)
+	                public.ad_item AS INCLUDED (secondary_id, ad_group, title, url, content, cpc, spent, clicks, impressions, actions, details, status, approval_state)
                 VALUES
                     (
                         @Id,
@@ -163,19 +161,26 @@ namespace Poller.Taboola
                         @Clicks,
                         @Impressions,
                         @Actions,
-                        NULL,
-                        CAST (@StatusText AS ad_item_status)
+                        @Details::json,
+                        CAST (@StatusText AS ad_item_status),
+                        CAST (@ApprovalStateText AS approval_state)
                     )
                 ON CONFLICT (secondary_id) DO UPDATE
                 SET
                     title = EXCLUDED.title,
-	                cpc = GREATEST(INCLUDED.cpc, EXCLUDED.cpc),
-	                spent = GREATEST(INCLUDED.spent, EXCLUDED.spent),
-	                clicks = GREATEST(INCLUDED.clicks, EXCLUDED.clicks),
-	                impressions = GREATEST(INCLUDED.impressions, EXCLUDED.impressions),
-	                actions = GREATEST(INCLUDED.actions, EXCLUDED.actions),
-                    details = EXCLUDED.details,
-                    status = EXCLUDED.status";
+                    cpc = GREATEST(INCLUDED.cpc, EXCLUDED.cpc),
+                    spent = GREATEST(INCLUDED.spent, EXCLUDED.spent),
+                    clicks = GREATEST(INCLUDED.clicks, EXCLUDED.clicks),
+                    impressions = GREATEST(INCLUDED.impressions, EXCLUDED.impressions),
+                    actions = GREATEST(INCLUDED.actions, EXCLUDED.actions),
+                    details = COALESCE(INCLUDED.details, EXCLUDED.details)";
+
+            if (updateStatus)
+            {
+                sql += @",
+                    status = EXCLUDED.status,
+                    approval_state = EXCLUDED.approval_state";
+            }
 
             using (var connection = _provider.ConnectionScope())
             {
@@ -187,22 +192,12 @@ namespace Poller.Taboola
         {
             if (accounts == null || accounts.Items.Count() <= 0) { return; }
 
-            foreach (var item in accounts.Items)
-            {
-                // FUTURE: Improve
-                item.Details = Json.Serialize(new AccountDetails
-                {
-                    PartnerTypes = item.PartnerTypes,
-                    Type = item.Type,
-                    CampaignTypes = item.CampaignTypes,
-                });
-            }
-
             var sql = @"
                 INSERT INTO
-	                public.account(publisher, name, currency, details)
+	                public.account(secondary_id, publisher, name, currency, details)
                 VALUES
                     (
+                        @Id,
                         'taboola',
                         @AccountId,
                         @Currency,
@@ -216,6 +211,11 @@ namespace Poller.Taboola
             }
         }
 
+        //TODO:
+        // - campaign_group
+        // - location_include
+        // - location_exclude
+        // - language
         private async Task CommitCampaigns(EntityList<Campaign> campaigns, CancellationToken token)
         {
             if (campaigns == null || campaigns.Items.Count() <= 0) { return; }
@@ -226,36 +226,42 @@ namespace Poller.Taboola
                 {
                     item.DailyCap = null;
                 }
+                if (item.EndDate.HasValue)
+                {
+                    if (item.EndDate.Value.Year == 9999 && item.EndDate.Value.Month == 12 && item.EndDate.Value.Day == 31)
+                    {
+                        item.EndDate = null;
+                    }
+                }
             }
-
-            var item2 = campaigns.Items.First();
-            item2.Delivery2 = AdDelivery.Accelerated;
 
             var sql = @"
                 INSERT INTO
-	                public.campaign(name, branding_text, location_include, language, initial_cpc, budget, budget_daily, delivery, start_date, end_date, utm, campaign_group, note, publisher_id)
+	                public.campaign(secondary_id, name, branding_text, location_include, location_exclude, language, initial_cpc, budget, budget_daily, budget_model, delivery, start_date, end_date, utm, campaign_group, note)
                 VALUES
                     (
+                        @Id,
                         @Name,
                         @Branding,
                         '{0}',
-                        '{XXX}',
+                        '{0}',
+                        '{XYZ}',
                         @Cpc,
                         @SpendingLimit,
-                        @Delivery2::delivery,
                         @DailyCap,
+                        CAST (@SpendingLimitModelText AS budget_model),
+                        CAST (@DeliveryText AS delivery),
                         COALESCE(@StartDate, CURRENT_TIMESTAMP),
                         @EndDate,
                         @Utm,
                         48389,
-                        @Note,
-                        @Id
+                        @Note
                     )
-                ON CONFLICT (publisher_id) DO NOTHING";
+                ON CONFLICT (secondary_id) DO NOTHING";
 
             using (var connection = _provider.ConnectionScope())
             {
-                await connection.ExecuteAsync(new CommandDefinition(sql, item2, cancellationToken: token));
+                await connection.ExecuteAsync(new CommandDefinition(sql, campaigns.Items, cancellationToken: token));
             }
         }
 
@@ -263,11 +269,12 @@ namespace Poller.Taboola
         {
             var sql = @"
                 SELECT
-                    id, publisher, name, currency
+                    publisher, name
 	            FROM
                     public.account
                 WHERE
-                    (details::json #>> '{partner_types}')::jsonb ? 'ADVERTISER'";
+                    publisher = 'taboola'::publisher AND
+                    (details::json #>> '{partner_types}')::jsonb ? 'advertiser'";
 
             using (var connection = _provider.ConnectionScope())
             {
@@ -299,7 +306,7 @@ namespace Poller.Taboola
         public async Task DataSyncbackAsync(PollerContext context, CancellationToken token)
         {
             // Accounts almost never change.
-            if (context.RunCount % 4 == 0 && false)
+            if (context.RunCount + 1 % 4 == 0)
             {
                 _logger.LogInformation("Syncback account information");
 
@@ -311,7 +318,7 @@ namespace Poller.Taboola
             foreach (var account in accounts.ToList().Shuffle().Take(2))
             {
                 var result = await GetAllCampaigns(account.Name, token);
-                //await CommitCampaigns(result, token);
+                await CommitCampaigns(result, token);
 
                 // Reorder the items with the idea of risk spreading.
                 foreach (var item in result.Items.ToList().Shuffle().Take(100))
@@ -319,7 +326,7 @@ namespace Poller.Taboola
                     try
                     {
                         var result2 = await GetCampaignAllItems(account.Name, item.Id, token);
-                        await CommitCampaignItems(result2, token);
+                        await CommitCampaignItems(result2, token, true);
 
                         // Prevent spamming.
                         await Task.Delay(250, token);

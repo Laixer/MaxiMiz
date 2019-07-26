@@ -104,6 +104,13 @@ namespace Poller.Taboola.Model
         public bool Active { get; set; }
 
         /// <summary>
+        /// Item approval status.
+        /// </summary>
+        [DataMember(Name = "approval_state")]
+        public ApprovalState ApprovalState { get; set; }
+        public string ApprovalStateText { get => ApprovalState.GetEnumMemberName(); }
+
+        /// <summary>
         /// Ad item status.
         /// </summary>
         [DataMember(Name = "status")]
@@ -156,5 +163,6 @@ namespace Poller.Taboola.Model
 
         public AdItemStatus Status { get; set; }
         public string StatusText { get => Status.GetEnumMemberName(); }
+        public string Details { get; }
     }
 }

@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Linq;
 using System.Runtime.Serialization;
+using Poller.Helper;
 
 namespace Poller.Taboola.Model
 {
@@ -20,7 +22,7 @@ namespace Poller.Taboola.Model
     internal class Account
     {
         [DataMember(Name = "id")]
-        public Guid Id { get; set; }
+        public string Id { get; set; }
 
         [DataMember(Name = "name")]
         public string Name { get; set; }
@@ -40,6 +42,15 @@ namespace Poller.Taboola.Model
         [DataMember(Name = "campaign_types")]
         public string[] CampaignTypes { get; set; }
 
-        public string Details { get; set; }
+        public string Details
+        {
+            // FUTURE: Improve
+            get => Json.Serialize(new AccountDetails
+            {
+                PartnerTypes = PartnerTypes?.Select(s => s.ToLowerInvariant()).ToArray(),
+                Type = Type.ToLower(),
+                CampaignTypes = CampaignTypes?.Select(s => s.ToLowerInvariant()).ToArray(),
+            });
+        }
     }
 }
