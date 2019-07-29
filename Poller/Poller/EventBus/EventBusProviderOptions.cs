@@ -1,9 +1,9 @@
-﻿namespace Poller.Database
+﻿namespace Poller.EventBus
 {
-    public class DbProviderOptions
+    public class EventBusProviderOptions
     {
         /// <summary>
-        /// Database connection name.
+        /// Event bus connection name.
         /// </summary>
         public string ConnectionStringName { get; set; }
     }
