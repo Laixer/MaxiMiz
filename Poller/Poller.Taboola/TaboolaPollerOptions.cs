@@ -26,5 +26,10 @@ namespace Poller.Taboola
         /// Interval (in minutes) for operation.
         /// </summary>
         public int DataSyncbackInterval { get; set; } = 6 * 60;
+
+        /// <summary>
+        /// Event bus name on which events are received for backend communication.
+        /// </summary>
+        public string CreateOrUpdateObjectsEventBus { get; set; }
     }
 }

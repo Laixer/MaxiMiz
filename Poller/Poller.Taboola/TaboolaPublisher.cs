@@ -45,6 +45,7 @@ namespace Poller.Taboola
             {
                 _activatorFactory.TimeActivator(new RefreshAdvertisementDataDelegate(_poller), TimeSpan.FromMinutes(_options.RefreshAdvertisementDataInterval)),
                 _activatorFactory.TimeActivator(new DataSyncbackDelegate(_poller), TimeSpan.FromMinutes(_options.DataSyncbackInterval)),
+                _activatorFactory.EventActivator(new CreateOrUpdateObjectsDelegate(_poller), _options.CreateOrUpdateObjectsEventBus),
             };
         }
 
