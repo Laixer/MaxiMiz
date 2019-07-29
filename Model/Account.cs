@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Poller.Model.Data
+namespace Model
 {
     public class Account
     {

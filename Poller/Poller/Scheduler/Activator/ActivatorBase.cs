@@ -67,7 +67,7 @@ namespace Poller.Scheduler.Activator
                         // Use provider timespan if timeout is set by provider.
                         deadlineTimer.Reset(Operation.Timeout.TotalMilliseconds > 0
                             ? Operation.Timeout
-                            : TimeSpan.FromMinutes(1));
+                            : TimeSpan.FromMinutes(5));
                     }
 
                     // Restart the timeout from this point.

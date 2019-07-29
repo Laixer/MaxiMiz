@@ -7,14 +7,13 @@ using Google.Ads.GoogleAds.V1.Services;
 using Google.Api.Gax;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Poller.Model.Response;
 using Poller.Publisher;
 using System.Linq;
 
 namespace Poller.GoogleAds
 {
     [Publisher("GoogleAds")]
-    public class GoogleAdsPoller : RemotePublisher
+    public class GoogleAdsPoller // : RemotePublisher
     {
         private readonly Lazy<GoogleAdsClient> _client;
 
@@ -31,7 +30,7 @@ namespace Poller.GoogleAds
         /// <param name="options">An instance of options required for requests.</param>
         /// <param name="connection">The database connections to use for inserting fetched data.</param>
         public GoogleAdsPoller(ILogger<GoogleAdsPoller> logger, IOptions<GoogleAdsPollerOptions> options, DbConnection connection)
-            : base(logger)
+        //: base(logger)
         {
             this.options = options?.Value;
             this.connection = connection;
@@ -40,7 +39,7 @@ namespace Poller.GoogleAds
             _client = new Lazy<GoogleAdsClient>(() => new GoogleAdsClient(options.Value.Config));
         }
 
-        public override Task RefreshAdvertisementDataAsync()
+        public Task RefreshAdvertisementDataAsync()
         {
             GoogleAdsServiceClient googleAdsService = Client.GetService(Services.V1.GoogleAdsService);
             SearchGoogleAdsRequest request = new SearchGoogleAdsRequest()
@@ -75,7 +74,7 @@ namespace Poller.GoogleAds
 
                 try
                 {
-                    return new PublisherItem
+                    return new
                     {
                         PublisherItemId = ad.Id.Value,
                         Campaign = campaign.Id.Value,
@@ -85,14 +84,14 @@ namespace Poller.GoogleAds
                         Clicks = metrics.Clicks.Value,
                         Impressions = metrics.Impressions.Value,
                         Spent = Convert.ToDecimal(metrics.CostMicros.Value) / 1000000M,
-                        Currency = null, // TODO: fetch from account that is fetching this data.
+                        // Currency = null, // TODO: fetch from account that is fetching this data.
                         Actions = Convert.ToInt64(metrics.Conversions.Value)
                     };
                 }
                 catch (NullReferenceException nre)
                 {
-                    // TODO: finer error control so it does not do nothing when for example metrics is null.
-                    Logger.LogError($"Attribute from server was null, item could not be created");
+                    // TODO: Finer error control so it does not do nothing when for example metrics is null.
+                    //Logger.LogError($"Attribute from server was null, item could not be created");
                     throw nre;
                 };
             }).ToList();

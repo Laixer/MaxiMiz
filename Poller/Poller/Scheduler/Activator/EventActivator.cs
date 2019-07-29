@@ -38,6 +38,7 @@ namespace Poller.Scheduler.Activator
             ExecuteProvider();
 
             await queueClient.CompleteAsync(message.SystemProperties.LockToken);
+        }
 
         public override void Initialize(CancellationToken token)
         {
