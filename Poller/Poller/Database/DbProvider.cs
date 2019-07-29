@@ -15,8 +15,8 @@ namespace Poller.Database
         /// <summary>
         /// Create new instance.
         /// </summary>
-        /// <param name="configuration"></param>
-        /// <param name="options"></param>
+        /// <param name="configuration">Application configuration.</param>
+        /// <param name="options">Configuration options.</param>
         public DbProvider(IConfiguration configuration, IOptions<DbProviderOptions> options)
         {
             Configuration = configuration;

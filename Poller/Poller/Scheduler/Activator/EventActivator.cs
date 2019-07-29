@@ -2,27 +2,22 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Azure.ServiceBus;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using Poller.EventBus;
 
 namespace Poller.Scheduler.Activator
 {
     public class EventActivator : ActivatorBase
     {
-        private readonly string ServiceBusConnectionString;
         private readonly IQueueClient queueClient;
 
         public EventActivator(IServiceProvider serviceProvider, IOperationDelegate operation, string queueName)
             : base(serviceProvider, operation)
         {
-            var options = serviceProvider.GetRequiredService<IOptions<EventBusProviderOptions>>();
-            var config = serviceProvider.GetRequiredService<IConfiguration>();
-            ServiceBusConnectionString = config.GetConnectionString(options.Value.ConnectionStringName);
+            var eventBus = serviceProvider.GetRequiredService<EventBusProvider>();
 
-            queueClient = new QueueClient(ServiceBusConnectionString, queueName);
+            queueClient = eventBus.QueueClient(queueName);
             queueClient.RegisterMessageHandler(MessageCallbackAsync, new MessageHandlerOptions(ExceptionReceivedHandler));
         }
 
@@ -42,12 +37,16 @@ namespace Poller.Scheduler.Activator
         {
             ExecuteProvider();
 
-            await Task.CompletedTask;
-        }
+            await queueClient.CompleteAsync(message.SystemProperties.LockToken);
 
         public override void Initialize(CancellationToken token)
         {
             CancellationToken = token;
+        }
+
+        public override void Dispose()
+        {
+            queueClient.CloseAsync().Wait();
         }
     }
 }

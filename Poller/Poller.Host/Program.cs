@@ -37,7 +37,8 @@ namespace Poller.Host
                     services.AddRemotePublisher<GoogleAdsPoller, GoogleAdsPollerOptions>();
                     services.AddRemotePublisher<TaboolaPublisher, TaboolaPollerOptions>();
                     services.AddHostedService<RemoteApplicationService>();
-                    services.AddNpgsql("MaxiMizDatabase");
+                    services.AddDbProvider("MaxiMizDatabase");
+                    services.AddEventBusProvider("MaxiMizServiceBus");
                     services.AddActivatorFactory();
                     services.AddMemoryCache();
                 })
