@@ -5,6 +5,6 @@ namespace Poller.Poller
 {
     public interface IPollerCreateOrUpdateObjects : IPoller
     {
-        Task CreateOrUpdateObjectsAsync(PollerContext contex, CancellationToken token);
+        Task CreateOrUpdateObjectsAsync(CreateOrUpdateObjectsContext contex, CancellationToken token);
     }
 }

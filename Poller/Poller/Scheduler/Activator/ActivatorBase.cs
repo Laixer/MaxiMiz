@@ -63,7 +63,6 @@ namespace Poller.Scheduler.Activator
 
                     void SetDeadlineTimer()
                     {
-                        // _options.PublisherOperationTimeout
                         // Use provider timespan if timeout is set by provider.
                         deadlineTimer.Reset(Operation.Timeout.TotalMilliseconds > 0
                             ? Operation.Timeout
