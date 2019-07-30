@@ -13,7 +13,7 @@
 
 
   <ItemGroup>
-    <ProjectReference Include="..\Model\Model.csproj" />
+    <ProjectReference Include="..\Model\Maximiz.Model.csproj" />
   </ItemGroup>
 
 </Project>
