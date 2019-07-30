@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Maximiz.Model
+namespace Maximiz.Model.Entity
 {
     /// <summary>
     /// Create, update, delete tracking entity.

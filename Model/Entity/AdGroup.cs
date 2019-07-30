@@ -1,4 +1,4 @@
-﻿namespace Maximiz.Model
+﻿namespace Maximiz.Model.Entity
 {
     /// <summary>
     /// Group of advertisement items.

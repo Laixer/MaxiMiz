@@ -1,17 +1,13 @@
 ﻿using System;
 
-namespace Maximiz.Model
+namespace Maximiz.Model.Entity
 {
     /// <summary>
     /// Network account.
     /// </summary>
-    public class Account
+    [Serializable]
+    public class Account : Entity<Guid>
     {
-        /// <summary>
-        /// Account identifier.
-        /// </summary>
-        public Guid Id { get; set; }
-
         /// <summary>
         /// Network identifier for this object.
         /// </summary>
