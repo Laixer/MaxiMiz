@@ -19,4 +19,8 @@
     <PackageReference Include="Npgsql" Version="4.0.8" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\Model\Maximiz.Model.csproj" />
+  </ItemGroup>
+
 </Project>

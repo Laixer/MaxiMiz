@@ -10,10 +10,11 @@ using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using Poller.Database;
 using Poller.Extensions;
-using Poller.Helper;
 using Poller.OAuth;
 using Poller.Poller;
 using Poller.Taboola.Model;
+
+using AccountStore = Maximiz.Model.Account;
 
 namespace Poller.Taboola
 {
@@ -265,11 +266,11 @@ namespace Poller.Taboola
             }
         }
 
-        private async Task<IEnumerable<Account>> FetchAdvertiserAccounts(CancellationToken token)
+        private async Task<IEnumerable<AccountStore>> FetchAdvertiserAccounts(CancellationToken token)
         {
             var sql = @"
                 SELECT
-                    publisher, name
+                    *
 	            FROM
                     public.account
                 WHERE
@@ -278,12 +279,12 @@ namespace Poller.Taboola
 
             using (var connection = _provider.ConnectionScope())
             {
-                return await connection.QueryAsync<Account>(new CommandDefinition(sql, cancellationToken: token));
+                return await connection.QueryAsync<AccountStore>(new CommandDefinition(sql, cancellationToken: token));
             }
         }
 
         // TODO: Return account model according to database scheme.
-        private Task<IEnumerable<Account>> FetchAdvertiserAccountsForCache(CancellationToken token)
+        private Task<IEnumerable<AccountStore>> FetchAdvertiserAccountsForCache(CancellationToken token)
             => _cache.GetOrCreateAsync("AdvertiserAccounts", async entry =>
             {
                 entry.SlidingExpiration = TimeSpan.FromDays(1);

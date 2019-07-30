@@ -12,6 +12,11 @@ namespace Poller.Database
 
         public IConfiguration Configuration { get; }
 
+        static DbProvider()
+        {
+            Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
+        }
+
         /// <summary>
         /// Create new instance.
         /// </summary>
