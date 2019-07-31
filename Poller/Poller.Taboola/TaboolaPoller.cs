@@ -351,9 +351,6 @@ namespace Poller.Taboola
             return Task.CompletedTask;
         }
 
-        public void Dispose()
-        {
-            _client?.Dispose();
-        }
+        public void Dispose() => _client?.Dispose();
     }
 }
