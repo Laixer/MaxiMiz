@@ -7,6 +7,7 @@ namespace Poller.Helper
 {
     public static class Json
     {
+        private static readonly JsonSerializer jsonSerializer = new JsonSerializer();
 
         /// <summary>
         /// Deserializes A stream into an instance of an object.
@@ -20,7 +21,7 @@ namespace Poller.Helper
             using (var streamReader = new StreamReader(stream))
             using (var jsonTextReader = new JsonTextReader(streamReader))
             {
-                return new JsonSerializer().Deserialize<T>(jsonTextReader);
+                return jsonSerializer.Deserialize<T>(jsonTextReader);
             }
         }
 

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Threading;
+﻿using System.Threading;
 using System.Threading.Tasks;
 using Poller.Poller;
 
@@ -12,7 +11,7 @@ namespace Poller.Scheduler.Delegate
         {
         }
 
-        protected override async Task InvokeDelegateAsync(CancellationToken token)
+        protected override async Task InvokeDelegateAsync(IOperationContext context, CancellationToken token)
         {
             var pollerContext = BuildPollerContext();
 

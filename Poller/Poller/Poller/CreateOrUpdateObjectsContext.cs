@@ -1,6 +1,6 @@
 ﻿using System;
+using Maximiz.Model;
 using Maximiz.Model.Entity;
-using Maximiz.Model.Protocol;
 
 namespace Poller.Poller
 {
@@ -9,13 +9,19 @@ namespace Poller.Poller
         /// <summary>
         /// Action on entity.
         /// </summary>
-        public InternalMqMessage.Action Action { get; set; }
+        public CrudAction Action { get; set; }
 
         /// <summary>
         /// Entity to process.
         /// </summary>
         public Entity Entity { get; set; }
 
+        /// <summary>
+        /// Create new instance.
+        /// </summary>
+        /// <param name="runCount">Run count.</param>
+        /// <param name="lastRun">Last run.</param>
+        /// <param name="progressCallback">Process callback.</param>
         public CreateOrUpdateObjectsContext(int runCount, DateTime? lastRun, Action progressCallback = null)
             : base(runCount, lastRun, progressCallback)
         {

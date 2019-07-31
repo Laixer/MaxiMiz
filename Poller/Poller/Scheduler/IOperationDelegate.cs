@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Poller.Scheduler.Activator;
 
 namespace Poller.Scheduler
 {
@@ -25,7 +24,8 @@ namespace Poller.Scheduler
         /// <summary>
         /// Run the registered operation.
         /// </summary>
+        /// <param name="context">Operation context.</param>
         /// <param name="token">Cancellation token.</param>
-        Task InvokeAsync(CancellationToken token);
+        Task InvokeAsync(IOperationContext context, CancellationToken token);
     }
 }

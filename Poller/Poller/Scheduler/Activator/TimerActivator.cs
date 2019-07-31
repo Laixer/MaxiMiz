@@ -23,9 +23,9 @@ namespace Poller.Scheduler.Activator
             Scheduler.ScheduleTimer(_timer, _interval);
         }
 
-        private void TimerCallback(object _)
+        private async void TimerCallback(object _)
         {
-            ExecuteProvider();
+            await ExecuteProviderAsync();
 
             // TODO: reschedule
             Scheduler.ScheduleTimer(_timer, _interval);

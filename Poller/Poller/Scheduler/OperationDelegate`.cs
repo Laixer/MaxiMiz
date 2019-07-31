@@ -48,14 +48,24 @@ namespace Poller.Scheduler
             OnSlidingWindowChange = null;
         }
 
-        public async Task InvokeAsync(CancellationToken token)
+        /// <summary>
+        /// Run the registered operation.
+        /// </summary>
+        /// <param name="context">Operation context.</param>
+        /// <param name="token">Cancellation token.</param>
+        public async Task InvokeAsync(IOperationContext context, CancellationToken token)
         {
-            await InvokeDelegateAsync(token);
+            await InvokeDelegateAsync(context, token);
 
             runCount++;
             runLast = DateTime.Now;
         }
 
-        protected abstract Task InvokeDelegateAsync(CancellationToken token);
+        /// <summary>
+        /// Run the registered operation.
+        /// </summary>
+        /// <param name="context">Operation context.</param>
+        /// <param name="token">Cancellation token.</param>
+        protected abstract Task InvokeDelegateAsync(IOperationContext context, CancellationToken token);
     }
 }

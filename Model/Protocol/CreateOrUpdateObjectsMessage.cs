@@ -6,33 +6,28 @@ namespace Maximiz.Model.Protocol
     /// Represents messages for 'internal-mq' event queue.
     /// </summary>
     [Serializable]
-    public sealed class InternalMqMessage
+    public sealed class CreateOrUpdateObjectsMessage
     {
+        /// <summary>
+        /// Protocol constants.
+        /// </summary>
         public static class Protocol
         {
             public static ushort[] Header = new ushort[] { 0x12, 0xe7 };
             public static byte Version = 0x2;
         }
 
-        public enum Action
-        {
-            Create,
-            Update,
-            Delete,
-            Syncback,
-        }
-
         /// <summary>
         /// Create a new instance.
         /// </summary>
-        public InternalMqMessage() { }
+        public CreateOrUpdateObjectsMessage() { }
 
         /// <summary>
         /// Create a new instance.
         /// </summary>
         /// <param name="entity"></param>
         /// <param name="action"></param>
-        public InternalMqMessage(Entity.Entity entity, Action action)
+        public CreateOrUpdateObjectsMessage(Entity.Entity entity, CrudAction action)
         {
             Header = Protocol.Header;
             Version = Protocol.Version;
@@ -53,7 +48,7 @@ namespace Maximiz.Model.Protocol
         /// <summary>
         /// What to do with the Entity.
         /// </summary>
-        public Action EntityAction { get; set; }
+        public CrudAction EntityAction { get; set; }
 
         /// <summary>
         /// Entity to operate on.

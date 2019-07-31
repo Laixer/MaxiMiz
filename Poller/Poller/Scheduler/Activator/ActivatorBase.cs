@@ -12,7 +12,7 @@ namespace Poller.Scheduler.Activator
     {
         public IOperationDelegate Operation { get; }
         public IServiceProvider ServiceProvider { get; set; }
-        protected ILogger Logger { get; }
+        protected ILogger Logger { get; set; }
 
         protected CancellationToken CancellationToken { get; set; } = default;
         protected string OperationName { get => Operation.GetType().FullName; }
@@ -42,7 +42,7 @@ namespace Poller.Scheduler.Activator
         /// <summary>
         /// Run an operation delegate.
         /// </summary>
-        protected void ExecuteProvider()
+        protected async Task ExecuteProviderAsync(IOperationContext context = null)
         {
             if (CancellationToken.IsCancellationRequested) { return; }
 
@@ -75,7 +75,7 @@ namespace Poller.Scheduler.Activator
                     SetDeadlineTimer();
 
                     // Run operation synchronous.
-                    Operation.InvokeAsync(combinedCts.Token).Wait(combinedCts.Token);
+                    await Task.Run(async () => await Operation.InvokeAsync(context, combinedCts.Token), combinedCts.Token); //.Wait(combinedCts.Token);
                 }
             }
             catch (AggregateException e)
