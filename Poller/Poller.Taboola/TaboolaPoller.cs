@@ -25,9 +25,9 @@ namespace Poller.Taboola
         private readonly IMemoryCache _cache;
         private readonly HttpManager _client;
 
-        public TaboolaPoller(ILogger logger, TaboolaPollerOptions options, DbProvider provider, IMemoryCache cache)
+        public TaboolaPoller(ILoggerFactory logger, TaboolaPollerOptions options, DbProvider provider, IMemoryCache cache)
         {
-            _logger = logger;
+            _logger = logger.CreateLogger(typeof(TaboolaPoller).FullName);
             _provider = provider;
             _cache = cache;
 
@@ -346,7 +346,19 @@ namespace Poller.Taboola
 
         public Task CreateOrUpdateObjectsAsync(CreateOrUpdateObjectsContext context, CancellationToken token)
         {
-            //
+            switch (context.Action)
+            {
+                case Maximiz.Model.CrudAction.Create:
+                    break;
+                case Maximiz.Model.CrudAction.Read:
+                    throw new InvalidOperationException("Read is invalid for this operation");
+                case Maximiz.Model.CrudAction.Update:
+                    break;
+                case Maximiz.Model.CrudAction.Delete:
+                    break;
+                case Maximiz.Model.CrudAction.Syncback:
+                    break;
+            }
 
             return Task.CompletedTask;
         }
