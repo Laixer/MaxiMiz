@@ -5,6 +5,7 @@ namespace Maximiz.Model.Entity
     /// <summary>
     /// Advertisement item.
     /// </summary>
+    [Serializable]
     public class AdItem : EntityAudit<Guid>
     {
         /// <summary>

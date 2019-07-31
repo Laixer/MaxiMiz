@@ -1,8 +1,11 @@
-﻿namespace Maximiz.Model.Entity
+﻿using System;
+
+namespace Maximiz.Model.Entity
 {
     /// <summary>
     /// Group of advertisement items.
     /// </summary>
+    [Serializable]
     public class AdGroup : EntityAudit<int>
     {
         /// <summary>

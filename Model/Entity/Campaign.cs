@@ -5,6 +5,7 @@ namespace Maximiz.Model.Entity
     /// <summary>
     /// Campaign.
     /// </summary>
+    [Serializable]
     public class Campaign : EntityAudit<Guid>
     {
         /// <summary>

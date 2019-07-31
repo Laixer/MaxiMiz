@@ -6,6 +6,7 @@ namespace Maximiz.Model.Entity
     /// Create, update, delete tracking entity.
     /// </summary>
     /// <typeparam name="TPrimary">Primary key.</typeparam>
+    [Serializable]
     public abstract class EntityAudit<TPrimary> : Entity<TPrimary>
     {
         /// <summary>
