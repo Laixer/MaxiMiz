@@ -60,9 +60,9 @@ namespace Poller
         /// </summary>
         /// <param name="method">HTTP method.</param>
         /// <param name="url">Endpoint.</param>
-        public async Task RemoteExecuteAsync(HttpMethod method, string url, CancellationToken cancellationToken)
+        public async Task RemoteExecuteAsync(string url, HttpContent content, CancellationToken cancellationToken)
         {
-            using (var httpResponse = await BuildHttpClient().SendAsync(new HttpRequestMessage(method, url), cancellationToken))
+            using (var httpResponse = await BuildHttpClient().PostAsync(url, content, cancellationToken))
             {
                 httpResponse.EnsureSuccessStatusCode();
             }

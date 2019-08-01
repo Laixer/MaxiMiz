@@ -15,6 +15,8 @@ using Poller.Poller;
 using Poller.Taboola.Model;
 
 using AccountEntity = Maximiz.Model.Entity.Account;
+using CampaignEntity = Maximiz.Model.Entity.Campaign;
+using AdItemEntity = Maximiz.Model.Entity.AdItem;
 
 namespace Poller.Taboola
 {
@@ -50,20 +52,45 @@ namespace Poller.Taboola
         /// them propagate upwards.
         /// </summary>
         /// <typeparam name="TResult"></typeparam>
-        /// <param name="method"></param>
-        /// <param name="url"></param>
+        /// <param name="method">HTTP method.</param>
+        /// <param name="url">API endpoint.</param>
         /// <param name="cancellationToken">Cancellation token.</param>
         /// <returns>Object of TResult.</returns>
-        protected async Task<TResult> RemoteQueryAndLogAsync<TResult>(HttpMethod method, string url, CancellationToken cancellationToken = default) // TODO: remove default
+        protected async Task<TResult> RemoteQueryAndLogAsync<TResult>(HttpMethod method, string url, CancellationToken cancellationToken)
             where TResult : class
         {
             cancellationToken.ThrowIfCancellationRequested();
 
             try
             {
-                _logger.LogTrace($"Executing {method} {url}");
+                _logger.LogTrace($"Querying {method} {url}");
 
                 return await _client.RemoteQueryAsync<TResult>(method, url, cancellationToken);
+            }
+            catch (Exception e) when (e as OperationCanceledException == null && e as TaskCanceledException == null)
+            {
+                _logger.LogError($"{url}: {e.Message}");
+                throw e;
+            }
+        }
+
+        /// <summary>
+        /// Run the remote execute and catch all exceptions where before letting
+        /// them propagate upwards.
+        /// </summary>
+        /// <param name="method">HTTP method.</param>
+        /// <param name="url">API endpoint.</param>
+        /// <param name="content">Post content.</param>
+        /// <param name="cancellationToken">Cancellation token.</param>
+        protected async Task RemoteExecuteAndLogAsync<TResult>(string url, string content, CancellationToken cancellationToken)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+
+            try
+            {
+                _logger.LogTrace($"Executing {url}");
+
+                await _client.RemoteExecuteAsync(url, new StringContent(content), cancellationToken);
             }
             catch (Exception e) when (e as OperationCanceledException == null && e as TaskCanceledException == null)
             {
@@ -346,9 +373,27 @@ namespace Poller.Taboola
 
         public Task CreateOrUpdateObjectsAsync(CreateOrUpdateObjectsContext context, CancellationToken token)
         {
+            if (!(context.Entity is CampaignEntity || context.Entity is AdItemEntity))
+            {
+                throw new InvalidOperationException("Entity is invalid for this operation");
+            }
+
+            // TODO: 
+            // 1.) Convert into Taboola model
+            // 2.) Convert into Taboola model
+
             switch (context.Action)
             {
                 case Maximiz.Model.CrudAction.Create:
+                    if (context.Entity is CampaignEntity)
+                    {
+                        // CreateCampaign(account, token);
+                    }
+                    else
+                    {
+                        // context.Entity is AdItemEntity
+                    }
+
                     break;
                 case Maximiz.Model.CrudAction.Read:
                     throw new InvalidOperationException("Read is invalid for this operation");
