@@ -26,7 +26,7 @@ namespace Poller.Taboola
         /// <param name="options">An instance of options required for requests.</param>
         /// <param name="connection">The database connections to use for inserting fetched data.</param>
         public TaboolaPublisher(
-            ILogger<TaboolaPublisher> logger,
+            ILoggerFactory logger,
             IOptions<TaboolaPollerOptions> options,
             DbProvider provider,
             IMemoryCache cache,
@@ -43,8 +43,8 @@ namespace Poller.Taboola
 
             return new Collection<ActivatorBase>
             {
-                //_activatorFactory.TimeActivator(new RefreshAdvertisementDataDelegate(_poller), TimeSpan.FromMinutes(_options.RefreshAdvertisementDataInterval)),
-                //_activatorFactory.TimeActivator(new DataSyncbackDelegate(_poller), TimeSpan.FromMinutes(_options.DataSyncbackInterval)),
+                _activatorFactory.TimeActivator(new RefreshAdvertisementDataDelegate(_poller), TimeSpan.FromMinutes(_options.RefreshAdvertisementDataInterval)),
+                _activatorFactory.TimeActivator(new DataSyncbackDelegate(_poller), TimeSpan.FromMinutes(_options.DataSyncbackInterval)),
                 _activatorFactory.EventActivator(new CreateOrUpdateObjectsDelegate(_poller), _options.CreateOrUpdateObjectsEventBus),
             };
         }
