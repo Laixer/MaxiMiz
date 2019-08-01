@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using Maximiz.Model.Protocol;
@@ -46,16 +47,21 @@ namespace Poller.Scheduler.Activator
             Logger.LogTrace($"Message ID: {message.MessageId}");
             Logger.LogTrace($"Message Sequence: {message.SystemProperties.SequenceNumber}");
 
-            using (var stream = new System.IO.MemoryStream(message.Body))
+            // TODO: Protocol operations should not be handeled here
+            using (var stream = new MemoryStream(message.Body))
             {
                 var protocolMessage = BinarySerializer.Deserialize<CreateOrUpdateObjectsMessage>(stream);
                 if (protocolMessage.Header[0] != CreateOrUpdateObjectsMessage.Protocol.Header[0])
                 {
-                    throw new Exception("Unknown message format");
+                    throw new Exception("Unknown message format"); // TODO: Throw useful exception
                 }
                 if (protocolMessage.Version != CreateOrUpdateObjectsMessage.Protocol.Version)
                 {
-                    throw new Exception("Message version mismatch");
+                    throw new Exception("Message version mismatch"); // TODO: Throw useful exception
+                }
+                if (protocolMessage.Entity.Length != protocolMessage.EntityLength)
+                {
+                    throw new Exception("Message corrupted"); // TODO: Throw useful exception
                 }
 
                 await ExecuteProviderAsync(new EventActivatorOperationContext

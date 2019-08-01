@@ -350,7 +350,10 @@ namespace Poller.Taboola
                 var result = await GetAllCampaigns(account.Name, token);
                 await CommitCampaigns(result, token);
 
-                // Reorder the items with the idea of risk spreading.
+                // NOTE: We cannot process all items in one go since it takes
+                //       too long, and this is only a secondary function. We
+                //       choose 100 items at random and sync them. Over time
+                //       all items must be synced eventually.
                 foreach (var item in result.Items.ToList().Shuffle().Take(100))
                 {
                     try
@@ -373,35 +376,91 @@ namespace Poller.Taboola
 
         public Task CreateOrUpdateObjectsAsync(CreateOrUpdateObjectsContext context, CancellationToken token)
         {
-            if (!(context.Entity is CampaignEntity || context.Entity is AdItemEntity))
+            if (context.Entity.Length != 2)
             {
-                throw new InvalidOperationException("Entity is invalid for this operation");
+                throw new InvalidOperationException("Two entities expected");
+            }
+
+            // First item *must* be an account entity
+            if (!(context.Entity[0] is AccountEntity))
+            {
+                throw new InvalidOperationException("Entity account is expected");
+            }
+
+            foreach (var item in context.Entity)
+            {
+                if (!(item is CampaignEntity || item is AdItemEntity))
+                {
+                    throw new InvalidOperationException("Entity is invalid for this operation");
+                }
             }
 
             // TODO: 
             // 1.) Convert into Taboola model
-            // 2.) Convert into Taboola model
 
             switch (context.Action)
             {
                 case Maximiz.Model.CrudAction.Create:
-                    if (context.Entity is CampaignEntity)
+                    if (context.Entity[1] is CampaignEntity)
                     {
-                        // CreateCampaign(account, token);
+                        // TODO: CreateCampaign(account, token);
+                    }
+                    else if (context.Entity[1] is AdItemEntity)
+                    {
+                        // TODO: CreateAdItem(account, campaign, token);
                     }
                     else
                     {
-                        // context.Entity is AdItemEntity
+                        throw new Exception(); // TODO: Define exception.
                     }
-
                     break;
+
                 case Maximiz.Model.CrudAction.Read:
                     throw new InvalidOperationException("Read is invalid for this operation");
+
                 case Maximiz.Model.CrudAction.Update:
+                    if (context.Entity[1] is CampaignEntity)
+                    {
+                        // TODO: UpdateCampaign(account, campaign, token);
+                    }
+                    else if (context.Entity[1] is AdItemEntity)
+                    {
+                        // TODO: UpdateAdItem(account, campaign, item, token);
+                    }
+                    else
+                    {
+                        throw new Exception(); // TODO: Define exception.
+                    }
                     break;
+
                 case Maximiz.Model.CrudAction.Delete:
+                    if (context.Entity[1] is CampaignEntity)
+                    {
+                        // TODO: DeleteCampaign(account, campaign, token);
+                    }
+                    else if (context.Entity[1] is AdItemEntity)
+                    {
+                        // TODO: DeleteAdItem(account, campaign, item, token);
+                    }
+                    else
+                    {
+                        throw new Exception(); // TODO: Define exception.
+                    }
                     break;
+
                 case Maximiz.Model.CrudAction.Syncback:
+                    if (!(context.Entity[1] is CampaignEntity))
+                    {
+                        throw new Exception(); // TODO: Define exception.
+                    }
+
+                    //var result = await GetCampaigns(account, campaign, token);
+                    //await CommitCampaigns(result, token);
+                    // for each result.Items
+                    //  var result = await GetCampaignItems(account, campaign, item, token);
+                    //  await CommitCampaignItems(result, token, true);
+                    // endforeach
+
                     break;
             }
 

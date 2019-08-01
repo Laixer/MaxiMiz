@@ -25,13 +25,26 @@ namespace Maximiz.Model.Protocol
         /// <summary>
         /// Create a new instance.
         /// </summary>
-        /// <param name="entity"></param>
-        /// <param name="action"></param>
+        /// <param name="entity">Input entity.</param>
+        /// <param name="action">Action on entity.</param>
         public CreateOrUpdateObjectsMessage(Entity.Entity entity, CrudAction action)
         {
             Header = Protocol.Header;
             Version = Protocol.Version;
-            Entity = entity;
+            Entity = new Entity.Entity[] { entity };
+            EntityAction = action;
+        }
+
+        /// <summary>
+        /// Create a new instance.
+        /// </summary>
+        /// <param name="entities">Input entities.</param>
+        /// <param name="action">Action on entity.</param>
+        public CreateOrUpdateObjectsMessage(Entity.Entity[] entities, CrudAction action)
+        {
+            Header = Protocol.Header;
+            Version = Protocol.Version;
+            Entity = entities;
             EntityAction = action;
         }
 
@@ -53,6 +66,11 @@ namespace Maximiz.Model.Protocol
         /// <summary>
         /// Entity to operate on.
         /// </summary>
-        public Entity.Entity Entity { get; set; }
+        public Entity.Entity[] Entity { get; set; }
+
+        /// <summary>
+        /// Length of the entity array.
+        /// </summary>
+        public int EntityLength { get; set; }
     }
 }

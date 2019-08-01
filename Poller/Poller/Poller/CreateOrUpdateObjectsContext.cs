@@ -14,7 +14,7 @@ namespace Poller.Poller
         /// <summary>
         /// Entity to process.
         /// </summary>
-        public Entity Entity { get; set; }
+        public Entity[] Entity { get; set; }
 
         /// <summary>
         /// Create new instance.

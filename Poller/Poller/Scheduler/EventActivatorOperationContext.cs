@@ -8,7 +8,7 @@ namespace Poller.Scheduler
         /// <summary>
         /// Entity.
         /// </summary>
-        public Entity Entity { get; set; }
+        public Entity[] Entity { get; set; }
 
         /// <summary>
         /// Entity action.
