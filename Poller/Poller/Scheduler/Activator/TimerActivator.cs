@@ -27,10 +27,13 @@ namespace Poller.Scheduler.Activator
         {
             await ExecuteProviderAsync();
 
-            // TODO: reschedule
-            Scheduler.ScheduleTimer(_timer, _interval);
+            if (!CancellationToken.IsCancellationRequested)
+            {
+                // TODO: reschedule
+                Scheduler.ScheduleTimer(_timer, _interval);
 
-            Logger.LogDebug($"Rerun {OperationName} in ~{_interval}");
+                Logger.LogDebug($"Rerun {OperationName} in ~{_interval}");
+            }
         }
 
         public override void Dispose() => _timer.Dispose();
