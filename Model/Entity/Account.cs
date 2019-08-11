@@ -27,5 +27,11 @@ namespace Maximiz.Model.Entity
         /// Currency used in this account.
         /// </summary>
         public string Currency { get; set; }
+
+        /// <summary>
+        /// JSON string containing unused data which
+        /// we do have to store.
+        /// </summary>
+        public string Details { get; set; }
     }
 }
