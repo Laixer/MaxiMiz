@@ -1,10 +1,13 @@
 ﻿using System;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Runtime.Serialization;
 using Poller.Helper;
 
+[assembly: InternalsVisibleTo("Poller.Test")]
 namespace Poller.Taboola.Model
 {
+
     [DataContract]
     internal class AccountDetails
     {
