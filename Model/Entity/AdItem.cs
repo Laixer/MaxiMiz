@@ -57,5 +57,11 @@ namespace Maximiz.Model.Entity
         /// Actions on this item.
         /// </summary>
         public int Actions { get; set; }
+
+        /// <summary>
+        /// JSON string containing unused data which
+        /// we do have to store.
+        /// </summary>
+        public string Details { get; set; }
     }
 }
