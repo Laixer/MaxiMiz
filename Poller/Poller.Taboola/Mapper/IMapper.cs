@@ -9,22 +9,22 @@ namespace Poller.Taboola.Mapper
     /// Interface for mapping objects from Taboola
     /// to our Core.
     /// </summary>
-    interface IMapper<A, B>
+    interface IMapper<External, Core>
     {
 
         /// <summary>
-        /// Converter from A to B.
+        /// Converter from external to core.
         /// </summary>
-        /// <param name="from">B object</param>
-        /// <returns>A object</returns>
-        A Convert(B from);
+        /// <param name="core">Core object</param>
+        /// <returns>External object</returns>
+        External Convert(Core core);
 
         /// <summary>
-        /// Converter from B to A.
+        /// Converter from core to external.
         /// </summary>
-        /// <param name="from">A object</param>
-        /// <returns>B object</returns>
-        B Convert(A from);
+        /// <param name="external">External object</param>
+        /// <returns>Core object</returns>
+        Core Convert(External external);
 
     }
 }
