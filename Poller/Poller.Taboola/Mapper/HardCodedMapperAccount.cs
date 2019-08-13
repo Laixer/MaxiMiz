@@ -10,20 +10,27 @@ using AccountTaboola = Poller.Taboola.Model.Account;
 
 namespace Poller.Taboola.Mapper
 {
-    internal class HardCodedMapperAccount
+
+    /// <summary>
+    /// Implements our extensions to convert
+    /// accounts.
+    /// </summary>
+    internal static class HardCodedMapperAccount
     {
 
-        private readonly string DefaultAccountId = "invalid account id";
-        private readonly string DefaultPublisher = "taboola";
-        private readonly string DefaultName = "default name";
-        private readonly string DefaultCurrency = "invalid";
+        private static readonly string DefaultAccountId = "invalid account id";
+        private static readonly string DefaultPublisher = "taboola";
+        private static readonly string DefaultName = "default name";
+        private static readonly string DefaultCurrency = "invalid";
 
         /// <summary>
         /// Convert taboola account to maximiz model.
         /// </summary>
+        /// <param name="mapper">Base object</param>
         /// <param name="account">The object to convert</param>
         /// <returns>The converted object</returns>
-        public AccountMaximiz TaboolaToMaximiz(AccountTaboola account)
+        public static AccountMaximiz TaboolaToMaximiz(
+            this HardCodedMapper mapper, AccountTaboola account)
         {
             string details = Json.Serialize(new AccountDetails
             {
