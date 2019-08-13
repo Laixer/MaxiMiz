@@ -9,7 +9,8 @@ namespace Poller.Taboola.Model
 {
 
     /// <summary>
-    /// Represents a Taboola account.
+    /// Mirrors the properties of a Taboola
+    /// Account we get from their API.
     /// </summary>
     [DataContract]
     internal class Account
@@ -29,7 +30,8 @@ namespace Poller.Taboola.Model
 
         /// <summary>
         /// User created name, whitespaces replaced 
-        /// with underscores.
+        /// with underscores. Storing whitespaces in
+        /// your database is a bad idea.
         /// </summary>
         [DataMember(Name = "account_id")]
         public string AccountId { get; set; }
@@ -67,7 +69,12 @@ namespace Poller.Taboola.Model
         /// <summary>
         /// JSON string containing unused data which
         /// we do have to store.
+        /// 
+        /// TODO We never have any use for storing this
+        /// JSON string in the Taboola object. It is 
+        /// only used for our Maximiz object.
         /// </summary>
+        [Obsolete]
         public string Details
         {
             // FUTURE: Improve
@@ -80,26 +87,5 @@ namespace Poller.Taboola.Model
         }
     }
 
-    /// <summary>
-    /// Represents the properties of our 
-    /// Taboola account which we do not
-    /// store explicitly in our own database.
-    /// </summary>
-    [DataContract]
-    internal class AccountDetails
-    {
 
-        [DataMember(Name = "id")]
-        public string Id { get; set; }
-
-        [DataMember(Name = "partner_types")]
-        public string[] PartnerTypes { get; set; }
-
-        [DataMember(Name = "type")]
-        public string Type { get; set; }
-
-        [DataMember(Name = "campaign_types")]
-        public string[] CampaignTypes { get; set; }
-
-    }
 }
