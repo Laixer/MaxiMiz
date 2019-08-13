@@ -4,6 +4,14 @@ using Poller.Model.Data;
 
 namespace Poller.Taboola.Model
 {
+
+    /// <summary>
+    /// Mirrors the Taboola AdItem result we get
+    /// from the functions:
+    /// - TODO List these
+    /// 
+    /// This is coupled with <see cref="AdItemCoResult"/>.
+    /// </summary>
     [DataContract]
     internal class AdItem
     {
