@@ -66,26 +66,5 @@ namespace Poller.Taboola.Model
         [DataMember(Name = "campaign_types")]
         public string[] CampaignTypes { get; set; }
 
-        /// <summary>
-        /// JSON string containing unused data which
-        /// we do have to store.
-        /// 
-        /// TODO We never have any use for storing this
-        /// JSON string in the Taboola object. It is 
-        /// only used for our Maximiz object.
-        /// </summary>
-        [Obsolete]
-        public string Details
-        {
-            // FUTURE: Improve
-            get => Json.Serialize(new AccountDetails
-            {
-                PartnerTypes = PartnerTypes?.Select(s => s.ToLowerInvariant()).ToArray(),
-                Type = Type.ToLower(),
-                CampaignTypes = CampaignTypes?.Select(s => s.ToLowerInvariant()).ToArray(),
-            });
-        }
     }
-
-
 }
