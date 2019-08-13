@@ -16,6 +16,7 @@ namespace Poller.Taboola.Mapper
     /// Creates a configuration for the account
     /// data type.
     /// </summary>
+    [Obsolete]
     internal class ConfigAccount
     {
 

@@ -14,6 +14,7 @@ namespace Poller.Taboola.Mapper
     /// gap between our own models and those of the
     /// Taboola API.
     /// </summary>
+    [Obsolete]
     class DataMapper
     {
 
