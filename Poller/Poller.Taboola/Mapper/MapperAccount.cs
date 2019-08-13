@@ -26,20 +26,20 @@ namespace Poller.Taboola.Mapper
         /// <summary>
         /// Convert core model to taboola account.
         /// </summary>
-        /// <param name="from">The object to convert</param>
+        /// <param name="core">The object to convert</param>
         /// <returns>The converted object</returns>
-        public AccountTaboola Convert(AccountCore from)
+        public AccountTaboola Convert(AccountCore core)
         {
             AccountDetails details = Json.Deserialize
-               <AccountDetails>(from.Details);
+               <AccountDetails>(core.Details);
 
             return new AccountTaboola
             {
-                Name = from.Name ?? DefaultName,
-                AccountId = from.SecondaryId ?? DefaultAccountId,
+                Name = core.Name ?? DefaultName,
+                AccountId = core.SecondaryId ?? DefaultAccountId,
                 PartnerTypes = details.PartnerTypes,
                 Type = details.Type,
-                Currency = from.Currency ?? DefaultCurrency,
+                Currency = core.Currency ?? DefaultCurrency,
                 CampaignTypes = details.CampaignTypes
             };
         }
@@ -47,26 +47,26 @@ namespace Poller.Taboola.Mapper
         /// <summary>
         /// Convert taboola account to core model.
         /// </summary>
-        /// <param name="from">The object to convert</param>
+        /// <param name="external">The object to convert</param>
         /// <returns>The converted object</returns>
-        public AccountCore Convert(AccountTaboola from)
+        public AccountCore Convert(AccountTaboola external)
         {
             string details = Json.Serialize(new AccountDetails
             {
-                Id = from.Id,
-                PartnerTypes = from.PartnerTypes?.Select(
+                Id = external.Id,
+                PartnerTypes = external.PartnerTypes?.Select(
                     s => s.ToLowerInvariant()).ToArray(),
-                Type = from.Type.ToLower(),
-                CampaignTypes = from.CampaignTypes?.Select(
+                Type = external.Type.ToLower(),
+                CampaignTypes = external.CampaignTypes?.Select(
                     s => s.ToLowerInvariant()).ToArray(),
             });
 
             return new AccountCore
             {
-                SecondaryId = from.AccountId ?? DefaultAccountId,
+                SecondaryId = external.AccountId ?? DefaultAccountId,
                 Publisher = DefaultPublisher,
-                Name = from.Name ?? DefaultName,
-                Currency = from.Currency ?? DefaultCurrency,
+                Name = external.Name ?? DefaultName,
+                Currency = external.Currency ?? DefaultCurrency,
                 Details = details
             };
         }
