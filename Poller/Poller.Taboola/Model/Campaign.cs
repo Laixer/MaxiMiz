@@ -7,8 +7,14 @@ namespace Poller.Taboola.Model
 {
     // TODO:
     // - activity_schedule
-    // - verification_pixel
-    // - marketing_objective
+    // - verification_pixel --> doen we niets me
+    // - marketing_objective --> ooit wel gebruiken dus meenemen
+
+
+    /// <summary>
+    /// Represents all Taboola API parameters for
+    /// a single campaign.
+    /// </summary>
     [DataContract]
     internal class Campaign
     {
@@ -65,31 +71,14 @@ namespace Poller.Taboola.Model
         /// on a daily basis.
         /// </summary>
         [DataMember(Name = "daily_ad_delivery_model")]
-        public DailyAdDeliveryModel Delivery { get; set; }
-        public string DeliveryText
-        {
-            get
-            {
-                switch (Delivery)
-                {
-                    case DailyAdDeliveryModel.Balanced:
-                        return "balaned"; // TODO: This is a typo
-                    case DailyAdDeliveryModel.Accelerated:
-                        return "accelerated";
-                    case DailyAdDeliveryModel.Strict:
-                        return "strict";
-                }
-
-                throw new Exception();
-            }
-        }
+        public DailyAdDeliveryModel DailyAdDeliveryModel { get; set; }
 
         /// <summary>
         /// An object representing the wanted publisher
         /// bid modifiers for this campaign.
         /// </summary>
         [DataMember(Name="publisher_bid_modifier")]
-        public object PublisherBidModifier { get; set; }
+        public PublisherBidModifier PublisherBidModifier { get; set; }
 
         /// <summary>
         /// The maximum amount of money this campaign
@@ -103,21 +92,6 @@ namespace Poller.Taboola.Model
         /// </summary>
         [DataMember(Name = "spending_limit_model")]
         public SpendingLimitModel SpendingLimitModel { get; set; }
-        public string SpendingLimitModelText
-        {
-            get
-            {
-                switch (SpendingLimitModel)
-                {
-                    case SpendingLimitModel.Monthly:
-                        return "monthly";
-                    case SpendingLimitModel.Entire:
-                        return "campaign";
-                }
-
-                throw new Exception();
-            }
-        }
 
         /// <summary>
         /// Lists all countries the campaign will
@@ -237,7 +211,6 @@ namespace Poller.Taboola.Model
         /// </summary>
         [DataMember(Name = "approval_state")]
         public ApprovalState ApprovalState { get; set; }
-        public string ApprovalStateText { get => ApprovalState.GetEnumMemberName(); }
 
         /// <summary>
         /// Current campaign status.
