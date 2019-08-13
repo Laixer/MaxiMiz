@@ -56,6 +56,11 @@ namespace Maximiz.Model.Entity
         public decimal? DailyBudget { get; set; }
 
         /// <summary>
+        /// Budget spent.
+        /// </summary>
+        public decimal Spent { get; set; }
+
+        /// <summary>
         /// Campaign start date.
         /// </summary>
         public DateTime? StartDate { get; set; }
