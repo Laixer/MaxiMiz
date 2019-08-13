@@ -79,5 +79,12 @@ namespace Maximiz.Model.Entity
         /// Note.
         /// </summary>
         public string Note { get; set; }
+
+        /// <summary>
+        /// JSON string containing unused data which
+        /// we do have to store.
+        /// </summary>
+        public string Details { get; set; }
     }
+
 }
