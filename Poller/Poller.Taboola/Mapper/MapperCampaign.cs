@@ -19,29 +19,29 @@ namespace Poller.Taboola.Mapper
         /// <summary>
         /// Converts our core model to taboola campaign.
         /// </summary>
-        /// <param name="from">The object to convert</param>
+        /// <param name="core">The object to convert</param>
         /// <returns>The converted object</returns>
-        public CampaignTaboola Convert(CampaignCore from)
+        public CampaignTaboola Convert(CampaignCore core)
         {
-            if (from == null) throw new ArgumentNullException(nameof(from));
+            if (core == null) throw new ArgumentNullException(nameof(core));
 
             var result = new CampaignTaboola
             {
-                Id = from.SecondaryId,
-                Name = from.Name,
-                Branding = from.BrandingText,
-                Cpc = from.InitialCpc,
-                SpendingLimit = from.Budget,
-                DailyCap = from.DailyBudget,
-                Spent = from.Spent,
-                StartDate = from.StartDate,
-                EndDate = from.EndDate,
-                Utm = from.Utm,
-                Note = from.Note,
+                Id = core.SecondaryId,
+                Name = core.Name,
+                Branding = core.BrandingText,
+                Cpc = core.InitialCpc,
+                SpendingLimit = core.Budget,
+                DailyCap = core.DailyBudget,
+                Spent = core.Spent,
+                StartDate = core.StartDate,
+                EndDate = core.EndDate,
+                Utm = core.Utm,
+                Note = core.Note,
             };
 
             CampaignDetails details = Json.Deserialize
-               <CampaignDetails>(from.Details);
+               <CampaignDetails>(core.Details);
             PushDetails(result, details);
 
             return result;
@@ -82,25 +82,25 @@ namespace Poller.Taboola.Mapper
         /// <summary>
         /// Converts a taboola campaign to our core model.
         /// </summary>
-        /// <param name="from">The object to convert</param>
+        /// <param name="external">The object to convert</param>
         /// <returns>The converted object</returns>
-        public CampaignCore Convert(CampaignTaboola from)
+        public CampaignCore Convert(CampaignTaboola external)
         {
-            if (from == null) throw new ArgumentNullException(nameof(from));
+            if (external == null) throw new ArgumentNullException(nameof(external));
 
             return new CampaignCore
             {
-                SecondaryId = from.Id,
-                Name = from.Name,
-                BrandingText = from.Branding,
-                InitialCpc = from.Cpc,
-                Budget = from.SpendingLimit,
-                DailyBudget = from.DailyCap,
-                Spent = from.Spent,
-                StartDate = from.StartDate,
-                EndDate = from.EndDate,
-                Utm = from.Utm,
-                Note = from.Note
+                SecondaryId = external.Id,
+                Name = external.Name,
+                BrandingText = external.Branding,
+                InitialCpc = external.Cpc,
+                Budget = external.SpendingLimit,
+                DailyBudget = external.DailyCap,
+                Spent = external.Spent,
+                StartDate = external.StartDate,
+                EndDate = external.EndDate,
+                Utm = external.Utm,
+                Note = external.Note
             };
         }
 
