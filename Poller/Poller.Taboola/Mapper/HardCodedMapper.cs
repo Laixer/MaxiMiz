@@ -13,11 +13,15 @@ namespace Poller.Taboola.Mapper
 {
 
     /// <summary>
-    /// This class is the hard coded version of
-    /// <see cref="DataMapper"/>.
+    /// Our data mapper. This contains some base
+    /// functionality to convert JSON in both
+    /// directions. Extensions of this class use
+    /// these base methods.
     /// </summary>
-    class HardCodedMapper :
-        HardCodedMapperAccount
+    class HardCodedMapper
     {
+
+
+
     }
 }
