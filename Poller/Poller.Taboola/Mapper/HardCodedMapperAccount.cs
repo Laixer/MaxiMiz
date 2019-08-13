@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-using AccountMaximiz = Maximiz.Model.Entity.Account;
+using AccountCore = Maximiz.Model.Entity.Account;
 using AccountTaboola = Poller.Taboola.Model.Account;
 
 namespace Poller.Taboola.Mapper
@@ -24,12 +24,12 @@ namespace Poller.Taboola.Mapper
         private static readonly string DefaultCurrency = "invalid";
 
         /// <summary>
-        /// Convert taboola account to maximiz model.
+        /// Convert taboola account to core model.
         /// </summary>
         /// <param name="mapper">Base object</param>
         /// <param name="account">The object to convert</param>
         /// <returns>The converted object</returns>
-        public static AccountMaximiz TaboolaToMaximiz(
+        public static AccountCore TaboolaToCore(
             this HardCodedMapper mapper, AccountTaboola account)
         {
             string details = Json.Serialize(new AccountDetails
@@ -42,7 +42,7 @@ namespace Poller.Taboola.Mapper
                     s => s.ToLowerInvariant()).ToArray(),
             });
 
-            return new AccountMaximiz
+            return new AccountCore
             {
                 SecondaryId = account.AccountId ?? DefaultAccountId,
                 Publisher = DefaultPublisher,
@@ -53,11 +53,13 @@ namespace Poller.Taboola.Mapper
         }
 
         /// <summary>
-        /// Convert maximiz model to taboola account.
+        /// Convert core model to taboola account.
         /// </summary>
+        /// <param name="mapper">Base object</param>
         /// <param name="account">The object to convert</param>
         /// <returns>The converted object</returns>
-        public AccountTaboola MaximizToTaboola(AccountMaximiz account)
+        public static AccountTaboola CoreToTaboola(
+            this HardCodedMapper mapper, AccountCore account)
         {
             AccountDetails details = Json.Deserialize
                 <AccountDetails>(account.Details);

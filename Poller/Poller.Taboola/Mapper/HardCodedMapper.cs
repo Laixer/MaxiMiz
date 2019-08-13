@@ -5,10 +5,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-using AccountMaximiz = Maximiz.Model.Entity.Account;
-using AccountTaboola = Poller.Taboola.Model.Account;
-
-
 namespace Poller.Taboola.Mapper
 {
 
