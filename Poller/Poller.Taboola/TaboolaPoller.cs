@@ -20,6 +20,12 @@ using AdItemEntity = Maximiz.Model.Entity.AdItem;
 
 namespace Poller.Taboola
 {
+
+    /// <summary>
+    /// Partial class for our Taboola Poller. This
+    /// part implements all required activator base
+    /// interfaces.
+    /// </summary>
     internal partial class TaboolaPoller : IPollerRefreshAdvertisementData, IPollerDataSyncback, IPollerCreateOrUpdateObjects, IDisposable
     {
         private readonly ILogger _logger;
@@ -27,6 +33,13 @@ namespace Poller.Taboola
         private readonly IMemoryCache _cache;
         private readonly HttpManager _client;
 
+        /// <summary>
+        /// Constructor with dependency injection.
+        /// </summary>
+        /// <param name="logger">The logger</param>
+        /// <param name="options">The options</param>
+        /// <param name="provider">The database provider</param>
+        /// <param name="cache">The cache</param>
         public TaboolaPoller(ILoggerFactory logger, TaboolaPollerOptions options, DbProvider provider, IMemoryCache cache)
         {
             _logger = logger.CreateLogger(typeof(TaboolaPoller).FullName);
@@ -55,9 +68,9 @@ namespace Poller.Taboola
         /// This function calls the Taboola API and retrieves
         /// our accounts, campaigns and ad items.
         /// </summary>
-        /// <param name="context"></param>
-        /// <param name="token"></param>
-        /// <returns></returns>
+        /// <param name="context">The poller context</param>
+        /// <param name="token">Cancellation token</param>
+        /// <returns>Nothing (task)</returns>
         public async Task RefreshAdvertisementDataAsync(PollerContext context, CancellationToken token)
         {
             var accounts = await FetchAdvertiserAccountsForCache(token);
@@ -125,11 +138,14 @@ namespace Poller.Taboola
         }
 
         /// <summary>
-        /// Implements our crud interface.
+        /// Implements our CRUD interface. This handles
+        /// CRUD operations on given objects. The type
+        /// of operation and the objects are specified
+        /// within the context.
         /// </summary>
-        /// <param name="context"></param>
-        /// <param name="token"></param>
-        /// <returns></returns>
+        /// <param name="context">CRUD context</param>
+        /// <param name="token">Cancellation token</param>
+        /// <returns>Nothing (task)</returns>
         public Task CreateOrUpdateObjectsAsync(CreateOrUpdateObjectsContext context, CancellationToken token)
         {
             if (context.Entity.Length != 2)
@@ -223,6 +239,9 @@ namespace Poller.Taboola
             return Task.CompletedTask;
         }
 
+        /// <summary>
+        /// Called upon graceful shutdown.
+        /// </summary>
         public void Dispose() => _client?.Dispose();
     }
 }
