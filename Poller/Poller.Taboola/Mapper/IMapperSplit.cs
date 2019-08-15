@@ -16,17 +16,17 @@ namespace Poller.Taboola.Mapper
     {
 
         /// <summary>
-        /// 
+        /// Convert from core to our external object.
         /// </summary>
-        /// <param name="from"></param>
-        /// <returns></returns>
+        /// <param name="from">The core object</param>
+        /// <returns>The external object</returns>
         ExternalB Convert(Core from);
 
         /// <summary>
-        /// Converter from 
+        /// Converter from external object to our core.
         /// </summary>
-        /// <param name="from"></param>
-        /// <returns></returns>
+        /// <param name="from">External object</param>
+        /// <returns>Core object</returns>
         Core Convert(ExternalB from);
 
         /// <summary>
@@ -46,6 +46,26 @@ namespace Poller.Taboola.Mapper
         /// <param name="to">The object to copy to</param>
         /// <returns>The merged to object</returns>
         ExternalA Merge(ExternalB from, ExternalA to);
+
+        /// <summary>
+        /// Add the parameters of one half of the split
+        /// object to a core object. The core object can
+        /// already contain some values.
+        /// </summary>
+        /// <param name="core">The core object</param>
+        /// <param name="from">External object</param>
+        /// <returns></returns>
+        Core AddOnto(Core core, ExternalA from);
+
+        /// <summary>
+        /// Add the parameters of one half of the split
+        /// object to a core object. The core object can
+        /// already contain some values.
+        /// </summary>
+        /// <param name="core">The core object</param>
+        /// <param name="from">External object</param>
+        /// <returns></returns>
+        Core AddOnto(Core core, ExternalB from);
 
     }
 }
