@@ -38,10 +38,12 @@ namespace Poller
         }
 
         /// <summary>
-        /// Execute API call and return result.
+        /// Execute API call and return result. This function
+        /// actually communicates with the database.
         /// </summary>
         /// <remarks>
-        /// This operations throws an exception when status is not HTTP.OK.
+        /// This operations throws an exception when status is 
+        /// not HTTP.OK.
         /// </remarks>
         /// <param name="method">HTTP method.</param>
         /// <param name="url">Endpoint.</param>
