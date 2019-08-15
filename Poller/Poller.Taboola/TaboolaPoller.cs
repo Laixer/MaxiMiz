@@ -12,6 +12,7 @@ using Poller.Poller;
 using AccountEntity = Maximiz.Model.Entity.Account;
 using CampaignEntity = Maximiz.Model.Entity.Campaign;
 using AdItemEntity = Maximiz.Model.Entity.AdItem;
+using Poller.Taboola.Mapper;
 
 namespace Poller.Taboola
 {
@@ -27,6 +28,10 @@ namespace Poller.Taboola
         private readonly DbProvider _provider;
         private readonly IMemoryCache _cache;
         private readonly HttpManager _client;
+
+        private readonly MapperAccount _mapperAccount;
+        private readonly MapperCampaign _mapperCampaign;
+        private readonly MapperAdItem _mapperAdItem;
 
         /// <summary>
         /// Constructor with dependency injection.
@@ -54,7 +59,10 @@ namespace Poller.Taboola
                 }
             };
 
-            _dataMapperTest = new DataMapperTest();
+            _mapperAccount = new MapperAccount();
+            _mapperCampaign = new MapperCampaign();
+            _mapperAdItem = new MapperAdItem();
+
             _logger.LogInformation("Taboola poller created");
         }
 
@@ -66,7 +74,8 @@ namespace Poller.Taboola
         /// <param name="context">The poller context</param>
         /// <param name="token">Cancellation token</param>
         /// <returns>Nothing (task)</returns>
-        public async Task RefreshAdvertisementDataAsync(PollerContext context, CancellationToken token)
+        public async Task RefreshAdvertisementDataAsync(
+            PollerContext context, CancellationToken token)
         {
             var accounts = await FetchAdvertiserAccountsForCache(token);
 
@@ -77,7 +86,7 @@ namespace Poller.Taboola
                 // TODO: UpdateCampaignItems
                 await CommitCampaignItems(result, token);
 
-                // Prevent spamming.
+                // Prevent spamming
                 await Task.Delay(250, token);
             }
         }
@@ -99,6 +108,7 @@ namespace Poller.Taboola
                 _logger.LogInformation("Syncback account information");
 
                 var result = await GetAllAccounts(token);
+
                 await CommitAccounts(result, token);
             }
 
@@ -106,6 +116,7 @@ namespace Poller.Taboola
             foreach (var account in accounts.ToList().Shuffle().Take(2))
             {
                 var result = await GetAllCampaigns(account.Name, token);
+
                 await CommitCampaigns(result, token);
 
                 // NOTE: We cannot process all items in one go since it takes
@@ -117,6 +128,7 @@ namespace Poller.Taboola
                     try
                     {
                         var result2 = await GetCampaignAllItems(account.Name, item.Id, token);
+
                         await CommitCampaignItems(result2, token, true);
 
                         // Prevent spamming.
