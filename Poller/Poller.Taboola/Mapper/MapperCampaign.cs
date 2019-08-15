@@ -54,7 +54,8 @@ namespace Poller.Taboola.Mapper
         /// </summary>
         /// <param name="to">The object to push to</param>
         /// <param name="details">The extracted details</param>
-        private void PushDetails(CampaignTaboola to,
+        /// <return>The pushed object with extracted details</return>
+        private CampaignTaboola PushDetails(CampaignTaboola to,
             CampaignDetails details)
         {
             if (to == null) throw new ArgumentNullException(nameof(to));
@@ -77,6 +78,8 @@ namespace Poller.Taboola.Mapper
             to.ApprovalState = details.ApprovalState;
             to.Status = details.Status;
             to.Active = details.Active;
+
+            return to;
         }
 
         /// <summary>
@@ -100,7 +103,8 @@ namespace Poller.Taboola.Mapper
                 StartDate = external.StartDate,
                 EndDate = external.EndDate,
                 Utm = external.Utm,
-                Note = external.Note
+                Note = external.Note,
+                Details = ExtractDetailsToString(external)
             };
         }
 
