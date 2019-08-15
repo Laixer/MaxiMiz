@@ -4,6 +4,8 @@ using Poller.Taboola.Model;
 using AdItemCore = Maximiz.Model.Entity.AdItem;
 using AdItemTaboola = Poller.Taboola.Model.AdItem;
 using AdItemCoResult = Poller.Taboola.Model.AdItemCoResult;
+using System;
+using Poller.Helper;
 
 namespace Poller.Taboola.Mapper
 {
@@ -19,12 +21,53 @@ namespace Poller.Taboola.Mapper
         /// to our core ad item. This is the result we
         /// get when calling the ad items API. This only
         /// maps the available parameters.
+        /// 
+        /// TODO Long to int conversion
         /// </summary>
         /// <param name="from">Taboola co result</param>
         /// <returns>Core ad item</returns>
         public AdItemCore Convert(AdItemCoResult from)
         {
-            throw new System.NotImplementedException();
+            if (from == null) throw new 
+                    ArgumentNullException(nameof(from));
+
+            return new AdItemCore
+            {
+                SecondaryId = from.Id,
+                Title = from.Title,
+                Url = from.Url,
+                Cpc = from.Cpc,
+                Spent = from.Spent,
+                Impressions = (int)from.Impressions,
+                Actions = (int)from.Actions,
+                Details = ExtractDetailsToString(from)
+            };
+        }
+
+        /// <summary>
+        /// Extracts the details from a Taboola co result.
+        /// This then converts it to a JSON string.
+        /// </summary>
+        /// <param name="from">The Taboola co result</param>
+        /// <returns>The details object as JSON string</returns>
+        private string ExtractDetailsToString(
+            AdItemCoResult from)
+        {
+            if (from == null) throw new 
+                    ArgumentNullException(nameof(from));
+
+            return Json.Serialize(new AdItemDetails
+            {
+                ThumbnailUrl = from.ThumbnailUrl,
+                CampaignName = from.CampaignName,
+                ContentProvider = from.ContentProvider,
+                ContentProviderName = from.ContentProviderName,
+                Clicks = from.Clicks,
+                Cpm = from.Cpm,
+                Currency = from.Currency,
+                Cpa = from.Cpa,
+                Cvr = from.Cvr
+            });
         }
 
         /// <summary>
@@ -37,7 +80,37 @@ namespace Poller.Taboola.Mapper
         /// <returns>The core ad item</returns>
         public AdItemCore Convert(AdItemTaboola external)
         {
-            throw new System.NotImplementedException();
+            if (external == null) throw new 
+                    ArgumentNullException(nameof(external));
+
+            return new AdItemCore
+            {
+                SecondaryId = external.Id,
+                Title = external.Title,
+                Url = external.Url,
+                Details = ExtractDetailsToString(external)
+            };
+        }
+
+        /// <summary>
+        /// Extracts the details from a Taboola ad item.
+        /// This then converts it to a JSON string.
+        /// </summary>
+        /// <param name="from">The Taboola ad item</param>
+        /// <returns>The details object as JSON string</returns>
+        private string ExtractDetailsToString(
+            AdItemTaboola from)
+        {
+            if (from == null) throw new 
+                    ArgumentNullException(nameof(from));
+
+            return Json.Serialize(new AdItemDetails
+            {
+                CampaignId = from.CampaignId,
+                Active = from.Active,
+                ApprovalState = from.ApprovalState,
+                CampaignItemStatus = from.CampaignItemStatus
+            });
         }
 
         /// <summary>
@@ -109,5 +182,7 @@ namespace Poller.Taboola.Mapper
         {
             throw new System.NotImplementedException();
         }
+
+
     }
 }
