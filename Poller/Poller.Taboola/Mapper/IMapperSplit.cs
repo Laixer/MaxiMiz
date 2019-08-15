@@ -12,7 +12,7 @@ namespace Poller.Taboola.Mapper
     /// build a contract to handle the merging and
     /// splitting of these objects.
     /// </summary>
-    interface IMapperSplit<ExternalA, ExternalB, Core> : IMapper<ExternalA, Core>
+    interface IMapperSplit<TExternalA, TExternalB, TCore> : IMapper<TExternalA, TCore>
     {
 
         #pragma warning disable CS0108 // Member hides inherited member; missing new keyword
@@ -21,7 +21,7 @@ namespace Poller.Taboola.Mapper
         /// </summary>
         /// <param name="from">The core object</param>
         /// <returns>The external object</returns>
-        ExternalB Convert(Core from);
+        TExternalB Convert(TCore from);
         #pragma warning restore CS0108 // Member hides inherited member; missing new keyword
 
         /// <summary>
@@ -29,7 +29,7 @@ namespace Poller.Taboola.Mapper
         /// </summary>
         /// <param name="from">External object</param>
         /// <returns>Core object</returns>
-        Core Convert(ExternalB from);
+        TCore Convert(TExternalB from);
 
         /// <summary>
         /// Adds the parameters from one half of the
@@ -38,7 +38,7 @@ namespace Poller.Taboola.Mapper
         /// <param name="from">The object to copy from</param>
         /// <param name="to">The object to copy to</param>
         /// <returns>The merged to object</returns>
-        ExternalB Merge(ExternalA from, ExternalB to);
+        TExternalB Merge(TExternalA from, TExternalB to);
 
         /// <summary>
         /// Adds the parameters from one half of the
@@ -47,7 +47,7 @@ namespace Poller.Taboola.Mapper
         /// <param name="from">The object to copy from</param>
         /// <param name="to">The object to copy to</param>
         /// <returns>The merged to object</returns>
-        ExternalA Merge(ExternalB from, ExternalA to);
+        TExternalA Merge(TExternalB from, TExternalA to);
 
         /// <summary>
         /// Add the parameters of one half of the split
@@ -57,7 +57,7 @@ namespace Poller.Taboola.Mapper
         /// <param name="core">The core object</param>
         /// <param name="from">External object</param>
         /// <returns></returns>
-        Core AddOnto(Core core, ExternalA from);
+        TCore AddOnto(TCore core, TExternalA from);
 
         /// <summary>
         /// Add the parameters of one half of the split
@@ -67,7 +67,7 @@ namespace Poller.Taboola.Mapper
         /// <param name="core">The core object</param>
         /// <param name="from">External object</param>
         /// <returns></returns>
-        Core AddOnto(Core core, ExternalB from);
+        TCore AddOnto(TCore core, TExternalB from);
 
     }
 }
