@@ -15,12 +15,14 @@ namespace Poller.Taboola.Mapper
     interface IMapperSplit<ExternalA, ExternalB, Core> : IMapper<ExternalA, Core>
     {
 
+        #pragma warning disable CS0108 // Member hides inherited member; missing new keyword
         /// <summary>
         /// Convert from core to our external object.
         /// </summary>
         /// <param name="from">The core object</param>
         /// <returns>The external object</returns>
         ExternalB Convert(Core from);
+        #pragma warning restore CS0108 // Member hides inherited member; missing new keyword
 
         /// <summary>
         /// Converter from external object to our core.
