@@ -35,6 +35,7 @@ namespace Poller.Taboola.Mapper
 
             return new AccountTaboola
             {
+                Id = details.Id,
                 Name = core.Name ?? DefaultName,
                 AccountId = core.SecondaryId ?? DefaultAccountId,
                 PartnerTypes = details.PartnerTypes,
