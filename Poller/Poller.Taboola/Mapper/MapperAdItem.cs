@@ -196,7 +196,7 @@ namespace Poller.Taboola.Mapper
         /// <summary>
         /// Add Taboola item values to a core ad item.
         /// 
-        /// TODO Null handling & overwrite handling
+        /// TODO Null handling and overwrite handling
         /// </summary>
         /// <param name="core">The core ad item</param>
         /// <param name="from">The taboola ad item</param>
@@ -224,7 +224,7 @@ namespace Poller.Taboola.Mapper
             // Details
             AdItemDetails details = Json.Deserialize
                 <AdItemDetails>(core.Details);
-            details.CampaignId = from.CampaignId;
+            details.CampaignId = from.CampaignId ?? details.CampaignId;
             details.Active = from.Active;
             details.ApprovalState = from.ApprovalState;
             details.CampaignItemStatus = from.CampaignItemStatus;
@@ -237,7 +237,7 @@ namespace Poller.Taboola.Mapper
         /// Add Taboola co result ad item values to a 
         /// core ad item.
         /// 
-        /// TODO Null handling & overwrite handling
+        /// TODO Null handling and overwrite handling
         /// </summary>
         /// <param name="core">The core ad item</param>
         /// <param name="from">The taboola co result ad item</param>
@@ -269,14 +269,14 @@ namespace Poller.Taboola.Mapper
             // Details
             AdItemDetails details = Json.Deserialize
                 <AdItemDetails>(core.Details);
-            details.CampaignId = from.Campaign;
-            details.ThumbnailUrl = from.ThumbnailUrl;
-            details.CampaignName = from.CampaignName;
-            details.ContentProvider = from.ContentProvider;
-            details.ContentProviderName = from.ContentProviderName;
+            details.CampaignId = from.Campaign ?? details.CampaignId;
+            details.ThumbnailUrl = from.ThumbnailUrl ?? details.ThumbnailUrl;
+            details.CampaignName = from.CampaignName ?? details.CampaignName;
+            details.ContentProvider = from.ContentProvider ?? details.ContentProvider;
+            details.ContentProviderName = from.ContentProviderName ?? details.ContentProviderName;
             details.Clicks = from.Clicks;
             details.Cpm = from.Cpm;
-            details.Currency = from.Currency;
+            details.Currency = from.Currency ?? details.Currency;
             details.Cpa = from.Cpa;
             details.Cvr = from.Cvr;
             core.Details = Json.Serialize(details);
