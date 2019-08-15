@@ -1,26 +1,19 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
-using Dapper;
-using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
-using Poller.Database;
-using Poller.Extensions;
-using Poller.OAuth;
-using Poller.Poller;
 using Poller.Taboola.Model;
-
-using AccountEntity = Maximiz.Model.Entity.Account;
-using CampaignEntity = Maximiz.Model.Entity.Campaign;
-using AdItemEntity = Maximiz.Model.Entity.AdItem;
-using Poller.Taboola.Mapper;
 
 namespace Poller.Taboola
 {
+
+    /// <summary>
+    /// This is the part of our Taboola Poller that
+    /// uses http. All outgoing requests are placed
+    /// within this file.
+    /// </summary>
     internal partial class TaboolaPoller
     {
 
@@ -47,7 +40,6 @@ namespace Poller.Taboola
 
         /// <summary>
         /// Gets all our campaigns.
-        /// TODO Remove debug bit.
         /// </summary>
         /// <param name="account">The name of the account</param>
         /// <param name="token">Cancellation token</param>
