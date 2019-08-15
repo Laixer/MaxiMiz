@@ -26,31 +26,31 @@ namespace Poller.Taboola.Mapper
             _mapperAdItem = new MapperAdItem();
         }
 
-        public void ProcessAccount(AccountCore input)
+        public void ProcessAccount(AccountTaboola input)
         {
-            var taboola = _mapperAccount.Convert(input);
-            var core = _mapperAccount.Convert(taboola);
+            var core = _mapperAccount.Convert(input);
+            var taboola = _mapperAccount.Convert(core);
             return;
         }
 
-        public void ProcessCampaign(CampaignCore input)
+        public void ProcessCampaign(CampaignTaboola input)
         {
-            var taboola = _mapperCampaign.Convert(input);
-            var core = _mapperCampaign.Convert(taboola);
+            var core = _mapperCampaign.Convert(input);
+            var taboola = _mapperCampaign.Convert(core);
             return;
         }
 
         public void ProcessAdItem(AdItemTaboola input)
         {
-            var taboola = _mapperAdItem.Convert(input);
-            var core = _mapperAdItem.Convert(taboola);
+            var core = _mapperAdItem.Convert(input);
+            var taboola = _mapperAdItem.Convert(core);
             return;
         }
 
         public void ProcessAdItemCoResult(AdItemCoResult input)
         {
-            var taboola = _mapperAdItem.Convert(input);
-            var core = _mapperAdItem.Convert(taboola);
+            var core = _mapperAdItem.Convert(input);
+            var taboola = _mapperAdItem.Convert(core);
             return;
         }
 
