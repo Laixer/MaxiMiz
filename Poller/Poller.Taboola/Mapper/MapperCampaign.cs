@@ -141,5 +141,16 @@ namespace Poller.Taboola.Mapper
             });
         }
 
+        public IEnumerable<CampaignCore> ConvertAll(
+            IEnumerable<CampaignTaboola> list)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IEnumerable<CampaignTaboola> ConvertAll(
+            IEnumerable<CampaignCore> list)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

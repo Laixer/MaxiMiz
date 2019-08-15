@@ -6,6 +6,7 @@ using AdItemTaboola = Poller.Taboola.Model.AdItem;
 using AdItemCoResult = Poller.Taboola.Model.AdItemCoResult;
 using System;
 using Poller.Helper;
+using System.Collections.Generic;
 
 namespace Poller.Taboola.Mapper
 {
@@ -314,5 +315,16 @@ namespace Poller.Taboola.Mapper
             throw new System.NotImplementedException();
         }
 
+        public IEnumerable<AdItemCore> ConvertAll(
+            IEnumerable<AdItemTaboola> list)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IEnumerable<AdItemTaboola> ConvertAll(
+            IEnumerable<AdItemCore> list)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

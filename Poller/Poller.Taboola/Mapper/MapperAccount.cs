@@ -72,5 +72,37 @@ namespace Poller.Taboola.Mapper
             };
         }
 
+        /// <summary>
+        /// Convert a range from Taboola to Core.
+        /// </summary>
+        /// <param name="list">Taboola list</param>
+        /// <returns>Core list</returns>
+        public IEnumerable<AccountCore> ConvertAll(
+            IEnumerable<AccountTaboola> list)
+        {
+            List<AccountCore> result = new List<AccountCore>();
+            foreach (var x in list)
+            {
+                result.Add(Convert(x));
+            }
+            return result;
+        }
+
+        /// <summary>
+        /// Convert a range from Core to Taboola.
+        /// </summary>
+        /// <param name="list">Core list</param>
+        /// <returns>Taboola list</returns>
+        public IEnumerable<AccountTaboola> ConvertAll(
+            IEnumerable<AccountCore> list)
+        {
+            List<AccountTaboola> result = new List<AccountTaboola>();
+            foreach (var x in list)
+            {
+                result.Add(Convert(x));
+            }
+            return result;
+        }
+
     }
 }
