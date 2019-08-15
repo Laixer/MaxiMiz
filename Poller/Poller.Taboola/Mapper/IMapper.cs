@@ -9,7 +9,7 @@ namespace Poller.Taboola.Mapper
     /// Interface for mapping objects from Taboola
     /// to our Core.
     /// </summary>
-    interface IMapper<External, Core>
+    public interface IMapper<External, Core>
     {
 
         /// <summary>
