@@ -1,12 +1,17 @@
 ﻿using Dapper;
+using Maximiz.Model;
 using Maximiz.Model.Entity;
+using Maximiz.Model.Protocol;
 using Maximiz.Repositories.Interfaces;
+using Microsoft.Azure.ServiceBus;
 using Microsoft.Extensions.Configuration;
 using Npgsql;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.IO;
 using System.Linq;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Threading.Tasks;
 
 namespace Maximiz.Repositories
@@ -23,6 +28,25 @@ namespace Maximiz.Repositories
         public IDbConnection Connection {
             get {
                 return new NpgsqlConnection(_configuration.GetConnectionString("MaxiMizDatabase"));
+            }
+        }
+
+        public IQueueClient QueueClient {
+            get {
+                return new QueueClient(_configuration.GetConnectionString("MaxiMizServiceBus"), "testqueue");
+            }
+        }
+
+        public async Task CreateCampaignTest(Campaign entity)
+        {
+            // TODO: Create a separate method for sending an entity and crud action to the SB
+            var message = new CreateOrUpdateObjectsMessage(entity, CrudAction.Create);
+
+            var bf = new BinaryFormatter();
+            using (var stream = new MemoryStream()) {
+                bf.Serialize(stream, message);
+                // Send message to SB
+                await QueueClient.SendAsync(new Message(stream.ToArray()));
             }
         }
 
@@ -72,5 +96,6 @@ namespace Maximiz.Repositories
                 return result.ToList();
             }
         }
+
     }
 }

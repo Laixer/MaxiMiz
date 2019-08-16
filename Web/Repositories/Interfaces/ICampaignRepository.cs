@@ -9,5 +9,6 @@ namespace Maximiz.Repositories.Interfaces
     {
         Task<Campaign> GetCampaign(Guid id);
         Task<List<Campaign>> GetAllCampaigns();
+        Task CreateCampaignTest(Campaign c);
     }
 }

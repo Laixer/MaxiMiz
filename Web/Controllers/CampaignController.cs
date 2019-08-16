@@ -25,5 +25,21 @@ namespace Maximiz.Controllers
         {
             return View(_campaignRepo.GetCampaign(id).Result);
         }
+
+        public IActionResult TestCreate()
+        {
+            _campaignRepo.CreateCampaignTest(
+                new Campaign
+                {
+                    BrandingText = "Test",
+                    InitialCpc = 0.01M,
+                    Budget = 1000M,
+                    DailyBudget = 100M,
+                    Utm = "ABC"
+                }
+                );
+            return Ok("OK");
+        }
+
     }
 }
