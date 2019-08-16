@@ -18,13 +18,7 @@ namespace Maximiz.Controllers
 
         public IActionResult Index()
         {
-            var allCampaigns = GetAllCampaignsAsync().GetAwaiter().GetResult().Value;
-            return View(allCampaigns);
-        }
-
-        private async Task<ActionResult<IEnumerable<Campaign>>> GetAllCampaignsAsync()
-        {
-            return await _campaignRepo.GetAllCampaigns();
+            return View(_campaignRepo.GetAllCampaigns().Result);
         }
 
         public IActionResult Details(Guid id)
