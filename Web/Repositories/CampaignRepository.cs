@@ -33,8 +33,7 @@ namespace Maximiz.Repositories
         public async Task<Campaign> GetCampaign(Guid id)
         {
             using (IDbConnection connection = Connection) {
-                connection.Open();
-                IEnumerable<Campaign> result = await connection.QueryAsync<Campaign>($@"
+                IEnumerable<Campaign> result = await connection.QueryAsync<Campaign>(@"
                     SELECT 
                         id, secondary_id, 
                         name, branding_text, 
@@ -54,7 +53,7 @@ namespace Maximiz.Repositories
 	                FROM 
                         campaign
                     WHERE
-                        id = '{id.ToString()}';");
+                        id = @Id", new { Id = id });
                 return result.FirstOrDefault();
             }
         }
