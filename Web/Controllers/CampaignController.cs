@@ -18,12 +18,22 @@ namespace Maximiz.Controllers
 
         public IActionResult Index()
         {
+            return RedirectToAction("Overview");
+        }
+
+        public IActionResult Overview()
+        {
             return View(_campaignRepo.GetAllCampaigns().Result);
         }
 
         public IActionResult Details(Guid id)
         {
             return View(_campaignRepo.GetCampaign(id).Result);
+        }
+
+        public IActionResult New()
+        {
+            return View();
         }
 
         public IActionResult TestCreate()
