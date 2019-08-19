@@ -13,8 +13,8 @@ namespace Poller.Taboola.Mapper
 
     /// <summary>
     /// Our Ad Item mapper.
-    /// TODO Details handling might be possible
-    /// in a more elegant manner.
+    /// TODO Details handling might be possible in a more elegant manner.
+    /// TODO Weird inheritance inaccessibility fix.
     /// </summary>
     class MapperAdItem : IMapperSplit<AdItemTaboola, AdItemCoResult, AdItemCore>
     {
@@ -315,16 +315,65 @@ namespace Poller.Taboola.Mapper
             throw new System.NotImplementedException();
         }
 
+        /// <summary>
+        /// Convert a list from taboola to core.
+        /// </summary>
+        /// <param name="list">Taboola items</param>
+        /// <returns>Core items</returns>
         public IEnumerable<AdItemCore> ConvertAll(
             IEnumerable<AdItemTaboola> list)
         {
-            throw new NotImplementedException();
+            List<AdItemCore> result = new List<AdItemCore>();
+            foreach (var x in list)
+            {
+                result.Add(Convert(x));
+            }
+            return result;
         }
 
+        /// <summary>
+        /// TODO Duplicate function
+        /// </summary>
+        /// <param name="list"></param>
+        /// <returns></returns>
         public IEnumerable<AdItemTaboola> ConvertAll(
             IEnumerable<AdItemCore> list)
         {
-            throw new NotImplementedException();
+            List<AdItemTaboola> result = new List<AdItemTaboola>();
+            foreach (var x in list)
+            {
+                result.Add(InternalConvert(x));
+            }
+            return result;
         }
+
+        /// <summary>
+        /// TODO this is a duplicate. See issue #3.
+        /// </summary>
+        /// <param name="core"></param>
+        /// <returns></returns>
+        private AdItemTaboola InternalConvert(AdItemCore core)
+        {
+            if (core == null) throw new
+                    ArgumentNullException(nameof(core));
+
+            AdItemDetails details = Json.Deserialize
+                <AdItemDetails>(core.Details);
+
+            return new AdItemTaboola
+            {
+                // Properties
+                Id = core.SecondaryId,
+                Title = core.Title,
+                Url = core.Url,
+
+                // Details
+                CampaignId = details.CampaignId,
+                Active = details.Active,
+                ApprovalState = details.ApprovalState,
+                CampaignItemStatus = details.CampaignItemStatus
+            };
+        }
+
     }
 }
