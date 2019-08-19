@@ -1,4 +1,6 @@
 ﻿using System;
+using Maximiz.Model.Enums;
+using Poller.Taboola.Enums;
 
 namespace Maximiz.Model.Entity
 {
@@ -57,6 +59,16 @@ namespace Maximiz.Model.Entity
         /// Actions on this item.
         /// </summary>
         public int Actions { get; set; }
+
+        /// <summary>
+        /// Represents our approval state.
+        /// </summary>
+        public ApprovalState ApprovalState { get; set; }
+
+        /// <summary>
+        /// Represents our item status.
+        /// </summary>
+        public Status Status { get; set; }
 
         /// <summary>
         /// JSON string containing unused data which
