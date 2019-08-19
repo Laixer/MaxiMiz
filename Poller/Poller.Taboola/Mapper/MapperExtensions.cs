@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
+
 namespace Poller.Taboola.Mapper
 {
 
@@ -89,6 +90,6 @@ namespace Poller.Taboola.Mapper
             this AdItem adItem) =>
             string.IsNullOrEmpty(adItem.Title) ? 
             "INVALID" : adItem.Title;
-        
+
     }
 }
