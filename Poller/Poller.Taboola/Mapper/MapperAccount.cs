@@ -18,10 +18,10 @@ namespace Poller.Taboola.Mapper
     class MapperAccount : IMapper<AccountTaboola, AccountCore>
     {
 
-        private readonly string DefaultAccountId = "invalid-account-id";
-        private readonly string DefaultPublisher = "taboola";
-        private readonly string DefaultName = "default-name";
-        private readonly string DefaultCurrency = "invalid";
+        private const string DefaultAccountId = "invalid-account-id";
+        private const string DefaultPublisher = "taboola";
+        private const string DefaultName = "default-name";
+        private const string DefaultCurrency = "invalid";
 
         /// <summary>
         /// Convert core model to taboola account.
