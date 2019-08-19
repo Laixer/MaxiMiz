@@ -19,7 +19,9 @@ namespace Poller.Taboola.Mapper
     class MapperAdItem : IMapperSplit<AdItemTaboola, AdItemCoResult, AdItemCore>
     {
 
-        private const string DefaultString = "INVALID";
+        private const string DefaultString = "default";
+        private const int DefaultNumber = -1;
+        private const string DefaultJson = "{}";
 
         /// <summary>
         /// This converts a Taboola co result ad item 
@@ -36,17 +38,17 @@ namespace Poller.Taboola.Mapper
             if (from == null) throw new
                     ArgumentNullException(nameof(from));
 
-            return new AdItemCore
-            {
-                SecondaryId = from.Id,
-                Title = from.Title,
-                Url = from.Url,
-                Cpc = from.Cpc,
-                Spent = from.Spent,
-                Impressions = (int)from.Impressions,
-                Actions = (int)from.Actions,
-                Details = ExtractDetailsToString(from)
-            };
+            var result = DefaultAdItemCore();
+            result.SecondaryId = from.Id;
+            result.Title = from.Title;
+            result.Url = from.Url;
+            result.Cpc = from.Cpc;
+            result.Spent = from.Spent;
+            result.Impressions = (int)from.Impressions;
+            result.Actions = (int)from.Actions;
+            result.Details = ExtractDetailsToString(from);
+
+            return result;
         }
 
         /// <summary>
@@ -173,25 +175,8 @@ namespace Poller.Taboola.Mapper
         AdItemTaboola IMapper<AdItemTaboola, AdItemCore>
             .Convert(AdItemCore core)
         {
-            if (core == null) throw new
-                    ArgumentNullException(nameof(core));
-
-            AdItemDetails details = Json.Deserialize
-                <AdItemDetails>(core.Details);
-
-            return new AdItemTaboola
-            {
-                // Properties
-                Id = core.SecondaryId,
-                Title = core.Title,
-                Url = core.Url,
-
-                // Details
-                CampaignId = details.CampaignId,
-                Active = details.Active,
-                ApprovalState = details.ApprovalState,
-                CampaignItemStatus = details.CampaignItemStatus
-            };
+            throw new NotImplementedException("This function " +
+                "was moved due to inheritance inaccessibility");
         }
 
         /// <summary>
@@ -372,6 +357,30 @@ namespace Poller.Taboola.Mapper
                 Active = details.Active,
                 ApprovalState = details.ApprovalState,
                 CampaignItemStatus = details.CampaignItemStatus
+            };
+        }
+
+        /// <summary>
+        /// Default object with no null parameters.
+        /// This is database proof.
+        /// </summary>
+        /// <returns>Default object</returns>
+        private AdItemCore DefaultAdItemCore()
+        {
+            return new AdItemCore
+            {
+                SecondaryId = DefaultString,
+                AdGroup = DefaultNumber,
+                Title = DefaultString,
+                Url = DefaultString,
+                Content = DefaultString,
+                Cpc = DefaultNumber,
+                Spent = DefaultNumber,
+                Impressions = DefaultNumber,
+                Actions = DefaultNumber,
+                Status = Maximiz.Model.Enums.Status.Unknown,
+                ApprovalState = Maximiz.Model.Enums.ApprovalState.Unknown,
+                Details = DefaultJson
             };
         }
 
