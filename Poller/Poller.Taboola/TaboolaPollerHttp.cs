@@ -21,14 +21,15 @@ namespace Poller.Taboola
         /// Gets the Top Campaign Reports for a specific date as specified
         /// in the Backstage documentation, deserializes them and  inserts them into the database
         /// </summary>
-        private Task<EntityList<AdItem>> GetTopCampaignReportAsync(string account, CancellationToken token)
+        private Task<EntityList<AdItemCoResult>> GetTopCampaignReportAsync(string account, CancellationToken token)
         {
             var query = HttpUtility.ParseQueryString(string.Empty);
             query["end_date"] = query["start_date"] = DateTime.Now.ToString("yyyy-MM-dd");
 
             var url = $"api/1.0/{account}/reports/top-campaign-content/dimensions/item_breakdown?{query}";
 
-            return RemoteQueryAndLogAsync<EntityList<AdItem>>(HttpMethod.Get, url, token);
+            var result = RemoteQueryAndLogAsync<EntityList<AdItemCoResult>>(HttpMethod.Get, url, token);
+            return result;
         }
 
         private Task<EntityList<Account>> GetAllAccounts(CancellationToken token)
