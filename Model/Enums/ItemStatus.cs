@@ -14,6 +14,8 @@ namespace Maximiz.Model.Enums
     [JsonConverter(typeof(StringEnumConverter))]
     public enum Status
     {
+        [EnumMember(Value = "unknown")]
+        Unknown,
         [EnumMember(Value = "running")]
         Running,
         [EnumMember(Value = "crawling")]

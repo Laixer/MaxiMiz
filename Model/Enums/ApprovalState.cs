@@ -13,6 +13,8 @@ namespace Maximiz.Model.Enums
     [JsonConverter(typeof(StringEnumConverter))]
     public enum ApprovalState
     {
+        [EnumMember(Value = "unknown")]
+        Unknown,
         [EnumMember(Value = "approved")]
         Approved,
         [EnumMember(Value = "pending")]
