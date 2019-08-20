@@ -45,16 +45,18 @@ namespace Poller.Taboola
         }
 
         /// <summary>
-        /// Gets all our campaigns.
+        /// Gets all our campaigns for a given account.
         /// </summary>
-        /// <param name="account">The name of the account</param>
+        /// <param name="account">The Taboola account</param>
         /// <param name="token">Cancellation token</param>
         /// <returns>The campaign list</returns>
-        private Task<EntityList<Campaign>> GetAllCampaigns(string account, CancellationToken token)
+        private Task<EntityList<Campaign>> GetAllCampaigns(
+            Account account, CancellationToken token)
         {
-            var url = $"api/1.0/{account}/campaigns";
+            var url = $"api/1.0/{account.Name}/campaigns";
 
-            return RemoteQueryAndLogAsync<EntityList<Campaign>>(HttpMethod.Get, url, token);
+            return RemoteQueryAndLogAsync<EntityList<Campaign>>
+                (HttpMethod.Get, url, token);
         }
 
         private async Task GetCampaign(string account, string campaign, CancellationToken token)
