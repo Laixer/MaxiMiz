@@ -85,7 +85,7 @@ namespace Poller.Taboola
                     account.Name, token);
                 var converted = _mapperAdItem.ConvertAll(result.Items);
 
-                await CommitCampaignItemsConverted(converted, token);
+                await CommitCampaignItems(converted, token);
 
                 // Prevent spamming our API
                 await Task.Delay(250, token);
@@ -110,7 +110,7 @@ namespace Poller.Taboola
                 _logger.LogInformation("Syncback account information");
                 var result = await GetAllAccounts(token);
                 var converted = _mapperAccount.ConvertAll(result.Items);
-                await CommitAccountsConverted(converted, token);
+                await CommitAccounts(converted, token);
             }
 
              // Get local accounts and extract some campaign data.
