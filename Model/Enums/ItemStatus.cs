@@ -31,6 +31,6 @@ namespace Maximiz.Model.Enums
         [EnumMember(Value = "pending_approval")]
         PendingApproval,
         [EnumMember(Value = "rejected")]
-        Rejected,
+        Rejected
     }
 }
