@@ -32,6 +32,11 @@ namespace Poller.Taboola
             return result;
         }
 
+        /// <summary>
+        /// Retrieves accounts from the Taboola API.
+        /// </summary>
+        /// <param name="token">Cancellation token</param>
+        /// <returns>Fetched Taboola accounts</returns>
         private Task<EntityList<Account>> GetAllAccounts(CancellationToken token)
         {
             var url = $"api/1.0/users/current/allowed-accounts/";
