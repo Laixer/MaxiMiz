@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Maximiz.Model.Enums;
+using System;
 
 namespace Maximiz.Model.Entity
 {
@@ -10,13 +11,16 @@ namespace Maximiz.Model.Entity
     {
         /// <summary>
         /// Network identifier for this object.
+        /// This is the string integer we use
+        /// with the Taboola API.
         /// </summary>
         public string SecondaryId { get; set; }
 
         /// <summary>
         /// Publisher network.
         /// </summary>
-        public string Publisher { get; set; }
+        public Publisher Publisher { get; set; }
+        public string PublisherText { get => Publisher.GetEnumMemberName(); }
 
         /// <summary>
         /// Account name.
