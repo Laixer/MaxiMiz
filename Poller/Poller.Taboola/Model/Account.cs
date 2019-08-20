@@ -17,13 +17,12 @@ namespace Poller.Taboola.Model
     {
         /// <summary>
         /// Taboola internal id, being an integer.
-        /// TODO Is this correct?
         /// </summary>
         [DataMember(Name = "id")]
         public string Id { get; set; }
 
         /// <summary>
-        /// User created name.
+        /// User created name, human readable.
         /// </summary>
         [DataMember(Name = "name")]
         public string Name { get; set; }
