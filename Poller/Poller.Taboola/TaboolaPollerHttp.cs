@@ -6,6 +6,8 @@ using System.Web;
 using Microsoft.Extensions.Logging;
 using Poller.Taboola.Model;
 
+using AccountCore = Maximiz.Model.Entity.Account;
+
 namespace Poller.Taboola
 {
 
@@ -47,14 +49,13 @@ namespace Poller.Taboola
         /// <summary>
         /// Gets all our campaigns for a given account.
         /// </summary>
-        /// <param name="account">The Taboola account</param>
+        /// <param name="account">The core account</param>
         /// <param name="token">Cancellation token</param>
         /// <returns>The campaign list</returns>
         private Task<EntityList<Campaign>> GetAllCampaigns(
-            Account account, CancellationToken token)
+            AccountCore account, CancellationToken token)
         {
             var url = $"api/1.0/{account.Name}/campaigns";
-
             return RemoteQueryAndLogAsync<EntityList<Campaign>>
                 (HttpMethod.Get, url, token);
         }
