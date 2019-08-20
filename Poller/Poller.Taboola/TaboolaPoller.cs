@@ -77,7 +77,7 @@ namespace Poller.Taboola
         public async Task RefreshAdvertisementDataAsync(
             PollerContext context, CancellationToken token)
         {
-            var accounts = await FetchAdvertiserAccountsForCache(token);
+            var accounts = await FetchLocalAdvertiserAccountsForCache(token);
 
             foreach (var account in accounts.ToList().Shuffle())
             {
