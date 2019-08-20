@@ -41,5 +41,11 @@ namespace Poller.Taboola.Model
         [DataMember(Name = "campaign_types")]
         public string[] CampaignTypes { get; set; }
 
+        /// <summary>
+        /// The human readable variant of our account name.
+        /// </summary>
+        [DataMember(Name = "name_human_readable")]
+        public string NameHumanReadable { get; set; }
+
     }
 }
