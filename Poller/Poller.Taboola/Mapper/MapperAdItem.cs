@@ -372,8 +372,8 @@ namespace Poller.Taboola.Mapper
                 SecondaryId = DefaultString,
                 AdGroup = DefaultNumber,
                 Title = DefaultString,
-                Url = DefaultString,
-                Content = DefaultString,
+                // Url = DefaultString,             May be null
+                // Content = DefaultString,         May be null
                 Cpc = DefaultNumber,
                 Spent = DefaultNumber,
                 Impressions = DefaultNumber,
