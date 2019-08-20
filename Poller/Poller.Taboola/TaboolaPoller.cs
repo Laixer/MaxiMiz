@@ -103,7 +103,8 @@ namespace Poller.Taboola
         /// <returns>Nothing (task)</returns>
         public async Task DataSyncbackAsync(PollerContext context, CancellationToken token)
         {
-            // Accounts almost never change.
+            // Accounts almost never change, only do this once every 4 iterations.
+            // TODO Update account details when they are changed
             if (context.RunCount + 1 % 4 == 0)
             {
                 _logger.LogInformation("Syncback account information");
