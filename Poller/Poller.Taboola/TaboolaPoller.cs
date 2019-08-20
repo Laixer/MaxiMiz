@@ -113,7 +113,8 @@ namespace Poller.Taboola
                 await CommitAccountsConverted(converted, token);
             }
 
-            var accounts = await FetchAdvertiserAccountsForCache(token);
+             // Get local accounts and extract some campaign data.
+            var accounts = await FetchLocalAdvertiserAccountsForCache(token);
             foreach (var account in accounts.ToList().Shuffle().Take(2))
             {
                 var result = await GetAllCampaigns(account.Name, token);
