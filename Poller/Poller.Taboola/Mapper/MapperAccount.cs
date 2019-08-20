@@ -106,5 +106,24 @@ namespace Poller.Taboola.Mapper
             return result;
         }
 
+        /// <summary>
+        /// Creates an account object with all values
+        /// set to their default values. This prevents
+        /// null assignment in our database.
+        /// TODO Might be obsolete here?
+        /// </summary>
+        /// <returns>Default account</returns>
+        private AccountCore GetDefault()
+        {
+            return new AccountCore
+            {
+                SecondaryId = DefaultAccountIdName,
+                Publisher = ThisPublisher,
+                Name = DefaultString,
+                Currency = DefaultCurrency,
+                Details = DefaultJson
+            };
+        }
+
     }
 }
