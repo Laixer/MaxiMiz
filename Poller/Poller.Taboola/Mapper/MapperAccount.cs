@@ -1,12 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using Maximiz.Model.Entity;
 using Poller.Helper;
 using Poller.Taboola.Model;
 using AccountCore = Maximiz.Model.Entity.Account;
 using AccountTaboola = Poller.Taboola.Model.Account;
+using CorePublisher = Maximiz.Model.Enums.Publisher;
 
 
 namespace Poller.Taboola.Mapper
@@ -18,10 +16,13 @@ namespace Poller.Taboola.Mapper
     class MapperAccount : IMapper<AccountTaboola, AccountCore>
     {
 
-        private const string DefaultAccountId = "invalid-account-id";
-        private const string DefaultPublisher = "taboola";
-        private const string DefaultName = "default-name";
-        private const string DefaultCurrency = "invalid";
+        private const string DefaultString = "default";
+        private const int DefaultNumber = -1;
+        private const string DefaultJson = "{}";
+        private const string DefaultAccountIdNumber = "xxxxxxxx";
+        private const string DefaultAccountIdName = "invalid-account-id";
+        private const CorePublisher ThisPublisher = CorePublisher.Taboola;
+        private const string DefaultCurrency = "XXX";
 
         /// <summary>
         /// Convert core model to taboola account.
@@ -36,8 +37,8 @@ namespace Poller.Taboola.Mapper
             return new AccountTaboola
             {
                 Id = details.Id,
-                Name = core.Name ?? DefaultName,
-                AccountId = core.SecondaryId ?? DefaultAccountId,
+                Name = core.Name ?? DefaultString,
+                AccountId = core.SecondaryId ?? DefaultAccountIdName,
                 PartnerTypes = details.PartnerTypes,
                 Type = details.Type,
                 Currency = core.Currency ?? DefaultCurrency,
@@ -60,13 +61,14 @@ namespace Poller.Taboola.Mapper
                 Type = external.Type.ToLower(),
                 CampaignTypes = external.CampaignTypes?.Select(
                     s => s.ToLowerInvariant()).ToArray(),
+                NameHumanReadable = external.Name
             });
 
             return new AccountCore
             {
-                SecondaryId = external.AccountId ?? DefaultAccountId,
-                Publisher = DefaultPublisher,
-                Name = external.Name ?? DefaultName,
+                SecondaryId = external.Id ?? DefaultAccountIdNumber,
+                Publisher = ThisPublisher,
+                Name = external.AccountId ?? DefaultAccountIdName,
                 Currency = external.Currency ?? DefaultCurrency,
                 Details = details
             };
@@ -80,8 +82,8 @@ namespace Poller.Taboola.Mapper
         public IEnumerable<AccountCore> ConvertAll(
             IEnumerable<AccountTaboola> list)
         {
-            List<AccountCore> result = new List<AccountCore>();
-            foreach (var x in list)
+            IList<AccountCore> result = new List<AccountCore>();
+            foreach (var x in list.AsParallel())
             {
                 result.Add(Convert(x));
             }
@@ -96,8 +98,8 @@ namespace Poller.Taboola.Mapper
         public IEnumerable<AccountTaboola> ConvertAll(
             IEnumerable<AccountCore> list)
         {
-            List<AccountTaboola> result = new List<AccountTaboola>();
-            foreach (var x in list)
+            IList<AccountTaboola> result = new List<AccountTaboola>();
+            foreach (var x in list.AsParallel())
             {
                 result.Add(Convert(x));
             }
