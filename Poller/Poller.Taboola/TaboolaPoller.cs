@@ -81,12 +81,13 @@ namespace Poller.Taboola
 
             foreach (var account in accounts.ToList().Shuffle())
             {
-                var result = await GetTopCampaignReportAsync(account.Name, token);
+                var result = await GetTopCampaignReportAsync(
+                    account.Name, token);
+                var converted = _mapperAdItem.ConvertAll(result.Items);
 
-                // TODO: UpdateCampaignItems
-                await CommitCampaignItems(result, token);
+                await CommitCampaignItemsConverted(converted, token);
 
-                // Prevent spamming
+                // Prevent spamming our API
                 await Task.Delay(250, token);
             }
         }
