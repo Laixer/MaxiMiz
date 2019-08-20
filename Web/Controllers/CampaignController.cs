@@ -9,36 +9,76 @@ namespace Maximiz.Controllers
 {
     public class CampaignController : Controller
     {
-        private readonly ICampaignRepository _campaignRepo;
+        private readonly ICampaignRepository campaignRepo;
 
         public CampaignController(ICampaignRepository campaignRepo)
         {
-            _campaignRepo = campaignRepo;
+            this.campaignRepo = campaignRepo;
         }
 
+        [HttpGet]
         public IActionResult Index()
         {
             return RedirectToAction("Overview");
         }
 
+        [HttpGet]
         public IActionResult Overview()
         {
-            return View(_campaignRepo.GetAllCampaigns().Result);
+            return View(campaignRepo.GetAll());
         }
 
+        [HttpGet]
         public IActionResult Details(Guid id)
         {
-            return View(_campaignRepo.GetCampaign(id).Result);
+            return View(campaignRepo.Get(id));
         }
 
+        [HttpGet]
         public IActionResult New()
         {
             return View();
         }
 
+        [HttpGet, Route("Campaign/New/Basic")]
+        public IActionResult NewBasic()
+        {
+            return View("~/Views/Campaign/Create/Basic.cshtml");
+        }
+
+        [HttpGet, Route("Campaign/New/Advanced")]
+        public IActionResult NewAdvanced()
+        {
+            return View("~/Views/Campaign/Create/Advanced.cshtml");
+        }
+
+        [HttpGet]
+        public IEnumerable<Campaign> Search(string query)
+        {
+            return campaignRepo.Search(query);
+        }
+
+        [HttpPut]
+        public IActionResult Edit(Campaign campaign)
+        {
+            return Ok();
+        }
+
+        [HttpPut]
+        public IActionResult Duplicate(Campaign campaign)
+        {
+            return null;
+        }
+
+        [HttpDelete]
+        public IActionResult Delete(Campaign campaign)
+        {
+            return null;
+        }
+
         public IActionResult TestCreate()
         {
-            _campaignRepo.CreateCampaignTest(
+             campaignRepo.Create(
                 new Campaign
                 {
                     BrandingText = "Test",
@@ -47,8 +87,8 @@ namespace Maximiz.Controllers
                     DailyBudget = 100M,
                     Utm = "ABC"
                 }
-                );
-            return Ok("OK");
+            );
+            return Ok("Campaign was created.");
         }
 
     }
