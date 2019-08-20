@@ -23,9 +23,8 @@ namespace Maximiz.Model.Entity
         public string PublisherText { get => Publisher.GetEnumMemberName(); }
 
         /// <summary>
-        /// Account name, no spaces. Used as
-        /// external identifier for reports 
-        /// API calls.
+        /// Account name, no spaces. Used as external 
+        /// identifier for report API calls.
         /// </summary>
         public string Name { get; set; }
 
