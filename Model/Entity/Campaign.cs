@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Maximiz.Model.Enums;
+using System;
 
 namespace Maximiz.Model.Entity
 {
@@ -22,6 +23,18 @@ namespace Maximiz.Model.Entity
         /// Campaign name.
         /// </summary>
         public string Name { get; set; }
+
+        /// <summary>
+        /// Language of the campaign, 2 chars.
+        /// TODO Why do we need this?
+        /// </summary>
+        public char[] Language { get; set; }
+
+        /// <summary>
+        /// Delivery mode of this ad.
+        /// </summary>
+        public Delivery Delivery { get; set; }
+        public string DeliveryText { get => Delivery.GetEnumMemberName(); }
 
         /// <summary>
         /// Campaign branding text.
