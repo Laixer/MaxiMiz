@@ -108,10 +108,9 @@ namespace Poller.Taboola
             if (context.RunCount + 1 % 4 == 0)
             {
                 _logger.LogInformation("Syncback account information");
-
                 var result = await GetAllAccounts(token);
-
-                await CommitAccounts(result, token);
+                var converted = _mapperAccount.ConvertAll(result.Items);
+                await CommitAccountsConverted(converted, token);
             }
 
             var accounts = await FetchAdvertiserAccountsForCache(token);
