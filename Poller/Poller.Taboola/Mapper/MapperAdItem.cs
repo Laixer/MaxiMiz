@@ -7,6 +7,7 @@ using AdItemCoResult = Poller.Taboola.Model.AdItemCoResult;
 using System;
 using Poller.Helper;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Poller.Taboola.Mapper
 {
@@ -307,6 +308,22 @@ namespace Poller.Taboola.Mapper
         /// <returns>Core items</returns>
         public IEnumerable<AdItemCore> ConvertAll(
             IEnumerable<AdItemTaboola> list)
+        {
+            List<AdItemCore> result = new List<AdItemCore>();
+            foreach (var x in list)
+            {
+                result.Add(Convert(x));
+            }
+            return result;
+        }
+
+        /// <summary>
+        /// Convert a list from taboola to core.
+        /// </summary>
+        /// <param name="list">Taboola items</param>
+        /// <returns>Core items</returns>
+        public IEnumerable<AdItemCore> ConvertAll(
+            IEnumerable<AdItemCoResult> list)
         {
             List<AdItemCore> result = new List<AdItemCore>();
             foreach (var x in list)
