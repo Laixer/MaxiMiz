@@ -4,23 +4,27 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Maximiz.ViewModels.AdGroup
+namespace Maximiz.InputModels.AdGroup
 {
-    public class CreateAdGroupViewModel
+    public class CreateAdGroupModel
     {
         /// <summary>
         /// Name of the Ad Group
         /// </summary>
         public string Name { get; set; }
         /// <summary>
+        /// Describes this group of ads
+        /// </summary>
+        public string Description { get; set; }
+        /// <summary>
         /// Destination URL
         /// </summary>
-        public string URL { get; set; }
+        public string Url { get; set; }
         /// <summary>
         /// Tracking Code
         /// </summary>
         [Display(Name = "Tracking Code")]
-        public string UTM { get; set; }
+        public string Utm { get; set; }
         public List<string> Titles { get; set; }
     }
 }

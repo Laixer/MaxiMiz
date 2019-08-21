@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using Maximiz.InputModels.Campaign;
 using Maximiz.Model.Entity;
 using Maximiz.Repositories.Interfaces;
-using Maximiz.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Maximiz.Controllers
@@ -41,16 +41,16 @@ namespace Maximiz.Controllers
         }
 
         [HttpPost]
-        public IActionResult Create(CreateCampaignViewModel model)
+        public IActionResult Create(CreateCampaignModel model)
         {
             // TODO: Validate and create model, handle possible error
             if (ModelState.IsValid) {
 
                 Campaign campaign = new Campaign()
                 {
-                    Utm = model.URL,
-                    InitialCpc = model.CPC,
-                    BrandingText = model.Branding,
+                    Utm = model.Url,
+                    InitialCpc = model.Cpc,
+                    BrandingText = model.BrandingText,
                 };
 
                 campaignRepo.Create(campaign);

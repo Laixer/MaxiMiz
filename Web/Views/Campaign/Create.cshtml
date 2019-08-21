@@ -1,4 +1,4 @@
-﻿@model Maximiz.ViewModels.CreateCampaignViewModel
+﻿@model Maximiz.InputModels.Campaign.CreateCampaignModel
 
 @{
     ViewData["Title"] = "New";
@@ -76,14 +76,14 @@
                     <span asp-validation-for="Name" class="text-danger"></span>
                 </div>
                 <div class="form-group">
-                    <label asp-for="Branding" class="control-label"></label>
-                    <input asp-for="Branding" class="form-control" />
-                    <span asp-validation-for="Branding" class="text-danger"></span>
+                    <label asp-for="BrandingText" class="control-label"></label>
+                    <input asp-for="BrandingText" class="form-control" />
+                    <span asp-validation-for="BrandingText" class="text-danger"></span>
                 </div>
                 <div class="form-group">
-                    <label asp-for="URL" class="control-label"></label>
-                    <input asp-for="URL" class="form-control" />
-                    <span asp-validation-for="URL" class="text-danger"></span>
+                    <label asp-for="Url" class="control-label"></label>
+                    <input asp-for="Url" class="form-control" />
+                    <span asp-validation-for="Url" class="text-danger"></span>
                 </div>
                 <button class="btn btn-primary nextBtn pull-right" type="button">Next</button>
             </div>
@@ -100,19 +100,19 @@
                     <span asp-validation-for="Objective" class="text-danger"></span>
                 </div>
                 <div class="form-group">
-                    <label asp-for="AdDelivery" class="control-label"></label>
+                    <label asp-for="Objective" class="control-label"></label>
                     <input asp-for="AdDelivery" class="form-control" />
                     <span asp-validation-for="AdDelivery" class="text-danger"></span>
                 </div>
                 <div class="form-group">
-                    <label asp-for="SpendingLimit" class="control-label"></label>
+                    <label asp-for="AdDelivery" class="control-label"></label>
                     <input asp-for="SpendingLimit" class="form-control" />
                     <span asp-validation-for="SpendingLimit" class="text-danger"></span>
                 </div>
                 <div class="form-group">
-                    <label asp-for="CPC" class="control-label"></label>
-                    <input asp-for="CPC" class="form-control" />
-                    <span asp-validation-for="CPC" class="text-danger"></span>
+                    <label asp-for="SpendingLimit" class="control-label"></label>
+                    <input asp-for="Cpc" class="form-control" />
+                    <span asp-validation-for="Cpc" class="text-danger"></span>
                 </div>
                 <button class="btn btn-outline-primary prevBtn pull-left" type="button">Back</button>
                 <button class="btn btn-primary nextBtn pull-right" type="button">Next</button>
@@ -233,13 +233,13 @@
                     //TODO: Inject summary content
                     var account = $("#@Html.IdFor(m => m.Account)").val();
                     var name = $("#@Html.IdFor(m => m.Name)").val();
-                    var branding = $("#@Html.IdFor(m => m.Branding)").val();
-                    var url = $("#@Html.IdFor(m => m.URL)").val();
+                    var branding = $("#@Html.IdFor(m => m.BrandingText)").val();
+                    var url = $("#@Html.IdFor(m => m.Url)").val();
 
                     var objective = $("#@Html.IdFor(m => m.Objective)").val();
                     var adDelivery = $("#@Html.IdFor(m => m.AdDelivery)").val();
                     var spendingLimit = $("#@Html.IdFor(m => m.SpendingLimit)").val();
-                    var cpc = $("#@Html.IdFor(m => m.CPC)").val();
+                    var cpc = $("#@Html.IdFor(m => m.Cpc)").val();
 
                     $("#summary_account").html(account);
                     $("#summary_name").html(name);

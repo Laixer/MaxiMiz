@@ -1,9 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Maximiz.ViewModels
+namespace Maximiz.InputModels.Campaign
 {
     //TODO: Check and determine needed properties and types
-    public class CreateCampaignViewModel
+    public class CreateCampaignModel
     {
         public string Account { get; set; }
 
@@ -15,14 +15,14 @@ namespace Maximiz.ViewModels
         [Display(Name = "Branding")]
         public string BrandingText { get; set; }
 
-        public string URL { get; set; }
+        public string Url { get; set; }
 
         public string Objective { get; set; }
         //public string CTA { get; set; } ???
         public decimal SpendingLimit { get; set; }
 
         public string AdDelivery { get; set; }
-        public decimal CPC { get; set; }
+        public decimal Cpc { get; set; }
         //TODO: Adjust CPC for: public string AdjustCPC { get; set; }
 
         public string GeoTargeting { get; set; }
