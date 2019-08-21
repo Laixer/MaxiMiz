@@ -2,29 +2,29 @@
 
 namespace Maximiz.Repositories.Interfaces
 {
-    /// <typeparam name="TE">Entity</typeparam>
-    /// <typeparam name="TP">Primary key</typeparam>
-    public interface IEntityRepository<TE, TP> where TE: Entity
+    /// <typeparam name="TEntity">Entity</typeparam>
+    /// <typeparam name="TPrimary">Primary key</typeparam>
+    public interface IEntityRepository<TEntity, TPrimary> where TEntity: Entity
     {
         /// <summary>
         /// Returns a specific entity
         /// </summary>
         /// <param name="id">The primary key of the entity to obtain</param>
-        TE Get(TP id);
+        TEntity Get(TPrimary id);
         
         /// <summary>
         /// Create a new entity
         /// </summary>
-        void Create(TE entity);
+        void Create(TEntity entity);
 
         /// <summary>
         /// Update an existing entity
         /// </summary>
-        void Update(TE entity);
+        void Update(TEntity entity);
 
         /// <summary>
         /// Delete a specific entity
         /// </summary>
-        void Delete(TE entity);
+        void Delete(TEntity entity);
     }
 }

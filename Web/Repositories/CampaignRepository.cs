@@ -49,6 +49,14 @@ namespace Maximiz.Repositories
             }
 
             throw new NotImplementedException();
+
+            string sql = @"INSERT INTO public.campaign(
+	id, secondary_id, name, branding_text, location_include, location_exclude, language, device, os, initial_cpc, budget, budget_daily, budget_model, delivery, bid_strategy, start_date, end_date, utm, status, create_date, update_date, delete_date, note, campaign_group, connection)
+	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+
+            using (IDbConnection connection = CreateConnection) {
+                int rowsAffected = connection.Execute(sql, new { name=entity.Name, branding_text=entity.BrandingText });
+            }
         }
 
         public void Delete(Campaign entity)

@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using Maximiz.Model.Entity;
 using Maximiz.Repositories.Interfaces;
+using Maximiz.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Maximiz.Controllers
@@ -35,21 +35,28 @@ namespace Maximiz.Controllers
         }
 
         [HttpGet]
-        public IActionResult New()
+        public IActionResult Create()
         {
             return View();
         }
 
-        [HttpGet, Route("Campaign/New/Basic")]
-        public IActionResult NewBasic()
+        [HttpPost]
+        public IActionResult Create(CreateCampaignViewModel model)
         {
-            return View("~/Views/Campaign/Create/Basic.cshtml");
-        }
+            // TODO: Validate and create model, handle possible error
+            if (ModelState.IsValid) {
 
-        [HttpGet, Route("Campaign/New/Advanced")]
-        public IActionResult NewAdvanced()
-        {
-            return View("~/Views/Campaign/Create/Advanced.cshtml");
+                Campaign campaign = new Campaign()
+                {
+                    Utm = model.URL,
+                    InitialCpc = model.CPC,
+                    BrandingText = model.Branding,
+                };
+
+                campaignRepo.Create(campaign);
+            }
+
+            return RedirectToAction("Overview");
         }
 
         [HttpGet]
@@ -61,34 +68,24 @@ namespace Maximiz.Controllers
         [HttpPut]
         public IActionResult Edit(Campaign campaign)
         {
-            return Ok();
+            // TODO: Check validity
+            campaignRepo.Update(campaign);
+
+            return StatusCode(500, "Error");
         }
 
         [HttpPut]
         public IActionResult Duplicate(Campaign campaign)
         {
+            // TODO
             return null;
         }
 
         [HttpDelete]
         public IActionResult Delete(Campaign campaign)
         {
+            // TODO
             return null;
-        }
-
-        public IActionResult TestCreate()
-        {
-             campaignRepo.Create(
-                new Campaign
-                {
-                    BrandingText = "Test",
-                    InitialCpc = 0.01M,
-                    Budget = 1000M,
-                    DailyBudget = 100M,
-                    Utm = "ABC"
-                }
-            );
-            return Ok("Campaign was created.");
         }
 
     }
