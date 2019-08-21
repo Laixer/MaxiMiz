@@ -2,21 +2,26 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Maximiz.Model.Entity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Maximiz.Controllers
 {
-    public class AdController : Controller
+    public class AdGroupController : Controller
     {
-        public IActionResult Index()
+        [HttpGet]
+        public IActionResult Create()
         {
             return View();
         }
 
-        public IActionResult New()
+        [HttpPost]
+        public IActionResult Create(AdGroup model)
         {
+            // Test
+            var x = model.Name;
+
             return View();
         }
-
     }
 }
