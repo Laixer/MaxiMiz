@@ -1,37 +1,20 @@
+﻿using Poller.Model.Data;
 using System;
+using System.Collections.Generic;
 using System.Runtime.Serialization;
-using Poller.Extensions;
-using Poller.Model.Data;
+using System.Text;
 
 namespace Poller.Taboola.Model
 {
-    // TODO:
-    // - activity_schedule
-    // - verification_pixel --> doen we niets me
-    // - marketing_objective --> ooit wel gebruiken dus meenemen
-
 
     /// <summary>
-    /// Represents all Taboola API parameters for
-    /// a single campaign.
+    /// Used as a JSON mapping template. This contains
+    /// all Campaign properties we do not explicitly
+    /// store in our own database.
     /// </summary>
     [DataContract]
-    internal class Campaign
+    internal class CampaignDetails
     {
-
-        /// <summary>
-        /// Unique numeric Id used by Taboola, returned
-        /// as a string by the API.
-        /// </summary>
-        [DataMember(Name = "id")]
-        public string Id { get; set; }
-
-        /// <summary>
-        /// The name the user gave to this account. A
-        /// human readable name.
-        /// </summary>
-        [DataMember(Name = "name")]
-        public string Name { get; set; }
 
         /// <summary>
         /// The account_id of the campaign's advertiser
@@ -39,32 +22,6 @@ namespace Poller.Taboola.Model
         /// </summary>
         [DataMember(Name = "advertiser_id")]
         public string Account { get; set; }
-
-        /// <summary>
-        /// The text that will appear below the title
-        /// of each of our campaign items.
-        /// </summary>
-        [DataMember(Name = "branding_text")]
-        public string Branding { get; set; }
-
-        /// <summary>
-        /// Query-string parameter added to the URL of
-        /// the campaign items to allow for tracking.
-        /// </summary>
-        [DataMember(Name = "tracking_code")]
-        public string Utm { get; set; }
-
-        /// <summary>
-        /// Cost per click.
-        /// </summary>
-        [DataMember(Name = "cpc")]
-        public decimal Cpc { get; set; }
-
-        /// <summary>
-        /// Daily max spending limit.
-        /// </summary>
-        [DataMember(Name = "daily_cap")]
-        public decimal? DailyCap { get; set; }
 
         /// <summary>
         /// Defines the way our campaign will be delivered
@@ -77,15 +34,8 @@ namespace Poller.Taboola.Model
         /// An object representing the wanted publisher
         /// bid modifiers for this campaign.
         /// </summary>
-        [DataMember(Name="publisher_bid_modifier")]
+        [DataMember(Name = "publisher_bid_modifier")]
         public PublisherBidModifier PublisherBidModifier { get; set; }
-
-        /// <summary>
-        /// The maximum amount of money this campaign
-        /// can consume.
-        /// </summary>
-        [DataMember(Name = "spending_limit")]
-        public decimal SpendingLimit { get; set; }
 
         /// <summary>
         /// Determines the type of spending limit.
@@ -154,33 +104,12 @@ namespace Poller.Taboola.Model
         [DataMember(Name = "connection_type_targeting")]
         public Target ConnectionTypeTargeting { get; set; }
 
-        // TODO Why exclude?
-        //[DataMember(Name = "audience_segments_multi_targeting")]
-        //public Target AudienceSegmentsMultiTargeting { get; set; }
-
-        //[DataMember(Name = "custom_audience_targeting")]
-        //public Target CustomAudienceTargeting { get; set; }
-
-        //[DataMember(Name = "marking_label_multi_targeting")]
-        //public Target MarkingLabelMultiTargeting { get; set; }
-
         /// <summary>
+        /// Cost per action goal.
         /// TODO What is this?
         /// </summary>
         [DataMember(Name = "cpa_goal")]
         public decimal CpaGoal { get; set; }
-
-        /// <summary>
-        /// Campaign user comments.
-        /// </summary>
-        [DataMember(Name = "comments")]
-        public string Note { get; set; }
-
-        /// <summary>
-        /// The amount of money spent on this campaign.
-        /// </summary>
-        [DataMember(Name = "spent")]
-        public decimal Spent { get; set; }
 
         /// <summary>
         /// The strategy we use for our bidding methods.
@@ -193,18 +122,6 @@ namespace Poller.Taboola.Model
         /// </summary>
         [DataMember(Name = "traffic_allocation_mode")]
         public TrafficAllocationMode TrafficAllocationMode { get; set; }
-
-        /// <summary>
-        /// When our campaign starts.
-        /// </summary>
-        [DataMember(Name = "start_date")]
-        public DateTime? StartDate { get; set; }
-
-        /// <summary>
-        /// When our campaign ends.
-        /// </summary>
-        [DataMember(Name = "end_date")]
-        public DateTime? EndDate { get; set; }
 
         /// <summary>
         /// Current approval state by Taboola.
@@ -223,5 +140,6 @@ namespace Poller.Taboola.Model
         /// </summary>
         [DataMember(Name = "is_active")]
         public bool Active { get; set; }
+
     }
 }

@@ -14,5 +14,7 @@ namespace Poller.Model.Data
         Pending,
         [EnumMember(Value = "rejected")]
         Rejected,
+        [EnumMember(Value = "unknown")]
+        Unknown,
     }
 }
