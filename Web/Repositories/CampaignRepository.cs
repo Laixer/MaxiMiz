@@ -28,18 +28,18 @@ namespace Maximiz.Repositories
         /// <summary>
         /// Returns a new instance of <see cref="NpgsqlConnection"/> for the MaxiMiz database
         /// </summary>
-        public IDbConnection CreateConnection => new NpgsqlConnection(_configuration.GetConnectionString("MaxiMizDatabase"));
-        
+        public IDbConnection GetConnection => new NpgsqlConnection(_configuration.GetConnectionString("MaxiMizDatabase"));
+
         /// <summary>
         /// Returns a new instance of <see cref="QueueClient"/> for the MaxiMiz service bus
         /// </summary>
-        public IQueueClient CreateQueueClient => new QueueClient(_configuration.GetConnectionString("MaxiMizServiceBus"), "testqueue");
+        public IQueueClient GetQueueClient => new QueueClient(_configuration.GetConnectionString("MaxiMizServiceBus"), "testqueue");
 
         public void Create(Campaign entity)
         {
             var message = new CreateOrUpdateObjectsMessage(entity, CrudAction.Create);
 
-            var qClient = CreateQueueClient;
+            var qClient = GetQueueClient;
 
             var bf = new BinaryFormatter();
             using (var stream = new MemoryStream()) {
@@ -48,45 +48,96 @@ namespace Maximiz.Repositories
                 qClient.SendAsync(new Message(stream.ToArray()));
             }
 
-            throw new NotImplementedException();
+            // TODO: Inline SQL is temporary
+            var sql = @" 
+            INSERT INTO PUBLIC.campaign_group
+                (id,
+                 NAME,
+                 branding_text,
+                 location_include,
+                 location_exclude,
+                 language,
+                 device,
+                 os,
+                 initial_cpc,
+                 budget,
+                 budget_daily,
+                 budget_model,
+                 delivery,
+                 bid_strategy,
+                 start_date,
+                 end_date,
+                 status,
+                 create_date,
+                 update_date,
+                 delete_date,
+                 note,
+                 connection)
+                VALUES  (?,
+                         ?,
+                         ?,
+                         ?,
+                         ?,
+                         ?,
+                         ?,
+                         ?,
+                         ?,
+                         ?,
+                         ?,
+                         ?,
+                         ?,
+                         ?,
+                         ?,
+                         ?,
+                         ?,
+                         ?,
+                         ?,
+                         ?,
+                         ?,
+                         ?
+                );";
 
-            string sql = @"INSERT INTO public.campaign(
-	id, secondary_id, name, branding_text, location_include, location_exclude, language, device, os, initial_cpc, budget, budget_daily, budget_model, delivery, bid_strategy, start_date, end_date, utm, status, create_date, update_date, delete_date, note, campaign_group, connection)
-	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
-
-            using (IDbConnection connection = CreateConnection) {
-                int rowsAffected = connection.Execute(sql, new { name=entity.Name, branding_text=entity.BrandingText });
+            using (IDbConnection connection = GetConnection) {
+                int rowsAffected = connection.Execute(sql, new { name = entity.Name, branding_text = entity.BrandingText });
             }
         }
 
-        public void Delete(Campaign entity)
+        public Task CreateGroup(CampaignGroup campaignGroup)
         {
             throw new NotImplementedException();
         }
 
-        public Campaign Get(Guid id)
+        async Task IEntityRepository<Campaign, Guid>.Create(Campaign entity)
         {
-            using (IDbConnection connection = CreateConnection) {
-                IEnumerable<Campaign> result = connection.Query<Campaign>(@"
+            throw new NotImplementedException();
+        }
+
+        async Task IEntityRepository<Campaign, Guid>.Delete(Campaign entity)
+        {
+            throw new NotImplementedException();
+        }
+
+        async Task<Campaign> IEntityRepository<Campaign, Guid>.Get(Guid id)
+        {
+            using (IDbConnection connection = GetConnection) {
+                var result = await connection.QueryFirstOrDefaultAsync<Campaign>(@"
                     SELECT * FROM campaign WHERE id = @Id", new { Id = id });
-                return result.FirstOrDefault();
+                return result;
             }
         }
 
-        public IEnumerable<Campaign> GetAll()
+        async Task<IEnumerable<Campaign>> ICampaignRepository.GetAll()
         {
             // TODO: Limited to 100 for now
-            using (IDbConnection connection = CreateConnection) {
-                IEnumerable<Campaign> result = connection.Query<Campaign>($"SELECT * FROM campaign LIMIT {100}");
-                return result.ToList();
+            using (IDbConnection connection = GetConnection) {
+                return await connection.QueryAsync<Campaign>($"SELECT * FROM campaign LIMIT {100}");
             }
         }
 
-        public IEnumerable<Campaign> Search(string q)
+        async Task<IEnumerable<Campaign>> ICampaignRepository.Search(string q)
         {
-            using (IDbConnection connection = CreateConnection) {
+            using (IDbConnection connection = GetConnection) {
                 // TODO: Fix/optimize query
-                // TODO: Which columns should be tested? Name and Branding_text only?
                 IEnumerable<Campaign> result =
                     connection.Query<Campaign>(
                     @"SELECT * FROM campaign WHERE name ~* @SearchQuery OR branding_text ~* @SearchQuery;",
@@ -97,8 +148,9 @@ namespace Maximiz.Repositories
             }
         }
 
-        public void Update(Campaign entity)
+        async Task IEntityRepository<Campaign, Guid>.Update(Campaign entity)
         {
+            //TODO
             object @params = new
             {
                 entity.Name,
@@ -106,7 +158,7 @@ namespace Maximiz.Repositories
                 entity.InitialCpc
             };
 
-            using (IDbConnection connection = CreateConnection) {
+            using (IDbConnection connection = GetConnection) {
                 //connection.Update(campaign);
             }
             throw new NotImplementedException();

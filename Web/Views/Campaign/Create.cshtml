@@ -1,14 +1,21 @@
-﻿@model Maximiz.InputModels.Campaign.CreateCampaignModel
+﻿@using Maximiz.Model.Enums
+@model Maximiz.InputModels.CampaignGroupInputModel
 
 @{
     ViewData["Title"] = "New";
 }
 
 @section Styles {
-    <link href="~/css/stepwizard.css" />
+    <link rel="stylesheet" href="~/css/stepwizard.css" />
+
+    <style>
+        label {
+            font-weight: bold;
+        }
+    </style>
 }
 
-<h1>New Campaign</h1>
+<h1>New Campaign Group</h1>
 
 <br />
 <br />
@@ -19,268 +26,130 @@
     <div class="stepwizard">
         <div class="stepwizard-row row setup-panel">
             <div class="stepwizard-step col-md-2">
-                <a href="#step-1" type="button" class="btn btn-primary btn-circle">
-                    <img width="64" height="64" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAeCAYAAAA7MK6iAAABEklEQVRIie3UMUoDYRDF8Z8psqUpLBRrBS+gx7ATD6E5iSjeQQ/gJUzEwoCgndhppWBCSmOxuyBBzXzmCyjsg9fsN8x/BnYejf6oCnTRx6hyH4fV20K0jgEm3/imqsmqYgb0Mzzr5t0AtPZBTvBVAriXEzxMAA8jDZeC4EnioDP7toKNRgnQt0hRFHyXAA7VRsFnCeDzhNqZKpQ3Grnjdk4wZSr9BF9IctVqKwOipzybIS6rb9k3bZRF0eRqYRu72MEWOtXbK+6VeX6Ba7zPO9gajvEsntVPOMLqb4AdnGKcAJz2GCdYjkI38TgHcNoP2IiAbzNCaw+mIV9l9UpkukSFeu4r/9Rc275gL+MSjf6JPgDX8rYJGKocvwAAAABJRU5ErkJggg==">
-                </a>
+                <a href="#step-1" type="button" class="btn btn-primary btn-circle"></a>
                 <p><small>Account</small></p>
             </div>
             <div class="stepwizard-step col-md-2">
-                <a href="#step-2" type="button" class="btn btn-default btn-circle" disabled="disabled">
-                    <img width="64" height="64" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAQAAAAAYLlVAAAAAmJLR0QA/4ePzL8AAAMoSURBVGje7ZhfSFNxFMc/ujkrSIlIoYR6kQgfCsskUsjMood6UNZDGb2U9MdlIgUF4YIIeilIwhYRhZTlg+RITSQS8sHCiggK+oMRllQPRZg2TU8Pu17359676zbvwHbO07Zzft/Pfru/c85vkLSkJW0OWiZX+MJnGslMhHwqPYjivdisByhR5QWhxHoAF4Jwh4sIgst6gDoEwYMbQaizHqA5sQB5TCQSYPoEJAjgjPr06wE4OEArW2dH/jCThgAOqviIIAzOxubXK/KjmgBpqrggdEZecD4FbNH0YpaERa+kS1m6TxEOBXigig/iIj2SvJPvQfUs2Me4EFBiC7jKmPJJF5madcCm7MsgLubpy2ZTghMn+9UF9f0Se6nlJu/Vd8Y5i123EFXgpdpIfDltygme8k90a/ozTaBHrI2lEubyNWzJSp3YzJC4nzRRFFspTqEPQZjkFd10K7//bp3ohcqGN9OAi2LSYu8FGxAEH2XKa68JgF/xbEbHEIQm9bXlAPUIgjtxAO7/AaCCzpDjfJ0MKwF+aNSOo1YCPAyTH2eTlQDpFIU0tRWxPQPD5LAgkQ/hVL/wcoScWAH8KdeiAPD7X9pYHwtAqbKpa6IE8PeR2yyOFsDOGwThD148eJTRaWYAgjDERqJsxwX8Dltuj05shsGYMkp5tDejfPpDFntLi6b3GE5KPjp1juG6yJPgaiqpooqTAeO1njdxnPN0aFY4LYCeyBNhoB1i2FD+lvptbGynVQM4FGAoYCY2BbGIUj5oSA9Qzqqw6EKeRgDYzLuAwXyHuX3o1wBo14l10GAIAHb2qRDfoge4bBB/2hAgEKJjJgBunDhx8gRBOGGY0RDxcgo2cs3+c+QHmGqavQjCLsOMdF4qADc4F/v1PBhgAEECar62FSoAE4zHFyAVH4KQFTHrftAzEzeAbARhhBSTvTXuAPkIwmsTWTVBADXxAtiJmDw+24IAyuIFcBBBaDSRlcYLVf552M0xaoAWBKHWVN4y2vDh4x5LIR4AiziltJs807kOHMRsoQ3mLhabJ0j+8fRVyirLoh0fwgj9VGMnaUlL2ty0f4VAaFZFniw0AAAAAElFTkSuQmCC">
-                </a>
+                <a href="#step-2" type="button" class="btn btn-default btn-circle" disabled="disabled"></a>
                 <p><small>Marketing</small></p>
             </div>
             <div class="stepwizard-step col-md-2">
-                <a href="#step-3" type="button" class="btn btn-default btn-circle" disabled="disabled">
-                    <img width="64" height="64" src="data:image/png;base64,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">
-                </a>
+                <a href="#step-3" type="button" class="btn btn-default btn-circle" disabled="disabled"></a>
                 <p><small>Targeting</small></p>
             </div>
             <div class="stepwizard-step col-md-2">
-                <a href="#step-4" type="button" class="btn btn-default btn-circle" disabled="disabled">
-                    <img width="64" height="64" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAABkCAQAAADa613fAAAAAmJLR0QA/4ePzL8AAAP9SURBVHja7dvPbxRlHMfxVxOt/JQI0VggYgROJITgQQhUQTARPeoRSMQLije0JcQDLQj1T5GupdFAEPBEQS6EkzHhUiB2bQ9tkcVEsrqPBx/XdndBujtLt/X5zGHmmeeZ2X3nmc/3+30mGZKSkpLml1Y7ZNB1eQ/kXTfoY6vnGsQuV5SEqq1kyJtzBWK984LgntP22qxDuw6b7XNaQRCcs671Md4yIZjQZWGN3oW6TArG7W5tjA8VBf2WP2LMcjlB0YFWno2ikmPaYnuTE65Fs19zwqZ4vk2PkmKrzsp6E4Jj5dYZt5y0TYenddjmpNsGyu7oEYy3plfOC/rjbLxrzGHPVIxY4DNj3omzkhOcbT2MHYJJKyJG3mtT+oanHG+Rtwc8Z1ywq9VArgi64kM1Ng2DMK211Zi1oFswVD5/2eVMjhvM4iX3YsA943BFb6hod8mBRQpKVpVHhSlX1H/ckD4RfBUj1a0qb4Qqr9yxEeQEH7USyKBgL/jCiare6h85pRfsq1HGNLrdd8NxL9QHcl2wGVyz7TFAOv0ANjQBJMQC6f16QPKCDvCLFx8DZKUR8KzgXsaP1mI7fCMoeW/mIA8E7fGovar3NzsqzrT7HTwl+KMpHjkq+NXz9c9IPu6naruxiuJ9lZ+rZiTr8PutEJ04Q4+8Gj2yvUZ/JUqnq2WP3GxSZtspuDHTi84I9oHjTtYcMR3ly1iT7RcMZvK3X3bJfRetKZ9ZKijM9DaHBP0xj9y24D9Q/s0jXwsOZgLyvSMWO+ritCAz4+yyWkkhZvYBnz60Hvsxlia1MntjKliCpWXH1Z0mhwTdYJ1RWx4xcqtRr4AjQlY1kkuOWuJzFxoFeWNK9btH/qEoW+W9HavfiQyr3zUuKPjOS42CcE6Qi+uRPUZ1VXllgW6jEaPNQNPXI3WCrDMu6ImttXLu6NNppXYrva7PHf3xoaJXMB7L+RYDYbeikp7ymn2jXleNeGDEVb0xUtGmV0mx6YuqBmriA4qCXPRKba0wICj6oOmLvYaK+93GBZO6LarRu8gRdwV/Zl7tDmN4yv6frQGtdVYQFPTbb4NlWGaD/XLxTePZJnsjw+XWTkMPefd72c4n9h4ho3XjKkFw013BXTcNOphRFn/CIBneKIEkkAQyP0D+TmCTYLIcqutrt8CMhIpXR/W1Zw1keL6AhATSYiCNmrsFzZ7ySAJp6EZZe2LWPJJ1lJq1qJVAEkgye8ojCSQlxBS1EkgCSWZPeSSBzNWE2DIgWUalOQoyMl9AJJAWMvtPKfwmkASSQBLI/xAkL9T4CONJqVOoo6ypqb6mfR3yuNupbEDa9RmZNYgRp2p8ApKUlJSUlJSUlJSUNPf1FwzfxYteC529AAAAAElFTkSuQmCC">
-                </a>
+                <a href="#step-4" type="button" class="btn btn-default btn-circle" disabled="disabled"></a>
                 <p><small>Schedule</small></p>
             </div>
             <div class="stepwizard-step col-md-4">
-                <a href="#step-5" type="button" class="btn btn-default btn-circle" disabled="disabled">
-                    <img width="64" height="64" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAQAAAC0NkA6AAAAAmJLR0QA/4ePzL8AAABcSURBVFjD7dhBCgAgCERR73+tOVhtg2ghmJj92oXwQBmozLquEbRrIBHdAGmMyHQfOdW6EB0yoK1Wy2lFJKVdIJ8i5AQEhJwweBBy8ufgU271vLRA/EiPv5V31wSlrOuqMUPs9QAAAABJRU5ErkJggg==">
-                </a>
+                <a href="#step-5" type="button" class="btn btn-default btn-circle" disabled="disabled"></a>
                 <p><small>Summary</small></p>
             </div>
         </div>
     </div>
 
-    <form asp-controller="Campaign" asp-action="Create" method="post" role="form">
-        <div class="panel panel-primary setup-content" id="step-1">
-            <div class="panel-heading">
-                <h2 class="panel-title">Account</h2>
+    <form asp-controller="Campaign" asp-action="CreateGroup" method="post" role="form">
+        <div class="form-group">
+            <label class="control-label text-warning">Campaign</label>
+            <div class="row">
+                <img style="padding:8px; width:128px; height:48px;" src="https://www.taboola.com/sites/all/themes/taboola2017/images/taboola/logo-blue.png" />
+                <img style="padding:8px;  width:96px; border-radius:50%" src="data:image/jpeg;base64,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" />
+                <img style="padding:8px;  width:128px; height:48px;" src="https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png" />
             </div>
-            <div class="panel-body">
-                <div class="form-group">
-                    <label class="control-label">Campaign</label>
-                    <div class="row">
-                        <img style="padding:8px; width:128px; height:48px;" src="https://www.taboola.com/sites/all/themes/taboola2017/images/taboola/logo-blue.png" />
-                        <img style="padding:8px;  width:96px; border-radius:50%" src="data:image/jpeg;base64,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" />
-                        <img style="padding:8px;  width:128px; height:48px;" src="https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png" />
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label asp-for="Account" class="control-label"></label>
-                    <input asp-for="Account" class="form-control" />
-                    <span asp-validation-for="Account" class="text-danger"></span>
-                </div>
-                <div class="form-group">
-                    <label asp-for="Name" class="control-label"></label>
-                    <input asp-for="Name" class="form-control" />
-                    <span asp-validation-for="Name" class="text-danger"></span>
-                </div>
-                <div class="form-group">
-                    <label asp-for="BrandingText" class="control-label"></label>
-                    <input asp-for="BrandingText" class="form-control" />
-                    <span asp-validation-for="BrandingText" class="text-danger"></span>
-                </div>
-                <div class="form-group">
-                    <label asp-for="Url" class="control-label"></label>
-                    <input asp-for="Url" class="form-control" />
-                    <span asp-validation-for="Url" class="text-danger"></span>
-                </div>
-                <button class="btn btn-primary nextBtn pull-right" type="button">Next</button>
+        </div>
+        <div class="form-group">
+            <label asp-for="Name" class="control-label"></label>
+            <input asp-for="Name" class="form-control" />
+            <span asp-validation-for="Name" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="Budget" class="control-label"></label>
+            <input asp-for="Budget" class="form-control" />
+            <span asp-validation-for="Budget" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="Language" class="control-label"></label>
+            <input asp-for="Language" class="form-control" value="NL" readonly />
+            <span asp-validation-for="Language" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="BrandingText" class="control-label"></label>
+            <input asp-for="BrandingText" class="form-control" />
+            <span asp-validation-for="BrandingText" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="Utm" class="control-label"></label>
+            <input asp-for="Utm" class="form-control" />
+            <span asp-validation-for="Utm" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="Delivery" class="control-label"></label>
+            <select asp-for="Delivery" asp-items="Html.GetEnumSelectList<Maximiz.Model.Enums.Delivery>()" class="form-control"></select>
+            <span asp-validation-for="Delivery" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="InitialCpc" class="control-label"></label>
+            <input asp-for="InitialCpc" class="form-control" />
+            <span asp-validation-for="InitialCpc" class="text-danger"></span>
+        </div>
+
+        @* Geo-Location *@
+        <div class="form-group row">
+            <label>@Html.DisplayNameFor(m => m.Location_Inc)</label>
+            <div class="col-sm-12">
+                <input id="location_0" type="checkbox" name="@Html.IdFor(m => m.Location_Inc)" value="0" checked disabled />
+                @* The disabled checkbox will be ignored and the one below this comment will not be shown but posted (temporary)  *@
+                <input id="location_0_temp" type="hidden" name="@Html.IdFor(m => m.Location_Inc)" value="0" />
+                <span>United States - Country</span>
+            </div>
+            <div class="col-sm-12">
+                <input id="location_1" type="checkbox" name="@Html.IdFor(m => m.Location_Inc)" value="1" checked disabled />
+                @* The disabled checkbox will be ignored and the one below this comment will not be shown but posted (temporary)  *@
+                <input id="location_1_temp" type="hidden" name="@Html.IdFor(m => m.Location_Inc)" value="1" />
+                <span>Netherlands - Country</span>
             </div>
         </div>
 
-        <div class="panel panel-primary setup-content" id="step-2">
-            <div class="panel-heading">
-                <h2 class="panel-title">Marketing</h2>
-            </div>
-            <div class="panel-body">
-                <div class="form-group">
-                    <label asp-for="Objective" class="control-label"></label>
-                    <input asp-for="Objective" class="form-control" />
-                    <span asp-validation-for="Objective" class="text-danger"></span>
+        @* Targeted Devices *@
+        <div class="form-group row">
+            <label>@Html.DisplayNameFor(m => m.Devices)</label>
+            @foreach (Device device in Enum.GetValues(typeof(Device))) {
+                <div class="col-sm-12">
+                    <input id="device_@device" type="checkbox" name="@Html.IdFor(m => m.Devices)" value="@device" @(Model != null && Model.Devices.Contains(@device) ? "checked" : "") />
+                    <span>@device</span>
                 </div>
-                <div class="form-group">
-                    <label asp-for="Objective" class="control-label"></label>
-                    <input asp-for="AdDelivery" class="form-control" />
-                    <span asp-validation-for="AdDelivery" class="text-danger"></span>
-                </div>
-                <div class="form-group">
-                    <label asp-for="AdDelivery" class="control-label"></label>
-                    <input asp-for="SpendingLimit" class="form-control" />
-                    <span asp-validation-for="SpendingLimit" class="text-danger"></span>
-                </div>
-                <div class="form-group">
-                    <label asp-for="SpendingLimit" class="control-label"></label>
-                    <input asp-for="Cpc" class="form-control" />
-                    <span asp-validation-for="Cpc" class="text-danger"></span>
-                </div>
-                <button class="btn btn-outline-primary prevBtn pull-left" type="button">Back</button>
-                <button class="btn btn-primary nextBtn pull-right" type="button">Next</button>
-            </div>
+            }
         </div>
 
-        <div class="panel panel-primary setup-content" id="step-3">
-            <div class="panel-heading">
-                <h2 class="panel-title">Targeting</h2>
-            </div>
-            <div class="panel-body">
-                <div class="form-group">
-                    <label class="control-label">Geo-targeting</label>
-                    <input maxlength="200" type="text" required="required" class="form-control" placeholder="" />
-                </div>
-                <div class="form-group">
-                    <label class="control-label">Devices</label>
-                    <input maxlength="200" type="text" required="required" class="form-control" placeholder="" />
-                </div>
-                <div class="form-group">
-                    <label class="control-label">Operating system</label>
-                    <input maxlength="200" type="text" required="required" class="form-control" placeholder="" />
-                </div>
-                <button class="btn btn-outline-primary prevBtn pull-left" type="button">Back</button>
-                <button class="btn btn-primary nextBtn pull-right" type="button">Next</button>
-            </div>
+        @* Start and End Date *@
+        <div class="form-group">
+            <label asp-for="StartDate" class="control-label"></label>
+            <input asp-for="StartDate" class="form-control" />
+            <span asp-validation-for="StartDate" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="EndDate" class="control-label"></label>
+            <input asp-for="EndDate" class="form-control" />
+            <span asp-validation-for="EndDate" class="text-danger"></span>
         </div>
 
-        <div class="panel panel-primary setup-content" id="step-4">
-            <div class="panel-heading">
-                <h2 class="panel-title">Schedule</h2>
-            </div>
-            <div class="panel-body">
-                <div class="form-group">
-                    <label class="control-label">End Date</label>
-                    <input type="date" required="required" class="form-control" placeholder="" />
+        @* Targeted Operating Systems *@
+        <div class="form-group row">
+            <label>@Html.DisplayNameFor(m => m.OperatingSystems)</label>
+            @foreach (OS os in Enum.GetValues(typeof(OS))) {
+                <div class="col-sm-12">
+                    <input id="os_@os" type="checkbox" name="@Html.IdFor(m => m.OperatingSystems)" value="@os" @(Model != null && Model.OperatingSystems.Contains(@os) ? "checked" : "") />
+                    <span>@os.ToString()</span>
                 </div>
-                <div class="form-group">
-                    <label class="control-label">Start Date</label>
-                    <input type="date" required="required" class="form-control" placeholder="" />
-                </div>
-                <button class="btn btn-outline-primary prevBtn pull-left" type="button">Back</button>
-                <button class="btn btn-success pull-right nextBtn" type="button">Summary</button>
-            </div>
+            }
         </div>
 
-        <div class="panel panel-primary setup-content summary" id="step-5">
-            <div class="panel-heading">
-                <h2 class="panel-title">Summary</h2>
-            </div>
-
-            <h4>Account</h4>
-            <table class="table">
-                <tr>
-                    <td>Account</td>
-                    <td><span id="summary_account"></span></td>
-                </tr>
-                <tr>
-                    <td>Name</td>
-                    <td><span id="summary_name"></span></td>
-                </tr>
-                <tr>
-                    <td>Branding</td>
-                    <td><span id="summary_branding"></span></td>
-                </tr>
-                <tr>
-                    <td>URL</td>
-                    <td><span id="summary_url"></span></td>
-                </tr>
-            </table>
-
-            <h4>Marketing</h4>
-            <table class="table">
-                <tr>
-                    <td>Objective</td>
-                    <td><span id="summary_objective"></span></td>
-                </tr>
-                <tr>
-                    <td>CPC</td>
-                    <td><span id="summary_cpc"></span></td>
-                </tr>
-                <tr>
-                    <td>Spending Limit</td>
-                    <td><span id="summary_spendingLimit"></span></td>
-                </tr>
-                <tr>
-                    <td>Ad delivery</td>
-                    <td><span id="summary_adDelivery"></span></td>
-                </tr>
-            </table>
-
-            <button class="btn btn-outline-primary prevBtn pull-left" type="button">Back</button>
-            <button class="btn btn-primary pull-right" type="submit">Create</button>
-        </div>
+        <a class="btn btn-outline-primary pull-left" href="../">Back</a>
+        <button class="btn btn-primary pull-right" type="submit">Create</button>
     </form>
 </div>
 
 @section Scripts {
-    <script>
-        $(document).ready(function () {
-
-            var navListItems = $('div.setup-panel div a'),
-                allWells = $('.setup-content'),
-                allNextBtn = $('.nextBtn'),
-                allPrevBtn = $('.prevBtn'),
-                summaryBtn = $('#summaryBtn');
-
-            // Initially hide all wells
-            allWells.hide();
-
-            // Clicking on the navigation buttons
-            navListItems.click(function (e) {
-                e.preventDefault();
-                var $target = $($(this).attr('href')),
-                    $item = $(this);
-
-                if ($target.hasClass("summary")) {
-                    //TODO: Inject summary content
-                    var account = $("#@Html.IdFor(m => m.Account)").val();
-                    var name = $("#@Html.IdFor(m => m.Name)").val();
-                    var branding = $("#@Html.IdFor(m => m.BrandingText)").val();
-                    var url = $("#@Html.IdFor(m => m.Url)").val();
-
-                    var objective = $("#@Html.IdFor(m => m.Objective)").val();
-                    var adDelivery = $("#@Html.IdFor(m => m.AdDelivery)").val();
-                    var spendingLimit = $("#@Html.IdFor(m => m.SpendingLimit)").val();
-                    var cpc = $("#@Html.IdFor(m => m.Cpc)").val();
-
-                    $("#summary_account").html(account);
-                    $("#summary_name").html(name);
-                    $("#summary_branding").html(branding);
-                    $("#summary_url").html(url);
-
-                    $("#summary_objective").html(objective);
-                    $("#summary_adDelivery").html(adDelivery);
-                    $("#summary_spendingLimit").html(spendingLimit);
-                    $("#summary_cpc").html(cpc);
-                }
-
-                if (!$item.hasClass('disabled')) {
-                    navListItems.removeClass('btn-primary').addClass('btn-default');
-                    $item.addClass('btn-primary');
-                    allWells.hide();
-                    $target.show();
-                    $target.find('input:eq(0)').focus();
-                }
-            });
-
-            // Next step
-            allNextBtn.click(function () {
-                var curStep = $(this).closest(".setup-content"),
-                    curStepBtn = curStep.attr("id"),
-                    nextStepWizard = $('div.setup-panel div a[href="#' + curStepBtn + '"]').parent().next().children("a");
-
-                nextStepWizard.removeAttr('disabled').trigger('click');
-            });
-
-            // Previous step (back)
-            allPrevBtn.click(function () {
-                var curStep = $(this).closest(".setup-content"),
-                    curStepBtn = curStep.attr("id"),
-                    prevStepWizard = $('div.setup-panel div a[href="#' + curStepBtn + '"]').parent().prev().children("a");
-
-                prevStepWizard.removeAttr('disabled').trigger('click');
-            });
-
-            // Initial step click
-            $('div.setup-panel div a.btn-primary').trigger('click');
-        });
-    </script>
+    <script src="~/lib/jquery-validation/dist/jquery.validate.js"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.js"></script>
 }

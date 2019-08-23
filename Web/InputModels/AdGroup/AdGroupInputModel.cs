@@ -1,30 +1,31 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Threading.Tasks;
 
-namespace Maximiz.InputModels.AdGroup
+namespace Maximiz.InputModels
 {
-    public class CreateAdGroupModel
+    public class AdGroupInputModel
     {
         /// <summary>
-        /// Name of the Ad Group
+        /// Group name.
         /// </summary>
         public string Name { get; set; }
+
         /// <summary>
-        /// Describes this group of ads
+        /// Description for all items in the group.
         /// </summary>
         public string Description { get; set; }
+
         /// <summary>
-        /// Destination URL
+        /// URL for all items in the group.
         /// </summary>
         public string Url { get; set; }
+
         /// <summary>
-        /// Tracking Code
+        /// Tracking code for all the items in the group.
         /// </summary>
         [Display(Name = "Tracking Code")]
         public string Utm { get; set; }
+
         public List<string> Titles { get; set; }
     }
 }

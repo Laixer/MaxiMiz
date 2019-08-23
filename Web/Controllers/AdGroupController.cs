@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Maximiz.InputModels.AdGroup;
+using Maximiz.InputModels;
 using Maximiz.Model.Entity;
 using Microsoft.AspNetCore.Mvc;
 
@@ -17,7 +17,7 @@ namespace Maximiz.Controllers
         }
 
         [HttpPost]
-        public IActionResult Create(CreateAdGroupModel model)
+        public IActionResult Create(AdGroupInputModel model)
         {
             // Test
             var x = model.Name;

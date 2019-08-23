@@ -1,4 +1,4 @@
-﻿@model  Maximiz.InputModels.AdGroup.CreateAdGroupModel
+﻿@model  Maximiz.InputModels.AdGroupInputModel
 
 @{
     ViewData["Title"] = "New Ad Group";
@@ -27,11 +27,20 @@
             <span class="text-danger">(Create a seperate ad for each title?)</span>
             <div class="form-group">
                 <label for="adgTitle">Titles</label>
-                <input type="text" class="form-control" id="adgTitle1">
+                <input placeholder="Title" type="text" class="form-control" id="adgTitle1">
+                <textarea placeholder="Description" type="text" class="form-control" maxlength="150" required=""></textarea>
                 <input type="text" class="form-control" id="adgTitle2">
+                <input placeholder="Title" type="text" class="form-control" id="adgTitle2">
+                <textarea placeholder="Description" type="text" class="form-control" maxlength="150" required=""></textarea>
                 <input type="text" class="form-control" id="adgTitle3">
+                <input placeholder="Title" type="text" class="form-control" id="adgTitle3">
+                <textarea placeholder="Description" type="text" class="form-control" maxlength="150" required=""></textarea>
                 <input type="text" class="form-control" id="adgTitle4">
+                <input placeholder="Title" type="text" class="form-control" id="adgTitle4">
+                <textarea placeholder="Description" type="text" class="form-control" maxlength="150" required=""></textarea>
                 <input type="text" class="form-control" id="adgTitle5">
+                <input placeholder="Title" type="text" class="form-control" id="adgTitle5">
+                <textarea placeholder="Description" type="text" class="form-control" maxlength="150" required=""></textarea>
                 <button class="btn btn-link">Add Title +</button>
             </div>
             <span class="text-danger">(Where does the tracking (utm) code go?)</span>

@@ -1,19 +1,21 @@
-﻿using System;
-using System.Collections.Generic;
-using Maximiz.InputModels.Campaign;
+﻿using Maximiz.InputModels;
 using Maximiz.Model.Entity;
 using Maximiz.Repositories.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Maximiz.Controllers
 {
+    // TODO make methods asynchronous (busy)
     public class CampaignController : Controller
     {
-        private readonly ICampaignRepository campaignRepo;
+        private readonly ICampaignRepository _campaignRepo;
 
         public CampaignController(ICampaignRepository campaignRepo)
         {
-            this.campaignRepo = campaignRepo;
+            _campaignRepo = campaignRepo;
         }
 
         [HttpGet]
@@ -22,54 +24,74 @@ namespace Maximiz.Controllers
             return RedirectToAction("Overview");
         }
 
+        /// <summary>
+        /// An overview of all campaigns
+        /// </summary>
         [HttpGet]
-        public IActionResult Overview()
+        public async Task<IActionResult> Overview()
         {
-            return View(campaignRepo.GetAll());
+            var allCampaigns = await _campaignRepo.GetAll();
+            return View(allCampaigns);
         }
 
+        /// <summary>
+        /// Displaying the details for a single <see cref="Campaign"></see>
+        /// </summary>
         [HttpGet]
-        public IActionResult Details(Guid id)
+        public async Task<IActionResult> Details(Guid id)
         {
-            return View(campaignRepo.Get(id));
+            var c = await _campaignRepo.Get(id);
+            return View(c);
         }
 
+        /// <summary>
+        /// The create page for a new <see cref="Campaign"></see>
+        /// </summary>
         [HttpGet]
         public IActionResult Create()
         {
             return View();
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="model">The input model for a new campaign</param>
+        /// <returns></returns>
         [HttpPost]
-        public IActionResult Create(CreateCampaignModel model)
+        public IActionResult Create(CampaignGroupInputModel model)
         {
             // TODO: Validate and create model, handle possible error
-            if (ModelState.IsValid) {
-
-                Campaign campaign = new Campaign()
-                {
-                    Utm = model.Url,
-                    InitialCpc = model.Cpc,
-                    BrandingText = model.BrandingText,
-                };
-
-                campaignRepo.Create(campaign);
+            if (!ModelState.IsValid) {
+                return View(model);
             }
+
+            //var campaign = new Campaign
+            //{
+            //    Utm = model.Url,
+            //    InitialCpc = model.InitialCpc,
+            //    BrandingText = model.BrandingText,
+            //};
+            //
+            //_campaignRepo.Create(campaign);
+
+            return View(model);
 
             return RedirectToAction("Overview");
         }
 
+        /// <summary>
+        /// Query the database to search for campaigns
+        /// </summary>
+        /// <param name="query">The search term</param>
+        /// <returns></returns>
         [HttpGet]
-        public IEnumerable<Campaign> Search(string query)
-        {
-            return campaignRepo.Search(query);
-        }
+        public async Task<IEnumerable<Campaign>> Search(string query) => await _campaignRepo.Search(query);
 
         [HttpPut]
         public IActionResult Edit(Campaign campaign)
         {
-            // TODO: Check validity
-            campaignRepo.Update(campaign);
+            _campaignRepo.Update(campaign);
 
             return StatusCode(500, "Error");
         }
