@@ -35,8 +35,9 @@ namespace Maximiz.Repositories
         /// </summary>
         public IQueueClient GetQueueClient => new QueueClient(_configuration.GetConnectionString("MaxiMizServiceBus"), "testqueue");
 
-        public void Create(Campaign entity)
+        public async Task CreateGroup(CampaignGroup entity)
         {
+            // TODO: Put this away somewhere else. This is temporary.
             var message = new CreateOrUpdateObjectsMessage(entity, CrudAction.Create);
 
             var qClient = GetQueueClient;
@@ -45,14 +46,14 @@ namespace Maximiz.Repositories
             using (var stream = new MemoryStream()) {
                 bf.Serialize(stream, message);
                 // Send message to SB
-                qClient.SendAsync(new Message(stream.ToArray()));
+                await qClient.SendAsync(new Message(stream.ToArray()));
             }
+            //!
 
-            // TODO: Inline SQL is temporary
+            // TODO: Inline SQL is also temporary
             var sql = @" 
             INSERT INTO PUBLIC.campaign_group
-                (id,
-                 NAME,
+                (NAME,
                  branding_text,
                  location_include,
                  location_exclude,
@@ -73,38 +74,40 @@ namespace Maximiz.Repositories
                  delete_date,
                  note,
                  connection)
-                VALUES  (?,
-                         ?,
-                         ?,
-                         ?,
-                         ?,
-                         ?,
-                         ?,
-                         ?,
-                         ?,
-                         ?,
-                         ?,
-                         ?,
-                         ?,
-                         ?,
-                         ?,
-                         ?,
-                         ?,
-                         ?,
-                         ?,
-                         ?,
-                         ?,
-                         ?
+                VALUES  (@Name,
+                         @Branding_Text,
+                         @Location_Include,
+                         @Location_Exclude,
+                         @Language,
+                         @Device,
+                         @OS,
+                         @Initial_CPC,
+                         @Budget,
+                         @Budget_Daily,
+                         @Budget_Model,
+                         @Delivery,
+                         @Bid_Strategy,
+                         @Start_Date,
+                         @End_Date,
+                         @Status,
+                         @Create_Date,
+                         @Update_Date,
+                         @Delete_Date,
+                         @Note,
+                         @Connection
                 );";
 
-            using (IDbConnection connection = GetConnection) {
-                int rowsAffected = connection.Execute(sql, new { name = entity.Name, branding_text = entity.BrandingText });
-            }
-        }
+            var parameters = new
+            {
+                Name = entity.Name,
+                Branding_Text = entity.BrandingText,
+                Location_Incldue = entity.LocationInclude
+                // TODO ETC...
+            };
 
-        public Task CreateGroup(CampaignGroup campaignGroup)
-        {
-            throw new NotImplementedException();
+            using (IDbConnection connection = GetConnection) {
+                await connection.ExecuteAsync(sql, parameters);
+            }
         }
 
         async Task IEntityRepository<Campaign, Guid>.Create(Campaign entity)
