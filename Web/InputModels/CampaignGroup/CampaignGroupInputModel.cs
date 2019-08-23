@@ -102,11 +102,6 @@ namespace Maximiz.InputModels
         public DateTime? EndDate { get; set; }
 
         /// <summary>
-        /// Status.
-        /// </summary>
-        public Status Status { get; set; }
-
-        /// <summary>
         /// Tracking code.
         /// </summary>
         [Required, Display(Name = "Tracking Code")]
