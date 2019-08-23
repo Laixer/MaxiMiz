@@ -28,7 +28,7 @@ namespace Maximiz.Model.Entity
         /// Language of the campaign, 2 chars.
         /// TODO Why do we need this?
         /// </summary>
-        public char[] Language { get; set; }
+        public string[] Language { get; set; } //TODO: Why can it not be casted to a char[]?
 
         /// <summary>
         /// Delivery mode of this ad.
@@ -96,6 +96,16 @@ namespace Maximiz.Model.Entity
         /// we do have to store.
         /// </summary>
         public string Details { get; set; }
+
+        /// <summary>
+        /// Status.
+        /// </summary>
+        public Status Status { get; set; }
+
+        /// <summary>
+        /// Connections.
+        /// </summary>
+        public Connection[] Connections { get; set; }
     }
 
 }
