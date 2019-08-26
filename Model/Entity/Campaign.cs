@@ -25,18 +25,6 @@ namespace Maximiz.Model.Entity
         public string Name { get; set; }
 
         /// <summary>
-        /// Language of the campaign, 2 chars.
-        /// TODO Why do we need this?
-        /// </summary>
-        public string[] Language { get; set; } //TODO: Why can it not be casted to a char[]?
-
-        /// <summary>
-        /// Delivery mode of this ad.
-        /// </summary>
-        public Delivery Delivery { get; set; }
-        public string DeliveryText { get => Delivery.GetEnumMemberName(); }
-
-        /// <summary>
         /// Campaign branding text.
         /// </summary>
         public string BrandingText { get; set; }
@@ -50,6 +38,22 @@ namespace Maximiz.Model.Entity
         /// Region in which campaign is not active.
         /// </summary>
         public int[] LocationExclude { get; set; }
+
+        /// <summary>
+        /// Language of the campaign, 2 chars.
+        /// TODO Why do we need this? Should just be a string.
+        /// </summary>
+        public string Language { get; set; }
+
+        /// <summary>
+        /// Targeted Device.
+        /// </summary>
+        public Device Device { get; set; }
+
+        /// <summary>
+        /// Targeted OS.
+        /// </summary>
+        public OS OperatingSystem { get; set; }
 
         /// <summary>
         /// The initial CPC per item.
@@ -67,9 +71,20 @@ namespace Maximiz.Model.Entity
         public decimal? DailyBudget { get; set; }
 
         /// <summary>
-        /// Budget spent.
+        /// Budget model for the campaign.
         /// </summary>
-        public decimal Spent { get; set; }
+        public BudgetModel BudgetModel { get; set; }
+
+        /// <summary>
+        /// Delivery mode of this ad.
+        /// </summary>
+        public Delivery Delivery { get; set; }
+        public string DeliveryText { get => Delivery.GetEnumMemberName(); }
+
+        /// <summary>
+        /// Bid Strategy.
+        /// </summary>
+        public BidStrategy BidStrategy { get; set; }
 
         /// <summary>
         /// Campaign start date.
@@ -82,9 +97,19 @@ namespace Maximiz.Model.Entity
         public DateTime? EndDate { get; set; }
 
         /// <summary>
+        /// Status.
+        /// </summary>
+        public Status Status { get; set; }
+
+        /// <summary>
         /// Tracking code.
         /// </summary>
         public string Utm { get; set; }
+
+        /// <summary>
+        /// Budget spent.
+        /// </summary>
+        public decimal Spent { get; set; }
 
         /// <summary>
         /// Note.
@@ -98,14 +123,20 @@ namespace Maximiz.Model.Entity
         public string Details { get; set; }
 
         /// <summary>
-        /// Status.
-        /// </summary>
-        public Status Status { get; set; }
-
-        /// <summary>
         /// Connections.
         /// </summary>
         public Connection[] Connections { get; set; }
+
+
+        public static Campaign FromGroup(CampaignGroup group)
+        {
+            return new Campaign
+            {
+                Name = group.Name,
+                InitialCpc = group.InitialCpc
+                // TODO: Add remaining properties
+            };
+        }
     }
 
 }

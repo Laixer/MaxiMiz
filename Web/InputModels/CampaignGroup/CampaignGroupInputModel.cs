@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using System;
 using System.Linq;
 using System.ComponentModel.DataAnnotations;
+using Maximiz.Model.Entity;
 
 namespace Maximiz.InputModels
 {
@@ -27,35 +28,26 @@ namespace Maximiz.InputModels
         /// <summary>
         /// Geolocations to include.
         /// </summary>
-        [Required]
         [Display(Name = "Include Geo-targeting")]
-        public int[] Location_Inc { get; set; }
+        public int[] LocationInclude { get; set; }
 
         /// <summary>
         /// Geolocations to exclude.
         /// </summary>
-        [Required]
         [Display(Name = "Exclude Geo-targeting")]
-        public int[] Location_Exc { get; set; }
+        public int[] LocationExclude { get; set; }
 
         /// <summary>
         /// Language of the campaign, 2 chars.
         /// </summary>
-        public string[] Language { get; set; }
+        [MaxLength(2)]
+        public string Language { get; set; }
 
         /// <summary>
         /// Targeted devices.
         /// </summary>
+        [Display(Name = "Targeted Devices")]
         public Device[] Devices { get; set; }
-
-        public SelectList DeviceSelectList =>  
-            new SelectList(Enum.GetValues(typeof(Device)).OfType<Device>()
-            .Select(x =>
-                new SelectListItem
-                {
-                    Text = x.ToString(),
-                    Value = x.GetEnumMemberName()
-                }));
 
         /// <summary>
         /// Targeted operating systems.
@@ -79,13 +71,26 @@ namespace Maximiz.InputModels
         /// <summary>
         /// Budget per day. Can be null.
         /// </summary>
+        [Display(Name = "Daily Budget")]
         public decimal? DailyBudget { get; set; }
+
+        /// <summary>
+        /// Budget Model.
+        /// </summary>
+        [Required, Display(Name = "Budget Model")]
+        public BudgetModel BudgetModel { get; set; }
 
         /// <summary>
         /// Delivery mode.
         /// </summary>
         [Required, Display(Name = "Ad Delivery")]
         public Delivery Delivery { get; set; }
+
+        /// <summary>
+        /// Bid strategy.
+        /// </summary>
+        [Required, Display(Name = "Bid Strategy")]
+        public BidStrategy BidStrategy { get; set; }
 
         /// <summary>
         /// Campaign start date.
@@ -111,5 +116,34 @@ namespace Maximiz.InputModels
         /// Connections.
         /// </summary>
         public Connection[] Connections { get; set; }
+
+        /// <summary>
+        /// Returns a new <see cref="CampaignGroup"></see> model from an existing <see cref="CampaignGroupInputModel"></see> instance.
+        /// </summary>
+        /// <returns></returns>
+        public CampaignGroup ToModel()
+        {
+            return new CampaignGroup
+            {
+                Name = Name,
+                BrandingText = BrandingText,
+                LocationInclude = LocationInclude,
+                LocationExclude = LocationExclude,
+                Language = Language,
+                Devices = Devices,
+                OperatingSystems = OperatingSystems,
+                InitialCpc = InitialCpc,
+                Budget = Budget,
+                DailyBudget = DailyBudget,
+                BudgetModel = BudgetModel,
+                Delivery = Delivery,
+                BidStrategy = BidStrategy,
+                StartDate = StartDate,
+                EndDate = EndDate,
+                Status = Status.Unknown,
+                Utm = Utm,
+                Connections = Connections
+            };
+        }
     }
 }

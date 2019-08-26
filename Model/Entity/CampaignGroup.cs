@@ -8,6 +8,7 @@ namespace Maximiz.Model.Entity
     /// <summary>
     /// Campaign Group.
     /// </summary>
+    [Serializable]
     public class CampaignGroup : EntityAudit<int>
     {
         /// <summary>
@@ -34,7 +35,7 @@ namespace Maximiz.Model.Entity
         /// Language of the campaign, 2 chars.
         /// TODO Why do we need this?
         /// </summary>
-        public string[] Language { get; set; }
+        public string Language { get; set; }
 
         /// <summary>
         /// Targeted devices.
@@ -62,10 +63,20 @@ namespace Maximiz.Model.Entity
         public decimal? DailyBudget { get; set; }
 
         /// <summary>
+        /// Budget Model.
+        /// </summary>
+        public BudgetModel BudgetModel { get; set; }
+
+        /// <summary>
         /// Delivery mode of this ad.
         /// </summary>
         public Delivery Delivery { get; set; }
         public string DeliveryText { get => Delivery.GetEnumMemberName(); }
+
+        /// <summary>
+        /// Bid strategy.
+        /// </summary>
+        public BidStrategy BidStrategy { get; set; }
 
         /// <summary>
         /// Campaign start date.
