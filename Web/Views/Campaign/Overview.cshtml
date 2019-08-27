@@ -18,11 +18,16 @@
         <th><input id="check_all" name="check_all" type="checkbox" /></th>
         <th>Campaign</th>
         <th>CPC</th>
+        <th>Device</th>
+        <th>OS</th>
+        <th>Status</th>
+        <th>Budget</th>
+        <th>Spent</th>
+        <th>Start Date</th>
+        <th>End Date</th>
         <th>CTR</th>
         <th>PVPS</th>
         <th>Clicks</th>
-        <th>Budget</th>
-        <th>Spent</th>
         <th>Revenue</th>
         <th>ROI</th>
         <th>Taboola</th>
@@ -31,23 +36,26 @@
         <th>Actions</th>
     </tr>
     @foreach (Maximiz.Model.Entity.Campaign campaign in Model) {
-        <tr>
-            <td><input type="checkbox" name="check_campaign" id="@campaign.Id" /></td>
-            <td>@Html.ActionLink(@campaign.Name, "Details", "Campaign", new { id = campaign.Id })</td>
-            <td>@campaign.InitialCpc</td>
-            <td>?</td>
-            <td>?</td>
-            <td>?</td>
-            <td>
-                @campaign.Budget
-            </td>
-            <td>?</td>
-            <td>?</td>
-            <td>?</td>
-            <td>?</td>
-            <td>?</td>
-            <td>?</td>
-            <td>...</td>
-        </tr>
+<tr>
+    <td><input type="checkbox" name="check_campaign" id="@campaign.Id" /></td>
+    <td>@Html.ActionLink(@campaign.Name, "Details", "Campaign", new { id = campaign.Id })</td>
+    <td>@campaign.InitialCpc</td>
+    <td>@(campaign.Device.FirstOrDefault())</td>
+    <td>@campaign.OS.FirstOrDefault()</td>
+    <td>@campaign.Status</td>
+    <td>@campaign.Budget</td>
+    <td>@campaign.Spent</td>
+    <td>@campaign.StartDate</td>
+    <td>@campaign.EndDate</td>
+    <td>?</td>
+    <td>?</td>
+    <td>?</td>
+    <td>?</td>
+    <td>?</td>
+    <td>?</td>
+    <td>?</td>
+    <td>?</td>
+    <td>...</td>
+</tr>
     }
 </table>

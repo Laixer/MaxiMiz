@@ -14,7 +14,7 @@ namespace Maximiz.Model.Enums
         [EnumMember(Value = "cable")]
         Cable,
         [EnumMember(Value = "wifi")]
-        WiFi,
+        Wifi,
         [EnumMember(Value = "cellular")]
         Cellular
     }

@@ -1,10 +1,10 @@
 ﻿@model Maximiz.Model.Entity.Campaign
 
 @{
-    ViewData["Title"] = "Campaign";
+    ViewData["Title"] = "View";
 }
 
-<h1>Campaign</h1>
+<h1>View</h1>
 
 <div>
     <h4>Campaign</h4>
@@ -53,6 +53,30 @@
             @Html.DisplayFor(model => model.DailyBudget)
         </dd>
         <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.BudgetModel)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.BudgetModel)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Delivery)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Delivery)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.DeliveryText)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.DeliveryText)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.BidStrategy)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.BidStrategy)
+        </dd>
+        <dt class = "col-sm-2">
             @Html.DisplayNameFor(model => model.StartDate)
         </dt>
         <dd class = "col-sm-10">
@@ -65,10 +89,22 @@
             @Html.DisplayFor(model => model.EndDate)
         </dd>
         <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Status)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Status)
+        </dd>
+        <dt class = "col-sm-2">
             @Html.DisplayNameFor(model => model.Utm)
         </dt>
         <dd class = "col-sm-10">
             @Html.DisplayFor(model => model.Utm)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Spent)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Spent)
         </dd>
         <dt class = "col-sm-2">
             @Html.DisplayNameFor(model => model.Note)
@@ -77,28 +113,16 @@
             @Html.DisplayFor(model => model.Note)
         </dd>
         <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Details)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Details)
+        </dd>
+        <dt class = "col-sm-2">
             @Html.DisplayNameFor(model => model.CreateDate)
         </dt>
         <dd class = "col-sm-10">
             @Html.DisplayFor(model => model.CreateDate)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.UpdateDate)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.UpdateDate)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.DeleteDate)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.DeleteDate)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Id)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Id)
         </dd>
     </dl>
 </div>

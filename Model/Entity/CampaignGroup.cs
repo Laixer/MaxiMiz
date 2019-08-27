@@ -1,7 +1,5 @@
 ﻿using Maximiz.Model.Enums;
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Maximiz.Model.Entity
 {
@@ -40,12 +38,12 @@ namespace Maximiz.Model.Entity
         /// <summary>
         /// Targeted devices.
         /// </summary>
-        public Device[] Devices { get; set; }
+        public Device[] Device { get; set; }
 
         /// <summary>
         /// Targeted operating systems.
         /// </summary>
-        public OS[] OperatingSystems { get; set; }
+        public OS[] OS { get; set; }
 
         /// <summary>
         /// The initial CPC per item.
@@ -106,6 +104,6 @@ namespace Maximiz.Model.Entity
         /// <summary>
         /// Connections.
         /// </summary>
-        public Connection[] Connections { get; set; }
+        public Connection[] Connection { get; set; }
     }
 }

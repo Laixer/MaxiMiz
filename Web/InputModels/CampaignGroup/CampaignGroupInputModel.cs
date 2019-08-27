@@ -130,8 +130,8 @@ namespace Maximiz.InputModels
                 LocationInclude = LocationInclude,
                 LocationExclude = LocationExclude,
                 Language = Language,
-                Devices = Devices,
-                OperatingSystems = OperatingSystems,
+                Device = Devices,
+                OS = OperatingSystems,
                 InitialCpc = InitialCpc,
                 Budget = Budget,
                 DailyBudget = DailyBudget,
@@ -142,7 +142,7 @@ namespace Maximiz.InputModels
                 EndDate = EndDate,
                 Status = Status.Unknown,
                 Utm = Utm,
-                Connections = Connections
+                Connection = Connections
             };
         }
     }

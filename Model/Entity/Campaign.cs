@@ -43,17 +43,17 @@ namespace Maximiz.Model.Entity
         /// Language of the campaign, 2 chars.
         /// TODO Why do we need this? Should just be a string.
         /// </summary>
-        public string Language { get; set; }
+        public string[] Language { get; set; }
 
         /// <summary>
         /// Targeted Device.
         /// </summary>
-        public Device Device { get; set; }
+        public Device[] Device { get; set; }
 
         /// <summary>
         /// Targeted OS.
         /// </summary>
-        public OS OperatingSystem { get; set; }
+        public OS[] OS { get; set; }
 
         /// <summary>
         /// The initial CPC per item.
@@ -125,7 +125,7 @@ namespace Maximiz.Model.Entity
         /// <summary>
         /// Connections.
         /// </summary>
-        public Connection[] Connections { get; set; }
+        public Connection[] Connection { get; set; }
 
 
         public static Campaign FromGroup(CampaignGroup group)
@@ -133,8 +133,23 @@ namespace Maximiz.Model.Entity
             return new Campaign
             {
                 Name = group.Name,
-                InitialCpc = group.InitialCpc
-                // TODO: Add remaining properties
+                BrandingText = group.BrandingText,
+                LocationInclude = group.LocationInclude,
+                LocationExclude = group.LocationExclude,
+                Language = new string[] { group.Language },
+                // Device and Operating System is unknown
+                InitialCpc = group.InitialCpc,
+                Budget = group.Budget,
+                DailyBudget = group.DailyBudget,
+                BudgetModel = group.BudgetModel,
+                Delivery = group.Delivery,
+                BidStrategy = group.BidStrategy,
+                StartDate = group.StartDate,
+                EndDate = group.EndDate,
+                Status = group.Status,
+                Utm = group.Utm,
+                Note = group.Note,
+                Connection = group.Connection
             };
         }
     }

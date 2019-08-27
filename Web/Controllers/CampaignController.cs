@@ -31,6 +31,9 @@ namespace Maximiz.Controllers
         public async Task<IActionResult> Overview()
         {
             var allCampaigns = await _campaignRepo.GetAll();
+
+            var x = 1;
+
             return View(allCampaigns);
         }
 
@@ -56,26 +59,19 @@ namespace Maximiz.Controllers
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="model">The input model for a new campaign</param>
+        /// <param name="input">The input model for a new campaign</param>
         /// <returns></returns>
         [HttpPost]
-        public IActionResult Create(CampaignGroupInputModel model)
+        public async Task<IActionResult> Create(CampaignGroupInputModel input)
         {
             // TODO: Validate and create model, handle possible error
             if (!ModelState.IsValid) {
-                return View(model);
+                return View(input);
             }
 
-            //var campaign = new Campaign
-            //{
-            //    Utm = model.Url,
-            //    InitialCpc = model.InitialCpc,
-            //    BrandingText = model.BrandingText,
-            //};
-            //
-            //_campaignRepo.Create(campaign);
+            CampaignGroup group = input.ToModel();
 
-            return View(model);
+            await _campaignRepo.CreateGroup(group);
 
             return RedirectToAction("Overview");
         }

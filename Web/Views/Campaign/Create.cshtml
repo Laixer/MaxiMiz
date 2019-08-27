@@ -68,6 +68,16 @@
             <span asp-validation-for="Budget" class="text-danger"></span>
         </div>
         <div class="form-group">
+            <label asp-for="BudgetModel" class="control-label"></label>
+            <select asp-for="BudgetModel" asp-items="Html.GetEnumSelectList<Maximiz.Model.Enums.BudgetModel>()" class="form-control"></select>
+            <span asp-validation-for="BudgetModel" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="BidStrategy" class="control-label"></label>
+            <select asp-for="BidStrategy" asp-items="Html.GetEnumSelectList<Maximiz.Model.Enums.BidStrategy>()" class="form-control"></select>
+            <span asp-validation-for="BidStrategy" class="text-danger"></span>
+        </div>
+        <div class="form-group">
             <label asp-for="Language" class="control-label"></label>
             <input asp-for="Language" class="form-control" value="NL" readonly />
             <span asp-validation-for="Language" class="text-danger"></span>
@@ -95,17 +105,17 @@
 
         @* Geo-Location *@
         <div class="form-group row">
-            <label>@Html.DisplayNameFor(m => m.Location_Inc)</label>
+            <label>@Html.DisplayNameFor(m => m.LocationInclude)</label>
             <div class="col-sm-12">
-                <input id="location_0" type="checkbox" name="@Html.IdFor(m => m.Location_Inc)" value="0" checked disabled />
+                <input id="location_0" type="checkbox" name="@Html.IdFor(m => m.LocationInclude)" value="0" checked disabled />
                 @* The disabled checkbox will be ignored and the one below this comment will not be shown but posted (temporary)  *@
-                <input id="location_0_temp" type="hidden" name="@Html.IdFor(m => m.Location_Inc)" value="0" />
+                <input id="location_0_temp" type="hidden" name="@Html.IdFor(m => m.LocationInclude)" value="0" />
                 <span>United States - Country</span>
             </div>
             <div class="col-sm-12">
-                <input id="location_1" type="checkbox" name="@Html.IdFor(m => m.Location_Inc)" value="1" checked disabled />
+                <input id="location_1" type="checkbox" name="@Html.IdFor(m => m.LocationInclude)" value="1" checked disabled />
                 @* The disabled checkbox will be ignored and the one below this comment will not be shown but posted (temporary)  *@
-                <input id="location_1_temp" type="hidden" name="@Html.IdFor(m => m.Location_Inc)" value="1" />
+                <input id="location_1_temp" type="hidden" name="@Html.IdFor(m => m.LocationInclude)" value="1" />
                 <span>Netherlands - Country</span>
             </div>
         </div>
@@ -113,7 +123,8 @@
         @* Targeted Devices *@
         <div class="form-group row">
             <label>@Html.DisplayNameFor(m => m.Devices)</label>
-            @foreach (Device device in Enum.GetValues(typeof(Device))) {
+            @foreach (Device device in Enum.GetValues(typeof(Device)))
+            {
                 <div class="col-sm-12">
                     <input id="device_@device" type="checkbox" name="@Html.IdFor(m => m.Devices)" value="@device" @(Model != null && Model.Devices.Contains(@device) ? "checked" : "") />
                     <span>@device</span>
@@ -136,10 +147,23 @@
         @* Targeted Operating Systems *@
         <div class="form-group row">
             <label>@Html.DisplayNameFor(m => m.OperatingSystems)</label>
-            @foreach (OS os in Enum.GetValues(typeof(OS))) {
+            @foreach (OS os in Enum.GetValues(typeof(OS)))
+            {
                 <div class="col-sm-12">
                     <input id="os_@os" type="checkbox" name="@Html.IdFor(m => m.OperatingSystems)" value="@os" @(Model != null && Model.OperatingSystems.Contains(@os) ? "checked" : "") />
                     <span>@os.ToString()</span>
+                </div>
+            }
+        </div>
+
+        @* Supported Connections *@
+        <div class="form-group row">
+            <label>@Html.DisplayNameFor(m => m.Connections)</label>
+            @foreach (Connection con in Enum.GetValues(typeof(Connection)))
+            {
+                <div class="col-sm-12">
+                    <input id="con_@con" type="checkbox" name="@Html.IdFor(m => m.Connections)" value="@con" @(Model != null && Model.Connections.Contains(@con) ? "checked" : "") />
+                    <span>@con.ToString()</span>
                 </div>
             }
         </div>

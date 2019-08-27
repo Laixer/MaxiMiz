@@ -16,14 +16,14 @@ namespace Maximiz.Model.Enums
         [EnumMember(Value = "linux")]
         Linux,
         [EnumMember(Value = "osx")]
-        OSX,
+        Osx,
         [EnumMember(Value = "android")]
         Android,
         [EnumMember(Value = "ios")]
-        IOS,
+        Ios,
         [EnumMember(Value = "unix")]
         Unix,
         [EnumMember(Value = "chromeos")]
-        ChromeOS
+        Chromeos
     }
 }

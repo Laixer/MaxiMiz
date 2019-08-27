@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Maximiz.Model.Enums;
 using Maximiz.Repositories;
 using Maximiz.Repositories.Interfaces;
 using Microsoft.AspNetCore.Builder;
@@ -11,6 +12,7 @@ using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Npgsql;
 
 namespace Maximiz
 {
@@ -34,8 +36,22 @@ namespace Maximiz
             });
 
             services.AddTransient<ICampaignRepository, CampaignRepository>();
+            services.AddTransient<IAdGroupRepository, AdGroupRepository>();
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Latest);
+
+            // Map Enums to Type
+            // TODO: Place somewhere else
+            NpgsqlConnection.GlobalTypeMapper.MapEnum<Status>("ad_item_status");
+            NpgsqlConnection.GlobalTypeMapper.MapEnum<ApprovalState>("approval_state");
+            NpgsqlConnection.GlobalTypeMapper.MapEnum<BidStrategy>("bid_strategy");
+            NpgsqlConnection.GlobalTypeMapper.MapEnum<BudgetModel>("budget_model");
+            NpgsqlConnection.GlobalTypeMapper.MapEnum<Connection>("connection");
+            NpgsqlConnection.GlobalTypeMapper.MapEnum<Delivery>("delivery");
+            NpgsqlConnection.GlobalTypeMapper.MapEnum<Device>("device");
+            NpgsqlConnection.GlobalTypeMapper.MapEnum<OS>("operating_system");
+
+            Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

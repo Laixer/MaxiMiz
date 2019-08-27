@@ -4,12 +4,21 @@ using System.Linq;
 using System.Threading.Tasks;
 using Maximiz.InputModels;
 using Maximiz.Model.Entity;
+using Maximiz.Repositories;
+using Maximiz.Repositories.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Maximiz.Controllers
 {
     public class AdGroupController : Controller
     {
+        private IAdGroupRepository _adGroupRepository;
+
+        public AdGroupController(IAdGroupRepository adGroupRepository)
+        {
+            _adGroupRepository = adGroupRepository;
+        }
+
         [HttpGet]
         public IActionResult Create()
         {
@@ -17,10 +26,9 @@ namespace Maximiz.Controllers
         }
 
         [HttpPost]
-        public IActionResult Create(AdGroupInputModel model)
+        public async Task<IActionResult> Create(AdGroupInputModel model)
         {
-            // Test
-            var x = model.Name;
+            await _adGroupRepository.CreateGroup(model);
 
             return View();
         }
