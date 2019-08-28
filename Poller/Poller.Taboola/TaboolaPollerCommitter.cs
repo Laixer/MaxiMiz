@@ -23,6 +23,39 @@ namespace Poller.Taboola
     internal partial class TaboolaPoller
     {
 
+        /// <summary>
+        /// Commits our accounts to the database.
+        /// </summary>
+        /// <param name="accounts">The core accounts</param>
+        /// <param name="token">Cancellation token</param>
+        /// <returns>Nothing (task)</returns>
+        private async Task CommitAccounts(
+            IEnumerable<AccountEntity> accounts,
+            CancellationToken token)
+        {
+            if (accounts == null || accounts.Count() <= 0) { return; }
+            // TODO Validate format? Or assume format? I think we should validate here.
+
+            // TODO char name 265 should be 256? Don't care I guess? Or optimized because 2^8?
+            var sql = @"
+                INSERT INTO
+	                public.account(secondary_id, publisher, name, currency, details)
+                VALUES
+                    (
+                        @SecondaryId,
+                        CAST (@PublisherText AS publisher),
+                        LEFT(@Name, 265),
+                        @Currency,
+                        CAST (@Details AS json)
+                    )
+                ON CONFLICT (name) DO NOTHING";
+
+            using (var connection = _provider.ConnectionScope())
+            {
+                await connection.ExecuteAsync(new CommandDefinition(
+                    sql, accounts, cancellationToken: token));
+            }
+        }
 
         /// <summary>
         /// Commits a list of campaign items to our database.
