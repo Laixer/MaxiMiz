@@ -112,15 +112,18 @@ namespace Poller.Taboola
         }
 
         /// <summary>
-        /// Run the remote query and catch all exceptions where before letting
-        /// them propagate upwards.
+        /// Run the remote query and catch all exceptions 
+        /// where before letting them propagate upwards.
         /// </summary>
         /// <typeparam name="TResult"></typeparam>
         /// <param name="method">HTTP method.</param>
         /// <param name="url">API endpoint.</param>
-        /// <param name="cancellationToken">Cancellation token.</param>
+        /// <param name="cancellationToken">Cancellation 
+        /// token.</param>
         /// <returns>Object of TResult.</returns>
-        protected async Task<TResult> RemoteQueryAndLogAsync<TResult>(HttpMethod method, string url, CancellationToken cancellationToken)
+        protected async Task<TResult> RemoteQueryAndLogAsync
+            <TResult>(HttpMethod method, string url,
+            CancellationToken cancellationToken)
             where TResult : class
         {
             cancellationToken.ThrowIfCancellationRequested();
