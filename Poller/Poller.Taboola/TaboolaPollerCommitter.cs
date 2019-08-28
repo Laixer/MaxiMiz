@@ -21,19 +21,32 @@ namespace Poller.Taboola
     {
 
 
-        // TODO: ad_group
-        private async Task CommitCampaignItems(EntityList<AdItem> aditems, CancellationToken token, bool updateStatus = false)
+        /// <summary>
+        /// Commits a list of campaign items to our database.
+        /// These entries have already been converted.
+        /// TODO Bulk insert.
+        /// TODO ad_group
+        /// </summary>
+        /// <param name="aditems">The list of ad items</param>
+        /// <param name="token">Cancellation token</param>
+        /// <param name="updateStatus">If we want to update
+        /// the items status and approval state</param>
+        /// <returns>Nothing (task)</returns>
+        private async Task CommitCampaignItems(
+            IEnumerable<AdItemEntity> aditems,
+            CancellationToken token,
+            bool updateStatus = false)
         {
-            if (aditems == null || aditems.Items.Count() <= 0) { return; }
+            if (aditems == null || aditems.Count() <= 0) { return; }
 
             var sql = @"
                 INSERT INTO
 	                public.ad_item AS INCLUDED (secondary_id, ad_group, title, url, content, cpc, spent, clicks, impressions, actions, details, status, approval_state)
                 VALUES
                     (
-                        @Id,
+                        @SecondaryId,
                         2,
-                        LEFT(@TitleText, 128),
+                        LEFT(@Title, 128),
                         @Url,
                         @Content,
                         @Cpc,
@@ -41,13 +54,12 @@ namespace Poller.Taboola
                         @Clicks,
                         @Impressions,
                         @Actions,
-                        @Details::json,
+                        CAST (@Details AS json),
                         CAST (@StatusText AS ad_item_status),
                         CAST (@ApprovalStateText AS approval_state)
                     )
                 ON CONFLICT (secondary_id) DO UPDATE
                 SET
-                    title = EXCLUDED.title,
                     cpc = GREATEST(INCLUDED.cpc, EXCLUDED.cpc),
                     spent = GREATEST(INCLUDED.spent, EXCLUDED.spent),
                     clicks = GREATEST(INCLUDED.clicks, EXCLUDED.clicks),
@@ -55,6 +67,8 @@ namespace Poller.Taboola
                     actions = GREATEST(INCLUDED.actions, EXCLUDED.actions),
                     details = COALESCE(INCLUDED.details, EXCLUDED.details)";
 
+            // If we update the items status we also
+            // include the status and approval state.
             if (updateStatus)
             {
                 sql += @",
@@ -62,9 +76,11 @@ namespace Poller.Taboola
                     approval_state = EXCLUDED.approval_state";
             }
 
+            // Call for execution
             using (var connection = _provider.ConnectionScope())
             {
-                await connection.ExecuteAsync(new CommandDefinition(sql, aditems.Items, cancellationToken: token));
+                await connection.ExecuteAsync(new CommandDefinition(
+                    sql, aditems, cancellationToken: token));
             }
         }
 
