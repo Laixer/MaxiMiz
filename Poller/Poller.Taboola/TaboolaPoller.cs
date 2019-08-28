@@ -34,6 +34,7 @@ namespace Poller.Taboola
         private readonly MapperAccount _mapperAccount;
         private readonly MapperCampaign _mapperCampaign;
         private readonly MapperAdItem _mapperAdItem;
+        private readonly MapperTarget _mapperTarget;
 
         /// <summary>
         /// Constructor with dependency injection.
@@ -66,6 +67,7 @@ namespace Poller.Taboola
             _mapperAccount = new MapperAccount();
             _mapperCampaign = new MapperCampaign();
             _mapperAdItem = new MapperAdItem();
+            _mapperTarget = new MapperTarget();
 
             _logger.LogInformation("Taboola poller created");
         }
