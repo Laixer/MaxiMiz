@@ -29,7 +29,7 @@ namespace Poller.Scheduler.Activator
             if (!CancellationToken.IsCancellationRequested)
             {
                 // TODO: reschedule
-                SchedulerScheduleTimer(_timer, _interval, true);
+                Scheduler.ScheduleTimer(_timer, _interval, true);
 
                 Logger.LogDebug($"Rerun {OperationName} in ~{_interval}");
             }
