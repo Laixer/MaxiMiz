@@ -18,15 +18,21 @@ namespace Maximiz.Controllers
             _campaignRepo = campaignRepo;
         }
 
+        // GET: /Campaign/
+        /// <summary>
+        /// Index page for campaigns
+        /// </summary>
         [HttpGet]
         public IActionResult Index()
         {
             return RedirectToAction("Overview");
         }
 
+        // GET: /Campaign/Overview
         /// <summary>
         /// An overview of all campaigns
         /// </summary>
+        /// <returns></returns>
         [HttpGet]
         public async Task<IActionResult> Overview()
         {
@@ -37,6 +43,7 @@ namespace Maximiz.Controllers
             return View(allCampaigns);
         }
 
+        // GET: /Campaign/Details/{Id}
         /// <summary>
         /// Displaying the details for a single <see cref="Campaign"></see>
         /// </summary>
@@ -47,6 +54,7 @@ namespace Maximiz.Controllers
             return View(c);
         }
 
+        // GET: /Campaign/Create
         /// <summary>
         /// The create page for a new <see cref="Campaign"></see>
         /// </summary>
@@ -56,8 +64,9 @@ namespace Maximiz.Controllers
             return View();
         }
 
+        // POST: /Campaign/Create
         /// <summary>
-        /// 
+        /// Create a new <see cref="CampaignGroup"></see> entity and generate its corresponding <see cref="Campaign"></see> entities.
         /// </summary>
         /// <param name="input">The input model for a new campaign</param>
         /// <returns></returns>
@@ -76,34 +85,43 @@ namespace Maximiz.Controllers
             return RedirectToAction("Overview");
         }
 
+        // GET: /Campaign/Search
         /// <summary>
-        /// Query the database to search for campaigns
+        /// Query the database to search for campaigns.
         /// </summary>
-        /// <param name="query">The search term</param>
+        /// <param name="query">The search term to query the database for.</param>
         /// <returns></returns>
         [HttpGet]
         public async Task<IEnumerable<Campaign>> Search(string query) => await _campaignRepo.Search(query);
 
+        // PUT: /Campaign/Edit
+        /// <summary>
+        /// Update an existing <see cref="Campaign"></see> entity.
+        /// </summary>
+        /// <param name="campaign"></param>
+        /// <returns></returns>
         [HttpPut]
         public IActionResult Edit(Campaign campaign)
         {
+            // TODO
+            return NotFound();
             _campaignRepo.Update(campaign);
-
-            return StatusCode(500, "Error");
         }
 
         [HttpPut]
         public IActionResult Duplicate(Campaign campaign)
         {
             // TODO
-            return null;
+            return NotFound();
+            _campaignRepo.Create(campaign);
         }
 
         [HttpDelete]
         public IActionResult Delete(Campaign campaign)
         {
             // TODO
-            return null;
+            return NotFound();
+            _campaignRepo.Delete(campaign);
         }
 
     }
