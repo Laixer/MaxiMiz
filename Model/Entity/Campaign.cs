@@ -28,7 +28,7 @@ namespace Maximiz.Model.Entity
         /// Language of the campaign, 2 chars.
         /// TODO Why do we need this?
         /// </summary>
-        public char[] Language { get; set; }
+        public string Language { get; set; }
 
         /// <summary>
         /// Delivery mode of this ad.
