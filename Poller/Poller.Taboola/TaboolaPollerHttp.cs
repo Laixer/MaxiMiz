@@ -31,8 +31,7 @@ namespace Poller.Taboola
 
             var url = $"api/1.0/{account}/reports/top-campaign-content/dimensions/item_breakdown?{query}";
 
-            var result = RemoteQueryAndLogAsync<EntityList<AdItemCoResult>>(HttpMethod.Get, url, token);
-            return result;
+            return RemoteQueryAndLogAsync<EntityList<AdItemCoResult>>(HttpMethod.Get, url, token);
         }
 
         /// <summary>
