@@ -23,7 +23,7 @@ namespace Poller.Taboola
     /// part implements all required activator base
     /// interfaces.
     /// </summary>
-    internal partial class TaboolaPoller : IPollerRefreshAdvertisementData, 
+    internal partial class TaboolaPoller : IPollerRefreshAdvertisementData,
         IPollerDataSyncback, IPollerCreateOrUpdateObjects, IDisposable
     {
         private readonly ILogger _logger;
@@ -43,8 +43,8 @@ namespace Poller.Taboola
         /// <param name="options">The options</param>
         /// <param name="provider">The database provider</param>
         /// <param name="cache">The cache</param>
-        public TaboolaPoller(ILoggerFactory logger, 
-            TaboolaPollerOptions options, DbProvider provider, 
+        public TaboolaPoller(ILoggerFactory logger,
+            TaboolaPollerOptions options, DbProvider provider,
             IMemoryCache cache)
         {
             _logger = logger.CreateLogger(typeof(TaboolaPoller).FullName);
