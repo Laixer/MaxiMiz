@@ -53,7 +53,7 @@ namespace Maximiz.Model.Entity
         /// <summary>
         /// Targeted OS.
         /// </summary>
-        public OS[] OS { get; set; }
+        public OS[] Os { get; set; }
 
         /// <summary>
         /// The initial CPC per item.
@@ -127,7 +127,10 @@ namespace Maximiz.Model.Entity
         /// </summary>
         public Connection[] Connection { get; set; }
 
-
+        /// <summary>
+        /// Returns a new Campaign entity created from Campaign Group Input.
+        /// </summary>
+        /// <param name="group">The campaign group this campaign should belong to.</param>
         public static Campaign FromGroup(CampaignGroup group)
         {
             return new Campaign
@@ -137,7 +140,6 @@ namespace Maximiz.Model.Entity
                 LocationInclude = group.LocationInclude,
                 LocationExclude = group.LocationExclude,
                 Language = new string[] { group.Language },
-                // Device and Operating System is unknown
                 InitialCpc = group.InitialCpc,
                 Budget = group.Budget,
                 DailyBudget = group.DailyBudget,

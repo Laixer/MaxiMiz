@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Maximiz.InputModels.AdGroup;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace Maximiz.InputModels
@@ -26,6 +27,6 @@ namespace Maximiz.InputModels
         [Display(Name = "Tracking Code")]
         public string Utm { get; set; }
 
-        public List<string> Titles { get; set; }
+        public List<AdItemInputModel> AdItems;
     }
 }

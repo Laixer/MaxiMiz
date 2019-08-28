@@ -43,7 +43,7 @@ namespace Maximiz.Model.Entity
         /// <summary>
         /// Targeted operating systems.
         /// </summary>
-        public OS[] OS { get; set; }
+        public OS[] Os { get; set; }
 
         /// <summary>
         /// The initial CPC per item.

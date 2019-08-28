@@ -79,7 +79,7 @@ namespace Maximiz.Repositories
                 campaignGroupEntity.LocationExclude,
                 Language = new string[] { "N", "L" },
                 campaignGroupEntity.Device,
-                campaignGroupEntity.OS,
+                campaignGroupEntity.Os,
                 campaignGroupEntity.InitialCpc,
                 campaignGroupEntity.Budget,
                 BudgetDaily = campaignGroupEntity.DailyBudget,
@@ -121,7 +121,7 @@ namespace Maximiz.Repositories
 
             Parallel.ForEach(campaignGroupEntity.Device, device =>
             {
-                Parallel.ForEach(campaignGroupEntity.OS, os =>
+                Parallel.ForEach(campaignGroupEntity.Os, os =>
                 {
                     Parallel.ForEach(campaignGroupEntity.LocationInclude, location =>
                     {
@@ -171,7 +171,6 @@ namespace Maximiz.Repositories
                             campaign.EndDate,
                             campaign.Utm,
                             campaign.Connection
-                            // TODO finish
                         };
 
                         await connection.ExecuteAsync(sql_campaign_insert,@params,transaction: transaction);

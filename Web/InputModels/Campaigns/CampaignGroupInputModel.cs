@@ -131,7 +131,7 @@ namespace Maximiz.InputModels
                 LocationExclude = LocationExclude,
                 Language = Language,
                 Device = Devices,
-                OS = OperatingSystems,
+                Os = OperatingSystems,
                 InitialCpc = InitialCpc,
                 Budget = Budget,
                 DailyBudget = DailyBudget,

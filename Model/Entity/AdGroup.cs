@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Maximiz.Model.Enums;
+using System;
 
 namespace Maximiz.Model.Entity
 {
@@ -22,5 +23,10 @@ namespace Maximiz.Model.Entity
         /// Description for all items in the group.
         /// </summary>
         public string Description { get; set; }
+
+        /// <summary>
+        /// The current status of the group.
+        /// </summary>
+        public Status Status { get; set; }
     }
 }
