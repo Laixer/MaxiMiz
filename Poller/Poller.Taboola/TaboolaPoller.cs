@@ -140,17 +140,38 @@ namespace Poller.Taboola
                     {
                         var result2 = await GetCampaignAllItems(account.Name, item.Id, token);
 
-                        await CommitCampaignItems(result2, token, true);
+        /// <summary>
+        /// This will get all campaign items for each campaign
+        /// in the specified list.
+        /// </summary>
+        /// <param name="context">The poller context</param>
+        /// <param name="account">Account object</param>
+        /// <param name="campaigns">Campaign list</param>
+        /// <param name="token">Cancellation token</param>
+        /// <returns></returns>
+        private async Task ProcessCampainItems(
+            PollerContext context,
+            AccountEntity account,
+            IEnumerable<CampaignEntity> campaigns,
+            CancellationToken token)
+        {
+            foreach (var campaign in campaigns)
+            {
+                try
+                {
+                    var items = await GetCampaignAllItems(
+                        account.Name, campaign.SecondaryId, token);
+                    var convertedItems = _mapperAdItem.ConvertAll(items.Items);
+                    await CommitCampaignItems(convertedItems, token, true);
 
-                        // Prevent spamming.
-                        await Task.Delay(250, token);
+                    // Prevent spamming.
+                    await Task.Delay(250, token);
 
-                        context.MarkProgress(token);
-                    }
-                    catch (TaskCanceledException)
-                    {
-                        token.ThrowIfCancellationRequested();
-                    }
+                    context.MarkProgress(token);
+                }
+                catch (TaskCanceledException)
+                {
+                    token.ThrowIfCancellationRequested();
                 }
             }
         }
