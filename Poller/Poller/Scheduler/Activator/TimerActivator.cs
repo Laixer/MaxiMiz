@@ -19,8 +19,7 @@ namespace Poller.Scheduler.Activator
         public override void Initialize(CancellationToken token)
         {
             CancellationToken = token;
-
-            Scheduler.ScheduleTimer(_timer, _interval);
+            Scheduler.ScheduleTimer(_timer, _interval, true);
         }
 
         private async void TimerCallback(object _)
