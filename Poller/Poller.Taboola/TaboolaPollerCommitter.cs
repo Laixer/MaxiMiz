@@ -145,7 +145,13 @@ namespace Poller.Taboola
             }
         }
 
-        private async Task<IEnumerable<AccountEntity>> FetchAdvertiserAccounts(CancellationToken token)
+        /// <summary>
+        /// Gets all advertiser accounts from our database.
+        /// </summary>
+        /// <param name="token">Cancellation token</param>
+        /// <returns>All advertiser accounts</returns>
+        private async Task<IEnumerable<AccountEntity>>
+            FetchAdvertiserAccounts(CancellationToken token)
         {
             var sql = @"
                 SELECT
@@ -158,7 +164,9 @@ namespace Poller.Taboola
 
             using (var connection = _provider.ConnectionScope())
             {
-                return await connection.QueryAsync<AccountEntity>(new CommandDefinition(sql, cancellationToken: token));
+                var result = await connection.QueryAsync<AccountEntity>
+                    (new CommandDefinition(sql, cancellationToken: token));
+                return result;
             }
         }
 
