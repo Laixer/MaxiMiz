@@ -133,20 +133,10 @@ namespace Poller.Taboola
         {
             if (campaigns == null || campaigns.Count() <= 0) { return; }
 
-
-
-        //TODO:
-        // - campaign_group
-        // - location_include
-        // - location_exclude
-        // - language
-        private async Task CommitCampaigns(EntityList<Campaign> campaigns, CancellationToken token)
-        {
-            if (campaigns == null || campaigns.Items.Count() <= 0) { return; }
-
-            foreach (var item in campaigns.Items)
-            {
-            }
+            //foreach (var campaign in campaigns)
+            //{
+            //    if (!(campaign.InitialCpc < campaign.DailyBudget || campaign.DailyBudget != null)) { }
+            //}
 
             var sql = @"
                 INSERT INTO
