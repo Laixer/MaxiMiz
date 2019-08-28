@@ -161,25 +161,36 @@ namespace Poller.Taboola
 
             var sql = @"
                 INSERT INTO
-	                public.campaign(secondary_id, name, branding_text, location_include, location_exclude, language, initial_cpc, budget, budget_daily, budget_model, delivery, start_date, end_date, utm, campaign_group, note)
+	                public.campaign(
+                        secondary_id, name, branding_text, 
+                        language_as_text, initial_cpc, budget, 
+                        budget_daily, spent, delivery, 
+                        start_date, end_date, utm, 
+                        campaign_group, note, details,
+
+                        location_include, location_exclude,
+                        language)
                 VALUES
                     (
-                        @Id,
+                        @SecondaryId,
                         @Name,
-                        @Branding,
-                        '{0}',
-                        '{0}',
-                        '{AB}',
-                        @Cpc,
-                        @SpendingLimit,
-                        @DailyCap,
-                        CAST (@SpendingLimitModelText AS budget_model),
+                        @BrandingText,
+                        @Language,
+                        @InitialCpc,
+                        @Budget,
+                        @DailyBudget,
+                        @Spent,
                         CAST (@DeliveryText AS delivery),
                         COALESCE(@StartDate, CURRENT_TIMESTAMP),
-                        @EndDate,
+                        VALIDATE_DATE(@EndDate),
                         @Utm,
                         48389,
-                        @Note
+                        @Note,
+                        CAST (@Details AS json),
+
+                        @LocationInclude,
+                        @LocationExclude,
+                        '{AB}'
                     )
                 ON CONFLICT (secondary_id) DO NOTHING";
 
