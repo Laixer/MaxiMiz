@@ -23,7 +23,8 @@ namespace Poller.Taboola
     /// part implements all required activator base
     /// interfaces.
     /// </summary>
-    internal partial class TaboolaPoller : IPollerRefreshAdvertisementData, IPollerDataSyncback, IPollerCreateOrUpdateObjects, IDisposable
+    internal partial class TaboolaPoller : IPollerRefreshAdvertisementData, 
+        IPollerDataSyncback, IPollerCreateOrUpdateObjects, IDisposable
     {
         private readonly ILogger _logger;
         private readonly DbProvider _provider;
