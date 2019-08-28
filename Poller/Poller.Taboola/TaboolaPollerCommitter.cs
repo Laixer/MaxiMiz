@@ -196,7 +196,8 @@ namespace Poller.Taboola
 
             using (var connection = _provider.ConnectionScope())
             {
-                await connection.ExecuteAsync(new CommandDefinition(sql, campaigns.Items, cancellationToken: token));
+                await connection.ExecuteAsync(new CommandDefinition(
+                    sql, campaigns, cancellationToken: token));
             }
         }
 
