@@ -154,16 +154,38 @@ namespace Poller.Taboola.Mapper
             });
         }
 
+        /// <summary>
+        /// Bulk conversion from Taboola to Core.
+        /// </summary>
+        /// <param name="list">Taboola list</param>
+        /// <returns>Core list</returns>
         public IEnumerable<CampaignCore> ConvertAll(
             IEnumerable<CampaignTaboola> list)
         {
-            throw new NotImplementedException();
+            IList<CampaignCore> result = new List<CampaignCore>();
+            foreach (var item in list.AsParallel())
+            {
+                result.Add(Convert(item));
+            }
+            return result;
         }
 
+        /// <summary>
+        /// Bulk conversion from Core to Taboola.
+        /// </summary>
+        /// <param name="list">Core list</param>
+        /// <returns>Taboola list</returns>
         public IEnumerable<CampaignTaboola> ConvertAll(
             IEnumerable<CampaignCore> list)
         {
-            throw new NotImplementedException();
+            IList<CampaignTaboola> result = new List<CampaignTaboola>();
+            foreach (var item in list.AsParallel())
+            {
+                result.Add(Convert(item));
+            }
+            return result;
+        }
+
         /// <summary>
         /// Creates a default without null values.
         /// TODO Match db schema
