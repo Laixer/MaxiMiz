@@ -100,11 +100,12 @@ namespace Poller.Taboola
             string account, string campaign, CancellationToken token)
         {
             var url = $"api/1.0/{account}/campaigns/{campaign}/items";
-
-            return RemoteQueryAndLogAsync<EntityList<AdItem>>(HttpMethod.Get, url, token);
+            return RemoteQueryAndLogAsync<EntityList<AdItem>>
+                (HttpMethod.Get, url, token);
         }
 
-        private Task<AdItem> GetCampaignItem(string account, string campaign, string item, CancellationToken token)
+        private Task<AdItem> GetCampaignItem(string account,
+            string campaign, string item, CancellationToken token)
         {
             var url = $"api/1.0/{account}/campaigns/{campaign}/items/{item}";
 
