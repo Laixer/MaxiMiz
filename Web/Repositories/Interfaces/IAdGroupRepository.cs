@@ -10,8 +10,7 @@ namespace Maximiz.Repositories.Interfaces
         /// <summary>
         /// Create a new AdGroup
         /// </summary>
-        /// <param name="inputModel">The model containing the input for the ad</param>
-        /// <returns></returns>
-        Task CreateGroup(AdGroupInputModel inputModel);
+        /// <param name="adGroupInput">The model containing the input for the ad</param>
+        Task CreateGroup(AdGroupInputModel adGroupInput);
     }
 }

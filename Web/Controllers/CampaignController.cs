@@ -38,8 +38,6 @@ namespace Maximiz.Controllers
         {
             var allCampaigns = await _campaignRepo.GetAll();
 
-            var x = 1;
-
             return View(allCampaigns);
         }
 

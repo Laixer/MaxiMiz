@@ -1,4 +1,5 @@
-﻿@model  Maximiz.InputModels.AdGroupInputModel
+﻿@using Maximiz.InputModels
+@model AdGroupInputModel
 
 @{
     ViewData["Title"] = "New Ad Group";
@@ -6,56 +7,4 @@
 
 <h1>New Ad Group</h1>
 
-<form method="post" asp-controller="AdGroup" asp-action="Create">
-    <div class="row">
-        <div class="col-md-4">
-            <div class="form-group">
-                <label asp-for="Name" class="control-label"></label>
-                <input asp-for="Name" class="form-control" />
-                <span asp-validation-for="Name" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Description" class="control-label"></label>
-                <input asp-for="Description" class="form-control" />
-                <span asp-validation-for="Description" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Url" class="control-label"></label>
-                <input asp-for="Url" class="form-control" />
-                <span asp-validation-for="Url" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label for="adgTitle">Titles</label>
-                <input placeholder="Title" type="text" class="form-control" id="adgTitle1">
-                <textarea placeholder="Description" type="text" class="form-control" maxlength="150" required=""></textarea>
-                <input type="text" class="form-control" id="adgTitle2">
-                <input placeholder="Title" type="text" class="form-control" id="adgTitle2">
-                <textarea placeholder="Description" type="text" class="form-control" maxlength="150" required=""></textarea>
-                <input type="text" class="form-control" id="adgTitle3">
-                <input placeholder="Title" type="text" class="form-control" id="adgTitle3">
-                <textarea placeholder="Description" type="text" class="form-control" maxlength="150" required=""></textarea>
-                <input type="text" class="form-control" id="adgTitle4">
-                <input placeholder="Title" type="text" class="form-control" id="adgTitle4">
-                <textarea placeholder="Description" type="text" class="form-control" maxlength="150" required=""></textarea>
-                <input type="text" class="form-control" id="adgTitle5">
-                <input placeholder="Title" type="text" class="form-control" id="adgTitle5">
-                <textarea placeholder="Description" type="text" class="form-control" maxlength="150" required=""></textarea>
-                <button class="btn btn-link">Add Title +</button>
-            </div>
-            <span class="text-danger">(Where does the tracking (utm) code go?)</span>
-            <div class="form-group">
-                <label for="images">Upload images</label>
-                <input type="file" class="form-control" id="images" multiple />
-            </div>
-        </div>
-
-        <div class="col-md-8">
-            <div class="form-group">
-                <label>Preview</label>
-            </div>
-            <button class="btn btn-secondary">Cancel</button>
-            <button type="submit" class="btn btn-primary">Save</button>
-        </div>
-    </div>
-</form>
-
+<partial name="_AdGroupForm" model="@Model" />

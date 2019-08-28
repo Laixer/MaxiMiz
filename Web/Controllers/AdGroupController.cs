@@ -12,7 +12,7 @@ namespace Maximiz.Controllers
 {
     public class AdGroupController : Controller
     {
-        private IAdGroupRepository _adGroupRepository;
+        private readonly IAdGroupRepository _adGroupRepository;
 
         public AdGroupController(IAdGroupRepository adGroupRepository)
         {

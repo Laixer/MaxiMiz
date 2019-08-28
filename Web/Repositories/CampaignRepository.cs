@@ -1,4 +1,6 @@
 ﻿using Dapper;
+using Dapper.Contrib.Extensions;
+using Maximiz.InputModels.Campaigns;
 using Maximiz.Model;
 using Maximiz.Model.Entity;
 using Maximiz.Model.Enums;
@@ -58,9 +60,7 @@ namespace Maximiz.Repositories
                     @Name,
                     @BrandingText,
                     @LocationInclude, @LocationExclude,
-                    @Language,
-                    @Device, 
-                    @OS,
+                    @Language, @Device, @OS,
                     @InitialCPC,
                     @Budget, @BudgetDaily, @BudgetModel::budget_model,
                     @Delivery::delivery,
@@ -99,15 +99,10 @@ namespace Maximiz.Repositories
                         @SecondaryId,
                         @Name,
                         @BrandingText,
-                        '{0}',
-                        '{0}',
-                        @Language,
-                        @Device,
-                        @OS,
+                        '{0}','{0}',
+                        @Language, @Device, @OS,
                         @InitialCpc,
-                        @Budget,
-                        @BudgetDaily,
-                        @BudgetModel::budget_model,
+                        @Budget, @BudgetDaily, @BudgetModel::budget_model,
                         @Delivery::delivery,
                         COALESCE(@StartDate, CURRENT_TIMESTAMP),
                         @EndDate,
@@ -128,8 +123,10 @@ namespace Maximiz.Repositories
                         // Generate the campaign
                         Campaign campaign = Campaign.FromGroup(campaignGroupEntity);
                         campaign.Device = new Device[] { device };
-                        campaign.OS = new OS[] { os };
+                        campaign.Os = new OS[] { os };
                         campaign.LocationInclude = new int[1] { location };
+
+                        campaign.Name = CampaignNameGenerator.Generate(campaignGroupEntity.Name, location.ToString(), os, device);
 
                         campaignsToCreate.Add(campaign);
                     });
@@ -152,7 +149,7 @@ namespace Maximiz.Repositories
                     {
                         var @params = new
                         {
-                            SecondaryId = Guid.NewGuid().ToString().Substring(0,16),
+                            SecondaryId = Guid.NewGuid().ToString().Substring(0, 16),
                             CampaignGroupId = newCampaignGroupId,
                             campaign.Name,
                             campaign.BrandingText,
@@ -160,7 +157,7 @@ namespace Maximiz.Repositories
                             campaign.LocationExclude,
                             Language = new string[] { "N", "L" },   // TODO: For some reason length must be 3
                             campaign.Device,
-                            campaign.OS,               
+                            campaign.Os,
                             campaign.InitialCpc,
                             campaign.Budget,
                             BudgetDaily = campaign.DailyBudget,
@@ -173,7 +170,7 @@ namespace Maximiz.Repositories
                             campaign.Connection
                         };
 
-                        await connection.ExecuteAsync(sql_campaign_insert,@params,transaction: transaction);
+                        await connection.ExecuteAsync(sql_campaign_insert, @params, transaction: transaction);
                     }
 
                     transaction.Commit();
@@ -181,17 +178,20 @@ namespace Maximiz.Repositories
             }
         }
 
-        Task IEntityRepository<Campaign, Guid>.Create(Campaign entity)
+        Task<Guid> IEntityRepository<Campaign, Guid>.Create(Campaign entity)
         {
             throw new NotImplementedException();
         }
 
-        Task IEntityRepository<Campaign, Guid>.Delete(Campaign entity)
+        public async Task Delete(Campaign entity)
         {
-            throw new NotImplementedException();
+            using (IDbConnection connection = GetConnection)
+            {
+                await connection.DeleteAsync(entity);
+            }
         }
 
-        async Task<Campaign> IEntityRepository<Campaign, Guid>.Get(Guid id)
+        public async Task<Campaign> Get(Guid id)
         {
             using (IDbConnection connection = GetConnection)
             {
@@ -201,9 +201,9 @@ namespace Maximiz.Repositories
             }
         }
 
-        async Task<IEnumerable<Campaign>> ICampaignRepository.GetAll()
+        public async Task<IEnumerable<Campaign>> GetAll()
         {
-            // TODO: Limited to 100 for now
+            // TODO: Limited to 100 and sorted by latest date desc for now
             using (IDbConnection connection = GetConnection)
             {
                 var result = await connection.QueryAsync<Campaign>(@"SELECT * FROM campaign ORDER BY create_date DESC LIMIT 100");
@@ -211,7 +211,7 @@ namespace Maximiz.Repositories
             }
         }
 
-        async Task<IEnumerable<Campaign>> ICampaignRepository.Search(string q)
+        public async Task<IEnumerable<Campaign>> Search(string q)
         {
             using (IDbConnection connection = GetConnection)
             {
@@ -226,21 +226,21 @@ namespace Maximiz.Repositories
             }
         }
 
-        async Task IEntityRepository<Campaign, Guid>.Update(Campaign entity)
+        public async Task<Campaign> Update(Campaign entity)
         {
-            //TODO
-            object @params = new
-            {
-                entity.Name,
-                entity.BrandingText,
-                entity.InitialCpc
-            };
-
             using (IDbConnection connection = GetConnection)
             {
-                //connection.Update(campaign);
+                bool success = await connection.UpdateAsync(entity);
+
+                if (success)
+                {
+                    return entity;
+                }
+
+                //TODO: Update failed
+                return null;
             }
-            throw new NotImplementedException();
         }
+
     }
 }

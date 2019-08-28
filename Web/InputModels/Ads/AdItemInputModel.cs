@@ -7,8 +7,14 @@ namespace Maximiz.InputModels
 {
     public class AdItemInputModel
     {
+        /// <summary>
+        /// Advertisement title.
+        /// </summary>
         public string Title { get; set; }
 
-        public string Description { get; set; }
+        /// <summary>
+        /// Advertisement content.
+        /// </summary>
+        public string Content { get; set; }
     }
 }

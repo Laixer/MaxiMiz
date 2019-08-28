@@ -1,5 +1,4 @@
-﻿using Maximiz.InputModels.AdGroup;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace Maximiz.InputModels
@@ -17,8 +16,9 @@ namespace Maximiz.InputModels
         public string Description { get; set; }
 
         /// <summary>
-        /// URL for all items in the group.
+        /// Display URL for all items in the group.
         /// </summary>
+        [Display(Name = "Destination URL")]
         public string Url { get; set; }
 
         /// <summary>
@@ -27,6 +27,9 @@ namespace Maximiz.InputModels
         [Display(Name = "Tracking Code")]
         public string Utm { get; set; }
 
+        /// <summary>
+        /// Ad items to create for this group.
+        /// </summary>
         public List<AdItemInputModel> AdItems;
     }
 }

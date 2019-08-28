@@ -15,14 +15,14 @@ namespace Maximiz.Repositories.Interfaces
         Task<TEntity> Get(TPrimary id);
 
         /// <summary>
-        /// Create a new entity
+        /// Create a new entity and return its created ID
         /// </summary>
-        Task Create(TEntity entity);
+        Task<TPrimary> Create(TEntity entity);
 
         /// <summary>
         /// Update an existing entity
         /// </summary>
-        Task Update(TEntity entity);
+        Task<TEntity> Update(TEntity entity);
 
         /// <summary>
         /// Delete a specific entity

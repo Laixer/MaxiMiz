@@ -58,7 +58,8 @@ namespace Maximiz.InputModels
         /// <summary>
         /// The initial CPC per item.
         /// </summary>
-        [Required, Display(Name = "CPC")]
+        [Required]
+        [Display(Name = "CPC")]
         public decimal InitialCpc { get; set; }
 
         /// <summary>
@@ -77,19 +78,22 @@ namespace Maximiz.InputModels
         /// <summary>
         /// Budget Model.
         /// </summary>
-        [Required, Display(Name = "Budget Model")]
+        [Required]
+        [Display(Name = "Budget Model")]
         public BudgetModel BudgetModel { get; set; }
 
         /// <summary>
         /// Delivery mode.
         /// </summary>
-        [Required, Display(Name = "Ad Delivery")]
+        [Required]
+        [Display(Name = "Ad Delivery")]
         public Delivery Delivery { get; set; }
 
         /// <summary>
         /// Bid strategy.
         /// </summary>
-        [Required, Display(Name = "Bid Strategy")]
+        [Required]
+        [Display(Name = "Bid Strategy")]
         public BidStrategy BidStrategy { get; set; }
 
         /// <summary>
@@ -109,7 +113,8 @@ namespace Maximiz.InputModels
         /// <summary>
         /// Tracking code.
         /// </summary>
-        [Required, Display(Name = "Tracking Code")]
+        [Required]
+        [Display(Name = "Tracking Code")]
         public string Utm { get; set; }
 
         /// <summary>

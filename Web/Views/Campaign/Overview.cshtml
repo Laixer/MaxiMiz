@@ -1,4 +1,5 @@
-﻿@model IEnumerable<Maximiz.Model.Entity.Campaign>
+﻿@using Maximiz.Model.Entity
+@model IEnumerable<Campaign>
 
 @{
     ViewData["Title"] = "Campaigns";
@@ -35,27 +36,28 @@
         <th>Profit</th>
         <th>Actions</th>
     </tr>
-    @foreach (Maximiz.Model.Entity.Campaign campaign in Model) {
-<tr>
-    <td><input type="checkbox" name="check_campaign" id="@campaign.Id" /></td>
-    <td>@Html.ActionLink(@campaign.Name, "Details", "Campaign", new { id = campaign.Id })</td>
-    <td>@campaign.InitialCpc</td>
-    <td>@(campaign.Device.FirstOrDefault())</td>
-    <td>@campaign.OS.FirstOrDefault()</td>
-    <td>@campaign.Status</td>
-    <td>@campaign.Budget</td>
-    <td>@campaign.Spent</td>
-    <td>@campaign.StartDate</td>
-    <td>@campaign.EndDate</td>
-    <td>?</td>
-    <td>?</td>
-    <td>?</td>
-    <td>?</td>
-    <td>?</td>
-    <td>?</td>
-    <td>?</td>
-    <td>?</td>
-    <td>...</td>
-</tr>
+    @foreach (Maximiz.Model.Entity.Campaign campaign in Model)
+    {
+        <tr>
+            <td><input type="checkbox" name="check_campaign" id="@campaign.Id" /></td>
+            <td>@Html.ActionLink(@campaign.Name, "Details", "Campaign", new { id = campaign.Id })</td>
+            <td>@campaign.InitialCpc</td>
+            <td>@(campaign.Device.FirstOrDefault())</td>
+            <td>@campaign.Os.FirstOrDefault()</td>
+            <td>@campaign.Status</td>
+            <td>@campaign.Budget</td>
+            <td>@campaign.Spent</td>
+            <td>@campaign.StartDate</td>
+            <td>@campaign.EndDate</td>
+            <td>?</td>
+            <td>?</td>
+            <td>?</td>
+            <td>?</td>
+            <td>?</td>
+            <td>?</td>
+            <td>?</td>
+            <td>?</td>
+            <td>...</td>
+        </tr>
     }
 </table>
