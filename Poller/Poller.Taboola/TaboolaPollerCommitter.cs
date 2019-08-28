@@ -68,28 +68,20 @@ namespace Poller.Taboola
             }
         }
 
-        private async Task CommitAccounts(EntityList<Account> accounts, CancellationToken token)
+        /// <summary>
+        /// This commits our fetched campaigns to our local
+        /// database.
+        /// </summary>
+        /// <param name="campaigns">Core campaign list</param>
+        /// <param name="token"></param>
+        /// <returns></returns>
+        private async Task CommitCampaigns(
+            IEnumerable<CampaignEntity> campaigns,
+            CancellationToken token)
         {
-            if (accounts == null || accounts.Items.Count() <= 0) { return; }
+            if (campaigns == null || campaigns.Count() <= 0) { return; }
 
-            var sql = @"
-                INSERT INTO
-	                public.account(secondary_id, publisher, name, currency, details)
-                VALUES
-                    (
-                        @Id,
-                        'taboola',
-                        @AccountId,
-                        @Currency,
-                        @Details::json
-                    )
-                ON CONFLICT (name) DO NOTHING";
 
-            using (var connection = _provider.ConnectionScope())
-            {
-                await connection.ExecuteAsync(new CommandDefinition(sql, accounts.Items, cancellationToken: token));
-            }
-        }
 
         //TODO:
         // - campaign_group
