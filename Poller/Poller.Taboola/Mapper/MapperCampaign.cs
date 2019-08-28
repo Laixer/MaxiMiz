@@ -200,6 +200,7 @@ namespace Poller.Taboola.Mapper
                 Name = DefaultCampaignIdName,
                 Language = DefaultLanguage,
                 Budget = DefaultNumber,
+                DailyBudget = null,
                 Delivery = DefaultDelivery,
                 LocationInclude = DefaultLocations,
                 LocationExclude = DefaultLocations
