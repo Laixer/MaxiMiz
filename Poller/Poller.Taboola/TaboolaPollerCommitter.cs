@@ -162,9 +162,6 @@ namespace Poller.Taboola
             }
         }
 
-        // TODO: Return account model according to database scheme.
-        private Task<IEnumerable<AccountEntity>> FetchAdvertiserAccountsForCache(CancellationToken token)
-            => _cache.GetOrCreateAsync("AdvertiserAccounts", async entry =>
         /// <summary>
         /// Gets all publisher accounts from our database.
         /// </summary>
@@ -190,11 +187,24 @@ namespace Poller.Taboola
             }
         }
 
+        /// <summary>
+        /// This adds the accounts that are present in
+        /// our OWN database to the cache.
+        /// TODO: Return account model according to
+        /// database scheme.
+        /// </summary>
+        /// <param name="token"></param>
+        /// <returns></returns>
+        private Task<IEnumerable<AccountEntity>>
+            FetchLocalAdvertiserAccountsForCache
+            (CancellationToken token)
+        {
+            return _cache.GetOrCreateAsync(
+                "AdvertiserAccounts", async entry =>
             {
                 entry.SlidingExpiration = TimeSpan.FromDays(1);
                 return await FetchAdvertiserAccounts(token);
             });
-
-
+        }
     }
 }
