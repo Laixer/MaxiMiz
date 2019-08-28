@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Maximiz.Model.Enums;
+using System;
 
 namespace Maximiz.Model.Entity
 {
@@ -22,6 +23,18 @@ namespace Maximiz.Model.Entity
         /// Campaign name.
         /// </summary>
         public string Name { get; set; }
+
+        /// <summary>
+        /// Language of the campaign, 2 chars.
+        /// TODO Why do we need this?
+        /// </summary>
+        public string Language { get; set; }
+
+        /// <summary>
+        /// Delivery mode of this ad.
+        /// </summary>
+        public Delivery Delivery { get; set; }
+        public string DeliveryText { get => Delivery.GetEnumMemberName(); }
 
         /// <summary>
         /// Campaign branding text.
@@ -49,9 +62,14 @@ namespace Maximiz.Model.Entity
         public decimal Budget { get; set; }
 
         /// <summary>
-        /// Budget per day.
+        /// Budget per day. Can be null.
         /// </summary>
-        public decimal DailyBudget { get; set; }
+        public decimal? DailyBudget { get; set; }
+
+        /// <summary>
+        /// Budget spent.
+        /// </summary>
+        public decimal Spent { get; set; }
 
         /// <summary>
         /// Campaign start date.
@@ -72,5 +90,12 @@ namespace Maximiz.Model.Entity
         /// Note.
         /// </summary>
         public string Note { get; set; }
+
+        /// <summary>
+        /// JSON string containing unused data which
+        /// we do have to store.
+        /// </summary>
+        public string Details { get; set; }
     }
+
 }

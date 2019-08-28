@@ -19,8 +19,7 @@ namespace Poller.Scheduler.Activator
         public override void Initialize(CancellationToken token)
         {
             CancellationToken = token;
-
-            Scheduler.ScheduleTimer(_timer, _interval);
+            Scheduler.ScheduleTimer(_timer, _interval, true);
         }
 
         private async void TimerCallback(object _)
@@ -30,7 +29,7 @@ namespace Poller.Scheduler.Activator
             if (!CancellationToken.IsCancellationRequested)
             {
                 // TODO: reschedule
-                Scheduler.ScheduleTimer(_timer, _interval);
+                Scheduler.ScheduleTimer(_timer, _interval, true);
 
                 Logger.LogDebug($"Rerun {OperationName} in ~{_interval}");
             }

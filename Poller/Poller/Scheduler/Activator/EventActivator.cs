@@ -20,6 +20,8 @@ namespace Poller.Scheduler.Activator
         {
             Logger = ServiceProvider.GetRequiredService<ILogger<EventActivator>>();
 
+            queueName = queueName ?? throw new ArgumentNullException(nameof(queueName));
+
             queueClient = serviceProvider.GetRequiredService<EventBusProvider>().QueueClient(queueName);
             queueClient.RegisterMessageHandler(MessageCallbackAsync, new MessageHandlerOptions(ExceptionReceivedHandler)
             {
