@@ -139,7 +139,7 @@ namespace Maximiz.Model.Entity
                 BrandingText = group.BrandingText,
                 LocationInclude = group.LocationInclude,
                 LocationExclude = group.LocationExclude,
-                Language = new string[] { group.Language },
+                Language = group.Language,
                 InitialCpc = group.InitialCpc,
                 Budget = group.Budget,
                 DailyBudget = group.DailyBudget,
