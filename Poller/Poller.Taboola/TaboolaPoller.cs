@@ -124,9 +124,11 @@ namespace Poller.Taboola
             var accounts = await FetchLocalAdvertiserAccountsForCache(token);
             foreach (var account in accounts.ToList().Shuffle().Take(2))
             {
-                var result = await GetAllCampaigns(account.Name, token);
+                var result = (await GetAllCampaigns(account, token)).Items;
+                result = _mapperTarget.ConvertAll(result);
+                var converted = _mapperCampaign.ConvertAll(result);
 
-                await CommitCampaigns(result, token);
+                await CommitCampaigns(converted, token);
 
                 // NOTE: We cannot process all items in one go since it takes
                 //       too long, and this is only a secondary function. We
