@@ -146,17 +146,6 @@ namespace Poller.Taboola
 
             foreach (var item in campaigns.Items)
             {
-                if (item.Cpc > item.DailyCap)
-                {
-                    item.DailyCap = null;
-                }
-                if (item.EndDate.HasValue)
-                {
-                    if (item.EndDate.Value.Year == 9999 && item.EndDate.Value.Month == 12 && item.EndDate.Value.Day == 31)
-                    {
-                        item.EndDate = null;
-                    }
-                }
             }
 
             var sql = @"
