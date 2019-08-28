@@ -6,8 +6,11 @@ using System.Threading.Tasks;
 using Dapper;
 using Microsoft.Extensions.Caching.Memory;
 using Poller.Taboola.Model;
+using Poller.Taboola.Mapper;
 
 using AccountEntity = Maximiz.Model.Entity.Account;
+using AdItemEntity = Maximiz.Model.Entity.AdItem;
+using CampaignEntity = Maximiz.Model.Entity.Campaign;
 
 
 namespace Poller.Taboola
