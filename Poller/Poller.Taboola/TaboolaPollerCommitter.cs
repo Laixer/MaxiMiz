@@ -165,6 +165,31 @@ namespace Poller.Taboola
         // TODO: Return account model according to database scheme.
         private Task<IEnumerable<AccountEntity>> FetchAdvertiserAccountsForCache(CancellationToken token)
             => _cache.GetOrCreateAsync("AdvertiserAccounts", async entry =>
+        /// <summary>
+        /// Gets all publisher accounts from our database.
+        /// </summary>
+        /// <param name="token">Cancellation token</param>
+        /// <returns>All publisher accounts</returns>
+        private async Task<IEnumerable<AccountEntity>>
+            FetchPublisherAccounts(CancellationToken token)
+        {
+            var sql = @"
+                SELECT
+                    *
+	            FROM
+                    public.account
+                WHERE
+                    publisher = 'taboola'::publisher AND
+                    (details::json #>> '{partner_types}')::jsonb ? 'publisher'";
+
+            using (var connection = _provider.ConnectionScope())
+            {
+                var result = await connection.QueryAsync<AccountEntity>
+                    (new CommandDefinition(sql, cancellationToken: token));
+                return result;
+            }
+        }
+
             {
                 entry.SlidingExpiration = TimeSpan.FromDays(1);
                 return await FetchAdvertiserAccounts(token);
