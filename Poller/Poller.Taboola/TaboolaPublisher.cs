@@ -12,6 +12,11 @@ using Poller.Scheduler.Delegate;
 
 namespace Poller.Taboola
 {
+
+    /// <summary>
+    /// Our Taboola publisher class. This sets up our poller
+    /// to communicate with Taboola.
+    /// </summary>
     [Publisher("Taboola")]
     public class TaboolaPublisher : IRemotePublisher, IDisposable
     {
@@ -22,7 +27,7 @@ namespace Poller.Taboola
         /// <summary>
         /// Creates a TaboolaPoller for fetching Data from Taboola.
         /// </summary>
-        /// <param name="logger">A logger for this poller.</typeparam>
+        /// <param name="logger">A logger for this poller.</param>
         /// <param name="options">An instance of options required for requests.</param>
         /// <param name="connection">The database connections to use for inserting fetched data.</param>
         public TaboolaPublisher(

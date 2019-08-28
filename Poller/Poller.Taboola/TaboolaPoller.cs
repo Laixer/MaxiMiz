@@ -13,6 +13,8 @@ using AccountEntity = Maximiz.Model.Entity.Account;
 using CampaignEntity = Maximiz.Model.Entity.Campaign;
 using AdItemEntity = Maximiz.Model.Entity.AdItem;
 using Poller.Taboola.Mapper;
+using Poller.Taboola.Model;
+using System.Collections.Generic;
 
 namespace Poller.Taboola
 {
@@ -22,7 +24,8 @@ namespace Poller.Taboola
     /// part implements all required activator base
     /// interfaces.
     /// </summary>
-    internal partial class TaboolaPoller : IPollerRefreshAdvertisementData, IPollerDataSyncback, IPollerCreateOrUpdateObjects, IDisposable
+    internal partial class TaboolaPoller : IPollerRefreshAdvertisementData,
+        IPollerDataSyncback, IPollerCreateOrUpdateObjects, IDisposable
     {
         private readonly ILogger _logger;
         private readonly DbProvider _provider;
@@ -32,6 +35,7 @@ namespace Poller.Taboola
         private readonly MapperAccount _mapperAccount;
         private readonly MapperCampaign _mapperCampaign;
         private readonly MapperAdItem _mapperAdItem;
+        private readonly MapperTarget _mapperTarget;
 
         /// <summary>
         /// Constructor with dependency injection.
@@ -40,7 +44,9 @@ namespace Poller.Taboola
         /// <param name="options">The options</param>
         /// <param name="provider">The database provider</param>
         /// <param name="cache">The cache</param>
-        public TaboolaPoller(ILoggerFactory logger, TaboolaPollerOptions options, DbProvider provider, IMemoryCache cache)
+        public TaboolaPoller(ILoggerFactory logger,
+            TaboolaPollerOptions options, DbProvider provider,
+            IMemoryCache cache)
         {
             _logger = logger.CreateLogger(typeof(TaboolaPoller).FullName);
             _provider = provider;
@@ -62,6 +68,7 @@ namespace Poller.Taboola
             _mapperAccount = new MapperAccount();
             _mapperCampaign = new MapperCampaign();
             _mapperAdItem = new MapperAdItem();
+            _mapperTarget = new MapperTarget();
 
             _logger.LogInformation("Taboola poller created");
         }
@@ -113,35 +120,57 @@ namespace Poller.Taboola
                 await CommitAccounts(converted, token);
             }
 
-             // Get local accounts and extract some campaign data.
+            // Get local accounts and extract some campaign data.
             var accounts = await FetchLocalAdvertiserAccountsForCache(token);
             foreach (var account in accounts.ToList().Shuffle().Take(2))
             {
-                var result = await GetAllCampaigns(account.Name, token);
+                var result = (await GetAllCampaigns(account, token)).Items;
+                result = _mapperTarget.ConvertAll(result);
+                var converted = _mapperCampaign.ConvertAll(result);
 
-                await CommitCampaigns(result, token);
+                await CommitCampaigns(converted, token);
 
                 // NOTE: We cannot process all items in one go since it takes
                 //       too long, and this is only a secondary function. We
                 //       choose 100 items at random and sync them. Over time
                 //       all items must be synced eventually.
-                foreach (var item in result.Items.ToList().Shuffle().Take(100))
+                await ProcessCampainItems(context, account,
+                    converted.ToList().Shuffle().Take(100), token);
+            }
+        }
+
+        /// <summary>
+        /// This will get all campaign items for each campaign
+        /// in the specified list.
+        /// </summary>
+        /// <param name="context">The poller context</param>
+        /// <param name="account">Account object</param>
+        /// <param name="campaigns">Campaign list</param>
+        /// <param name="token">Cancellation token</param>
+        /// <returns></returns>
+        private async Task ProcessCampainItems(
+            PollerContext context,
+            AccountEntity account,
+            IEnumerable<CampaignEntity> campaigns,
+            CancellationToken token)
+        {
+            foreach (var campaign in campaigns)
+            {
+                try
                 {
-                    try
-                    {
-                        var result2 = await GetCampaignAllItems(account.Name, item.Id, token);
+                    var items = await GetCampaignAllItems(
+                        account.Name, campaign.SecondaryId, token);
+                    var convertedItems = _mapperAdItem.ConvertAll(items.Items);
+                    await CommitCampaignItems(convertedItems, token, true);
 
-                        await CommitCampaignItems(result2, token, true);
+                    // Prevent spamming.
+                    await Task.Delay(250, token);
 
-                        // Prevent spamming.
-                        await Task.Delay(250, token);
-
-                        context.MarkProgress(token);
-                    }
-                    catch (TaskCanceledException)
-                    {
-                        token.ThrowIfCancellationRequested();
-                    }
+                    context.MarkProgress(token);
+                }
+                catch (TaskCanceledException)
+                {
+                    token.ThrowIfCancellationRequested();
                 }
             }
         }

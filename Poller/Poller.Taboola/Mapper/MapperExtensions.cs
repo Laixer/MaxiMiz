@@ -29,7 +29,7 @@ namespace Poller.Taboola.Mapper
             switch (campaign.DailyAdDeliveryModel)
             {
                 case DailyAdDeliveryModel.Balanced:
-                    return "balaned"; // TODO: This is a typo
+                    return "balanced";
                 case DailyAdDeliveryModel.Accelerated:
                     return "accelerated";
                 case DailyAdDeliveryModel.Strict:

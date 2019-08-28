@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
@@ -30,8 +31,7 @@ namespace Poller.Taboola
 
             var url = $"api/1.0/{account}/reports/top-campaign-content/dimensions/item_breakdown?{query}";
 
-            var result = RemoteQueryAndLogAsync<EntityList<AdItemCoResult>>(HttpMethod.Get, url, token);
-            return result;
+            return RemoteQueryAndLogAsync<EntityList<AdItemCoResult>>(HttpMethod.Get, url, token);
         }
 
         /// <summary>
@@ -88,14 +88,24 @@ namespace Poller.Taboola
             return RemoteQueryAndLogAsync<Campaign>(HttpMethod.Delete, url, token);
         }
 
-        private Task<EntityList<AdItem>> GetCampaignAllItems(string account, string campaign, CancellationToken token)
+        /// <summary>
+        /// Query all campaign items for a given campaign
+        /// from the Taboola API.
+        /// </summary>
+        /// <param name="account">Account name</param>
+        /// <param name="campaign">Campaign id name</param>
+        /// <param name="token">Cancellation token</param>
+        /// <returns></returns>
+        private Task<EntityList<AdItem>> GetCampaignAllItems(
+            string account, string campaign, CancellationToken token)
         {
             var url = $"api/1.0/{account}/campaigns/{campaign}/items";
-
-            return RemoteQueryAndLogAsync<EntityList<AdItem>>(HttpMethod.Get, url, token);
+            return RemoteQueryAndLogAsync<EntityList<AdItem>>
+                (HttpMethod.Get, url, token);
         }
 
-        private Task<AdItem> GetCampaignItem(string account, string campaign, string item, CancellationToken token)
+        private Task<AdItem> GetCampaignItem(string account,
+            string campaign, string item, CancellationToken token)
         {
             var url = $"api/1.0/{account}/campaigns/{campaign}/items/{item}";
 
@@ -103,15 +113,18 @@ namespace Poller.Taboola
         }
 
         /// <summary>
-        /// Run the remote query and catch all exceptions where before letting
-        /// them propagate upwards.
+        /// Run the remote query and catch all exceptions 
+        /// where before letting them propagate upwards.
         /// </summary>
         /// <typeparam name="TResult"></typeparam>
         /// <param name="method">HTTP method.</param>
         /// <param name="url">API endpoint.</param>
-        /// <param name="cancellationToken">Cancellation token.</param>
+        /// <param name="cancellationToken">Cancellation 
+        /// token.</param>
         /// <returns>Object of TResult.</returns>
-        protected async Task<TResult> RemoteQueryAndLogAsync<TResult>(HttpMethod method, string url, CancellationToken cancellationToken)
+        protected async Task<TResult> RemoteQueryAndLogAsync
+            <TResult>(HttpMethod method, string url,
+            CancellationToken cancellationToken)
             where TResult : class
         {
             cancellationToken.ThrowIfCancellationRequested();

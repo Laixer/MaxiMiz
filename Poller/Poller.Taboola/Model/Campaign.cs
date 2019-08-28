@@ -98,14 +98,14 @@ namespace Poller.Taboola.Model
         /// include or exclude.
         /// </summary>
         [DataMember(Name = "country_targeting")]
-        public Target CountryTargeting { get; set; }
+        public TargetDefault CountryTargeting { get; set; }
 
         /// <summary>
         /// Lists all regions or DMAs the campaign 
         /// will include or exclude.
         /// </summary>
         [DataMember(Name = "sub_country_targeting")]
-        public Target SubCountryTargeting { get; set; }
+        public TargetDefault SubCountryTargeting { get; set; }
 
         /// <summary>
         /// Lists all postal codes the campaign will
@@ -113,7 +113,7 @@ namespace Poller.Taboola.Model
         /// indicate we target all postal codes.
         /// </summary>
         [DataMember(Name = "postal_code_targeting")]
-        public Target PostalCodeTargeting { get; set; }
+        public TargetDefault PostalCodeTargeting { get; set; }
 
         /// <summary>
         /// Lists all contexts (?) the campaign will
@@ -122,14 +122,14 @@ namespace Poller.Taboola.Model
         /// TODO How to interpret this?
         /// </summary>
         [DataMember(Name = "contextual_targeting")]
-        public Target ContextualTargeting { get; set; }
+        public TargetDefault ContextualTargeting { get; set; }
 
         /// <summary>
         /// Lists all device types the campaign will
         /// include or exclude. NULL means target all.
         /// </summary>
         [DataMember(Name = "platform_targeting")]
-        public Target PlatformTargeting { get; set; }
+        public TargetDefault PlatformTargeting { get; set; }
 
         /// <summary>
         /// Lists all partner account_id's exclude from 
@@ -138,21 +138,23 @@ namespace Poller.Taboola.Model
         /// must reference an account with type=PARTNER.
         /// </summary>
         [DataMember(Name = "publisher_targeting")]
-        public Target PublisherTargeting { get; set; }
+        public TargetDefault PublisherTargeting { get; set; }
 
         /// <summary>
         /// Lists all operating systems the campaign will
-        /// include or exclude.
+        /// include or exclude. This is of type ITarget
+        /// to allow for two-type-format conversion in an 
+        /// elegant manner.
         /// </summary>
         [DataMember(Name = "os_targeting")]
-        public Target OsTargeting { get; set; }
+        public TargetBase OsTargeting { get; set; }
 
         /// <summary>
         /// Lists all connection types the campaign 
         /// will include or exclude.
         /// </summary>
         [DataMember(Name = "connection_type_targeting")]
-        public Target ConnectionTypeTargeting { get; set; }
+        public TargetDefault ConnectionTypeTargeting { get; set; }
 
         // TODO Why exclude?
         //[DataMember(Name = "audience_segments_multi_targeting")]

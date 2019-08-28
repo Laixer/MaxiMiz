@@ -25,6 +25,18 @@ namespace Maximiz.Model.Entity
         public string Name { get; set; }
 
         /// <summary>
+        /// Language of the campaign, 2 chars.
+        /// TODO Why do we need this?
+        /// </summary>
+        public string Language { get; set; }
+
+        /// <summary>
+        /// Delivery mode of this ad.
+        /// </summary>
+        public Delivery Delivery { get; set; }
+        public string DeliveryText { get => Delivery.GetEnumMemberName(); }
+
+        /// <summary>
         /// Campaign branding text.
         /// </summary>
         public string BrandingText { get; set; }
@@ -38,12 +50,6 @@ namespace Maximiz.Model.Entity
         /// Region in which campaign is not active.
         /// </summary>
         public int[] LocationExclude { get; set; }
-
-        /// <summary>
-        /// Language of the campaign, 2 chars.
-        /// TODO Why do we need this? Should just be a string.
-        /// </summary>
-        public string[] Language { get; set; }
 
         /// <summary>
         /// Targeted Device.
@@ -74,12 +80,6 @@ namespace Maximiz.Model.Entity
         /// Budget model for the campaign.
         /// </summary>
         public BudgetModel BudgetModel { get; set; }
-
-        /// <summary>
-        /// Delivery mode of this ad.
-        /// </summary>
-        public Delivery Delivery { get; set; }
-        public string DeliveryText { get => Delivery.GetEnumMemberName(); }
 
         /// <summary>
         /// Bid Strategy.

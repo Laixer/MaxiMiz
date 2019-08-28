@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using Maximiz.Model.Entity;
+using Maximiz.Model.Enums;
 using Poller.Helper;
 using Poller.Taboola.Model;
 using CampaignCore = Maximiz.Model.Entity.Campaign;
@@ -15,6 +17,16 @@ namespace Poller.Taboola.Mapper
     /// </summary>
     class MapperCampaign : IMapper<CampaignTaboola, CampaignCore>
     {
+
+        private const string DefaultString = "default";
+        private const int DefaultNumber = -1;
+        private const string DefaultJson = "{}";
+        private const string DefaultCampaignIdNumber = "xxxxxxxx";
+        private const string DefaultCampaignIdName = "invalid-campaign-id";
+        private const string DefaultCurrency = "XXX";
+        private const Delivery DefaultDelivery = Delivery.Unknown;
+        private const string DefaultLanguage = "NL";
+        private readonly int[] DefaultLocations = new int[0];
 
         /// <summary>
         /// Converts our core model to taboola campaign.
@@ -91,21 +103,22 @@ namespace Poller.Taboola.Mapper
         {
             if (external == null) throw new ArgumentNullException(nameof(external));
 
-            return new CampaignCore
-            {
-                SecondaryId = external.Id,
-                Name = external.Name,
-                BrandingText = external.Branding,
-                InitialCpc = external.Cpc,
-                Budget = external.SpendingLimit,
-                DailyBudget = external.DailyCap,
-                Spent = external.Spent,
-                StartDate = external.StartDate,
-                EndDate = external.EndDate,
-                Utm = external.Utm,
-                Note = external.Note,
-                Details = ExtractDetailsToString(external)
-            };
+            var result = GetDefault();
+
+            result.SecondaryId = external.Id;
+            result.Name = external.Name;
+            result.BrandingText = external.Branding;
+            result.InitialCpc = external.Cpc;
+            result.Budget = external.SpendingLimit;
+            result.DailyBudget = external.DailyCap;
+            result.Spent = external.Spent;
+            result.StartDate = external.StartDate;
+            result.EndDate = external.EndDate;
+            result.Utm = external.Utm;
+            result.Note = external.Note;
+            result.Details = ExtractDetailsToString(external);
+
+            return result;
         }
 
         /// <summary>
@@ -141,16 +154,57 @@ namespace Poller.Taboola.Mapper
             });
         }
 
+        /// <summary>
+        /// Bulk conversion from Taboola to Core.
+        /// </summary>
+        /// <param name="list">Taboola list</param>
+        /// <returns>Core list</returns>
         public IEnumerable<CampaignCore> ConvertAll(
             IEnumerable<CampaignTaboola> list)
         {
-            throw new NotImplementedException();
+            IList<CampaignCore> result = new List<CampaignCore>();
+            foreach (var item in list.AsParallel())
+            {
+                result.Add(Convert(item));
+            }
+            return result;
         }
 
+        /// <summary>
+        /// Bulk conversion from Core to Taboola.
+        /// </summary>
+        /// <param name="list">Core list</param>
+        /// <returns>Taboola list</returns>
         public IEnumerable<CampaignTaboola> ConvertAll(
             IEnumerable<CampaignCore> list)
         {
-            throw new NotImplementedException();
+            IList<CampaignTaboola> result = new List<CampaignTaboola>();
+            foreach (var item in list.AsParallel())
+            {
+                result.Add(Convert(item));
+            }
+            return result;
+        }
+
+        /// <summary>
+        /// Creates a default without null values.
+        /// TODO Match db schema
+        /// TODO Fill up
+        /// </summary>
+        /// <returns>Default</returns>
+        private CampaignCore GetDefault()
+        {
+            return new CampaignCore
+            {
+                SecondaryId = DefaultCampaignIdNumber,
+                Name = DefaultCampaignIdName,
+                Language = DefaultLanguage,
+                Budget = DefaultNumber,
+                DailyBudget = null,
+                Delivery = DefaultDelivery,
+                LocationInclude = DefaultLocations,
+                LocationExclude = DefaultLocations
+            };
         }
     }
 }
