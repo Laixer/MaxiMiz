@@ -134,11 +134,10 @@ namespace Poller.Taboola
                 //       too long, and this is only a secondary function. We
                 //       choose 100 items at random and sync them. Over time
                 //       all items must be synced eventually.
-                foreach (var item in result.Items.ToList().Shuffle().Take(100))
-                {
-                    try
-                    {
-                        var result2 = await GetCampaignAllItems(account.Name, item.Id, token);
+                await ProcessCampainItems(context, account,
+                    converted.ToList().Shuffle().Take(100), token);
+            }
+        }
 
         /// <summary>
         /// This will get all campaign items for each campaign
