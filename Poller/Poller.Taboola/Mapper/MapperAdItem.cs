@@ -310,7 +310,7 @@ namespace Poller.Taboola.Mapper
             IEnumerable<AdItemTaboola> list)
         {
             List<AdItemCore> result = new List<AdItemCore>();
-            foreach (var x in list)
+            foreach (var x in list.AsParallel())
             {
                 result.Add(Convert(x));
             }
