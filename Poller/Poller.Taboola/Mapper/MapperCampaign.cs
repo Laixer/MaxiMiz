@@ -118,6 +118,9 @@ namespace Poller.Taboola.Mapper
             result.Note = external.Note;
             result.Details = ExtractDetailsToString(external);
 
+            // Daily cap of 0 means unlimited, which we denote as null
+            if (result.DailyBudget == 0) { result.DailyBudget = null; }
+
             return result;
         }
 
