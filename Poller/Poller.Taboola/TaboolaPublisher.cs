@@ -12,6 +12,11 @@ using Poller.Scheduler.Delegate;
 
 namespace Poller.Taboola
 {
+
+    /// <summary>
+    /// Our Taboola publisher class. This sets up our poller
+    /// to communicate with Taboola.
+    /// </summary>
     [Publisher("Taboola")]
     public class TaboolaPublisher : IRemotePublisher, IDisposable
     {
@@ -22,7 +27,7 @@ namespace Poller.Taboola
         /// <summary>
         /// Creates a TaboolaPoller for fetching Data from Taboola.
         /// </summary>
-        /// <param name="logger">A logger for this poller.</typeparam>
+        /// <param name="logger">A logger for this poller.</param>
         /// <param name="options">An instance of options required for requests.</param>
         /// <param name="connection">The database connections to use for inserting fetched data.</param>
         public TaboolaPublisher(
@@ -37,6 +42,14 @@ namespace Poller.Taboola
             _options = options?.Value;
         }
 
+        /// <summary>
+        /// Returns all activators for this poller. Each activator
+        /// will perform some desired action upon trigger, either
+        /// by time or by some event. The actual functionality of
+        /// the poller is determined by these activators.
+        /// </summary>
+        /// <param name="cancellationToken">The cancellation token</param>
+        /// <returns>The list of activators</returns>
         public IEnumerable<ActivatorBase> GetActivators(CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
@@ -49,6 +62,9 @@ namespace Poller.Taboola
             };
         }
 
+        /// <summary>
+        /// Called upon safe shutdown.
+        /// </summary>
         public void Dispose() => _poller?.Dispose();
     }
 }

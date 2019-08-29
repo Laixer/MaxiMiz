@@ -1,4 +1,6 @@
 ﻿using System;
+using Maximiz.Model.Enums;
+
 
 namespace Maximiz.Model.Entity
 {
@@ -57,5 +59,23 @@ namespace Maximiz.Model.Entity
         /// Actions on this item.
         /// </summary>
         public int Actions { get; set; }
-    }
+
+        /// <summary>
+        /// Represents our approval state.
+        /// </summary>
+        public ApprovalState ApprovalState { get; set; }
+        public string ApprovalStateText { get => ApprovalState.GetEnumMemberName(); }
+
+        /// <summary>
+        /// Represents our item status.
+        /// </summary>
+        public Status Status { get; set; }
+        public string StatusText { get => Status.GetEnumMemberName(); }
+
+        /// <summary>
+        /// JSON string containing unused data which
+        /// we do have to store.
+        /// </summary>
+        public string Details { get; set; }
+}
 }

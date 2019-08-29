@@ -9,6 +9,7 @@ namespace Poller.Scheduler
 
         /// <summary>
         /// Schedule the timer for next interval.
+        /// TODO This is still untested.
         /// </summary>
         /// <remarks>
         /// The scheduler will add a bias offset to the timer for a more 
