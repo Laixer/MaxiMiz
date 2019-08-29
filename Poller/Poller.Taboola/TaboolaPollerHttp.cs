@@ -67,7 +67,14 @@ namespace Poller.Taboola
             var result = await RemoteQueryAndLogAsync<Campaign>(HttpMethod.Get, url, token);
         }
 
-        private Task<Campaign> CreateCampaign(string account, CancellationToken token)
+        /// <summary>
+        /// Creates a new campaign in the Taboola API.
+        /// </summary>
+        /// <param name="account">The account</param>
+        /// <param name="token">Cancellation token</param>
+        /// <returns>The created campaign</returns>
+        private Task<Campaign> CreateCampaign(
+            AccountCore account, CancellationToken token)
         {
             var url = $"api/1.0/{account}/campaigns/";
 
