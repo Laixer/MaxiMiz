@@ -15,6 +15,7 @@ using AdItemEntity = Maximiz.Model.Entity.AdItem;
 using Poller.Taboola.Mapper;
 using Poller.Taboola.Model;
 using System.Collections.Generic;
+using Maximiz.Model.Entity;
 
 namespace Poller.Taboola
 {
