@@ -114,7 +114,7 @@ namespace Poller.Taboola
 
         /// <summary>
         /// Run the remote query and catch all exceptions 
-        /// where before letting them propagate upwards.
+        /// before letting them propagate upwards.
         /// </summary>
         /// <typeparam name="TResult"></typeparam>
         /// <param name="method">HTTP method.</param>
