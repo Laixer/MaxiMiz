@@ -83,6 +83,21 @@ namespace Maximiz.Controllers
             return RedirectToAction("Overview");
         }
 
+        public IActionResult CreateTest(string name)
+        {
+            return View("Create", new CampaignGroupInputModel()
+            {
+                Name = name ?? "Test",
+                Budget = 9001,
+                DailyBudget = 10,
+                Devices = new Model.Enums.Device[] { Model.Enums.Device.Desktop, Model.Enums.Device.Laptop, Model.Enums.Device.Mobile, Model.Enums.Device.Tablet, Model.Enums.Device.Wearable },
+                OperatingSystems = new Model.Enums.OS[] { Model.Enums.OS.Android, Model.Enums.OS.Chromeos, Model.Enums.OS.Ios, },
+                Connections = new Model.Enums.Connection[] { Model.Enums.Connection.Wifi },
+                Utm = "utm=test",
+                BrandingText = "Test",
+            });
+        }
+
         // GET: /Campaign/Search
         /// <summary>
         /// Query the database to search for campaigns.
