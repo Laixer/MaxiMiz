@@ -121,7 +121,7 @@ namespace Poller.Taboola
         /// <param name="url">API endpoint.</param>
         /// <param name="cancellationToken">Cancellation 
         /// token.</param>
-        /// <returns>Object of TResult.</returns>
+        /// <returns>Task with of TResult object</returns>
         protected async Task<TResult> RemoteQueryAndLogAsync
             <TResult>(HttpMethod method, string url,
             CancellationToken cancellationToken)
