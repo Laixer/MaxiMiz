@@ -6,6 +6,7 @@ using Maximiz.Model.Entity;
 using Maximiz.Model.Enums;
 using Maximiz.Model.Protocol;
 using Maximiz.Repositories.Interfaces;
+using Maximiz.ServiceBus;
 using Microsoft.Azure.ServiceBus;
 using Microsoft.Extensions.Configuration;
 using Npgsql;
@@ -113,6 +114,8 @@ namespace Maximiz.Repositories
                     int newCampaignGroupId = await connection.ExecuteScalarAsync<int>
                         (sql_group_insert, campaignGroup, transaction: transaction);
 
+                    campaignGroup.Id = newCampaignGroupId;
+
                     // Insert the campaigns.
                     foreach (Campaign campaign in campaignsToCreate)
                     {
@@ -121,6 +124,10 @@ namespace Maximiz.Repositories
 
                         await connection.ExecuteAsync(sql_campaign_insert, campaign, transaction: transaction);
                     }
+
+                    // Send create messages to the service bus.
+                    await ServiceBusQueue.SendObjectMessage(campaignGroup, CrudAction.Create);
+                    await ServiceBusQueue.SendObjectMessage(campaignsToCreate, CrudAction.Create);
 
                     transaction.Commit();
                 }
@@ -131,25 +138,6 @@ namespace Maximiz.Repositories
                 }
             }
 
-        }
-
-        // TODO: Finish and use this method
-        public async Task SendToBus(IEnumerable<Entity> entities, CrudAction crudAction)
-        {
-            foreach(Entity e in entities)
-            {
-                var message = new CreateOrUpdateObjectsMessage(e, crudAction);
-
-                var qClient = GetQueueClient;
-
-                var bf = new BinaryFormatter();
-                using (var stream = new MemoryStream())
-                {
-                    bf.Serialize(stream, message);
-                    // Send message to SB
-                    await qClient.SendAsync(new Message(stream.ToArray()));
-                }
-            }
         }
 
         public Task<Guid> Create(Campaign entity)

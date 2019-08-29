@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Maximiz.ServiceBus;
 using Maximiz.Model.Enums;
 using Maximiz.Repositories;
 using Maximiz.Repositories.Interfaces;
@@ -37,6 +38,9 @@ namespace Maximiz
 
             services.AddTransient<ICampaignRepository, CampaignRepository>();
             services.AddTransient<IAdGroupRepository, AdGroupRepository>();
+
+            // TODO
+            ServiceBusQueue.Configure(Configuration);
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Latest);
 
