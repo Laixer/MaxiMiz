@@ -184,7 +184,9 @@ namespace Poller.Taboola
         /// <param name="context">CRUD context</param>
         /// <param name="token">Cancellation token</param>
         /// <returns>Nothing (task)</returns>
-        public Task CreateOrUpdateObjectsAsync(CreateOrUpdateObjectsContext context, CancellationToken token)
+        public Task CreateOrUpdateObjectsAsync(
+            CreateOrUpdateObjectsContext context,
+            CancellationToken token)
         {
             if (context.Entity.Length != 2)
             {

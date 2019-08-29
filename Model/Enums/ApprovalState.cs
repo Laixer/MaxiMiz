@@ -44,6 +44,6 @@ namespace Maximiz.Model.Enums
         /// Item has been rejected externally.
         /// </summary>
         [EnumMember(Value = "rejected")]
-        Rejected,
+        Rejected
     }
 }
