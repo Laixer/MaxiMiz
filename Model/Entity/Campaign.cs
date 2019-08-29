@@ -80,11 +80,13 @@ namespace Maximiz.Model.Entity
         /// Budget model for the campaign.
         /// </summary>
         public BudgetModel BudgetModel { get; set; }
+        public string BudgetModelText => BudgetModel.GetEnumMemberName();
 
         /// <summary>
         /// Bid Strategy.
         /// </summary>
         public BidStrategy BidStrategy { get; set; }
+        public string BidStrategyText => BidStrategy.GetEnumMemberName();
 
         /// <summary>
         /// Campaign start date.
@@ -100,6 +102,7 @@ namespace Maximiz.Model.Entity
         /// Status.
         /// </summary>
         public Status Status { get; set; }
+        public string StatusText => Status.GetEnumMemberName();
 
         /// <summary>
         /// Tracking code.

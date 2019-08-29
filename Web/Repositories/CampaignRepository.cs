@@ -37,21 +37,8 @@ namespace Maximiz.Repositories
         /// </summary>
         public IQueueClient GetQueueClient => new QueueClient(_configuration.GetConnectionString("MaxiMizServiceBus"), "testqueue");
 
-        public async Task CreateGroup(CampaignGroup campaignGroupEntity)
+        public async Task CreateGroup(CampaignGroup campaignGroup)
         {
-            var message = new CreateOrUpdateObjectsMessage(campaignGroupEntity, CrudAction.Create);
-
-            var qClient = GetQueueClient;
-
-            var bf = new BinaryFormatter();
-            using (var stream = new MemoryStream())
-            {
-                bf.Serialize(stream, message);
-                // Send message to SB
-                await qClient.SendAsync(new Message(stream.ToArray()));
-            }
-            //!
-
             // SQL query to insert campaign group and select inserted row ID
             var sql_group_insert = @" 
             INSERT INTO PUBLIC.campaign_group
@@ -60,125 +47,112 @@ namespace Maximiz.Repositories
                     @Name,
                     @BrandingText,
                     @LocationInclude, @LocationExclude,
-                    @Language, @Device, @OS,
+                    '{NL}', @Device, @OS,
                     @InitialCPC,
-                    @Budget, @BudgetDaily, @BudgetModel::budget_model,
-                    @Delivery::delivery,
-                    @BidStrategy::bid_strategy,
+                    @Budget, @DailyBudget, @BudgetModelText::budget_model,
+                    @DeliveryText::delivery,
+                    @BidStrategyText::bid_strategy,
                     COALESCE(@StartDate, CURRENT_TIMESTAMP),
                     @EndDate,
                     @Connection
                 )
                 RETURNING id";
 
-            var sql_group_params = new
-            {
-                campaignGroupEntity.Name,
-                campaignGroupEntity.BrandingText,
-                campaignGroupEntity.LocationInclude,
-                campaignGroupEntity.LocationExclude,
-                Language = new string[] { "N", "L" },
-                campaignGroupEntity.Device,
-                campaignGroupEntity.Os,
-                campaignGroupEntity.InitialCpc,
-                campaignGroupEntity.Budget,
-                BudgetDaily = campaignGroupEntity.DailyBudget,
-                BudgetModel = campaignGroupEntity.BudgetModel.GetEnumMemberName(),
-                Delivery = campaignGroupEntity.Delivery.GetEnumMemberName(),
-                BidStrategy = campaignGroupEntity.BidStrategy.GetEnumMemberName(),
-                campaignGroupEntity.StartDate,
-                campaignGroupEntity.EndDate,
-                campaignGroupEntity.Connection
-            };
-
             // SQL query to insert a new campaign
-            var sql_campaign_insert = @"INSERT INTO
-	                public.campaign(secondary_id, name, branding_text, location_include, location_exclude, language, device, os, initial_cpc, budget, budget_daily, budget_model, delivery, start_date, end_date, utm, connection, campaign_group)
+            string sql_campaign_insert = @"INSERT INTO
+	                public.campaign(secondary_id, campaign_group, name, branding_text, location_include, location_exclude, language, language_as_text, device, os, initial_cpc, budget, budget_daily, budget_model, delivery, start_date, end_date, utm, connection)
                 VALUES
                     (
                         @SecondaryId,
+                        @CampaignGroup,
                         @Name,
                         @BrandingText,
                         '{0}','{0}',
+                        '{NL}',
                         @Language, @Device, @OS,
                         @InitialCpc,
-                        @Budget, @BudgetDaily, @BudgetModel::budget_model,
-                        @Delivery::delivery,
+                        @Budget, @DailyBudget, @BudgetModelText::budget_model,
+                        @DeliveryText::delivery,
                         COALESCE(@StartDate, CURRENT_TIMESTAMP),
                         @EndDate,
                         @Utm,
-                        @Connection,
-                        @CampaignGroupId
+                        @Connection
                     );";
 
             // For temporary storage of the campaigns to create
             List<Campaign> campaignsToCreate = new List<Campaign>();
 
-            Parallel.ForEach(campaignGroupEntity.Device, device =>
+            Parallel.ForEach(campaignGroup.Device, device =>
             {
-                Parallel.ForEach(campaignGroupEntity.Os, os =>
+                Parallel.ForEach(campaignGroup.Os, os =>
                 {
-                    Parallel.ForEach(campaignGroupEntity.LocationInclude, location =>
+                    Parallel.ForEach(campaignGroup.LocationInclude, location =>
                     {
                         // Generate the campaign
-                        Campaign campaign = Campaign.FromGroup(campaignGroupEntity);
+                        Campaign campaign = Campaign.FromGroup(campaignGroup);
                         campaign.Device = new Device[] { device };
                         campaign.Os = new OS[] { os };
                         campaign.LocationInclude = new int[1] { location };
 
-                        campaign.Name = CampaignNameGenerator.Generate(campaignGroupEntity.Name, location.ToString(), os, device);
+                        campaign.Name = CampaignNameGenerator.Generate(campaignGroup.Name, campaign.Language, location.ToString(), os, device);
 
                         campaignsToCreate.Add(campaign);
                     });
                 });
             });
 
-            var gen = campaignsToCreate;
-
             using (IDbConnection connection = GetConnection)
             {
                 connection.Open();
 
-                using (IDbTransaction transaction = connection.BeginTransaction())
+                IDbTransaction transaction = connection.BeginTransaction();
+
+                try
                 {
                     // Create a new campaign group record.
-                    int newCampaignGroupId = await connection.ExecuteScalarAsync<int>(sql_group_insert, sql_group_params, transaction: transaction);
+                    int newCampaignGroupId = await connection.ExecuteScalarAsync<int>
+                        (sql_group_insert, campaignGroup, transaction: transaction);
 
-                    // Insert the generated campaigns.
+                    // Insert the campaigns.
                     foreach (Campaign campaign in campaignsToCreate)
                     {
-                        var @params = new
-                        {
-                            SecondaryId = Guid.NewGuid().ToString().Substring(0, 16),
-                            CampaignGroupId = newCampaignGroupId,
-                            campaign.Name,
-                            campaign.BrandingText,
-                            campaign.LocationInclude,
-                            campaign.LocationExclude,
-                            Language = new string[] { "N", "L" },   // TODO: For some reason length must be 3
-                            campaign.Device,
-                            campaign.Os,
-                            campaign.InitialCpc,
-                            campaign.Budget,
-                            BudgetDaily = campaign.DailyBudget,
-                            BudgetModel = campaign.BudgetModel.GetEnumMemberName(),
-                            Delivery = campaign.Delivery.GetEnumMemberName(),
-                            BidStrategy = campaign.BidStrategy.GetEnumMemberName(),
-                            campaign.StartDate,
-                            campaign.EndDate,
-                            campaign.Utm,
-                            campaign.Connection
-                        };
+                        campaign.CampaignGroup = newCampaignGroupId;
+                        campaign.SecondaryId = $"TEST{Guid.NewGuid().ToString().Substring(0, 8)}";
 
-                        await connection.ExecuteAsync(sql_campaign_insert, @params, transaction: transaction);
+                        await connection.ExecuteAsync(sql_campaign_insert, campaign, transaction: transaction);
                     }
 
                     transaction.Commit();
                 }
+                catch(Exception)
+                {
+                    transaction.Rollback();
+                    throw;
+                }
+            }
+
+        }
+
+        // TODO: Finish and use this method
+        public async Task SendToBus(IEnumerable<Entity> entities, CrudAction crudAction)
+        {
+            foreach(Entity e in entities)
+            {
+                var message = new CreateOrUpdateObjectsMessage(e, crudAction);
+
+                var qClient = GetQueueClient;
+
+                var bf = new BinaryFormatter();
+                using (var stream = new MemoryStream())
+                {
+                    bf.Serialize(stream, message);
+                    // Send message to SB
+                    await qClient.SendAsync(new Message(stream.ToArray()));
+                }
             }
         }
 
-        Task<Guid> IEntityRepository<Campaign, Guid>.Create(Campaign entity)
+        public Task<Guid> Create(Campaign entity)
         {
             throw new NotImplementedException();
         }

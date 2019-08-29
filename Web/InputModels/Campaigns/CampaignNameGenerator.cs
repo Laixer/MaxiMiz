@@ -10,23 +10,25 @@ namespace Maximiz.InputModels.Campaigns
         //       Maybe add properties from the linked account.
 
         /// <summary>
-        /// Generates a name for a <see cref="Campaign"></see>
+        /// Generates a name for a given <see cref="Campaign"></see>.
         /// </summary>
         /// <param name="groupName"></param>
         /// <param name="language"></param>
         /// <param name="os"></param>
         /// <param name="device"></param>
         /// <returns></returns>
-        public static string Generate(string groupName, string language, OS os, Device device)
+        public static string Generate(string groupName, string language, string location, OS os, Device device)
         {
             StringBuilder sb = new StringBuilder();
-            sb.Append(language);
+            sb.Append(language.ToUpper());
             sb.Append("_");
-            sb.Append(os.GetEnumMemberName());
+            sb.Append(os.GetEnumMemberName().ToUpper().Substring(0,2));
             sb.Append("_");
-            sb.Append(device.GetEnumMemberName());
+            sb.Append(device.GetEnumMemberName().ToUpper().Substring(0,3));
             sb.Append("_");
-            sb.Append(groupName);
+            sb.Append(groupName.ToUpper());
+            sb.Append("_");
+            sb.Append(location);
 
             return sb.ToString();
         }
