@@ -108,5 +108,11 @@ namespace Maximiz.Model.Entity
         /// Connections.
         /// </summary>
         public Connection[] Connection { get; set; }
+
+        /// <summary>
+        /// Represents the state of approval within our system.
+        /// </summary>
+        public ApprovalState ApprovalState { get; set; }
+        public string ApprovalStateText => ApprovalState.GetEnumMemberName();
     }
 }

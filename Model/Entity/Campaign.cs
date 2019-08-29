@@ -131,6 +131,13 @@ namespace Maximiz.Model.Entity
         public Connection[] Connection { get; set; }
 
         /// <summary>
+        /// Represents the state of approval within our system.
+        /// </summary>
+        public ApprovalState ApprovalState { get; set; }
+        public string ApprovalStateText => ApprovalState.GetEnumMemberName();
+
+
+        /// <summary>
         /// Returns a new Campaign entity created from Campaign Group Input.
         /// </summary>
         /// <param name="group">The campaign group this campaign should belong to.</param>
