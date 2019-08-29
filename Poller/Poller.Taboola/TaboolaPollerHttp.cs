@@ -76,9 +76,9 @@ namespace Poller.Taboola
         private Task<Campaign> CreateCampaign(
             AccountCore account, CancellationToken token)
         {
-            var url = $"api/1.0/{account}/campaigns/";
-
-            return RemoteQueryAndLogAsync<Campaign>(HttpMethod.Post, url, token);
+            var url = $"api/1.0/{account.Name}/campaigns/";
+            return RemoteQueryAndLogAsync<Campaign>(
+                HttpMethod.Post, url, token);
         }
 
         private async Task UpdateCampaignStatus(string account, string campaign, CancellationToken token)
