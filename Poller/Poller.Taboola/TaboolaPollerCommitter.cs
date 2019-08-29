@@ -161,7 +161,7 @@ namespace Poller.Taboola
                         @Spent,
                         CAST (@DeliveryText AS delivery),
                         COALESCE(@StartDate, CURRENT_TIMESTAMP),
-                        VALIDATE_DATE(@EndDate),
+                        VALIDATE_TIMESTAMP(@EndDate),
                         @Utm,
                         48389,
                         @Note,
