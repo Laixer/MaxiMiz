@@ -180,6 +180,15 @@ namespace Poller.Taboola
         /// CRUD operations on given objects. The type
         /// of operation and the objects are specified
         /// within the context.
+        /// 
+        /// The context must contain an account and an
+        /// entity to be updated. This function will throw
+        /// if this is not the case.
+        /// 
+        /// The entity must either be an ad item or a
+        /// campaign. No other entites can be crudded.
+        /// 
+        /// The operation can not be a read operation.
         /// </summary>
         /// <param name="context">CRUD context</param>
         /// <param name="token">Cancellation token</param>
