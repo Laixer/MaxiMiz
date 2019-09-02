@@ -28,5 +28,6 @@ namespace Maximiz.Model.Entity
         /// The current status of the group.
         /// </summary>
         public Status Status { get; set; }
+        public string StatusText => Status.GetEnumMemberName();
     }
 }

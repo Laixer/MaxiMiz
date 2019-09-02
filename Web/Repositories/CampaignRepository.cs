@@ -31,13 +31,20 @@ namespace Maximiz.Repositories
         /// <summary>
         /// Returns a new instance of <see cref="NpgsqlConnection"/> for the MaxiMiz database
         /// </summary>
+        /// <returns></returns>
         public IDbConnection GetConnection => new NpgsqlConnection(_configuration.GetConnectionString("MaxiMizDatabase"));
 
         /// <summary>
         /// Returns a new instance of <see cref="QueueClient"/> for the MaxiMiz service bus
         /// </summary>
+        /// <returns></returns>
         public IQueueClient GetQueueClient => new QueueClient(_configuration.GetConnectionString("MaxiMizServiceBus"), "testqueue");
 
+        /// <summary>
+        /// Inserts a new campaign group and campaigns into the database and sends commands to the service bus.
+        /// </summary>
+        /// <param name="campaignGroup">Model to insert</param>
+        /// <returns></returns>
         public async Task CreateGroup(CampaignGroup campaignGroup)
         {
             // SQL query to insert campaign group and select inserted row ID
@@ -127,7 +134,7 @@ namespace Maximiz.Repositories
 
                     // Send create messages to the service bus.
                     await ServiceBusQueue.SendObjectMessage(campaignGroup, CrudAction.Create);
-                    await ServiceBusQueue.SendObjectMessage(campaignsToCreate, CrudAction.Create);
+                    await ServiceBusQueue.SendObjectMessages(campaignsToCreate, CrudAction.Create);
 
                     transaction.Commit();
                 }
@@ -188,6 +195,7 @@ namespace Maximiz.Repositories
             }
         }
 
+        // TODO: Fix mapping for Dapper Contrib
         public async Task<Campaign> Update(Campaign entity)
         {
             using (IDbConnection connection = GetConnection)

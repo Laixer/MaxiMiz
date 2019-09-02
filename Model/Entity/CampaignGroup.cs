@@ -89,7 +89,7 @@ namespace Maximiz.Model.Entity
         public DateTime? EndDate { get; set; }
 
         /// <summary>
-        /// Status.
+        /// The current status of the Campaign Group.
         /// </summary>
         public Status Status { get; set; }
         public string StatusText => Status.GetEnumMemberName();

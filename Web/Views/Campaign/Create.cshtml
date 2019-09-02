@@ -127,9 +127,15 @@
             @foreach (Device device in Enum.GetValues(typeof(Device)))
             {
                 <div class="col-sm-12">
-                    <input id="device_@device" type="checkbox" name="@Html.IdFor(m => m.Devices)" value="@device" @(Model != null && Model.Devices.Contains(@device) ? "checked" : "") />
+                    <input id="device_@device" type="checkbox" name="@Html.IdFor(m => m.Devices)" value="@device" @(Model != null && Model.Devices != null && Model.Devices.Contains(@device) ? "checked" : "") />
                     <span>@device</span>
                 </div>
+            }
+            @if (Model != null && Model.Devices == null)
+            {
+                <span class="text-danger">
+                    <span id="Device-error" class="">Please select 1 or more devices.</span>
+                </span>
             }
         </div>
 
@@ -151,9 +157,15 @@
             @foreach (OS os in Enum.GetValues(typeof(OS)))
             {
                 <div class="col-sm-12">
-                    <input id="os_@os" type="checkbox" name="@Html.IdFor(m => m.OperatingSystems)" value="@os" @(Model != null && Model.OperatingSystems.Contains(@os) ? "checked" : "") />
+                    <input id="os_@os" type="checkbox" name="@Html.IdFor(m => m.OperatingSystems)" value="@os" @(Model != null && Model.OperatingSystems != null && Model.OperatingSystems.Contains(@os) ? "checked" : "") />
                     <span>@os.ToString()</span>
                 </div>
+            }
+            @if (Model != null && Model.OperatingSystems == null)
+            {
+                <span class="text-danger">
+                    <span id="Os-error" class="">Please select 1 or more operating systems.</span>
+                </span>
             }
         </div>
 
@@ -163,9 +175,15 @@
             @foreach (Connection con in Enum.GetValues(typeof(Connection)))
             {
                 <div class="col-sm-12">
-                    <input id="con_@con" type="checkbox" name="@Html.IdFor(m => m.Connections)" value="@con" @(Model != null && Model.Connections.Contains(@con) ? "checked" : "") />
+                    <input id="con_@con" type="checkbox" name="@Html.IdFor(m => m.Connections)" value="@con" @(Model != null && Model.Connections != null && Model.Connections.Contains(@con) ? "checked" : "") />
                     <span>@con.ToString()</span>
                 </div>
+            }
+            @if (Model != null && Model.Connections == null)
+            {
+                <span class="text-danger">
+                    <span id="Connection-error" class="">Please select 1 or more connections.</span>
+                </span>
             }
         </div>
 

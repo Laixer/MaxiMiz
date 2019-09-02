@@ -46,12 +46,16 @@ namespace Maximiz.InputModels
         /// <summary>
         /// Targeted devices.
         /// </summary>
+        [Required]
+        [MinLength(1)]
         [Display(Name = "Targeted Devices")]
         public Device[] Devices { get; set; }
 
         /// <summary>
         /// Targeted operating systems.
         /// </summary>
+        [Required]
+        [MinLength(1)]
         [Display(Name = "Operating Systems")]
         public OS[] OperatingSystems { get; set; }
 
@@ -126,7 +130,7 @@ namespace Maximiz.InputModels
         /// Returns a new <see cref="CampaignGroup"></see> model from an existing <see cref="CampaignGroupInputModel"></see> instance.
         /// </summary>
         /// <returns></returns>
-        public CampaignGroup ToModel()
+        public CampaignGroup ToEntityModel()
         {
             return new CampaignGroup
             {

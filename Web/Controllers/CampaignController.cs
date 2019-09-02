@@ -76,7 +76,7 @@ namespace Maximiz.Controllers
                 return View(input);
             }
 
-            CampaignGroup group = input.ToModel();
+            CampaignGroup group = input.ToEntityModel();
 
             await _campaignRepo.CreateGroup(group);
 

@@ -56,7 +56,7 @@ namespace Maximiz.ServiceBus
         /// <param name="entities"></param>
         /// <param name="crudAction"></param>
         /// <returns></returns>
-        public static async Task SendObjectMessage(IEnumerable<Entity> entities, CrudAction crudAction)
+        public static async Task SendObjectMessages(IEnumerable<Entity> entities, CrudAction crudAction)
         {
             foreach (Entity e in entities.AsParallel())
             {

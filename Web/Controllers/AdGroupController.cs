@@ -26,7 +26,17 @@ namespace Maximiz.Controllers
         [HttpGet]
         public IActionResult Create()
         {
-            return View();
+            // Create an empty model for the first time loading the create form.
+            var emptyModel = new AdGroupInputModel
+            {
+                AdItems = new List<AdItemInputModel>()
+            };
+
+            // Initially add 5 empty ad items, to be viewed within the create form.
+            for (int i = 0; i < 5; ++i)
+                emptyModel.AdItems.Add(new AdItemInputModel());
+
+            return View(emptyModel);
         }
 
         /// <summary>
@@ -47,6 +57,9 @@ namespace Maximiz.Controllers
             {
                 return View(model);
             }
+
+            // Remove empty ads before sending the model
+            model.AdItems.RemoveAll(x => string.IsNullOrEmpty(x.Title) && string.IsNullOrEmpty(x.Content));
 
             await _adGroupRepository.CreateGroup(model);
 
