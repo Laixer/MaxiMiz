@@ -24,6 +24,7 @@ namespace Maximiz.Repositories.Interfaces
         /// Create a new campaign group.
         /// </summary>
         /// <param name="entity">A campaign group entity</param>
+        /// <returns></returns>
         Task CreateGroup(CampaignGroup entity);
     }
 }

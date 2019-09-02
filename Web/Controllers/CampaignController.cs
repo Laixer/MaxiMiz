@@ -83,6 +83,7 @@ namespace Maximiz.Controllers
             return RedirectToAction("Overview");
         }
 
+        // TODO Remove, temporary page for quickly creating a model with a prefilled  form
         public IActionResult CreateTest(string name)
         {
             return View("Create", new CampaignGroupInputModel()

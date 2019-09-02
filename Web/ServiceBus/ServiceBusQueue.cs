@@ -53,8 +53,8 @@ namespace Maximiz.ServiceBus
         /// <summary>
         /// Sends <see cref="CreateOrUpdateObjectsMessage"></see> messages for each entity in the given collection to the MaxiMiz Service Bus.
         /// </summary>
-        /// <param name="entities"></param>
-        /// <param name="crudAction"></param>
+        /// <param name="entities">A collection of entities</param>
+        /// <param name="crudAction">The action of the message to send for each entity</param>
         /// <returns></returns>
         public static async Task SendObjectMessages(IEnumerable<Entity> entities, CrudAction crudAction)
         {

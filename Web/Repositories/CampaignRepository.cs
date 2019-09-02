@@ -31,7 +31,6 @@ namespace Maximiz.Repositories
         /// <summary>
         /// Returns a new instance of <see cref="NpgsqlConnection"/> for the MaxiMiz database
         /// </summary>
-        /// <returns></returns>
         public IDbConnection GetConnection => new NpgsqlConnection(_configuration.GetConnectionString("MaxiMizDatabase"));
 
         /// <summary>
@@ -50,12 +49,13 @@ namespace Maximiz.Repositories
             // SQL query to insert campaign group and select inserted row ID
             var sql_group_insert = @" 
             INSERT INTO PUBLIC.campaign_group
-                (NAME, branding_text, location_include, location_exclude, language, device, os, initial_cpc, budget, budget_daily, budget_model, delivery, bid_strategy, start_date, end_date, connection)
+                (NAME, branding_text, location_include, location_exclude, language, language_as_text, device, os, initial_cpc, budget, budget_daily, budget_model, delivery, bid_strategy, start_date, end_date, connection)
                 VALUES  (
                     @Name,
                     @BrandingText,
                     @LocationInclude, @LocationExclude,
-                    '{NL}', @Device, @OS,
+                    '{NL}', 
+                    @Language, @Device, @OS,
                     @InitialCPC,
                     @Budget, @DailyBudget, @BudgetModelText::budget_model,
                     @DeliveryText::delivery,
@@ -102,7 +102,7 @@ namespace Maximiz.Repositories
                         campaign.Os = new OS[] { os };
                         campaign.LocationInclude = new int[1] { location };
 
-                        campaign.Name = CampaignNameGenerator.Generate(campaignGroup.Name, campaign.Language, location.ToString(), os, device);
+                        campaign.Name = CampaignNameGenerator.Generate(campaignGroup.Name, campaign.Language[0], location.ToString(), os, device);
 
                         campaignsToCreate.Add(campaign);
                     });

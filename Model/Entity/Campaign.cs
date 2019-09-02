@@ -28,7 +28,9 @@ namespace Maximiz.Model.Entity
         /// Language of the campaign, 2 chars.
         /// TODO Why do we need this?
         /// </summary>
-        public string Language { get; set; }
+        //public string Language { get; set; }
+        // TODO Change back to string after db table fix.
+        public string[] Language { get; set; }
 
         /// <summary>
         /// Delivery mode of this ad.
@@ -149,7 +151,7 @@ namespace Maximiz.Model.Entity
                 BrandingText = group.BrandingText,
                 LocationInclude = group.LocationInclude,
                 LocationExclude = group.LocationExclude,
-                Language = group.Language,
+                Language = new string[] { group.Language },
                 InitialCpc = group.InitialCpc,
                 Budget = group.Budget,
                 DailyBudget = group.DailyBudget,
