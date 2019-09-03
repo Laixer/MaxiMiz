@@ -88,7 +88,7 @@ namespace Poller.OAuth
         }
 
         /// <summary>
-        /// Send OAuth authorize request.
+        /// Send OAuth authorization request.
         /// </summary>
         /// <param name="grantType">Grant type.</param>
         /// <param name="tokenUri">Endpoint.</param>
