@@ -31,7 +31,18 @@ namespace Poller
         /// </summary>
         private readonly OAuthAuthorizationProvider _authorizationProvider;
 
-        public HttpManager(string baseUrl) => _baseUrl = baseUrl;
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        /// <param name="uris">Contains our url 
+        /// and endpoints</param>
+        /// <param name="authorizationProvider">
+        /// Contains our client credentials</param>
+        public HttpManager(Uris uris, OAuthAuthorizationProvider authorizationProvider)
+        {
+            _uris = uris;
+            _authorizationProvider = authorizationProvider;
+        }
 
         /// <summary>
         /// Create or reuse an OAuthHttpClient, with our
