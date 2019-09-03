@@ -7,8 +7,6 @@ using System.Threading.Tasks;
 
 namespace Poller.OAuth
 {
-    public partial class OAuthHttpClient : HttpClient
-    {
         protected OAuthTicket ticket;
 
         public string AuthorizeUri { get; set; }
@@ -30,6 +28,8 @@ namespace Poller.OAuth
     /// This actually sends our requests with integrated
     /// authorization.
     /// </summary>
+    internal class OAuthHttpClient : HttpClient
+    {
 
         protected async Task AttachTokenAuthentication(HttpRequestMessage httpRequest)
         {
