@@ -90,7 +90,8 @@ namespace Poller
         public async Task RemoteExecuteAsync(string url, HttpContent content, 
             CancellationToken cancellationToken)
         {
-            using (var httpResponse = await BuildHttpClient().PostAsync(url, content, cancellationToken))
+            using (var httpResponse = await BuildAuthorizedHttpClient().PostAsync(
+                url, content, cancellationToken))
             {
                 httpResponse.EnsureSuccessStatusCode();
             }
