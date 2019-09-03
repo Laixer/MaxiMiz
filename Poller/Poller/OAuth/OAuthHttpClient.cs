@@ -113,14 +113,16 @@ namespace Poller.OAuth
         }
 
         /// <summary>
-        /// Send OAuth refresh token request.
+        /// Send an OAuth refresh token request.
         /// </summary>
         /// <param name="grantType">Grant type.</param>
         /// <param name="tokenUri">Endpoint.</param>
-        /// <returns><see cref="OAuthTicket"/>.</returns>
-        protected async virtual Task<OAuthTicket> SendTokenRefreshRequestAsync(string grantType = OAuthGrantType.RefreshToken, string refreshUri = null)
+        /// <returns>Task with ticket</returns>
+        protected async virtual Task<OAuthTicket> SendTokenRefreshRequestAsync(
+            string grantType = OAuthGrantType.RefreshToken, string refreshUri = null)
         {
-            using (var httpRequest = new HttpRequestMessage(HttpMethod.Post, refreshUri ?? RefreshUri)
+            using (var httpRequest = new HttpRequestMessage(HttpMethod.Post, 
+                refreshUri ?? _uris.RefreshEndpoint)
             {
                 Content = new FormUrlEncodedContent(
                     new Dictionary<string, string>(_credentials)
