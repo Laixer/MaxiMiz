@@ -1,4 +1,5 @@
 using Poller.Helper;
+using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -10,7 +11,8 @@ namespace Poller.OAuth
 
     /// <summary>
     /// This actually sends our requests with integrated
-    /// authorization.
+    /// authorization. All requests will be sent to the 
+    /// base url, which is set in the <see cref="Uris"/>.
     /// </summary>
     internal class OAuthHttpClient : HttpClient
     {
