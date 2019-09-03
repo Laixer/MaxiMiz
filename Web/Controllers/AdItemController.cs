@@ -16,9 +16,14 @@ namespace Maximiz.Controllers
             _adItemRepo = adItemRepository;
         }
 
+        // GET: /AdItem
+        /// <summary>
+        /// Index page which redirects to the overview.
+        /// </summary>
+        /// <returns></returns>
         public IActionResult Index()
         {
-            return View();
+            return RedirectToAction("Overview");
         }
         
         // TODO Change method

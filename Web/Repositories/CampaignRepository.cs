@@ -4,7 +4,6 @@ using Maximiz.InputModels.Campaigns;
 using Maximiz.Model;
 using Maximiz.Model.Entity;
 using Maximiz.Model.Enums;
-using Maximiz.Model.Protocol;
 using Maximiz.Repositories.Interfaces;
 using Maximiz.ServiceBus;
 using Microsoft.Azure.ServiceBus;
@@ -13,8 +12,6 @@ using Npgsql;
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.IO;
-using System.Runtime.Serialization.Formatters.Binary;
 using System.Threading.Tasks;
 
 namespace Maximiz.Repositories
@@ -141,7 +138,7 @@ namespace Maximiz.Repositories
 
                     transaction.Commit();
                 }
-                catch(Exception)
+                catch (Exception)
                 {
                     transaction.Rollback();
                     throw;

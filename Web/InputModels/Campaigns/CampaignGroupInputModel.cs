@@ -123,7 +123,7 @@ namespace Maximiz.InputModels
         public string Utm { get; set; }
 
         /// <summary>
-        /// Connections.
+        /// Supported connections.
         /// </summary>
         public Connection[] Connections { get; set; }
 
