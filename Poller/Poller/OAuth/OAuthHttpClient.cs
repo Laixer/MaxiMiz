@@ -52,6 +52,8 @@ namespace Poller.OAuth
                 {OAuthGrantType.ClientId, _authorizationProvider.ClientId},
                 {OAuthGrantType.ClientSecret, _authorizationProvider.ClientSecret},
             };
+
+            BaseAddress = _uris.GetBaseAsUri();
         }
 
         /// <summary>
