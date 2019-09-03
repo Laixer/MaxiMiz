@@ -28,7 +28,7 @@
             <div class="list-group list-group-flush">
                 <a href="/" class="list-group-item list-group-item-action @(Context.Request.Path.Value.Equals("/") ? "active" : "")">Dashboard</a>
                 <a href="/Campaign" class="list-group-item list-group-item-action @(Context.Request.Path.Value.StartsWith("/Campaign") ? "active" : "")">Campaigns</a>
-                <a href="#" class="list-group-item list-group-item-action @(Context.Request.Path.Value.StartsWith("/Ad") ? "active" : "")">Advertisements</a>
+                <a href="/Advertisements" class="list-group-item list-group-item-action @(Context.Request.Path.Value.StartsWith("/Ad") ? "active" : "")">Advertisements</a>
                 <a href="#" class="list-group-item list-group-item-action @(Context.Request.Path.Value.StartsWith("/Rules") ? "active" : "")">Rules</a>
                 <a href="#" class="list-group-item list-group-item-action @(Context.Request.Path.Value.StartsWith("/Targeting") ? "active" : "")">Targeting lists</a>
             </div>

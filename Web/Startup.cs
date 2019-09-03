@@ -38,6 +38,7 @@ namespace Maximiz
 
             services.AddTransient<ICampaignRepository, CampaignRepository>();
             services.AddTransient<IAdGroupRepository, AdGroupRepository>();
+            services.AddTransient<IAdItemRepository, AdItemRepository>();
 
             // TODO
             ServiceBusQueue.Configure(Configuration);

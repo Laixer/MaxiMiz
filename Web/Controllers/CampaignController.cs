@@ -8,7 +8,6 @@ using System.Threading.Tasks;
 
 namespace Maximiz.Controllers
 {
-    // TODO make methods asynchronous (busy)
     public class CampaignController : Controller
     {
         private readonly ICampaignRepository _campaignRepo;
