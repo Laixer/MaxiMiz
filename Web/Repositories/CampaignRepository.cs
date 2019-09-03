@@ -19,6 +19,9 @@ using System.Threading.Tasks;
 
 namespace Maximiz.Repositories
 {
+    /// <summary>
+    /// Repository layer for operations related to <see cref="Campaign"></see> data.
+    /// </summary>
     public class CampaignRepository : ICampaignRepository
     {
         private readonly IConfiguration _configuration;

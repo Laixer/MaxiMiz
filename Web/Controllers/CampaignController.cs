@@ -8,6 +8,9 @@ using System.Threading.Tasks;
 
 namespace Maximiz.Controllers
 {
+    /// <summary>
+    /// Controller for requests related to Campaigns.
+    /// </summary>
     public class CampaignController : Controller
     {
         private readonly ICampaignRepository _campaignRepo;

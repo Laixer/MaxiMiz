@@ -4,17 +4,18 @@ using Maximiz.Model;
 using Maximiz.Model.Entity;
 using Maximiz.Repositories.Interfaces;
 using Maximiz.ServiceBus;
-using Microsoft.Azure.ServiceBus;
 using Microsoft.Extensions.Configuration;
 using Npgsql;
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace Maximiz.Repositories
 {
+    /// <summary>
+    /// Repository layer for operations related to <see cref="AdGroup"></see> data.
+    /// </summary>
     public class AdGroupRepository : IAdGroupRepository
     {
         private readonly IConfiguration _configuration;
@@ -37,7 +38,7 @@ namespace Maximiz.Repositories
         public async Task CreateGroup(AdGroupInputModel adGroupInput)
         {
             // TODO Ensure these are the correct columns and properties to insert
-            
+
             // TODO For later: Must link adgroup/ads to a campaign
             var sql_group_insert = @"
                 INSERT INTO public.ad_group(
@@ -81,16 +82,16 @@ namespace Maximiz.Repositories
 
                 try
                 {
-                    // Create a new AdGroup record.
+                    // Create a new AdGroup record in the database
                     int newAdGroupId = await connection.ExecuteScalarAsync<int>(sql_group_insert, adGroup, transaction: transaction);
 
-                    // Insert the generated campaigns.
+                    // Insert the generated ads
                     foreach (AdItem adItem in adItemsToCreate)
                     {
-                        // Add the ID from the newly inserted Ad Group.
+                        // Add the ID from the newly inserted Ad Group
                         adItem.AdGroup = newAdGroupId;
-                    
-                        // Insert Ad Item.
+
+                        // Insert Ad Item into database table
                         await connection.ExecuteAsync(sql_ad_item_insert, adItem, transaction: transaction);
                     }
 
@@ -104,6 +105,7 @@ namespace Maximiz.Repositories
                 }
                 catch
                 {
+                    // In case of any exceptions, rollback any changes made within the database.
                     transaction.Rollback();
                     throw;
                 }

@@ -1,10 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Maximiz.Model.Entity;
 
 namespace Maximiz.InputModels
 {
+    /// <summary>
+    /// An model containing the user based input for a single <see cref="AdItem"></see>
+    /// </summary>
     public class AdItemInputModel
     {
         /// <summary>

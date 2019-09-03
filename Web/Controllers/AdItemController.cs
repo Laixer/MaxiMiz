@@ -1,15 +1,18 @@
-﻿using System.Threading.Tasks;
+﻿using Maximiz.Repositories.Interfaces;
 using Microsoft.AspNetCore.Mvc;
-using Maximiz.Repositories;
-using Maximiz.Repositories.Interfaces;
+using System.Threading.Tasks;
 
 namespace Maximiz.Controllers
 {
+    /// <summary>
+    /// Controller for requests related to Ad Items.
+    /// </summary>
     public class AdItemController : Controller
     {
         private readonly IAdItemRepository _adItemRepo;
 
-        public AdItemController(IAdItemRepository adItemRepository) {
+        public AdItemController(IAdItemRepository adItemRepository)
+        {
             _adItemRepo = adItemRepository;
         }
 
@@ -17,7 +20,13 @@ namespace Maximiz.Controllers
         {
             return View();
         }
-
+        
+        // TODO Change method
+        // GET: /Advertisements
+        /// <summary>
+        /// (Temporary) action for displaying an overview of advertisements.
+        /// </summary>
+        /// <returns></returns>
         [Route("Advertisements")]
         public async Task<IActionResult> Overview()
         {

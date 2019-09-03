@@ -10,6 +10,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Maximiz.Controllers
 {
+    /// <summary>
+    /// Controller for handling requests related to Ad Groups.
+    /// </summary>
     public class AdGroupController : Controller
     {
         private readonly IAdGroupRepository _adGroupRepository;
@@ -19,6 +22,7 @@ namespace Maximiz.Controllers
             _adGroupRepository = adGroupRepository;
         }
 
+        // GET: /AdGroup/Create
         /// <summary>
         /// The Create page for creating a new <see cref="AdGroup"></see>
         /// </summary>
@@ -39,6 +43,7 @@ namespace Maximiz.Controllers
             return View(emptyModel);
         }
 
+        // POST: /AdGroup/Create
         /// <summary>
         /// <para>
         /// Creates and inserts an <see cref="AdGroup"></see> entity into the database.
@@ -63,7 +68,7 @@ namespace Maximiz.Controllers
 
             await _adGroupRepository.CreateGroup(model);
 
-            // TODO: Determine where to redirect after a succesful Ad Group creation.
+            // TODO: Determine where to redirect after a succesful Ad Group creation. (AdGroup overview?)
             return RedirectToAction("Index", "Home");
         }
     }

@@ -1,12 +1,13 @@
-﻿using Maximiz.Model.Enums;
-using Microsoft.AspNetCore.Mvc.Rendering;
+﻿using Maximiz.Model.Entity;
+using Maximiz.Model.Enums;
 using System;
-using System.Linq;
 using System.ComponentModel.DataAnnotations;
-using Maximiz.Model.Entity;
 
 namespace Maximiz.InputModels
 {
+    /// <summary>
+    /// A model containing the user based input for a single <see cref="Campaign"></see> entity.
+    /// </summary>
     public class CampaignGroupInputModel
     {
         /// <summary>

@@ -12,6 +12,9 @@ using System.Threading.Tasks;
 
 namespace Maximiz.ServiceBus
 {
+    /// <summary>
+    /// Class for sending messages to the MaxiMiz™ Service Bus.
+    /// </summary>
     public class ServiceBusQueue
     {
         private static IConfiguration _configuration;

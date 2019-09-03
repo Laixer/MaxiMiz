@@ -10,6 +10,9 @@ using System.Threading.Tasks;
 
 namespace Maximiz.Repositories
 {
+    /// <summary>
+    ///  Repository layer for operations related to <see cref="AdItem"></see> data.
+    /// </summary>
     public class AdItemRepository : IAdItemRepository
     {
         private readonly IConfiguration _configuration;

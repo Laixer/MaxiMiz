@@ -1,8 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using Maximiz.Model.Entity;
 
 namespace Maximiz.InputModels
 {
+    /// <summary>
+    /// A model containing the user based input for a single <see cref="AdGroup"></see> entity.
+    /// </summary>
     public class AdGroupInputModel
     {
         /// <summary>
