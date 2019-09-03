@@ -1,5 +1,9 @@
 ﻿namespace Poller.Model
 {
+
+    /// <summary>
+    /// Contains our client credentials and tokens.
+    /// </summary>
     public class OAuth2
     {
         /// <summary>
