@@ -53,6 +53,7 @@ namespace Poller.OAuth
         }
 
         /// <summary>
+        /// This invokes functions that add authentication and send the request.
         /// </summary>
         /// <param name="request">Http request"</param>
         /// <param name="cancellationToken">Cancellation token.</param>
