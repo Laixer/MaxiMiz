@@ -103,6 +103,7 @@ namespace Poller.OAuth
                 _ticket = await SendTokenRefreshRequestAsync();
             }
 
+            // Attach the bearer token to the request
             httpRequest.Headers.Authorization = new AuthenticationHeaderValue(
                 OAuthAuthenticationType.Bearer, _ticket.AccessToken);
         }
@@ -116,7 +117,7 @@ namespace Poller.OAuth
         protected async virtual Task<OAuthTicket> SendAuthorizeRequestAsync(
             string grantType, string tokenUri = null)
         {
-            using (var httpRequest = new HttpRequestMessage(HttpMethod.Post, 
+            using (var httpRequest = new HttpRequestMessage(HttpMethod.Post,
                 tokenUri ?? _uris.TokenEndpoint)
             {
                 Content = new FormUrlEncodedContent
@@ -142,7 +143,7 @@ namespace Poller.OAuth
         protected async virtual Task<OAuthTicket> SendTokenRefreshRequestAsync(
             string grantType = OAuthGrantType.RefreshToken, string refreshUri = null)
         {
-            using (var httpRequest = new HttpRequestMessage(HttpMethod.Post, 
+            using (var httpRequest = new HttpRequestMessage(HttpMethod.Post,
                 refreshUri ?? _uris.RefreshEndpoint)
             {
                 Content = new FormUrlEncodedContent(
