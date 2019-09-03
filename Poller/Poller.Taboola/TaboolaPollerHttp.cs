@@ -13,16 +13,17 @@ namespace Poller.Taboola
 {
 
     /// <summary>
-    /// This is the part of our Taboola Poller that
-    /// uses http. All outgoing requests are placed
-    /// within this file.
+    /// This is the part of our Taboola Poller that uses http. All outgoing 
+    /// requests are placed within this file. All http requests are handled
+    /// by our <see cref="HttpManager"/>.
     /// </summary>
     internal partial class TaboolaPoller
     {
 
         /// <summary>
-        /// Gets the Top Campaign Reports for a specific date as specified
-        /// in the Backstage documentation, deserializes them and  inserts them into the database
+        /// Gets the Top Campaign Reports for a specific date as specified in 
+        /// the Backstage documentation, deserializes them and inserts them 
+        /// into the database.
         /// </summary>
         private Task<EntityList<AdItemCoResult>> GetTopCampaignReportAsync(string account, CancellationToken token)
         {
@@ -96,13 +97,12 @@ namespace Poller.Taboola
         }
 
         /// <summary>
-        /// Query all campaign items for a given campaign
-        /// from the Taboola API.
+        /// Query all campaign items for a given campaign from the Taboola API.
         /// </summary>
         /// <param name="account">Account name</param>
         /// <param name="campaign">Campaign id name</param>
         /// <param name="token">Cancellation token</param>
-        /// <returns></returns>
+        /// <returns>Task with entity list of ad items</returns>
         private Task<EntityList<AdItem>> GetCampaignAllItems(
             string account, string campaign, CancellationToken token)
         {
@@ -120,15 +120,14 @@ namespace Poller.Taboola
         }
 
         /// <summary>
-        /// Run the remote query and catch all exceptions 
-        /// before letting them propagate upwards.
+        /// Run the remote query and catch all exceptions  before letting them 
+        /// propagate upwards.
         /// </summary>
         /// <typeparam name="TResult"></typeparam>
         /// <param name="method">HTTP method.</param>
-        /// <param name="url">API endpoint.</param>
-        /// <param name="cancellationToken">Cancellation 
-        /// token.</param>
-        /// <returns>Task with of TResult object</returns>
+        /// <param name="endpoint">API endpoint.</param>
+        /// <param name="cancellationToken">Cancellation token.</param>
+        /// <returns>Task with TResult object</returns>
         protected async Task<TResult> RemoteQueryAndLogAsync
             <TResult>(HttpMethod method, string url,
             CancellationToken cancellationToken)
@@ -153,10 +152,12 @@ namespace Poller.Taboola
         /// Run the remote execute and catch all exceptions where before letting
         /// them propagate upwards.
         /// </summary>
-        /// <param name="url">API endpoint.</param>
-        /// <param name="content">Post content.</param>
-        /// <param name="cancellationToken">Cancellation token.</param>
         protected async Task RemoteExecuteAndLogAsync<TResult>(string url, string content, CancellationToken cancellationToken)
+        /// <param name="method">Http method</param>
+        /// <param name="endpoint">API endpoint</param>
+        /// <param name="content">Http content</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Task</returns>
         {
             cancellationToken.ThrowIfCancellationRequested();
 
