@@ -15,23 +15,11 @@ namespace Poller.OAuth
     internal class OAuthHttpClient : HttpClient
     {
 
-        protected async Task AttachTokenAuthentication(HttpRequestMessage httpRequest)
-        {
-            if (ticket == null)
-            {
-                ticket = await SendAuthorizeRequestAsync("password");
-            }
-            else if (!ticket.IsValid)
-            {
-                ticket = await SendTokenRefreshRequestAsync();
-            }
         /// <summary>
         /// The authorization ticket containing our tokens.
         /// </summary>
         private OAuthTicket _ticket;
 
-            httpRequest.Headers.Authorization = new AuthenticationHeaderValue(OAuthAuthenticationType.Bearer, ticket.AccessToken);
-        }
         /// <summary>
         /// Contains our url and token endpoints.
         /// </summary>
@@ -79,15 +67,30 @@ namespace Poller.OAuth
 
         /// <summary>
         /// Build the OAuth request structure.
+        /// This checks if our authorization ticket exists and 
+        /// is still valid and gets us a new one if it isn't.
+        /// After that the ticket is attached to the request.
         /// </summary>
         /// <returns>Key value pair.</returns>
         protected virtual Dictionary<string, string> BuildAuthorizeRequest()
+        /// <param name="httpRequest">The request</param>
+        /// <returns>The request with authentication</returns>
+        protected async Task AttachTokenAuthentication(HttpRequestMessage httpRequest)
         {
-            return new Dictionary<string, string>
+            if (_ticket == null)
             {
                 {OAuthGrantType.ClientId, AuthorizationProvider.ClientId},
                 {OAuthGrantType.ClientSecret, AuthorizationProvider.ClientSecret},
             };
+                _ticket = await SendAuthorizeRequestAsync("password");
+            }
+            else if (!_ticket.IsValid)
+            {
+                _ticket = await SendTokenRefreshRequestAsync();
+            }
+
+            httpRequest.Headers.Authorization = new AuthenticationHeaderValue(
+                OAuthAuthenticationType.Bearer, _ticket.AccessToken);
         }
 
         /// <summary>
