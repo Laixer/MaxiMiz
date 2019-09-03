@@ -88,16 +88,19 @@ namespace Poller
         /// 
         /// TODO What can our status codes be?
         /// </summary>
-        public async Task RemoteExecuteAsync(string url, HttpContent content, 
         /// <param name="method">Http method</param>
         /// <param name="endpoint">Endpoint url without the base</param>
         /// <param name="content">Http content</param>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns></returns>
+        public async Task RemoteExecuteAsync(
+            HttpMethod method, string endpoint, HttpContent content, 
             CancellationToken cancellationToken)
         {
-            using (var httpResponse = await BuildAuthorizedHttpClient().PostAsync(
-                url, content, cancellationToken))
+            var request = new HttpRequestMessage(method, endpoint);
+            request.Content = content;
+            using (var httpResponse = await BuildAuthorizedHttpClient().
+                SendAsync(request, cancellationToken))
             {
                 httpResponse.EnsureSuccessStatusCode();
             }
