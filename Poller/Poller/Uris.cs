@@ -40,6 +40,14 @@ namespace Poller
             TokenEndpoint = tokenEndpoint;
             RefreshEndpoint = refreshEndpoint;
         }
+
+        /// <summary>
+        /// Convert base URL to URI.
+        /// </summary>
+        public Uri GetBaseAsUri()
+        {
+            return new Uri(BaseUrl);
+        }
                
     }
 }
