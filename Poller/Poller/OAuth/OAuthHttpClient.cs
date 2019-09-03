@@ -36,17 +36,11 @@ namespace Poller.OAuth
         private readonly Dictionary<string, string> _credentials;
 
         /// <summary>
-        /// Redirect all calls to internal sender.
         /// Constructor which sets our default headers.
         /// </summary>
-        /// <param name="request">Http request, see <see cref="HttpRequestMessage"/>.</param>
-        /// <param name="cancellationToken">Cancellation token.</param>
-        /// <returns><see cref="HttpResponseMessage"/>.</returns>
-        public override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         /// <param name="uris">Base url and token endpoints</param>
         public OAuthHttpClient(Uris uris, OAuthAuthorizationProvider authorizationProvider)
         {
-            return SendInternalAsync(request, cancellationToken);
             _uris = uris;
             _authorizationProvider = authorizationProvider;
             DefaultRequestHeaders.UserAgent.ParseAdd("Poller.Host");
@@ -59,13 +53,15 @@ namespace Poller.OAuth
         }
 
         /// <summary>
-        /// Redirect all calls to internal sender.
         /// </summary>
-        /// <param name="request">Http request, see <see cref="HttpRequestMessage"/>.</param>
-        /// <returns><see cref="HttpResponseMessage"/>.</returns>
-        public new Task<HttpResponseMessage> SendAsync(HttpRequestMessage request)
+        /// <param name="request">Http request"</param>
+        /// <param name="cancellationToken">Cancellation token.</param>
+        /// <returns><see cref="HttpResponseMessage"/>The response</returns>
+        public override async Task<HttpResponseMessage> SendAsync(
+            HttpRequestMessage request, CancellationToken cancellationToken)
         {
-            return SendInternalAsync(request, default);
+            await AttachTokenAuthentication(request).ConfigureAwait(false);
+            return await base.SendAsync(request, cancellationToken);
         }
 
         /// <summary>
