@@ -152,24 +152,26 @@ namespace Poller.Taboola
         /// Run the remote execute and catch all exceptions where before letting
         /// them propagate upwards.
         /// </summary>
-        protected async Task RemoteExecuteAndLogAsync<TResult>(string url, string content, CancellationToken cancellationToken)
         /// <param name="method">Http method</param>
         /// <param name="endpoint">API endpoint</param>
         /// <param name="content">Http content</param>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Task</returns>
+        protected async Task RemoteExecuteAndLogAsync<TResult>(
+            HttpMethod method, string endpoint, HttpContent content, 
+            CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
 
             try
             {
-                _logger.LogTrace($"Executing {url}");
+                _logger.LogTrace($"Executing {endpoint} with content {content.ToString()}");
 
-                await _client.RemoteExecuteAsync(url, new StringContent(content), cancellationToken);
+                await _client.RemoteExecuteAsync(method, endpoint, content, cancellationToken);
             }
             catch (Exception e) when (e as OperationCanceledException == null && e as TaskCanceledException == null)
             {
-                _logger.LogError($"{url}: {e.Message}");
+                _logger.LogError($"{endpoint}: {e.Message}");
                 throw e;
             }
         }
