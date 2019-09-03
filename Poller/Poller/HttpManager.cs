@@ -73,10 +73,11 @@ namespace Poller
         /// <param name="endpoint">Endpoint</param>
         /// <param name="cancellationToken">Cancellation otken</param>
         public async Task<TResult> RemoteQueryAsync<TResult>(
-            HttpMethod method, string url, CancellationToken cancellationToken)
+            HttpMethod method, string endpoint, CancellationToken cancellationToken)
             where TResult : class
         {
-            using (var httpResponse = await BuildHttpClient().SendAsync(new HttpRequestMessage(method, url), cancellationToken))
+            using (var httpResponse = await BuildAuthorizedHttpClient().SendAsync(
+                new HttpRequestMessage(method, endpoint), cancellationToken))
             {
                 httpResponse.EnsureSuccessStatusCode();
                 return await Json.DeserializeAsync<TResult>(httpResponse);
