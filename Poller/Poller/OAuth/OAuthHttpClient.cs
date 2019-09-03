@@ -7,12 +7,7 @@ using System.Threading.Tasks;
 
 namespace Poller.OAuth
 {
-        protected OAuthTicket ticket;
 
-        public string AuthorizeUri { get; set; }
-        public string TokenUri { get; set; }
-        public string RefreshUri { get; set; }
-        public OAuthAuthorizationProvider AuthorizationProvider { get; set; }
 
         public OAuthHttpClient()
         {
@@ -41,9 +36,17 @@ namespace Poller.OAuth
             {
                 ticket = await SendTokenRefreshRequestAsync();
             }
+        /// <summary>
+        /// The authorization ticket containing our tokens.
+        /// </summary>
+        private OAuthTicket _ticket;
 
             httpRequest.Headers.Authorization = new AuthenticationHeaderValue(OAuthAuthenticationType.Bearer, ticket.AccessToken);
         }
+        /// <summary>
+        /// Contains our url and token endpoints.
+        /// </summary>
+        private readonly Uris _uris;
 
         private async Task<HttpResponseMessage> SendInternalAsync(HttpRequestMessage httpRequest, CancellationToken cancellationToken)
         {
