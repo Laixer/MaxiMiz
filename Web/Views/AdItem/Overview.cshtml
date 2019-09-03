@@ -1,4 +1,8 @@
-﻿@using Maximiz.Model.Entity
+﻿@*
+    View that lists all the existing advertisements
+*@
+
+@using Maximiz.Model.Entity
 @model IEnumerable<AdItem>
 
 @{
@@ -30,18 +34,18 @@
     </tr>
     @foreach (Maximiz.Model.Entity.AdItem ad in Model)
     {
-<tr>
-    <td><input type="checkbox" name="check_ad" id="@ad.Id" /></td>
-    <td>N/A</td>
-    <td>@ad.AdGroup</td>
-    <td>@ad.Title</td>
-    <td>@ad.Clicks</td>
-    <td>@ad.Status.ToString()</td>
-    <td>@ad.CreateDate</td>
-    <td><img style="width:100%;" src="@ad.Content" /></td>
-    <td>@ad.Url</td>
-    <td>@ad.Cpc</td>
-    <td>@ad.Impressions</td>
-</tr>
+        <tr>
+            <td><input type="checkbox" name="check_ad" id="@ad.Id" /></td>
+            <td>N/A</td>
+            <td>@ad.AdGroup</td>
+            <td>@ad.Title</td>
+            <td>@ad.Clicks</td>
+            <td>@ad.Status.ToString()</td>
+            <td>@ad.CreateDate</td>
+            <td><img style="width:100%;" src="@ad.Content" /></td>
+            <td>@ad.Url</td>
+            <td>@ad.Cpc</td>
+            <td>@ad.Impressions</td>
+        </tr>
     }
 </table>
