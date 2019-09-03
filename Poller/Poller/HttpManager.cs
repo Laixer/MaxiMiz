@@ -20,11 +20,16 @@ namespace Poller
         /// Static singleton client to manage authentication.
         /// </summary>
         private static OAuthHttpClient _client;
-        private readonly string _baseUrl;
 
-        public string TokenUri { get; set; }
-        public string RefreshUri { get; set; }
-        public OAuthAuthorizationProvider AuthorizationProvider { get; set; }
+        /// <summary>
+        /// Contains urls and endpoints.
+        /// </summary>
+        private readonly Uris _uris;
+
+        /// <summary>
+        /// Contains our client secrets and credentials.
+        /// </summary>
+        private readonly OAuthAuthorizationProvider _authorizationProvider;
 
         public HttpManager(string baseUrl) => _baseUrl = baseUrl;
 
