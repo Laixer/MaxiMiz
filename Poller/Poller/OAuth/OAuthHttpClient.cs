@@ -28,6 +28,10 @@ namespace Poller.OAuth
         private async Task<HttpResponseMessage> SendInternalAsync(HttpRequestMessage httpRequest, CancellationToken cancellationToken)
         {
             await AttachTokenAuthentication(httpRequest).ConfigureAwait(false);
+        /// <summary>
+        /// Contains our client secrets and credentials.
+        /// </summary>
+        private readonly OAuthAuthorizationProvider _authorizationProvider;
 
             return await base.SendAsync(httpRequest, cancellationToken);
         }
