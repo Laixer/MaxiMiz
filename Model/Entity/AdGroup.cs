@@ -1,4 +1,5 @@
 ﻿using System;
+using Maximiz.Model.Enums;
 
 namespace Maximiz.Model.Entity
 {
@@ -14,6 +15,11 @@ namespace Maximiz.Model.Entity
         public string Name { get; set; }
 
         /// <summary>
+        /// Uuid string of the campaign this adgroup belongs to.
+        /// </summary>
+        public string CampaignUuid { get; set; }
+
+        /// <summary>
         /// URL for all items in the group.
         /// </summary>
         public string Url { get; set; }
@@ -22,5 +28,10 @@ namespace Maximiz.Model.Entity
         /// Description for all items in the group.
         /// </summary>
         public string Description { get; set; }
+
+        /// <summary>
+        /// Indicates the (creation) status of this object.
+        /// </summary>
+        public Status Status { get; set; }
     }
 }
