@@ -1,5 +1,10 @@
 ﻿namespace Poller.OAuth
 {
+
+    /// <summary>
+    /// This contains our credentials for the
+    /// OAuth authorization.
+    /// </summary>
     public class OAuthAuthorizationProvider
     {
         /// <summary>
