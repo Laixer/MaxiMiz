@@ -48,20 +48,17 @@ namespace Poller
         /// Create or reuse an OAuthHttpClient, with our
         /// tokens included.
         /// </summary>
-        protected OAuthHttpClient BuildHttpClient(bool newInstance = false)
+        /// <param name="newInstance">Set to true to force
+        /// the creation of a new authorization client</param>
+        /// <returns>The created client.</returns>
+        internal OAuthHttpClient BuildAuthorizedHttpClient(bool newInstance = false)
         {
             if (_client != null && !newInstance)
             {
                 return _client;
             }
 
-            return _client = new OAuthHttpClient
-            {
-                BaseAddress = new Uri(_baseUrl),
-                TokenUri = TokenUri,
-                RefreshUri = RefreshUri,
-                AuthorizationProvider = AuthorizationProvider,
-            };
+            return _client = new OAuthHttpClient(_uris, _authorizationProvider);
         }
 
         /// <summary>
