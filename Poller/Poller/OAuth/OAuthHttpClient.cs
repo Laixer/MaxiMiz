@@ -65,7 +65,6 @@ namespace Poller.OAuth
         }
 
         /// <summary>
-        /// Build the OAuth request structure.
         /// This checks if our authorization ticket exists and 
         /// is still valid and gets us a new one if it isn't.
         /// After that the ticket is attached to the request.
@@ -92,10 +91,12 @@ namespace Poller.OAuth
         /// </summary>
         /// <param name="grantType">Grant type.</param>
         /// <param name="tokenUri">Endpoint.</param>
-        /// <returns><see cref="OAuthTicket"/>.</returns>
-        protected async virtual Task<OAuthTicket> SendAuthorizeRequestAsync(string grantType, string tokenUri = null)
+        /// <returns>Task with ticket</returns>
+        protected async virtual Task<OAuthTicket> SendAuthorizeRequestAsync(
+            string grantType, string tokenUri = null)
         {
-            using (var httpRequest = new HttpRequestMessage(HttpMethod.Post, tokenUri ?? TokenUri)
+            using (var httpRequest = new HttpRequestMessage(HttpMethod.Post, 
+                tokenUri ?? _uris.TokenEndpoint)
             {
                 Content = new FormUrlEncodedContent
                 (new Dictionary<string, string>(_credentials)
