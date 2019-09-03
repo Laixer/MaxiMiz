@@ -8,17 +8,6 @@ using System.Threading.Tasks;
 namespace Poller.OAuth
 {
 
-
-        public OAuthHttpClient()
-        {
-            DefaultRequestHeaders.UserAgent.ParseAdd("Poller.Host");
-        }
-
-        public OAuthHttpClient(OAuthAuthorizationProvider oAuthAuthorizationProvider)
-            : this()
-        {
-            AuthorizationProvider = oAuthAuthorizationProvider;
-        }
     /// <summary>
     /// This actually sends our requests with integrated
     /// authorization.
@@ -57,13 +46,25 @@ namespace Poller.OAuth
 
         /// <summary>
         /// Redirect all calls to internal sender.
+        /// Constructor which sets our default headers.
         /// </summary>
         /// <param name="request">Http request, see <see cref="HttpRequestMessage"/>.</param>
         /// <param name="cancellationToken">Cancellation token.</param>
         /// <returns><see cref="HttpResponseMessage"/>.</returns>
         public override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+        /// <param name="uris">Base url and token endpoints</param>
+        public OAuthHttpClient(Uris uris, OAuthAuthorizationProvider authorizationProvider)
         {
             return SendInternalAsync(request, cancellationToken);
+            _uris = uris;
+            _authorizationProvider = authorizationProvider;
+            DefaultRequestHeaders.UserAgent.ParseAdd("Poller.Host");
+
+            _credentials = new Dictionary<string, string>
+            {
+                {OAuthGrantType.ClientId, _authorizationProvider.ClientId},
+                {OAuthGrantType.ClientSecret, _authorizationProvider.ClientSecret},
+            };
         }
 
         /// <summary>
