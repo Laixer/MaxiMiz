@@ -26,6 +26,10 @@ namespace Poller.OAuth
         {
             AuthorizationProvider = oAuthAuthorizationProvider;
         }
+    /// <summary>
+    /// This actually sends our requests with integrated
+    /// authorization.
+    /// </summary>
 
         protected async Task AttachTokenAuthentication(HttpRequestMessage httpRequest)
         {
