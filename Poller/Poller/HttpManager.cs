@@ -62,15 +62,16 @@ namespace Poller
         }
 
         /// <summary>
-        /// Execute API query and return result. This function
-        /// actually communicates with the database.
+        /// Execute API query and return result. This function calls the
+        /// <see cref="OAuthHttpClient"/> which actually communicates with
+        /// the internet.
         /// </summary>
         /// <remarks>
-        /// This operations throws an exception when status is 
-        /// not HTTP.OK.
+        /// This operations throws an exception when status is not HTTP.OK.
         /// </remarks>
         /// <param name="method">HTTP method</param>
-        /// <param name="url">Endpoint</param>
+        /// <param name="endpoint">Endpoint</param>
+        /// <param name="cancellationToken">Cancellation otken</param>
         public async Task<TResult> RemoteQueryAsync<TResult>(
             HttpMethod method, string url, CancellationToken cancellationToken)
             where TResult : class
@@ -83,11 +84,16 @@ namespace Poller
         }
 
         /// <summary>
-        /// Execute API execute without retrieving result.
+        /// API execution.
+        /// 
+        /// TODO What can our status codes be?
         /// </summary>
-        /// <param name="method">HTTP method</param>
-        /// <param name="url">Endpoint</param>
         public async Task RemoteExecuteAsync(string url, HttpContent content, 
+        /// <param name="method">Http method</param>
+        /// <param name="endpoint">Endpoint url without the base</param>
+        /// <param name="content">Http content</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns></returns>
             CancellationToken cancellationToken)
         {
             using (var httpResponse = await BuildAuthorizedHttpClient().PostAsync(
