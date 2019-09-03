@@ -35,6 +35,10 @@ namespace Poller.OAuth
 
             return await base.SendAsync(httpRequest, cancellationToken);
         }
+        /// <summary>
+        /// Contains our credential key-value pairs.
+        /// </summary>
+        private readonly Dictionary<string, string> _credentials;
 
         /// <summary>
         /// Redirect all calls to internal sender.
@@ -75,17 +79,12 @@ namespace Poller.OAuth
         /// is still valid and gets us a new one if it isn't.
         /// After that the ticket is attached to the request.
         /// </summary>
-        /// <returns>Key value pair.</returns>
-        protected virtual Dictionary<string, string> BuildAuthorizeRequest()
         /// <param name="httpRequest">The request</param>
         /// <returns>The request with authentication</returns>
         protected async Task AttachTokenAuthentication(HttpRequestMessage httpRequest)
         {
             if (_ticket == null)
             {
-                {OAuthGrantType.ClientId, AuthorizationProvider.ClientId},
-                {OAuthGrantType.ClientSecret, AuthorizationProvider.ClientSecret},
-            };
                 _ticket = await SendAuthorizeRequestAsync("password");
             }
             else if (!_ticket.IsValid)
@@ -107,10 +106,11 @@ namespace Poller.OAuth
         {
             using (var httpRequest = new HttpRequestMessage(HttpMethod.Post, tokenUri ?? TokenUri)
             {
-                Content = new FormUrlEncodedContent(new Dictionary<string, string>(BuildAuthorizeRequest())
+                Content = new FormUrlEncodedContent
+                (new Dictionary<string, string>(_credentials)
                 {
-                    {OAuthGrantType.Username, AuthorizationProvider.Username},
-                    {OAuthGrantType.Password, AuthorizationProvider.Password},
+                    {OAuthGrantType.Username, _authorizationProvider.Username},
+                    {OAuthGrantType.Password, _authorizationProvider.Password},
                     {OAuthGrantType.GrantType, grantType},
                 })
             })
@@ -130,9 +130,10 @@ namespace Poller.OAuth
         {
             using (var httpRequest = new HttpRequestMessage(HttpMethod.Post, refreshUri ?? RefreshUri)
             {
-                Content = new FormUrlEncodedContent(new Dictionary<string, string>(BuildAuthorizeRequest())
+                Content = new FormUrlEncodedContent(
+                    new Dictionary<string, string>(_credentials)
                 {
-                    {OAuthGrantType.RefreshToken, ticket.RefreshToken},
+                    {OAuthGrantType.RefreshToken, _ticket.RefreshToken},
                     {OAuthGrantType.GrantType, grantType},
                 })
             })
