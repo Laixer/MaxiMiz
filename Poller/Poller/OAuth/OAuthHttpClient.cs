@@ -68,6 +68,22 @@ namespace Poller.OAuth
         }
 
         /// <summary>
+        /// This invokes functions that add authentication and send the request.
+        /// </summary>
+        /// <param name="request">Http request"</param>
+        /// <param name="cancellationToken">Cancellation token.</param>
+        /// <returns><see cref="HttpResponseMessage"/>The response</returns>
+        public async Task<HttpResponseMessage> PostAsync(
+            HttpRequestMessage request, HttpContent content,
+            CancellationToken cancellationToken)
+        {
+            request.Content = content;
+            await AttachTokenAuthentication(request).ConfigureAwait(false);
+            return await base.SendAsync(request, cancellationToken);
+        }
+
+
+        /// <summary>
         /// This checks if our authorization ticket exists and 
         /// is still valid and gets us a new one if it isn't.
         /// After that the ticket is attached to the request.
