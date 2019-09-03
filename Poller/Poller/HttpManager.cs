@@ -7,8 +7,18 @@ using Poller.OAuth;
 
 namespace Poller
 {
+
+    /// <summary>
+    /// Manages all our http requests. This class does not
+    /// sends the requests itself, but delegates this to the
+    /// <see cref="OAuthHttpClient"/> class.
+    /// </summary>
     public class HttpManager : IDisposable
     {
+
+        /// <summary>
+        /// Static singleton client to manage authentication.
+        /// </summary>
         private static OAuthHttpClient _client;
         private readonly string _baseUrl;
 
@@ -19,7 +29,8 @@ namespace Poller
         public HttpManager(string baseUrl) => _baseUrl = baseUrl;
 
         /// <summary>
-        /// Create or reuse an OAuthHttpClient.
+        /// Create or reuse an OAuthHttpClient, with our
+        /// tokens included.
         /// </summary>
         protected OAuthHttpClient BuildHttpClient(bool newInstance = false)
         {
@@ -38,16 +49,17 @@ namespace Poller
         }
 
         /// <summary>
-        /// Execute API call and return result. This function
+        /// Execute API query and return result. This function
         /// actually communicates with the database.
         /// </summary>
         /// <remarks>
         /// This operations throws an exception when status is 
         /// not HTTP.OK.
         /// </remarks>
-        /// <param name="method">HTTP method.</param>
-        /// <param name="url">Endpoint.</param>
-        public async Task<TResult> RemoteQueryAsync<TResult>(HttpMethod method, string url, CancellationToken cancellationToken)
+        /// <param name="method">HTTP method</param>
+        /// <param name="url">Endpoint</param>
+        public async Task<TResult> RemoteQueryAsync<TResult>(
+            HttpMethod method, string url, CancellationToken cancellationToken)
             where TResult : class
         {
             using (var httpResponse = await BuildHttpClient().SendAsync(new HttpRequestMessage(method, url), cancellationToken))
@@ -58,11 +70,12 @@ namespace Poller
         }
 
         /// <summary>
-        /// Execute API call without expecting result.
+        /// Execute API execute without retrieving result.
         /// </summary>
-        /// <param name="method">HTTP method.</param>
-        /// <param name="url">Endpoint.</param>
-        public async Task RemoteExecuteAsync(string url, HttpContent content, CancellationToken cancellationToken)
+        /// <param name="method">HTTP method</param>
+        /// <param name="url">Endpoint</param>
+        public async Task RemoteExecuteAsync(string url, HttpContent content, 
+            CancellationToken cancellationToken)
         {
             using (var httpResponse = await BuildHttpClient().PostAsync(url, content, cancellationToken))
             {
