@@ -23,6 +23,46 @@ namespace Poller.Taboola
     /// </summary>
     internal partial class TaboolaPoller
     {
+
+        /// <summary>
+        /// Gets the Top Campaign Reports for a specific date as specified in 
+        /// the Backstage documentation, deserializes them and inserts them 
+        /// into the database.
+        /// </summary>
+        private Task<EntityList<AdItemCoResult>> GetTopCampaignReportAsync(
+            string account, CancellationToken token)
+        {
+            var query = HttpUtility.ParseQueryString(string.Empty);
+            query["end_date"] = query["start_date"] = DateTime.Now.ToString("yyyy-MM-dd");
+            var endpoint = $"api/1.0/{account}/reports/top-campaign-content/dimensions/item_breakdown?{query}";
+            return RemoteQueryAndLogAsync<EntityList<AdItemCoResult>>(HttpMethod.Get, endpoint, token);
+        }
+
+        /// <summary>
+        /// Retrieves accounts from the Taboola API.
+        /// </summary>
+        /// <param name="token">Cancellation token</param>
+        /// <returns>Fetched Taboola accounts</returns>
+        private Task<EntityList<Account>> GetAllAccounts(CancellationToken token)
+        {
+            var endpoint = $"api/1.0/users/current/allowed-accounts/";
+            return RemoteQueryAndLogAsync<EntityList<Account>>(HttpMethod.Get, endpoint, token);
+        }
+
+        /// <summary>
+        /// Gets all our campaigns for a given account.
+        /// </summary>
+        /// <param name="account">The core account</param>
+        /// <param name="token">Cancellation token</param>
+        /// <returns>The campaign list</returns>
+        private Task<EntityList<Campaign>> GetAllCampaigns(
+            AccountCore account, CancellationToken token)
+        {
+            var endpoint = $"api/1.0/{account.Name}/campaigns";
+            return RemoteQueryAndLogAsync<EntityList<Campaign>>
+                (HttpMethod.Get, endpoint, token);
+        }
+
         /// <summary>
         /// Creates a new campaign in the Taboola API, based on a campaign in
         /// our database. All known parameters will be sent to Taboola.
