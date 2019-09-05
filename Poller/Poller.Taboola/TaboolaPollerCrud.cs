@@ -93,15 +93,17 @@ namespace Poller.Taboola
         }
 
         /// <summary>
-        /// This first creates the ad item, then populates it with the rest of
-        /// the specified parameters. This method can take a long time because
-        /// we have to validate whether or not the ad item was created.
+        /// This first creates the ad item, then waits for Taboola to set
+        /// the ad item status to anything but crawling. This method can 
+        /// take a long time because we have to validate whether or not 
+        /// the ad item was created. 
         /// 
-        /// TODO Might want to split this function #seperation-of-concerns.
+        /// The created ad item is converted and inserted into our own 
+        /// database after its creation.
         /// </summary>
-        /// <param name="account"></param>
-        /// <param name="adItem"></param>
-        /// <param name="token"></param>
+        /// <param name="account">The account</param>
+        /// <param name="adItem">The ad item</param>
+        /// <param name="token">The cancellation token</param>
         /// <returns></returns>
         private async Task CreateAdItem(AccountCore account,
             AdItemCore adItem, CancellationToken token)
