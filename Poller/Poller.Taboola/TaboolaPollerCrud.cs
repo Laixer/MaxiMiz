@@ -64,6 +64,20 @@ namespace Poller.Taboola
         }
 
         /// <summary>
+        /// Gets a single campaign based on its ID.
+        /// </summary>
+        /// <param name="account">The account</param>
+        /// <param name="campaign">The campaign</param>
+        /// <param name="token">The cancellation token</param>
+        /// <returns>Task</returns>
+        private Task<Campaign> GetCampaign(AccountCore account,
+            CampaignCore campaign, CancellationToken token)
+        {
+            var endpoint = $"api/1.0/{account.Name}/campaigns/{campaign.SecondaryId}";
+            return RemoteQueryAndLogAsync<Campaign>(HttpMethod.Get, endpoint, token);
+        }
+
+        /// <summary>
         /// Creates a new campaign in the Taboola API, based on a campaign in
         /// our database. All known parameters will be sent to Taboola.
         /// </summary>
