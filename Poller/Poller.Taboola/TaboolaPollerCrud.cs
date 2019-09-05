@@ -105,8 +105,8 @@ namespace Poller.Taboola
         /// <param name="adItem">The ad item</param>
         /// <param name="token">The cancellation token</param>
         /// <returns></returns>
-        private async Task CreateAdItem(AccountCore account,
-            AdItemCore adItem, CancellationToken token)
+        private async Task CreateAdItem(AccountCore account, AdItemCore adItem,
+            CancellationToken token)
         {
             // Get campaign this belongs to
             var campaignId = FetchCampaignIdFromAdItem(adItem, token).Result;
