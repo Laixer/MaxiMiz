@@ -1,5 +1,6 @@
 ﻿using Maximiz.InputModels;
 using Maximiz.Model.Entity;
+using Maximiz.Model.Enums;
 using Maximiz.Repositories.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -32,15 +33,20 @@ namespace Maximiz.Controllers
 
         // GET: /Campaign/Overview
         /// <summary>
-        /// An overview of all campaigns
+        /// An overview of all campaigns.
         /// </summary>
         /// <returns></returns>
         [HttpGet]
         public async Task<IActionResult> Overview()
         {
-            var allCampaigns = await _campaignRepo.GetAll();
+            return View(await _campaignRepo.GetAll());
+        }
 
-            return View(allCampaigns);
+        ///
+        [HttpGet]
+        public async Task<IActionResult> OverviewSorted(Order order, string type)
+        {
+            return View("Overview", await _campaignRepo.GetAll(type, order));
         }
 
         // GET: /Campaign/Details/{Id}
@@ -74,7 +80,8 @@ namespace Maximiz.Controllers
         public async Task<IActionResult> Create(CampaignGroupInputModel input)
         {
             // TODO: Validate and create model, handle possible error
-            if (!ModelState.IsValid) {
+            if (!ModelState.IsValid)
+            {
                 return View(input);
             }
 

@@ -23,15 +23,16 @@ namespace Maximiz.InputModels.Campaigns
         public static string Generate(string groupName, string language, string location, OS os, Device device)
         {
             StringBuilder sb = new StringBuilder();
+            sb.Append(groupName.ToUpper());
+            sb.Append("_");
+            sb.Append(location);
+            sb.Append("_");
             sb.Append(language.ToUpper());
             sb.Append("_");
             sb.Append(os.GetEnumMemberName().ToUpper().Substring(0, 2));
             sb.Append("_");
             sb.Append(device.GetEnumMemberName().ToUpper().Substring(0, 3));
-            sb.Append("_");
-            sb.Append(groupName.ToUpper());
-            sb.Append("_");
-            sb.Append(location);
+            
 
             return sb.ToString();
         }

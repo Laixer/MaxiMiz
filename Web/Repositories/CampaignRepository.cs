@@ -147,11 +147,17 @@ namespace Maximiz.Repositories
 
         }
 
+        
         public Task<Guid> Create(Campaign entity)
         {
             throw new NotImplementedException();
         }
 
+        /// <summary>
+        /// Delete a campaign out of the database.
+        /// </summary>
+        /// <param name="entity"> The campaign that should be deleted</param>
+        /// <returns></returns>
         public async Task Delete(Campaign entity)
         {
             using (IDbConnection connection = GetConnection)
@@ -160,6 +166,12 @@ namespace Maximiz.Repositories
             }
         }
 
+
+        /// <summary>
+        /// Get a specific campaign out the database.
+        /// </summary>
+        /// <param name="id">the id of the campaign</param>
+        /// <returns>one specific campaign in the database</returns>
         public async Task<Campaign> Get(Guid id)
         {
             using (IDbConnection connection = GetConnection)
@@ -170,17 +182,28 @@ namespace Maximiz.Repositories
             }
         }
 
-        public async Task<IEnumerable<Campaign>> GetAll()
+        /// <summary>
+        /// Get all the campaigns on the database
+        /// </summary>
+        /// <returns>All the campaigns in the database</returns>
+        public Task<IEnumerable<Campaign>> GetAll() => GetAll("Budget", Order.DESC);
+
+        public async Task<IEnumerable<Campaign>> GetAll(string query, Order order)
         {
-            // TODO: Limited to 100 and sorted by latest date desc for now
             using (IDbConnection connection = GetConnection)
             {
-                var result = await connection.QueryAsync<Campaign>(@"SELECT * FROM campaign ORDER BY create_date DESC LIMIT 100");
-                return result;
+                var orderString = order.GetEnumMemberName();
+                var sql = $"SELECT * FROM campaign ORDER BY {query} {orderString} LIMIT 100";
+                return await connection.QueryAsync<Campaign>(sql);
             }
         }
 
-        public async Task<IEnumerable<Campaign>> Search(string q)
+        /// <summary>
+        /// Search for a specific campaign in the database by name
+        /// </summary>
+        /// <param name="query">The full or part of the name of the campaign</param>
+        /// <returns>Every campaign that matches with the query</returns>
+        public async Task<IEnumerable<Campaign>> Search(string query)
         {
             using (IDbConnection connection = GetConnection)
             {
@@ -188,7 +211,7 @@ namespace Maximiz.Repositories
                 IEnumerable<Campaign> result =
                     await connection.QueryAsync<Campaign>(
                     @"SELECT * FROM campaign WHERE name ~* @SearchQuery OR branding_text ~* @SearchQuery;",
-                    new { SearchQuery = q }
+                    new { SearchQuery = query }
                     );
 
                 return result;
@@ -196,6 +219,11 @@ namespace Maximiz.Repositories
         }
 
         // TODO: Fix mapping for Dapper Contrib
+        /// <summary>
+        /// Update a campaign.
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <returns></returns>
         public async Task<Campaign> Update(Campaign entity)
         {
             using (IDbConnection connection = GetConnection)

@@ -1,4 +1,5 @@
 ﻿using Maximiz.Model.Entity;
+using Maximiz.Model.Enums;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -7,11 +8,13 @@ namespace Maximiz.Repositories.Interfaces
 {
     public interface ICampaignRepository : IEntityRepository<Campaign,Guid>
     {
+        Task<IEnumerable<Campaign>> GetAll();
+
         /// <summary>
         /// Retrieve all campaigns
         /// </summary>
         /// <returns>A list containing all the campaigns</returns>
-        Task<IEnumerable<Campaign>> GetAll();
+        Task<IEnumerable<Campaign>> GetAll(string query, Order order);
 
         /// <summary>
         /// Get campaigns that match or contain a search query

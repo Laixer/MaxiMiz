@@ -1,11 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
+using System.IO;
 using System.Threading.Tasks;
 using Maximiz.InputModels;
 using Maximiz.Model.Entity;
-using Maximiz.Repositories;
 using Maximiz.Repositories.Interfaces;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Maximiz.Controllers
@@ -37,12 +36,52 @@ namespace Maximiz.Controllers
             };
 
             // Initially add 5 empty ad items, to be viewed within the create form.
-            for (int i = 0; i < 5; ++i)
+            for (int i = 0; i < 5; i++)
+            {
                 emptyModel.AdItems.Add(new AdItemInputModel());
+            }
 
             return View(emptyModel);
         }
+        //TODO: Make this work
+        /// <summary>
+        /// Uploading a picture from the local device.
+        /// </summary>
+        /// <param name="uploadFile">The picture that needs to be uploaded</param>
+        /// <returns>A view with the picture that you uploaded</returns>
+        [HttpPost]
+        public IActionResult FileUpload(IFormFile uploadFile)
+        {
+            if (uploadFile != null)
+            {
+                string relativePath = "~/img/" + Path.GetFileName(uploadFile.FileName);
+                return View((object)relativePath);
+            }
+            return View();
+        }
 
+        /// <summary>
+        /// Adding a inputmodel for the inputgroup
+        /// </summary>
+        /// <param name="model">Model that needs the inputmodel</param>
+        /// <returns>The same view with a extra inputmodel</returns>
+        public IActionResult AddAdv(AdGroupInputModel model)
+        {
+            model.AdItems.Add(new AdItemInputModel());
+            return View(model);
+        }
+
+        /// <summary>
+        /// Deleting a inputmodel for the inputgroup
+        /// </summary>
+        /// <param name="model">Model that doesnt need the inputmodel</param>
+        /// <returns>the same view with one inputmodel less</returns>
+        [HttpGet]
+        public IActionResult DeleteAdv(AdGroupInputModel model)
+        {
+            //model.AdItems.RemoveAt(item);
+            return View(model);
+        }
         // POST: /AdGroup/Create
         /// <summary>
         /// <para>
