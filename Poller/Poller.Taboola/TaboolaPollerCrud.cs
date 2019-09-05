@@ -231,12 +231,13 @@ namespace Poller.Taboola
         /// The query is based on the campaign id.
         /// </summary>
         /// <param name="account">Account</param>
-        /// <param name="campaign">Campaign id as string</param>
+        /// <param name="campaign">Campaign</param>
         /// <param name="token">Cancellation token</param>
         /// <returns>Task with entity list of ad items</returns>
         private Task<EntityList<AdItem>> GetCampaignAllItems(
             AccountCore account, CampaignCore campaign, CancellationToken token)
         {
+            return GetCampaignAllItems(account, campaign.SecondaryId, token);
         }
 
         /// <summary>
