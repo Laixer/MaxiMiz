@@ -241,7 +241,7 @@ namespace Poller.Taboola
         /// <param name="token">Cancellation token</param>
         /// <returns>Task with entity list of ad items</returns>
         private Task<EntityList<AdItem>> GetCampaignAllItems(
-            AccountCore account, string campaign, CancellationToken token)
+            AccountCore account, CampaignCore campaign, CancellationToken token)
         {
             var endpoint = $"api/1.0/{account.Name}/campaigns/{campaign}/items";
             return RemoteQueryAndLogAsync<EntityList<AdItem>>
