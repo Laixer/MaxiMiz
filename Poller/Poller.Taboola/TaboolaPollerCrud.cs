@@ -118,7 +118,9 @@ namespace Poller.Taboola
                 endpoint, content, token).Result;
 
             // Validate if the ad item has been created --> not crawling.
-            // When this is done we have the populated ad item.
+            var createdWithFields = await ValidateAdItem(account, campaignId, createdAdItem, token);
+            await CommitAdItem(createdWithFields, token);
+        }
             var stopwatch = new Stopwatch();
             stopwatch.Start();
             while (true)
