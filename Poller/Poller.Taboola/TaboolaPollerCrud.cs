@@ -186,5 +186,27 @@ namespace Poller.Taboola
             return RemoteQueryAndLogAsync<AdItem>(HttpMethod.Get, endpoint, token);
         }
 
+        /// <summary>
+        /// Performs syncback over a single campaign.
+        /// </summary>
+        /// <param name="account">The account</param>
+        /// <param name="campaign">The campaign</param>
+        /// <param name="token">The cancellation token</param>
+        /// <returns>Task</returns>
+        private async Task SyncbackCampaign(AccountCore account,
+            CampaignCore campaign, CancellationToken token)
+        {
+            // First syncback the campaign
+            var campaignApi = await GetCampaign(account, campaign, token);
+            var converted = _mapperCampaign.Convert(campaignApi);
+            var list = new List<CampaignCore>();
+            list.Add(converted);
+            await CommitCampaigns(list, token);
+
+            // Then syncback all ad items
+            var result = await GetCampaignAllItems(account, campaign, token);
+            var items = _mapperAdItem.ConvertAll(result.Items);
+            await CommitAdItems(items, token);
+        }
     }
 }
