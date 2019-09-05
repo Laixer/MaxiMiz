@@ -250,9 +250,19 @@ namespace Poller.Taboola
 
         private Task<AdItem> GetCampaignItem(string account,
             string campaign, string item, CancellationToken token)
+        /// <summary>
+        /// Query all campaign items for a given campaign from the Taboola API.
+        /// The query is based on the campaign id.
+        /// </summary>
+        /// <param name="account">Account</param>
+        /// <param name="campaignId">Campaign id as string</param>
+        /// <param name="token">Cancellation token</param>
+        /// <returns>Task with entity list of ad items</returns>
+        private Task<EntityList<AdItem>> GetCampaignAllItems(
+           AccountCore account, string campaignId, CancellationToken token)
         {
-            var endpoint = $"api/1.0/{account}/campaigns/{campaign}/items/{item}";
-            return RemoteQueryAndLogAsync<AdItem>(HttpMethod.Get, endpoint, token);
+            var endpoint = $"api/1.0/{account.Name}/campaigns/{campaignId}/items";
+            return RemoteQueryAndLogAsync<EntityList<AdItem>>(HttpMethod.Get, endpoint, token);
         }
 
         /// <summary>
