@@ -42,7 +42,13 @@ namespace Maximiz.Controllers
             return View(await _campaignRepo.GetAll());
         }
 
-        ///
+        /// <summary>
+        /// A overview which can be sorted
+        /// It can be used after the page is loaded
+        /// </summary>
+        /// <param name="order"> Enum Order which order you want the type to be</param>
+        /// <param name="type">Top row of the table with all the types in it</param>
+        /// <returns></returns>
         [HttpGet]
         public async Task<IActionResult> OverviewSorted(Order order, string type)
         {
@@ -100,9 +106,9 @@ namespace Maximiz.Controllers
                 Name = name ?? "Test",
                 Budget = 9001,
                 DailyBudget = 10,
-                Devices = new Model.Enums.Device[] { Model.Enums.Device.Desktop, Model.Enums.Device.Laptop, Model.Enums.Device.Mobile, Model.Enums.Device.Tablet, Model.Enums.Device.Wearable },
-                OperatingSystems = new Model.Enums.OS[] { Model.Enums.OS.Android, Model.Enums.OS.Chromeos, Model.Enums.OS.Ios, },
-                Connections = new Model.Enums.Connection[] { Model.Enums.Connection.Wifi },
+                Devices = new Device[] { Device.Desktop, Device.Laptop, Device.Mobile, Device.Tablet, Device.Wearable },
+                OperatingSystems = new OS[] { OS.Android, OS.Chromeos, OS.Ios, },
+                Connections = new Connection[] { Connection.Wifi },
                 Utm = "utm=test",
                 BrandingText = "Test",
             });
@@ -115,7 +121,10 @@ namespace Maximiz.Controllers
         /// <param name="query">The search term to query the database for.</param>
         /// <returns></returns>
         [HttpGet]
-        public async Task<IEnumerable<Campaign>> Search(string query) => await _campaignRepo.Search(query);
+        public async Task<IActionResult> Search(string query)
+        {
+            return View("OverView", await _campaignRepo.Search(query));
+        }
 
         // PUT: /Campaign/Edit
         /// <summary>

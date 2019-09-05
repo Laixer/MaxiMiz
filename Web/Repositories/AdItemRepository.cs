@@ -51,7 +51,6 @@ namespace Maximiz.Repositories
                 return result;
             }
         }
-
         public Task<AdItem> Update(AdItem entity)
         {
             throw new NotImplementedException();

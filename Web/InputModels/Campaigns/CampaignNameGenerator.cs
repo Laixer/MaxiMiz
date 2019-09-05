@@ -32,8 +32,6 @@ namespace Maximiz.InputModels.Campaigns
             sb.Append(os.GetEnumMemberName().ToUpper().Substring(0, 2));
             sb.Append("_");
             sb.Append(device.GetEnumMemberName().ToUpper().Substring(0, 3));
-            
-
             return sb.ToString();
         }
     }

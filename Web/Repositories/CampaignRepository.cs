@@ -147,7 +147,6 @@ namespace Maximiz.Repositories
 
         }
 
-        
         public Task<Guid> Create(Campaign entity)
         {
             throw new NotImplementedException();

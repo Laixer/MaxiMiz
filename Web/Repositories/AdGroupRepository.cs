@@ -34,7 +34,6 @@ namespace Maximiz.Repositories
         {
             throw new NotImplementedException();
         }
-
         public async Task CreateGroup(AdGroupInputModel adGroupInput)
         {
             // TODO Ensure these are the correct columns and properties to insert
@@ -112,7 +111,6 @@ namespace Maximiz.Repositories
 
             }
         }
-
         public Task Delete(AdGroup entity)
         {
             throw new NotImplementedException();

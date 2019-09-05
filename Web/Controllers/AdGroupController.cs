@@ -1,11 +1,11 @@
-﻿using System.Collections.Generic;
-using System.IO;
-using System.Threading.Tasks;
-using Maximiz.InputModels;
+﻿using Maximiz.InputModels;
 using Maximiz.Model.Entity;
 using Maximiz.Repositories.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
+using System.IO;
+using System.Threading.Tasks;
 
 namespace Maximiz.Controllers
 {
@@ -101,7 +101,6 @@ namespace Maximiz.Controllers
             {
                 return View(model);
             }
-
             // Remove empty ads before sending the model
             model.AdItems.RemoveAll(x => string.IsNullOrEmpty(x.Title) && string.IsNullOrEmpty(x.Content));
 
