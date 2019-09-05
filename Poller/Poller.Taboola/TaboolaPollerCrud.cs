@@ -182,8 +182,22 @@ namespace Poller.Taboola
         }
 
         private async Task UpdateCampaignStatus(string account, string campaign, CancellationToken token)
+        /// <summary>
+        /// Updates an ad item in the Taboola API.
+        /// </summary>
+        /// <param name="account">The account</param>
+        /// <param name="adItem">The ad item</param>
+        /// <param name="token">The cancellation token</param>
+        /// <returns>Task</returns>
+        private async Task UpdateAdItem(AccountCore account, AdItemCore adItem,
+            CancellationToken token)
         {
             var endpoint = $"api/1.0/{account}/campaigns/{campaign}";
+            var content = new StringContent(Json.Serialize(adItem));
+            var campaignId = await FetchCampaignIdFromAdItem(adItem, token);
+            var endpoint = $"api/1.0/{account}/campaigns/{campaignId}/{adItem.SecondaryId}";
+            await RemoteExecuteAndLogAsync(HttpMethod.Post, endpoint, content, token);
+        }
 
             await RemoteQueryAndLogAsync<Campaign>(HttpMethod.Put, endpoint, token);
         }
