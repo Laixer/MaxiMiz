@@ -215,9 +215,21 @@ namespace Poller.Taboola
         }
 
         private async void DeleteCampaign(string account, string campaign, CancellationToken token)
+        /// <summary>
+        /// Deletes an ad item from the Taboola API.
+        /// </summary>
+        /// <param name="account"></param>
+        /// <param name="adItem"></param>
+        /// <param name="token"></param>
+        /// <returns></returns>
+        private async Task DeleteAdItem(AccountCore account, AdItemCore adItem,
+            CancellationToken token)
         {
             var url = $"api/1.0/{account}/campaigns/{campaign}";
             await RemoteQueryAndLogAsync(HttpMethod.Delete, url, token);
+            var campaignId = await FetchCampaignIdFromAdItem(adItem, token);
+            var endpoint = $"api/1.0/{account.Name}/campaigns/{campaignId}/items/{adItem.SecondaryId}";
+            await RemoteExecuteAndLogAsync(HttpMethod.Delete, endpoint, null, token);
         }
 
         /// <summary>
