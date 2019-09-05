@@ -200,6 +200,18 @@ namespace Poller.Taboola
         }
 
             await RemoteQueryAndLogAsync<Campaign>(HttpMethod.Put, endpoint, token);
+        /// <summary>
+        /// Deletes a campaign from the Taboola API.
+        /// </summary>
+        /// <param name="account">The account</param>
+        /// <param name="campaign">The campaign</param>
+        /// <param name="token">The cancellation token</param>
+        /// <returns>Task</returns>
+        private async Task DeleteCampaign(AccountCore account,
+            CampaignCore campaign, CancellationToken token)
+        {
+            var endpoint = $"api/1.0/{account.Name}/campaigns/{campaign.SecondaryId}";
+            await RemoteExecuteAndLogAsync(HttpMethod.Delete, endpoint, null, token);
         }
 
         private async void DeleteCampaign(string account, string campaign, CancellationToken token)
