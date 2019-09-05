@@ -8,6 +8,11 @@ using Microsoft.Extensions.Logging;
 using Poller.Taboola.Model;
 
 using AccountCore = Maximiz.Model.Entity.Account;
+using CampaignCore = Maximiz.Model.Entity.Campaign;
+using AdItemCore = Maximiz.Model.Entity.AdItem;
+using Poller.Helper;
+using System.Linq;
+using System.Diagnostics;
 
 namespace Poller.Taboola
 {
@@ -19,104 +24,6 @@ namespace Poller.Taboola
     /// </summary>
     internal partial class TaboolaPoller
     {
-
-        /// <summary>
-        /// Gets the Top Campaign Reports for a specific date as specified in 
-        /// the Backstage documentation, deserializes them and inserts them 
-        /// into the database.
-        /// </summary>
-        private Task<EntityList<AdItemCoResult>> GetTopCampaignReportAsync(string account, CancellationToken token)
-        {
-            var query = HttpUtility.ParseQueryString(string.Empty);
-            query["end_date"] = query["start_date"] = DateTime.Now.ToString("yyyy-MM-dd");
-
-            var endpoint = $"api/1.0/{account}/reports/top-campaign-content/dimensions/item_breakdown?{query}";
-
-            return RemoteQueryAndLogAsync<EntityList<AdItemCoResult>>(HttpMethod.Get, endpoint, token);
-        }
-
-        /// <summary>
-        /// Retrieves accounts from the Taboola API.
-        /// </summary>
-        /// <param name="token">Cancellation token</param>
-        /// <returns>Fetched Taboola accounts</returns>
-        private Task<EntityList<Account>> GetAllAccounts(CancellationToken token)
-        {
-            var endpoint = $"api/1.0/users/current/allowed-accounts/";
-
-            return RemoteQueryAndLogAsync<EntityList<Account>>(HttpMethod.Get, endpoint, token);
-        }
-
-        /// <summary>
-        /// Gets all our campaigns for a given account.
-        /// </summary>
-        /// <param name="account">The core account</param>
-        /// <param name="token">Cancellation token</param>
-        /// <returns>The campaign list</returns>
-        private Task<EntityList<Campaign>> GetAllCampaigns(
-            AccountCore account, CancellationToken token)
-        {
-            var endpoint = $"api/1.0/{account.Name}/campaigns";
-            return RemoteQueryAndLogAsync<EntityList<Campaign>>
-                (HttpMethod.Get, endpoint, token);
-        }
-
-        private async Task GetCampaign(string account, string campaign, CancellationToken token)
-        {
-            var endpoint = $"api/1.0/{account}/campaigns/{campaign}";
-
-            var result = await RemoteQueryAndLogAsync<Campaign>(HttpMethod.Get, endpoint, token);
-        }
-
-        /// <summary>
-        /// Creates a new campaign in the Taboola API.
-        /// </summary>
-        /// <param name="account">The account</param>
-        /// <param name="token">Cancellation token</param>
-        /// <returns>The created campaign</returns>
-        private Task<Campaign> CreateCampaign(
-            AccountCore account, CancellationToken token)
-        {
-            var endpoint = $"api/1.0/{account.Name}/campaigns/";
-            return RemoteQueryAndLogAsync<Campaign>(
-                HttpMethod.Post, endpoint, token);
-        }
-
-        private async Task UpdateCampaignStatus(string account, string campaign, CancellationToken token)
-        {
-            var endpoint = $"api/1.0/{account}/campaigns/{campaign}";
-
-            var result = await RemoteQueryAndLogAsync<Campaign>(HttpMethod.Put, endpoint, token);
-        }
-
-        private Task<Campaign> DeleteCampaign(string account, string campaign, CancellationToken token)
-        {
-            var url = $"api/1.0/{account}/campaigns/{campaign}";
-
-            return RemoteQueryAndLogAsync<Campaign>(HttpMethod.Delete, url, token);
-        }
-
-        /// <summary>
-        /// Query all campaign items for a given campaign from the Taboola API.
-        /// </summary>
-        /// <param name="account">Account name</param>
-        /// <param name="campaign">Campaign id name</param>
-        /// <param name="token">Cancellation token</param>
-        /// <returns>Task with entity list of ad items</returns>
-        private Task<EntityList<AdItem>> GetCampaignAllItems(
-            string account, string campaign, CancellationToken token)
-        {
-            var endpoint = $"api/1.0/{account}/campaigns/{campaign}/items";
-            return RemoteQueryAndLogAsync<EntityList<AdItem>>
-                (HttpMethod.Get, endpoint, token);
-        }
-
-        private Task<AdItem> GetCampaignItem(string account,
-            string campaign, string item, CancellationToken token)
-        {
-            var endpoint = $"api/1.0/{account}/campaigns/{campaign}/items/{item}";
-            return RemoteQueryAndLogAsync<AdItem>(HttpMethod.Get, endpoint, token);
-        }
 
         /// <summary>
         /// Run the remote query and catch all exceptions  before letting them 
@@ -149,16 +56,33 @@ namespace Poller.Taboola
 
         /// <summary>
         /// Run the remote execute and catch all exceptions where before letting
-        /// them propagate upwards.
+        /// them propagate upwards. This is typeless and returns nothing.
         /// </summary>
         /// <param name="method">Http method</param>
         /// <param name="endpoint">API endpoint</param>
         /// <param name="content">Http content</param>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Task</returns>
-        protected async Task RemoteExecuteAndLogAsync<TResult>(
-            HttpMethod method, string endpoint, HttpContent content, 
+        protected async Task RemoteExecuteAndLogAsync(HttpMethod method,
+            string endpoint, HttpContent content, CancellationToken cancellationToken)
+        {
+            await RemoteExecuteAndLogAsync<object>(method, endpoint, content, cancellationToken);
+        }
+
+        /// <summary>
+        /// Run the remote execute and catch all exceptions where before letting
+        /// them propagate upwards.
+        /// </summary>
+        /// <typeparam name="TResult">Expected return type</typeparam>
+        /// <param name="method">Http method</param>
+        /// <param name="endpoint">API endpoint</param>
+        /// <param name="content">Http content</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Task</returns>
+        protected async Task<TResult> RemoteExecuteAndLogAsync<TResult>(
+            HttpMethod method, string endpoint, HttpContent content,
             CancellationToken cancellationToken)
+            where TResult : class
         {
             cancellationToken.ThrowIfCancellationRequested();
 
@@ -166,9 +90,11 @@ namespace Poller.Taboola
             {
                 _logger.LogTrace($"Executing {endpoint} with content {content.ToString()}");
 
-                await _client.RemoteExecuteAsync(method, endpoint, content, cancellationToken);
+                return await _client.RemoteExecuteAsync<TResult>(
+                    method, endpoint, content, cancellationToken);
             }
-            catch (Exception e) when (e as OperationCanceledException == null && e as TaskCanceledException == null)
+            catch (Exception e) when (e as OperationCanceledException == null
+            && e as TaskCanceledException == null)
             {
                 _logger.LogError($"{endpoint}: {e.Message}");
                 throw e;
