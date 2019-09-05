@@ -121,35 +121,48 @@ namespace Poller.Taboola
             var createdWithFields = await ValidateAdItem(account, campaignId, createdAdItem, token);
             await CommitAdItem(createdWithFields, token);
         }
+
+        /// <summary>
+        /// Keeps on polling the API to validate that our created ad item has
+        /// been validated and left the crawling state. This operation can
+        /// take a long time.
+        /// </summary>
+        /// <remarks>This throws after 30 seconds without result</remarks>
+        /// <param name="account">The account</param>
+        /// <param name="campaignId">The numeric id as string of the campaign
+        /// this ad item belolngs to</param>
+        /// <param name="createdAdItem">The created Taboola ad item</param>
+        /// <param name="token">The cancellation token</param>
+        /// <returns></returns>
+        private async Task<AdItemCore> ValidateAdItem(AccountCore account,
+            string campaignId, AdItem createdAdItem, CancellationToken token)
+        {
             var stopwatch = new Stopwatch();
             stopwatch.Start();
-            while (true)
+            while (stopwatch.IsRunning)
             {
-                try
+                var result = GetCampaignAllItems(account, campaignId, token).Result.Items;
+                var selected = result.Where(x => x.Id == createdAdItem.Id).FirstOrDefault();
+
+                // Not crawling means we are done
+                if (selected.CampaignItemStatus != CampaignItemStatus.Crawling)
                 {
-                    var result = GetCampaignAllItems(account, campaignId, token).Result.Items;
-                    var selected = result.Where(x => x.Id == createdAdItem.Id).FirstOrDefault();
-
-                    // Not crawling means we are done
-                    if (selected.CampaignItemStatus != CampaignItemStatus.Crawling)
-                    {
-                        break;
-                    }
-
-                    // Else we wait
-                    else
-                    {
-                        await Task.Delay(2500);
-                    }
-
-                    if (stopwatch.ElapsedMilliseconds > 30000)
-                    {
-                        throw new TimeoutException($"Ad item with id = {createdAdItem} " +
-                            $"was not created after 30 seconds, aborting.");
-                    }
+                    return _mapperAdItem.Convert(selected);
                 }
-                catch (Exception e) { }
+
+                // Else we wait
+                else { await Task.Delay(2500); }
+
+                // Set stopwatch boundary
+                if (stopwatch.ElapsedMilliseconds > 30000)
+                {
+                    stopwatch.Stop();
+                    break;
+                }
             }
+
+            throw new TimeoutException($"Ad item with id = {createdAdItem} " +
+                $"was not created after 30 seconds, aborting.");
         }
 
         /// <summary>
