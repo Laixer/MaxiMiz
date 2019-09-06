@@ -209,5 +209,41 @@ namespace Poller.Taboola.Mapper
                 LocationExclude = DefaultLocations
             };
         }
+
+        /// <summary>
+        /// Converts an enum to all caps. This is because Taboola uses upper 
+        /// case to denote these enums, while we use lower case.
+        /// </summary>
+        /// <param name="input">Input enum</param>
+        /// <returns>Upper case string</returns>
+        private string ToUpperString(DailyAdDeliveryModel input)
+        {
+            return input.GetEnumMemberName().ToUpper();
+        }
+
+        /// <summary>
+        /// Converts an upper case string to a daily ad delivery model. This is 
+        /// because Taboola uses upper case to denote these enums, while we use
+        /// lower case.
+        /// </summary>
+        /// <remarks>When this can't match, it returns 
+        /// <see cref="DailyAdDeliveryModel.Unknown"/>.</remarks>
+        /// <param name="input">Input string, upper case expected</param>
+        /// <returns>Daily ad delivery model enum</returns>
+        private DailyAdDeliveryModel FromUpperString(string input)
+        {
+            switch (input)
+            {
+                case "ACCELERATED":
+                    return DailyAdDeliveryModel.Accelerated;
+                case "BALANCED":
+                    return DailyAdDeliveryModel.Balanced;
+                case "STRICT":
+                    return DailyAdDeliveryModel.Strict;
+            }
+
+            return DailyAdDeliveryModel.Unknown;
+        }
+
     }
 }
