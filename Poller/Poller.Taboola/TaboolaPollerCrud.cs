@@ -193,7 +193,7 @@ namespace Poller.Taboola
         private async Task UpdateAdItem(AccountCore account, AdItemCore adItem,
             CancellationToken token)
         {
-            var content = new StringContent(Json.Serialize(adItem));
+            var content = BuildStringContent(adItem);
             var campaignId = await FetchCampaignIdFromAdItem(adItem, token);
             var endpoint = $"api/1.0/{account}/campaigns/{campaignId}/{adItem.SecondaryId}";
             await RemoteExecuteAndLogAsync(HttpMethod.Post, endpoint, content, token);
