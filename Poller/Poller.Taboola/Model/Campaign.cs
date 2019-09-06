@@ -71,7 +71,7 @@ namespace Poller.Taboola.Model
         /// on a daily basis.
         /// </summary>
         [DataMember(Name = "daily_ad_delivery_model")]
-        public DailyAdDeliveryModel DailyAdDeliveryModel { get; set; }
+        public string DailyAdDeliveryModel { get; set; }
 
         /// <summary>
         /// An object representing the wanted publisher
