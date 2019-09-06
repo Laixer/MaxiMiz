@@ -89,6 +89,7 @@ namespace Poller
         /// 
         /// TODO What can our status codes be?
         /// </summary>
+        /// <typeparam name="TResult">Type to be returned</typeparam>
         /// <param name="method">Http method</param>
         /// <param name="endpoint">Endpoint url without the base</param>
         /// <param name="content">Http content</param>
