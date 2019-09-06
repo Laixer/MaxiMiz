@@ -94,8 +94,8 @@ namespace Poller
         /// <param name="content">Http content</param>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns></returns>
-        public async Task RemoteExecuteAsync(
-            HttpMethod method, string endpoint, HttpContent content, 
+        public async Task<TResult> RemoteExecuteAsync<TResult>(
+            HttpMethod method, string endpoint, HttpContent content,
             CancellationToken cancellationToken)
         {
             var request = new HttpRequestMessage(method, endpoint);
