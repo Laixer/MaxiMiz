@@ -185,14 +185,15 @@ namespace Maximiz.Repositories
         /// Get all the campaigns on the database
         /// </summary>
         /// <returns>All the campaigns in the database</returns>
-        public Task<IEnumerable<Campaign>> GetAll() => GetAll("Budget", Order.DESC);
+        public Task<IEnumerable<Campaign>> GetAll() => GetAll(CampaignModel.Budget, Order.DESC);
 
-        public async Task<IEnumerable<Campaign>> GetAll(string query, Order order)
+        public async Task<IEnumerable<Campaign>> GetAll(CampaignModel query, Order order)
         {
             using (IDbConnection connection = GetConnection)
             {
+                var queryString = query.GetEnumMemberName();
                 var orderString = order.GetEnumMemberName();
-                var sql = $"SELECT * FROM campaign ORDER BY {query} {orderString} LIMIT 100";
+                var sql = $"SELECT * FROM campaign ORDER BY {queryString} {orderString} LIMIT 100";
                 return await connection.QueryAsync<Campaign>(sql);
             }
         }

@@ -14,8 +14,6 @@
 <div class="row">
     <div class="col-md-6"></div>
     <div class="col-md-6">
-        
-        <input class="form-control" id="Search" name="Search" type="text" value="" onkeypress="location.href(@Url.Action("Search", "Campaign")) />
     </div>
 </div>
 
@@ -27,7 +25,7 @@
         <th>Device</th>
         <th>OS</th>
         <th>Status</th>
-        <th>Budget <button onclick="location.href='@Url.Action("OverviewSorted", "Campaign", new { @order = Order.ASC, @type = "Budget"})'">Add</button></th>
+        <th>Budget <button onclick="location.href='@Url.Action("OverviewSorted", "Campaign", new { @order = Order.ASC, @type = CampaignModel.Budget})'">Add</button></th>
         <th>Spent</th>
         <th>Start Date</th>
         <th>End Date</th>

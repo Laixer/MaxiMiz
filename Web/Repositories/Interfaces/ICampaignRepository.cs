@@ -14,7 +14,7 @@ namespace Maximiz.Repositories.Interfaces
         /// Retrieve all campaigns
         /// </summary>
         /// <returns>A list containing all the campaigns</returns>
-        Task<IEnumerable<Campaign>> GetAll(string query, Order order);
+        Task<IEnumerable<Campaign>> GetAll(CampaignModel query, Order order);
 
         /// <summary>
         /// Get campaigns that match or contain a search query

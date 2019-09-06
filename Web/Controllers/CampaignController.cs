@@ -50,7 +50,7 @@ namespace Maximiz.Controllers
         /// <param name="type">Top row of the table with all the types in it</param>
         /// <returns></returns>
         [HttpGet]
-        public async Task<IActionResult> OverviewSorted(Order order, string type)
+        public async Task<IActionResult> OverviewSorted(Order order, CampaignModel type)
         {
             return View("Overview", await _campaignRepo.GetAll(type, order));
         }
