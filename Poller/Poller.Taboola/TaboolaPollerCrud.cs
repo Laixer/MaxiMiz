@@ -277,5 +277,18 @@ namespace Poller.Taboola
             var items = _mapperAdItem.ConvertAll(result.Items);
             await CommitAdItems(items, token);
         }
+
+        /// <summary>
+        /// Does a proper encoding of any object. This returns a JSON string
+        /// content object with UTF-8 encoding and application/json added to
+        /// it.
+        /// </summary>
+        /// <param name="obj">The object to serialize</param>
+        /// <returns>Stringcontent object</returns>
+        private StringContent BuildStringContent(object obj)
+        {
+            var serialized = Json.Serialize(obj);
+            return new StringContent(serialized, Encoding.UTF8, "application/json");
+        }
     }
 }
