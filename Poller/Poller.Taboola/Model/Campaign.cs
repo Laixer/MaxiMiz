@@ -67,8 +67,9 @@ namespace Poller.Taboola.Model
         public decimal? DailyCap { get; set; }
 
         /// <summary>
-        /// Defines the way our campaign will be delivered
-        /// on a daily basis.
+        /// Defines the way our campaign will be delivered on a daily basis. 
+        /// This is stored as a string because our internal model uses lower
+        /// case, but Taboola uses upper case.
         /// </summary>
         [DataMember(Name = "daily_ad_delivery_model")]
         public string DailyAdDeliveryModel { get; set; }
