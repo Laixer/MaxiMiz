@@ -61,9 +61,8 @@ namespace Poller.Taboola.Mapper
         }
 
         /// <summary>
-        /// Pushes our details to a given taboola
-        /// campaign object. This will overwrite in 
-        /// all cases.
+        /// Pushes our details to a given taboola campaign object. This will 
+        /// overwrite in all cases.
         /// </summary>
         /// <param name="to">The object to push to</param>
         /// <param name="details">The extracted details</param>
