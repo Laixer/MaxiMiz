@@ -4,6 +4,7 @@
 @using Maximiz.Model.Enums
 @using Maximiz.Model.Entity
 @model IEnumerable<Campaign>
+@{string input = "";}
 
 @{
     ViewData["Title"] = "Campaigns";
@@ -14,7 +15,18 @@
 <div class="row">
     <div class="col-md-6"></div>
     <div class="col-md-6">
+
+        <input class="form-control" id="Search" name="Search" type="text" />
+        <button onclick="location.href='@Url.Action("Search", "Campaign", new {query =  "myfunction()"})'">Search</button>
     </div>
+    <script>
+        function myfunction() {
+            input = document.getElementById("Search").nodeValue;
+            return input;
+        }
+
+    </script>
+
 </div>
 
 <table class="table table-bordered">
@@ -64,3 +76,4 @@
         </tr>
     }
 </table>
+
