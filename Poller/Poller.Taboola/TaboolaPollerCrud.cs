@@ -13,6 +13,7 @@ using AdItemCore = Maximiz.Model.Entity.AdItem;
 using Poller.Helper;
 using System.Linq;
 using System.Diagnostics;
+using System.Text;
 
 namespace Poller.Taboola
 {
