@@ -79,7 +79,9 @@ namespace Poller.Taboola
 
         /// <summary>
         /// Creates a new campaign in the Taboola API, based on a campaign in
-        /// our database. All known parameters will be sent to Taboola.
+        /// our database. All known parameters will be sent to Taboola. After
+        /// this is done, the parameters of our created campaign are put back
+        /// into our own database.
         /// </summary>
         /// <param name="account">The account</param>
         /// <param name="campaign">The core campaign</param>
