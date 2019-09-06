@@ -27,6 +27,12 @@ namespace Poller.Model.Data
         /// Following daily cap.
         /// </summary>
         [EnumMember(Value = "strict")]
-        Strict
+        Strict,
+
+        /// <summary>
+        /// When we don't know, this is default.
+        /// </summary>
+        [EnumMember(Value = "unknown")]
+        Unknown
     }
 }
