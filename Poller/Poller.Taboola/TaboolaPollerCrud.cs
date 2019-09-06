@@ -88,7 +88,6 @@ namespace Poller.Taboola
             CancellationToken token)
         {
             var endpoint = $"api/1.0/{account.Name}/campaigns/";
-            var content = new StringContent(Json.Serialize(campaign));
             await RemoteExecuteAndLogAsync(HttpMethod.Post, endpoint, content, token);
         }
 
@@ -113,7 +112,7 @@ namespace Poller.Taboola
 
             // First create the ad item
             var endpoint = $"api/1.0 /{account.Name}/campaigns/{campaignId}/items/";
-            var content = new StringContent(adItem.Url);
+            var content = BuildStringContent(adItem.Url);
             var createdAdItem = RemoteExecuteAndLogAsync<AdItem>(HttpMethod.Post,
                 endpoint, content, token).Result;
 
@@ -176,7 +175,7 @@ namespace Poller.Taboola
             CampaignCore campaign, CancellationToken token)
         {
             var push = _mapperCampaign.Convert(campaign);
-            var content = new StringContent(Json.Serialize(push));
+            var content = BuildStringContent(push);
             var endpoint = $"api/1.0/{account}/campaigns/{campaign.SecondaryId}";
             await RemoteExecuteAndLogAsync(HttpMethod.Put, endpoint, content, token);
         }
