@@ -67,7 +67,7 @@ namespace Poller.Taboola
         /// Gets a single campaign based on its ID.
         /// </summary>
         /// <param name="account">The account</param>
-        /// <param name="campaign">The campaign</param>
+        /// <param name="campaignId">The campaign id</param>
         /// <param name="token">The cancellation token</param>
         /// <returns>Task</returns>
         private Task<Campaign> GetCampaign(AccountCore account,
