@@ -41,7 +41,7 @@ namespace Poller.Taboola.Mapper
             {
                 Id = core.SecondaryId,
                 Name = core.Name,
-                Branding = core.BrandingText,
+                BrandingText = core.BrandingText,
                 Cpc = core.InitialCpc,
                 SpendingLimit = core.Budget,
                 DailyCap = core.DailyBudget,
