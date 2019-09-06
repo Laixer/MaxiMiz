@@ -45,7 +45,7 @@ namespace Poller.Taboola.Model
         /// of each of our campaign items.
         /// </summary>
         [DataMember(Name = "branding_text")]
-        public string Branding { get; set; }
+        public string BrandingText { get; set; }
 
         /// <summary>
         /// Query-string parameter added to the URL of
