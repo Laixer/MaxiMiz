@@ -107,7 +107,7 @@ namespace Poller.Taboola.Mapper
 
             result.SecondaryId = external.Id;
             result.Name = external.Name;
-            result.BrandingText = external.Branding;
+            result.BrandingText = external.BrandingText;
             result.InitialCpc = external.Cpc;
             result.Budget = external.SpendingLimit;
             result.DailyBudget = external.DailyCap;
