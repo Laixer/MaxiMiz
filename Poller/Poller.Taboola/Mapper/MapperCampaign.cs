@@ -5,6 +5,7 @@ using System.Text;
 using Maximiz.Model.Entity;
 using Maximiz.Model.Enums;
 using Poller.Helper;
+using Poller.Model.Data;
 using Poller.Taboola.Model;
 using CampaignCore = Maximiz.Model.Entity.Campaign;
 using CampaignTaboola = Poller.Taboola.Model.Campaign;
