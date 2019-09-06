@@ -74,7 +74,7 @@ namespace Poller.Taboola.Mapper
             if (details == null) throw new ArgumentNullException(nameof(details));
 
             to.Account = details.Account;
-            to.DailyAdDeliveryModel = details.DailyAdDeliveryModel;
+            to.DailyAdDeliveryModel = ToUpperString(details.DailyAdDeliveryModel);
             to.PublisherBidModifier = details.PublisherBidModifier;
             to.SpendingLimitModel = details.SpendingLimitModel;
             to.CountryTargeting = details.CountryTargeting;
@@ -138,7 +138,7 @@ namespace Poller.Taboola.Mapper
             return Json.Serialize(new CampaignDetails
             {
                 Account = from.Account,
-                DailyAdDeliveryModel = from.DailyAdDeliveryModel,
+                DailyAdDeliveryModel = FromUpperString(from.DailyAdDeliveryModel),
                 PublisherBidModifier = from.PublisherBidModifier,
                 SpendingLimitModel = from.SpendingLimitModel,
                 CountryTargeting = from.CountryTargeting,
