@@ -210,7 +210,7 @@ namespace Maximiz.Repositories
                 // TODO: Fix/optimize query
                 IEnumerable<Campaign> result =
                     await connection.QueryAsync<Campaign>(
-                    $"SELECT * FROM campaign WHERE name ~* {query} OR branding_text ~* {query};");
+                    $"SELECT * FROM campaign WHERE name LIKE '%{query}%' OR branding_text LIKE '%{query}%';");
 
                 return result;
             }

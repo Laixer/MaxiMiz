@@ -16,16 +16,10 @@
     <div class="col-md-6"></div>
     <div class="col-md-6">
 
-        <input class="form-control" id="Search" name="Search" type="text" />
-        <button onclick="location.href='@Url.Action("Search", "Campaign", new {query =  "myfunction()"})'">Search</button>
+        <input class="form-control" id="SearchId" name="SearchId" type="text" />
+        <button onclick="location.href='@Url.Action("Search", "Campaign", new {query =  "DE"})'">Search</button>
     </div>
-    <script>
-        function myfunction() {
-            input = document.getElementById("Search").nodeValue;
-            return input;
-        }
-
-    </script>
+ 
 
 </div>
 
