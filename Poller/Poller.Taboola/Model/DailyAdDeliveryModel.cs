@@ -16,7 +16,7 @@ namespace Poller.Model.Data
         /// </summary>
         [EnumMember(Value = "balanced")]
         Balanced,
-        
+
         /// <summary>
         /// Ignoring daily cap.
         /// </summary>
