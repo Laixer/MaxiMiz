@@ -71,9 +71,9 @@ namespace Poller.Taboola
         /// <param name="token">The cancellation token</param>
         /// <returns>Task</returns>
         private Task<Campaign> GetCampaign(AccountCore account,
-            CampaignCore campaign, CancellationToken token)
+            string campaignId, CancellationToken token)
         {
-            var endpoint = $"api/1.0/{account.Name}/campaigns/{campaign.SecondaryId}";
+            var endpoint = $"api/1.0/{account.Name}/campaigns/{campaignId}";
             return RemoteQueryAndLogAsync<Campaign>(HttpMethod.Get, endpoint, token);
         }
 
