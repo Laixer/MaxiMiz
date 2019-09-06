@@ -1,6 +1,7 @@
 ﻿using Maximiz.InputModels;
 using Maximiz.Model.Entity;
 using Maximiz.Model.Enums;
+using Maximiz.Models;
 using Maximiz.Repositories.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -39,7 +40,7 @@ namespace Maximiz.Controllers
         [HttpGet]
         public async Task<IActionResult> Overview()
         {
-            return View(await _campaignRepo.GetAll());
+            return View(new OverviewCampaignModel { Campaigns = await _campaignRepo.GetAll() });
         }
 
         /// <summary>
@@ -52,7 +53,7 @@ namespace Maximiz.Controllers
         [HttpGet]
         public async Task<IActionResult> OverviewSorted(Order order, CampaignModel type)
         {
-            return View("Overview", await _campaignRepo.GetAll(type, order));
+            return View("Overview", new OverviewCampaignModel { Campaigns = await _campaignRepo.GetAll(type, order) });
         }
 
         // GET: /Campaign/Details/{Id}
@@ -123,7 +124,16 @@ namespace Maximiz.Controllers
         [HttpGet]
         public async Task<IActionResult> Search(string query)
         {
-            return View("OverView", await _campaignRepo.Search(query));
+            if (!string.IsNullOrEmpty(query))
+            {
+                var model = new OverviewCampaignModel
+                {
+                    Campaigns = await _campaignRepo.Search(query)
+                };
+                return View("OverView", model);
+            }
+
+            return View("OverView", new OverviewCampaignModel { Campaigns = await _campaignRepo.GetAll()});
         }
 
         // PUT: /Campaign/Edit

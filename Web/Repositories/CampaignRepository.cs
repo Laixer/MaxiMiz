@@ -200,6 +200,7 @@ namespace Maximiz.Repositories
 
         /// <summary>
         /// Search for a specific campaign in the database by name
+        /// name = the name of the campaign and branding text is the  brand of the campaign 
         /// </summary>
         /// <param name="query">The full or part of the name of the campaign</param>
         /// <returns>Every campaign that matches with the query</returns>
@@ -207,7 +208,6 @@ namespace Maximiz.Repositories
         {
             using (IDbConnection connection = GetConnection)
             {
-                // TODO: Fix/optimize query
                 IEnumerable<Campaign> result =
                     await connection.QueryAsync<Campaign>(
                     $"SELECT * FROM campaign WHERE name LIKE '%{query}%' OR branding_text LIKE '%{query}%';");

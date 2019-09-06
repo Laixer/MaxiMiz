@@ -3,71 +3,73 @@
 *@
 @using Maximiz.Model.Enums
 @using Maximiz.Model.Entity
-@model IEnumerable<Campaign>
+@model OverviewCampaignModel
 @{string input = "";}
 
 @{
     ViewData["Title"] = "Campaigns";
 }
 
-<h1>All Campaigns</h1>
+<body>
+    <h1>All Campaigns</h1>
 
-<div class="row">
-    <div class="col-md-6"></div>
-    <div class="col-md-6">
+    <div class="row">
+        <div class="col-md-6"></div>
+        <div class="col-md-6">
 
-        <input class="form-control" id="SearchId" name="SearchId" type="text" />
-        <button onclick="location.href='@Url.Action("Search", "Campaign", new {query =  "DE"})'">Search</button>
+            <input class="form-control" asp-for="Query" id="SearchId" name="SearchId" type="text" />
+            <button onclick="location.href='@Url.Action("Search", "Campaign",  Model.Query)'">Search</button>
+        </div>
+
+
     </div>
- 
 
-</div>
-
-<table class="table table-bordered">
-    <tr>
-        <th><input id="check_all" name="check_all" type="checkbox" /></th>
-        <th>Campaign</th>
-        <th>CPC</th>
-        <th>Device</th>
-        <th>OS</th>
-        <th>Status</th>
-        <th>Budget <button onclick="location.href='@Url.Action("OverviewSorted", "Campaign", new { @order = Order.ASC, @type = CampaignModel.Budget})'">Add</button></th>
-        <th>Spent</th>
-        <th>Start Date</th>
-        <th>End Date</th>
-        <th>CTR</th>
-        <th>PVPS</th>
-        <th>Clicks</th>
-        <th>Revenue</th>
-        <th>ROI</th>
-        <th>Taboola</th>
-        <th>Adsense</th>
-        <th>Profit</th>
-        <th>Actions</th>
-    </tr>
-    @foreach (Maximiz.Model.Entity.Campaign campaign in Model)
-    {
+    <table class="table table-bordered">
         <tr>
-            <td><input type="checkbox" name="check_campaign" id="@campaign.Id" /></td>
-            <td>@Html.ActionLink(@campaign.Name, "Details", "Campaign", new { id = campaign.Id })</td>
-            <td>@campaign.InitialCpc</td>
-            <td>@(campaign.Device.FirstOrDefault())</td>
-            <td>@campaign.Os.FirstOrDefault()</td>
-            <td>@campaign.Status</td>
-            <td>@campaign.Budget</td>
-            <td>@campaign.Spent</td>
-            <td>@campaign.StartDate</td>
-            <td>@campaign.EndDate</td>
-            <td>?</td>
-            <td>?</td>
-            <td>?</td>
-            <td>?</td>
-            <td>?</td>
-            <td>?</td>
-            <td>?</td>
-            <td>?</td>
-            <td>...</td>
+            <th><input id="check_all" name="check_all" type="checkbox" /></th>
+            <th>Campaign</th>
+            <th>CPC</th>
+            <th>Device</th>
+            <th>OS</th>
+            <th>Status</th>
+            <th>Budget <button onclick="location.href='@Url.Action("OverviewSorted", "Campaign", new { @order = Order.ASC, @type = CampaignModel.Budget})'">Add</button></th>
+            <th>Spent</th>
+            <th>Start Date</th>
+            <th>End Date</th>
+            <th>CTR</th>
+            <th>PVPS</th>
+            <th>Clicks</th>
+            <th>Revenue</th>
+            <th>ROI</th>
+            <th>Taboola</th>
+            <th>Adsense</th>
+            <th>Profit</th>
+            <th>Actions</th>
         </tr>
-    }
-</table>
+        @foreach (Maximiz.Model.Entity.Campaign campaign in Model.Campaigns)
+        {
+            <tr>
+                <td><input type="checkbox" name="check_campaign" id="@campaign.Id" /></td>
+                <td>@Html.ActionLink(@campaign.Name, "Details", "Campaign", new { id = campaign.Id })</td>
+                <td>@campaign.InitialCpc</td>
+                <td>@(campaign.Device.FirstOrDefault())</td>
+                <td>@campaign.Os.FirstOrDefault()</td>
+                <td>@campaign.Status</td>
+                <td>@campaign.Budget</td>
+                <td>@campaign.Spent</td>
+                <td>@campaign.StartDate</td>
+                <td>@campaign.EndDate</td>
+                <td>?</td>
+                <td>?</td>
+                <td>?</td>
+                <td>?</td>
+                <td>?</td>
+                <td>?</td>
+                <td>?</td>
+                <td>?</td>
+                <td>...</td>
+            </tr>
+        }
+    </table>
 
+</body>
