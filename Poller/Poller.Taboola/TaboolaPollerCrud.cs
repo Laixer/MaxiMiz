@@ -91,7 +91,11 @@ namespace Poller.Taboola
             CancellationToken token)
         {
             var endpoint = $"api/1.0/{account.Name}/campaigns/";
-            await RemoteExecuteAndLogAsync(HttpMethod.Post, endpoint, content, token);
+            var converted = _mapperCampaign.Convert(campaign);
+            var content = BuildStringContent(converted);
+            var result = await RemoteExecuteAndLogAsync<Campaign>(HttpMethod.Post, endpoint, content, token);
+            var campaignFetched = _mapperCampaign.Convert(result);
+            await UpdateCampaign(account, campaignFetched, token);
         }
 
         /// <summary>
