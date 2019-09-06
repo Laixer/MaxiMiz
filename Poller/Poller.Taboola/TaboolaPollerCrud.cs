@@ -266,7 +266,7 @@ namespace Poller.Taboola
             CampaignCore campaign, CancellationToken token)
         {
             // First syncback the campaign
-            var campaignApi = await GetCampaign(account, campaign, token);
+            var campaignApi = await GetCampaign(account, campaign.SecondaryId, token);
             var converted = _mapperCampaign.Convert(campaignApi);
             var list = new List<CampaignCore>();
             list.Add(converted);
