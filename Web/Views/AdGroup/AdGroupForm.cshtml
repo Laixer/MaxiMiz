@@ -1,0 +1,65 @@
+﻿@*
+    Form for creating a new Ad Group.
+*@
+
+@using Maximiz.InputModels
+@model AdGroupInputModel
+
+@{
+    ViewData["Title"] = "AdGroups";
+}
+
+<body>
+            <div class="row">
+            <div class="col-md-4">
+                <div class="form-group">
+                    <label asp-for="Name" class="control-label"></label>
+                    <input asp-for="Name" class="form-control" />
+                    <span asp-validation-for="Name" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Description" class="control-label"></label>
+                    <input asp-for="Description" class="form-control" />
+                    <span asp-validation-for="Description" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Url" class="control-label"></label>
+                    <input asp-for="Url" class="form-control" />
+                    <span asp-validation-for="Url" class="text-danger"></span>
+                </div>
+                <div class="form-group" name="AdItems">
+                    @for (int i = 0; i < Model.AdItems.Count; ++i)
+                    {
+                        <label>@(i + 1)</label>
+                        <input asp-for="AdItems[i].Title" class="form-control" placeholder="Title" />
+                        <input asp-for="AdItems[i].Content" class="form-control" placeholder="Description" />
+                    }
+                    <a class="text-primary">Add Advertisement +</a>
+                </div>
+                <div class="col-md-6">
+                    @using (Html.BeginForm("Upload", "AdGroup", FormMethod.Post, new
+                    {
+                        enctype = "multipart/form-data"
+                    }))
+                    {
+                        <input type="file" name="file" id="file" />
+                        <input type="submit" />
+                    }
+                </div>
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    <label>Preview</label>
+                </div>
+                <button class="btn btn-secondary">Cancel</button>
+                <button type="submit" class="btn btn-primary">Save</button>
+            </div>
+        </div>
+    
+
+    @section Scripts {
+        <script src="~/lib/jquery-validation/dist/jquery.validate.js"></script>
+        <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.js"></script>
+    }
+
+</body>

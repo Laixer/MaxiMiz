@@ -4,8 +4,6 @@
 @using Maximiz.Model.Enums
 @using Maximiz.Model.Entity
 @model OverviewCampaignModel
-@{string input = "";}
-
 @{
     ViewData["Title"] = "Campaigns";
 }
@@ -16,12 +14,12 @@
     <div class="row">
         <div class="col-md-6"></div>
         <div class="col-md-6">
-
-            <input class="form-control" asp-for="Query" id="SearchId" name="SearchId" type="text" />
-            <button onclick="location.href='@Url.Action("Search", "Campaign",  Model.Query)'">Search</button>
+            @using (Html.BeginForm("Search", "Campaign"))
+            {
+                @Html.TextBoxFor(model => model.Query)
+                <input type="submit"/>
+            }
         </div>
-
-
     </div>
 
     <table class="table table-bordered">

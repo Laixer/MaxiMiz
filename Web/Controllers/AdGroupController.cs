@@ -3,6 +3,8 @@ using Maximiz.Model.Entity;
 using Maximiz.Repositories.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Protocols;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
@@ -50,14 +52,13 @@ namespace Maximiz.Controllers
         /// <param name="uploadFile">The picture that needs to be uploaded</param>
         /// <returns>A view with the picture that you uploaded</returns>
         [HttpPost]
-        public IActionResult FileUpload(IFormFile uploadFile)
+        public Task<IActionResult> Upload(IFormFile file)
         {
-            if (uploadFile != null)
+            if (file != null)
             {
-                string relativePath = "~/img/" + Path.GetFileName(uploadFile.FileName);
-                return View((object)relativePath);
+               
             }
-            return View();
+            throw new NotImplementedException();
         }
 
         /// <summary>

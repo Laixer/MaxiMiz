@@ -111,6 +111,11 @@ namespace Maximiz.Repositories
 
             }
         }
+
+        public Task Upload()
+        {
+            throw new NotImplementedException();
+        }
         public Task Delete(AdGroup entity)
         {
             throw new NotImplementedException();

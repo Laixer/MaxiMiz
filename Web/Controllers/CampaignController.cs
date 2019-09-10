@@ -121,7 +121,7 @@ namespace Maximiz.Controllers
         /// </summary>
         /// <param name="query">The search term to query the database for.</param>
         /// <returns></returns>
-        [HttpGet]
+        [HttpPost]
         public async Task<IActionResult> Search(string query)
         {
             if (!string.IsNullOrEmpty(query))

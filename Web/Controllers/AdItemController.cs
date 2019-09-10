@@ -26,7 +26,6 @@ namespace Maximiz.Controllers
             return RedirectToAction("Overview");
         }
         
-        // TODO Change method
         // GET: /Advertisements
         /// <summary>
         /// (Temporary) action for displaying an overview of advertisements.

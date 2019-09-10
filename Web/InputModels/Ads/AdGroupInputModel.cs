@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using Maximiz.Model.Entity;
+using Microsoft.AspNetCore.Http;
 
 namespace Maximiz.InputModels
 {
@@ -34,5 +35,7 @@ namespace Maximiz.InputModels
         /// Ad items to create for this group.
         /// </summary>
         public List<AdItemInputModel> AdItems { get; set; }
+
+        public string ImagePath{ get; set; }
     }
 }
