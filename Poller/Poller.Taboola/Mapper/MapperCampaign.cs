@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using Maximiz.Model.Entity;
 using Maximiz.Model.Enums;
 using Poller.Helper;
@@ -214,35 +216,58 @@ namespace Poller.Taboola.Mapper
         /// Converts an enum to all caps. This is because Taboola uses upper 
         /// case to denote these enums, while we use lower case.
         /// </summary>
+        /// <typeparam name="T">Enum type</typeparam>
         /// <param name="input">Input enum</param>
         /// <returns>Upper case string</returns>
-        private string ToUpperString(DailyAdDeliveryModel input)
+        private string ToUpperString<T>(T input)
+            where T : Enum
         {
-            return input.GetEnumMemberName().ToUpper();
+            var split = Regex.Split(input.ToString(), @"(?<!^)(?=[A-Z])");
+
+            if (split.Length > 1)
+            {
+                string result = "";
+                for (int i = 0; i < split.Length - 1; i++)
+                {
+                    result += split[i].ToUpper() + "_";
+                }
+                result += split[split.Length - 1].ToUpper();
+                return result;
+            }
+            else
+            {
+                return input.ToString().ToString();
+            }
         }
 
         /// <summary>
-        /// Converts an upper case string to a daily ad delivery model. This is 
-        /// because Taboola uses upper case to denote these enums, while we use
-        /// lower case.
+        /// Attempt to convert an enum from all caps snake case.
         /// </summary>
-        /// <remarks>When this can't match, it returns 
-        /// <see cref="DailyAdDeliveryModel.Unknown"/>.</remarks>
-        /// <param name="input">Input string, upper case expected</param>
-        /// <returns>Daily ad delivery model enum</returns>
-        private DailyAdDeliveryModel FromUpperString(string input)
+        /// <typeparam name="TEnum">The enum type</typeparam>
+        /// <param name="input">The input string, IN_THIS_FORMAT</param>
+        /// <param name="defaultReturn">If we can't parse we return this</param>
+        /// <returns>Converted enum</returns>
+        public static TEnum FromUpperString<TEnum>(string input, TEnum defaultReturn)
+            where TEnum : struct
         {
-            switch (input)
+            if (string.IsNullOrWhiteSpace(input)) { return defaultReturn; }
+
+            var words = input.Split(new char[] { '_' }, StringSplitOptions.RemoveEmptyEntries);
+            var pascal = "";
+            for (int i = 0; i < words.Length; i++)
             {
-                case "ACCELERATED":
-                    return DailyAdDeliveryModel.Accelerated;
-                case "BALANCED":
-                    return DailyAdDeliveryModel.Balanced;
-                case "STRICT":
-                    return DailyAdDeliveryModel.Strict;
+                words[i] = words[i].Trim('_');
+                pascal += words[i].Substring(0, 1).ToUpper() + words[i].Substring(1).ToLower();
             }
 
-            return DailyAdDeliveryModel.Unknown;
+            if (Enum.TryParse(pascal, out TEnum result))
+            {
+                return result;
+            }
+            else
+            {
+                return defaultReturn;
+            }
         }
 
     }
