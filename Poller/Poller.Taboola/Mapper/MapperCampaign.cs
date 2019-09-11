@@ -236,7 +236,7 @@ namespace Poller.Taboola.Mapper
             }
             else
             {
-                return input.ToString().ToString();
+                return input.ToString().ToUpper();
             }
         }
 
