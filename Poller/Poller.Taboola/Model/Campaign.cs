@@ -8,7 +8,6 @@ namespace Poller.Taboola.Model
     // TODO:
     // - activity_schedule
     // - verification_pixel --> doen we niets me
-    // - marketing_objective --> ooit wel gebruiken dus meenemen
 
 
     /// <summary>
