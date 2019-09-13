@@ -76,9 +76,9 @@ namespace Poller.Taboola
         /// </summary>
         /// <param name="context">The poller context</param>
         /// <param name="token">Cancellation token</param>
-        /// <returns>Nothing (task)</returns>
-        public async Task RefreshAdvertisementDataAsync(
-            PollerContext context, CancellationToken token)
+        /// <returns>Task</returns>
+        public async Task RefreshAdvertisementDataAsync(PollerContext context,
+            CancellationToken token)
         {
             var accounts = await FetchLocalAdvertiserAccountsForCacheAsync(token);
 
