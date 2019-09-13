@@ -91,7 +91,7 @@ namespace Poller.Taboola.Model
         /// Determines the type of spending limit.
         /// </summary>
         [DataMember(Name = "spending_limit_model")]
-        public SpendingLimitModel SpendingLimitModel { get; set; }
+        public string SpendingLimitModel { get; set; }
 
         /// <summary>
         /// Lists all countries the campaign will
@@ -188,13 +188,13 @@ namespace Poller.Taboola.Model
         /// The strategy we use for our bidding methods.
         /// </summary>
         [DataMember(Name = "bid_type")]
-        public BidType BidStrategy { get; set; }
+        public string BidStrategy { get; set; }
 
         /// <summary>
         /// The type of traffic optimization.
         /// </summary>
         [DataMember(Name = "traffic_allocation_mode")]
-        public TrafficAllocationMode TrafficAllocationMode { get; set; }
+        public string TrafficAllocationMode { get; set; }
 
         /// <summary>
         /// When our campaign starts.
@@ -212,13 +212,13 @@ namespace Poller.Taboola.Model
         /// Current approval state by Taboola.
         /// </summary>
         [DataMember(Name = "approval_state")]
-        public ApprovalState ApprovalState { get; set; }
+        public string ApprovalState { get; set; }
 
         /// <summary>
         /// Current campaign status.
         /// </summary>
         [DataMember(Name = "status")]
-        public CampaignStatus Status { get; set; }
+        public string Status { get; set; }
 
         /// <summary>
         /// True if the campaign is running.
