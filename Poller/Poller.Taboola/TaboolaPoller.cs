@@ -71,9 +71,8 @@ namespace Poller.Taboola
         }
 
         /// <summary>
-        /// Implementation from our data refresh interface.
-        /// This function calls the Taboola API and retrieves
-        /// our accounts, campaigns and ad items.
+        /// Implementation from our data refresh interface. This function calls 
+        /// the Taboola API and retrieves our accounts, campaigns and ad items.
         /// </summary>
         /// <param name="context">The poller context</param>
         /// <param name="token">Cancellation token</param>
