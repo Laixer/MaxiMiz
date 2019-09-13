@@ -8,6 +8,8 @@
     <Company>Laixer B.V.</Company>
     <Product>Maximiz Poller</Product>
     <Description>Remote publisher poller and communicator</Description>
+    <AssemblyVersion>1.1.0.0</AssemblyVersion>
+    <FileVersion>1.1.0.0</FileVersion>
   </PropertyGroup>
 
   <ItemGroup>

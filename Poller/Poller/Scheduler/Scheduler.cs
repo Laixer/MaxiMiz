@@ -3,6 +3,10 @@ using System.Threading;
 
 namespace Poller.Scheduler
 {
+
+    /// <summary>
+    /// Schedules our operations.
+    /// </summary>
     public static class Scheduler
     {
         private static readonly Random rand = new Random();

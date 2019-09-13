@@ -8,13 +8,12 @@ using Poller.Database;
 using Poller.Extensions;
 using Poller.OAuth;
 using Poller.Poller;
+using System.Collections.Generic;
 
 using AccountEntity = Maximiz.Model.Entity.Account;
 using CampaignEntity = Maximiz.Model.Entity.Campaign;
 using AdItemEntity = Maximiz.Model.Entity.AdItem;
 using Poller.Taboola.Mapper;
-using Poller.Taboola.Model;
-using System.Collections.Generic;
 
 namespace Poller.Taboola
 {
@@ -44,57 +43,53 @@ namespace Poller.Taboola
         /// <param name="options">The options</param>
         /// <param name="provider">The database provider</param>
         /// <param name="cache">The cache</param>
-        public TaboolaPoller(ILoggerFactory logger,
-            TaboolaPollerOptions options, DbProvider provider,
-            IMemoryCache cache)
+        public TaboolaPoller(ILoggerFactory logger, TaboolaPollerOptions options,
+            DbProvider provider, IMemoryCache cache)
         {
             _logger = logger.CreateLogger(typeof(TaboolaPoller).FullName);
             _provider = provider;
             _cache = cache;
 
-            _client = new HttpManager(options.BaseUrl)
-            {
-                TokenUri = "oauth/token",
-                RefreshUri = "oauth/token",
-                AuthorizationProvider = new OAuthAuthorizationProvider
+            // Create our http client
+            _client = new HttpManager(
+                new Uris(options.BaseUrl, "oauth/token", "oauth/token"),
+                new OAuthAuthorizationProvider
                 {
                     ClientId = options.OAuth2.ClientId,
                     ClientSecret = options.OAuth2.ClientSecret,
                     Username = options.OAuth2.Username,
                     Password = options.OAuth2.Password,
-                }
-            };
+                });
 
+            // Create all our mappers
             _mapperAccount = new MapperAccount();
             _mapperCampaign = new MapperCampaign();
             _mapperAdItem = new MapperAdItem();
             _mapperTarget = new MapperTarget();
 
-            _logger.LogInformation("Taboola poller created");
+            // Log version
+            _logger.LogInformation($"Poller {Constants.ApplicationName} created with {Constants.ApplicationVersion}.");
         }
 
         /// <summary>
-        /// Implementation from our data refresh interface.
-        /// This function calls the Taboola API and retrieves
-        /// our accounts, campaigns and ad items.
+        /// Implementation from our data refresh interface. This function calls 
+        /// the Taboola API and retrieves our accounts, campaigns and ad items.
         /// </summary>
         /// <param name="context">The poller context</param>
         /// <param name="token">Cancellation token</param>
-        /// <returns>Nothing (task)</returns>
-        public async Task RefreshAdvertisementDataAsync(
-            PollerContext context, CancellationToken token)
+        /// <returns>Task</returns>
+        public async Task RefreshAdvertisementDataAsync(PollerContext context,
+            CancellationToken token)
         {
-            var accounts = await FetchLocalAdvertiserAccountsForCache(token);
+            var accounts = await FetchLocalAdvertiserAccountsForCacheAsync(token);
 
             foreach (var account in accounts.ToList().Shuffle())
             {
-                var result = await GetTopCampaignReportAsync(
-                    account.Name, token);
+                var result = await GetTopCampaignReportAsync(account.Name, token);
                 var converted = _mapperAdItem.ConvertAll(result.Items);
+                await CommitAdItems(converted, token);
 
-                await CommitCampaignItems(converted, token);
-
-                // Prevent spamming our API
+                // Prevent spamming our database
                 await Task.Delay(250, token);
             }
         }
@@ -121,9 +116,10 @@ namespace Poller.Taboola
             }
 
             // Get local accounts and extract some campaign data.
-            var accounts = await FetchLocalAdvertiserAccountsForCache(token);
+            var accounts = await FetchLocalAdvertiserAccountsForCacheAsync(token);
             foreach (var account in accounts.ToList().Shuffle().Take(2))
             {
+                _logger.LogDebug($"Extracting data for account: {account.Name}");
                 var result = (await GetAllCampaigns(account, token)).Items;
                 result = _mapperTarget.ConvertAll(result);
                 var converted = _mapperCampaign.ConvertAll(result);
@@ -134,8 +130,8 @@ namespace Poller.Taboola
                 //       too long, and this is only a secondary function. We
                 //       choose 100 items at random and sync them. Over time
                 //       all items must be synced eventually.
-                await ProcessCampainItems(context, account,
-                    converted.ToList().Shuffle().Take(100), token);
+                // await ProcessCampainItems(context, account, converted.ToList(), token);
+                await ProcessCampainItems(context, account, converted.ToList().Shuffle().Take(100), token);
             }
         }
 
@@ -148,20 +144,17 @@ namespace Poller.Taboola
         /// <param name="campaigns">Campaign list</param>
         /// <param name="token">Cancellation token</param>
         /// <returns></returns>
-        private async Task ProcessCampainItems(
-            PollerContext context,
-            AccountEntity account,
-            IEnumerable<CampaignEntity> campaigns,
-            CancellationToken token)
+        private async Task ProcessCampainItems(PollerContext context, AccountEntity account,
+            IEnumerable<CampaignEntity> campaigns, CancellationToken token)
         {
             foreach (var campaign in campaigns)
             {
                 try
                 {
-                    var items = await GetCampaignAllItems(
-                        account.Name, campaign.SecondaryId, token);
+                    var items = await GetCampaignAllItemsAsync(account, campaign, token);
                     var convertedItems = _mapperAdItem.ConvertAll(items.Items);
-                    await CommitCampaignItems(convertedItems, token, true);
+                    await CommitAdItems(convertedItems, token, true);
+                    _logger.LogDebug($"Processed items for campaign {campaign.SecondaryId}");
 
                     // Prevent spamming.
                     await Task.Delay(250, token);
@@ -176,105 +169,142 @@ namespace Poller.Taboola
         }
 
         /// <summary>
-        /// Implements our CRUD interface. This handles
-        /// CRUD operations on given objects. The type
-        /// of operation and the objects are specified
-        /// within the context.
+        /// Implements our CRUD interface. This handles CRUD operations on given
+        /// objects. The type of operation and the objects are specified within
+        /// the context.
+        /// 
+        /// The context must contain an account and an entity to be updated. 
+        /// This function will throw if this is not the case.
+        /// 
+        /// The entity must either be an ad item or a campaign. No other entites
+        /// can be crudded.
+        /// 
+        /// The operation can not be a read operation.
+        /// 
+        /// TODO Returning what we created in a clean way.
         /// </summary>
         /// <param name="context">CRUD context</param>
         /// <param name="token">Cancellation token</param>
-        /// <returns>Nothing (task)</returns>
-        public Task CreateOrUpdateObjectsAsync(CreateOrUpdateObjectsContext context, CancellationToken token)
+        /// <returns>Task</returns>
+        public async Task CreateOrUpdateObjectsAsync(
+            CreateOrUpdateObjectsContext context, CancellationToken token)
         {
+            // Throws if invalid
+            ValidateCrudContext(context);
+
+            var account = (AccountEntity)context.Entity[0];
+            var entity = context.Entity[1];
+            switch (context.Action)
+            {
+                // Create an entity
+                // The entity must aleady exist in our own database
+                case Maximiz.Model.CrudAction.Create:
+                    switch (entity)
+                    {
+                        case CampaignEntity campaign:
+                            var createdConverted = await CreateCampaignAsync(account, campaign, token);
+                            await UpdateLocalCampaignAsync(createdConverted, token);
+
+                            context.Entity[1] = createdConverted;
+                            return;
+
+                        case AdItemEntity adItem:
+                            // var createdConverted = await CreateAdItemAsync(account, adItem, token);
+                            // await UpdateLocalAdItemAsync(createdConverted, token);
+                            break;
+                    }
+                    break;
+
+                // Update an entity
+                case Maximiz.Model.CrudAction.Update:
+                    switch (entity)
+                    {
+                        case CampaignEntity campaign:
+                            var updated = await UpdateCampaignAsync(account, campaign, token);
+                            var updatedConverted = _mapperCampaign.Convert(updated, campaign.Id);
+                            await UpdateLocalCampaignAsync(updatedConverted, token);
+
+                            context.Entity[1] = updatedConverted;
+                            return;
+
+                        case AdItemEntity adItem:
+                            //await UpdateAdItemAsync(account, adItem, token);
+                            break;
+                    }
+                    break;
+                // Delete an entity
+                case Maximiz.Model.CrudAction.Delete:
+                    switch (entity)
+                    {
+                        // TODO Do we want to delete this or update this to some delete status? I'd say delete the thing.
+                        case CampaignEntity campaign:
+                            var deleted = await DeleteCampaignAsync(account, campaign, token);
+                            var deletedConverted = _mapperCampaign.Convert(deleted, campaign.Id);
+                            await LocalDeleteCampaignAsync(deletedConverted.Id, token);
+
+                            context.Entity[1] = deletedConverted;
+                            return;
+
+                        case AdItemEntity adItem:
+                            //await DeleteAdItemAsync(account, adItem, token);
+                            break;
+                    }
+                    break;
+
+                // Syncback for campaign
+                case Maximiz.Model.CrudAction.Syncback:
+                    switch (entity)
+                    {
+                        case CampaignEntity campaign:
+                            // await SyncbackCampaignAsync(account, campaign, token);
+                            break;
+                    }
+                    break;
+            }
+        }
+
+        /// <summary>
+        /// Validates if our CRUD context has the correct format.
+        /// </summary>
+        /// <exception cref="InvalidOperationException">Invalid format</exception>
+        /// <param name="context">The CRUD context</param>
+        private void ValidateCrudContext(CreateOrUpdateObjectsContext context)
+        {
+            var account = context.Entity[0];
+            var entity = context.Entity[1];
+            var action = context.Action;
+
+            // Check format
             if (context.Entity.Length != 2)
             {
                 throw new InvalidOperationException("Two entities expected");
             }
-
-            // First item *must* be an account entity
-            if (!(context.Entity[0] is AccountEntity))
+            if (!(account is AccountEntity))
             {
                 throw new InvalidOperationException("Entity account is expected");
             }
 
-            foreach (var item in context.Entity)
+            // Check type
+            if (!(entity is CampaignEntity || entity is AdItemEntity))
             {
-                if (!(item is CampaignEntity || item is AdItemEntity))
-                {
-                    throw new InvalidOperationException("Entity is invalid for this operation");
-                }
+                throw new InvalidOperationException(
+                    "Entity is invalid for this operation");
             }
 
-            // TODO: 
-            // 1.) Convert into Taboola model
-
-            switch (context.Action)
+            // Check operation
+            if (action == Maximiz.Model.CrudAction.Read)
             {
-                case Maximiz.Model.CrudAction.Create:
-                    if (context.Entity[1] is CampaignEntity)
-                    {
-                        // TODO: CreateCampaign(account, token);
-                    }
-                    else if (context.Entity[1] is AdItemEntity)
-                    {
-                        // TODO: CreateAdItem(account, campaign, token);
-                    }
-                    else
-                    {
-                        throw new Exception(); // TODO: Define exception.
-                    }
-                    break;
-
-                case Maximiz.Model.CrudAction.Read:
-                    throw new InvalidOperationException("Read is invalid for this operation");
-
-                case Maximiz.Model.CrudAction.Update:
-                    if (context.Entity[1] is CampaignEntity)
-                    {
-                        // TODO: UpdateCampaign(account, campaign, token);
-                    }
-                    else if (context.Entity[1] is AdItemEntity)
-                    {
-                        // TODO: UpdateAdItem(account, campaign, item, token);
-                    }
-                    else
-                    {
-                        throw new Exception(); // TODO: Define exception.
-                    }
-                    break;
-
-                case Maximiz.Model.CrudAction.Delete:
-                    if (context.Entity[1] is CampaignEntity)
-                    {
-                        // TODO: DeleteCampaign(account, campaign, token);
-                    }
-                    else if (context.Entity[1] is AdItemEntity)
-                    {
-                        // TODO: DeleteAdItem(account, campaign, item, token);
-                    }
-                    else
-                    {
-                        throw new Exception(); // TODO: Define exception.
-                    }
-                    break;
-
-                case Maximiz.Model.CrudAction.Syncback:
-                    if (!(context.Entity[1] is CampaignEntity))
-                    {
-                        throw new Exception(); // TODO: Define exception.
-                    }
-
-                    //var result = await GetCampaigns(account, campaign, token);
-                    //await CommitCampaigns(result, token);
-                    // for each result.Items
-                    //  var result = await GetCampaignItems(account, campaign, item, token);
-                    //  await CommitCampaignItems(result, token, true);
-                    // endforeach
-
-                    break;
+                throw new InvalidOperationException(
+                    "Read is invalid for this operation");
             }
 
-            return Task.CompletedTask;
+            // Check syncback
+            if (action == Maximiz.Model.CrudAction.Syncback &&
+                !(entity is CampaignEntity))
+            {
+                throw new InvalidOperationException(
+                    "Can only syncback for campaigns");
+            }
         }
 
         /// <summary>

@@ -15,6 +15,11 @@ namespace Maximiz.Model.Entity
         public string SecondaryId { get; set; }
 
         /// <summary>
+        /// Indicates the status of any requested local changes made by the user.
+        /// </summary>
+        public ChangeRequestStatus? ChangeRequestStatus { get; set; }
+
+        /// <summary>
         /// Group to which this campaign belongs to.
         /// </summary>
         public int CampaignGroup { get; set; }
@@ -28,7 +33,7 @@ namespace Maximiz.Model.Entity
         /// Language of the campaign, 2 chars.
         /// TODO Why do we need this?
         /// </summary>
-        public string Language { get; set; }
+        public string LanguageAsText { get; set; }
 
         /// <summary>
         /// Delivery mode of this ad.
@@ -69,7 +74,7 @@ namespace Maximiz.Model.Entity
         /// <summary>
         /// Budget spent.
         /// </summary>
-        public decimal Spent { get; set; }
+        public decimal? Spent { get; set; }
 
         /// <summary>
         /// Campaign start date.

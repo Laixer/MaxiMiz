@@ -7,50 +7,77 @@ using Poller.OAuth;
 
 namespace Poller
 {
+
+    /// <summary>
+    /// Manages all our http requests. This class does not
+    /// sends the requests itself, but delegates this to the
+    /// <see cref="OAuthHttpClient"/> class.
+    /// </summary>
     public class HttpManager : IDisposable
     {
-        private static OAuthHttpClient _client;
-        private readonly string _baseUrl;
-
-        public string TokenUri { get; set; }
-        public string RefreshUri { get; set; }
-        public OAuthAuthorizationProvider AuthorizationProvider { get; set; }
-
-        public HttpManager(string baseUrl) => _baseUrl = baseUrl;
 
         /// <summary>
-        /// Create or reuse an OAuthHttpClient.
+        /// Static singleton client to manage authentication.
         /// </summary>
-        protected OAuthHttpClient BuildHttpClient(bool newInstance = false)
+        private static OAuthHttpClient _client;
+
+        /// <summary>
+        /// Contains urls and endpoints.
+        /// </summary>
+        private readonly Uris _uris;
+
+        /// <summary>
+        /// Contains our client secrets and credentials.
+        /// </summary>
+        private readonly OAuthAuthorizationProvider _authorizationProvider;
+
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        /// <param name="uris">Contains our url 
+        /// and endpoints</param>
+        /// <param name="authorizationProvider">
+        /// Contains our client credentials</param>
+        public HttpManager(Uris uris, OAuthAuthorizationProvider authorizationProvider)
+        {
+            _uris = uris;
+            _authorizationProvider = authorizationProvider;
+        }
+
+        /// <summary>
+        /// Create or reuse an OAuthHttpClient, with our
+        /// tokens included.
+        /// </summary>
+        /// <param name="newInstance">Set to true to force
+        /// the creation of a new authorization client</param>
+        /// <returns>The created client.</returns>
+        internal OAuthHttpClient BuildAuthorizedHttpClient(bool newInstance = false)
         {
             if (_client != null && !newInstance)
             {
                 return _client;
             }
 
-            return _client = new OAuthHttpClient
-            {
-                BaseAddress = new Uri(_baseUrl),
-                TokenUri = TokenUri,
-                RefreshUri = RefreshUri,
-                AuthorizationProvider = AuthorizationProvider,
-            };
+            return _client = new OAuthHttpClient(_uris, _authorizationProvider);
         }
 
         /// <summary>
-        /// Execute API call and return result. This function
-        /// actually communicates with the database.
+        /// Execute API query and return result. This function calls the
+        /// <see cref="OAuthHttpClient"/> which actually communicates with
+        /// the internet.
         /// </summary>
         /// <remarks>
-        /// This operations throws an exception when status is 
-        /// not HTTP.OK.
+        /// This operations throws an exception when status is not HTTP.OK.
         /// </remarks>
-        /// <param name="method">HTTP method.</param>
-        /// <param name="url">Endpoint.</param>
-        public async Task<TResult> RemoteQueryAsync<TResult>(HttpMethod method, string url, CancellationToken cancellationToken)
+        /// <param name="method">HTTP method</param>
+        /// <param name="endpoint">Endpoint</param>
+        /// <param name="cancellationToken">Cancellation otken</param>
+        public async Task<TResult> RemoteQueryAsync<TResult>(
+            HttpMethod method, string endpoint, CancellationToken cancellationToken)
             where TResult : class
         {
-            using (var httpResponse = await BuildHttpClient().SendAsync(new HttpRequestMessage(method, url), cancellationToken))
+            using (var httpResponse = await BuildAuthorizedHttpClient().SendAsync(
+                new HttpRequestMessage(method, endpoint), cancellationToken))
             {
                 httpResponse.EnsureSuccessStatusCode();
                 return await Json.DeserializeAsync<TResult>(httpResponse);
@@ -58,13 +85,25 @@ namespace Poller
         }
 
         /// <summary>
-        /// Execute API call without expecting result.
+        /// API execution.
+        /// 
+        /// TODO What can our status codes be?
         /// </summary>
-        /// <param name="method">HTTP method.</param>
-        /// <param name="url">Endpoint.</param>
-        public async Task RemoteExecuteAsync(string url, HttpContent content, CancellationToken cancellationToken)
+        /// <typeparam name="TResult">Type to be returned</typeparam>
+        /// <param name="method">Http method</param>
+        /// <param name="endpoint">Endpoint url without the base</param>
+        /// <param name="content">Http content</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns></returns>
+        public async Task<TResult> RemoteExecuteAsync<TResult>(
+            HttpMethod method, string endpoint, HttpContent content,
+            CancellationToken cancellationToken)
+            where TResult : class
         {
-            using (var httpResponse = await BuildHttpClient().PostAsync(url, content, cancellationToken))
+            var request = new HttpRequestMessage(method, endpoint);
+            request.Content = content;
+            using (var httpResponse = await BuildAuthorizedHttpClient().
+                SendAsync(request, cancellationToken))
             {
                 httpResponse.EnsureSuccessStatusCode();
             }
