@@ -125,12 +125,12 @@ namespace Poller.Taboola
 
                 await CommitCampaigns(converted, token);
 
-                    // NOTE: We cannot process all items in one go since it takes
-                    //       too long, and this is only a secondary function. We
-                    //       choose 100 items at random and sync them. Over time
-                    //       all items must be synced eventually.
-                    await ProcessCampainItems(context, account, converted.ToList(), token);
-                    // await ProcessCampainItems(context, account, converted.ToList().Shuffle().Take(100), token);
+                // NOTE: We cannot process all items in one go since it takes
+                //       too long, and this is only a secondary function. We
+                //       choose 100 items at random and sync them. Over time
+                //       all items must be synced eventually.
+                // await ProcessCampainItems(context, account, converted.ToList(), token);
+                await ProcessCampainItems(context, account, converted.ToList().Shuffle().Take(100), token);
             }
         }
 
