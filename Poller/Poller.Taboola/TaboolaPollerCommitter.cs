@@ -17,8 +17,7 @@ namespace Poller.Taboola
 {
 
     /// <summary>
-    /// Partial poller that contains all our database
-    /// read and write operations.
+    /// Partial poller that contains all our database write operations.
     /// </summary>
     internal partial class TaboolaPoller
     {
