@@ -14,9 +14,6 @@ using AccountEntity = Maximiz.Model.Entity.Account;
 using CampaignEntity = Maximiz.Model.Entity.Campaign;
 using AdItemEntity = Maximiz.Model.Entity.AdItem;
 using Poller.Taboola.Mapper;
-using Poller.Taboola.Model;
-using System.Collections.Generic;
-using Maximiz.Model.Entity;
 
 namespace Poller.Taboola
 {
