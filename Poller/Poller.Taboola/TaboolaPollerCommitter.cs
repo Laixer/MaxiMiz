@@ -133,18 +133,11 @@ namespace Poller.Taboola
         }
 
         /// <summary>
-        /// This commits our fetched campaigns to our local
-        /// database.
         /// Use this to update values for a campaign in our own database. The
         /// campaign MUST have a (nonzero) GUID to it, else we can't push the
         /// changes to the corresponding database row. This value is stored in
         /// the Id property.
         /// </summary>
-        /// <param name="campaigns">Core campaign list</param>
-        /// <param name="token"></param>
-        /// <returns></returns>
-        private async Task CommitCampaigns(
-            IEnumerable<CampaignEntity> campaigns,
         /// <param name="campaign">Campaign with valuid GUID</param>
         /// <param name="token">The cancellation token</param>
         /// <returns>Task</returns>
