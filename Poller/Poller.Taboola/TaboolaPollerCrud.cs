@@ -153,7 +153,7 @@ namespace Poller.Taboola
             stopwatch.Start();
             while (stopwatch.IsRunning)
             {
-                var result = GetCampaignAllItems(account, campaignId, token).Result.Items;
+                var result = GetCampaignAllItemsAsync(account, campaignId, token).Result.Items;
                 var selected = result.Where(x => x.Id == createdAdItem.Id).FirstOrDefault();
 
                 // Not crawling means we are done
