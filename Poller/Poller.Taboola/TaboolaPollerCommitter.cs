@@ -144,7 +144,6 @@ namespace Poller.Taboola
         private async Task UpdateLocalCampaignAsync(CampaignEntity campaign,
             CancellationToken token)
         {
-            if (campaigns == null || campaigns.Count() <= 0) { return; }
             // Throw on invalid GUID.
             ValidateGuid(campaign);
 
@@ -172,10 +171,6 @@ namespace Poller.Taboola
                     language = '{AB}'
                 WHERE Id = @Id;";
 
-            //foreach (var campaign in campaigns)
-            //{
-            //    if (!(campaign.InitialCpc < campaign.DailyBudget || campaign.DailyBudget != null)) { }
-            //}
             using (var connection = _provider.ConnectionScope())
             {
                 await connection.ExecuteAsync(new CommandDefinition(
