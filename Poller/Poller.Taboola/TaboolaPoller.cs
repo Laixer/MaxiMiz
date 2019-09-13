@@ -192,27 +192,10 @@ namespace Poller.Taboola
         /// </summary>
         /// <param name="context">CRUD context</param>
         /// <param name="token">Cancellation token</param>
-        private async Task RemoveAllDummyCampaignsAsync()
         /// <returns>Task</returns>
         public async Task CreateOrUpdateObjectsAsync(
             CreateOrUpdateObjectsContext context, CancellationToken token)
         {
-            if (context.Entity.Length != 2)
-            var token = new CancellationTokenSource().Token;
-            var accounts = await FetchAdvertiserAccounts(token);
-            var allDummies = new List<Model.Campaign>();
-            foreach (var account in accounts.AsParallel())
-            {
-                throw new InvalidOperationException("Two entities expected");
-                var campaigns = await GetAllCampaigns(account, token);
-                var dummies = new List<Model.Campaign>();
-                dummies.AddRange(campaigns.Items.Where(x => x.Name.Equals("Dummy campaign name")).ToList());
-                allDummies.AddRange(dummies);
-                foreach (var dummy in dummies.AsParallel())
-                {
-                   await DeleteCampaignAsync(account, _mapperCampaign.Convert(dummy), token);
-                }
-            }
             // Throws if invalid
             ValidateCrudContext(context);
 
