@@ -75,7 +75,7 @@ namespace Poller.Taboola.Mapper
             to.Account = details.Account;
             to.DailyAdDeliveryModel = ToUpperString(details.DailyAdDeliveryModel);
             to.PublisherBidModifier = details.PublisherBidModifier;
-            to.SpendingLimitModel = details.SpendingLimitModel;
+            to.SpendingLimitModel = ToUpperString(details.SpendingLimitModel);
             to.CountryTargeting = details.CountryTargeting;
             to.SubCountryTargeting = details.SubCountryTargeting;
             to.PostalCodeTargeting = details.PostalCodeTargeting;
@@ -84,11 +84,12 @@ namespace Poller.Taboola.Mapper
             to.OsTargeting = details.OsTargeting;
             to.ConnectionTypeTargeting = details.ConnectionTypeTargeting;
             to.CpaGoal = details.CpaGoal;
-            to.BidStrategy = details.BidStrategy;
-            to.TrafficAllocationMode = details.TrafficAllocationMode;
-            to.ApprovalState = details.ApprovalState;
-            to.Status = details.Status;
+            to.BidStrategy = ToUpperString(details.BidStrategy);
+            to.TrafficAllocationMode = ToUpperString(details.TrafficAllocationMode);
+            to.ApprovalState = ToUpperString(details.ApprovalState); ;
+            to.Status = ToUpperString(details.Status);
             to.Active = details.Active;
+            to.MarketingObjective = ToUpperString(details.MarketingObjective);
 
             return to;
         }
@@ -137,9 +138,9 @@ namespace Poller.Taboola.Mapper
             return Json.Serialize(new CampaignDetails
             {
                 Account = from.Account,
-                DailyAdDeliveryModel = FromUpperString(from.DailyAdDeliveryModel),
+                DailyAdDeliveryModel = FromUpperString(from.DailyAdDeliveryModel, DailyAdDeliveryModel.Unknown),
                 PublisherBidModifier = from.PublisherBidModifier,
-                SpendingLimitModel = from.SpendingLimitModel,
+                SpendingLimitModel = FromUpperString(from.SpendingLimitModel, SpendingLimitModel.Entire),
                 CountryTargeting = from.CountryTargeting,
                 SubCountryTargeting = from.SubCountryTargeting,
                 PostalCodeTargeting = from.PostalCodeTargeting,
@@ -148,11 +149,12 @@ namespace Poller.Taboola.Mapper
                 OsTargeting = from.OsTargeting,
                 ConnectionTypeTargeting = from.ConnectionTypeTargeting,
                 CpaGoal = from.CpaGoal,
-                BidStrategy = from.BidStrategy,
-                TrafficAllocationMode = from.TrafficAllocationMode,
-                ApprovalState = from.ApprovalState,
-                Status = from.Status,
-                Active = from.Active
+                BidStrategy = FromUpperString(from.BidStrategy, BidType.Fixed),
+                TrafficAllocationMode = FromUpperString(from.TrafficAllocationMode, TrafficAllocationMode.Even),
+                ApprovalState = FromUpperString(from.ApprovalState, Model.ApprovalState.Pending),
+                Status = FromUpperString(from.Status, CampaignStatus.PendingApproval),
+                Active = from.Active,
+                MarketingObjective = FromUpperString(from.MarketingObjective, MarketingObjective.DriveWebsiteTraffic)
             });
         }
 
