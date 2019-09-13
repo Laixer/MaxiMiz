@@ -64,6 +64,7 @@ namespace Poller.Taboola
                     Password = options.OAuth2.Password,
                 });
 
+            // Create all our mappers
             _mapperAccount = new MapperAccount();
             _mapperCampaign = new MapperCampaign();
             _mapperAdItem = new MapperAdItem();
