@@ -213,8 +213,8 @@ namespace Poller.Taboola
             CancellationToken token)
         {
             var content = BuildStringContent(adItem);
-            var campaignId = await FetchCampaignIdFromAdItem(adItem, token);
-            var endpoint = $"api/1.0/{account}/campaigns/{campaignId}/{adItem.SecondaryId}";
+            var campaignId = await FetchCampaignIdFromAdItemAsync(adItem, token);
+            var endpoint = $"api/1.0/{account}/campaigns/{campaignId}/{adItem.SecondaryId}/";
             await RemoteExecuteAndLogAsync(HttpMethod.Post, endpoint, content, token);
         }
 
