@@ -81,8 +81,7 @@ namespace Poller.Taboola
         /// </summary>
         /// <param name="token"></param>
         /// <returns></returns>
-        private Task<IEnumerable<AccountEntity>>
-            FetchLocalAdvertiserAccountsForCache
+        private Task<IEnumerable<AccountEntity>> FetchLocalAdvertiserAccountsForCacheAsync
             (CancellationToken token)
         {
             return _cache.GetOrCreateAsync(
