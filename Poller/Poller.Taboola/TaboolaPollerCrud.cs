@@ -228,8 +228,8 @@ namespace Poller.Taboola
         private async Task<Campaign> DeleteCampaignAsync(AccountCore account,
             CampaignCore campaign, CancellationToken token)
         {
-            var endpoint = $"api/1.0/{account.Name}/campaigns/{campaign.SecondaryId}";
-            await RemoteExecuteAndLogAsync(HttpMethod.Delete, endpoint, null, token);
+            var endpoint = $"api/1.0/{account.Name}/campaigns/{campaign.SecondaryId}/";
+            return await RemoteExecuteAndLogAsync<Campaign>(HttpMethod.Delete, endpoint, null, token);
         }
 
         /// <summary>
