@@ -220,11 +220,11 @@ namespace Poller.Taboola
                     switch (entity)
                     {
                         case CampaignEntity campaign:
-                            var updated = await UpdateCampaignAsync(account, campaign, token);
-                            var updatedConverted = _mapperCampaign.Convert(updated, campaign.Id);
-                            await UpdateLocalCampaignAsync(updatedConverted, token);
+                            // var updated = await UpdateCampaignAsync(account, campaign, token);
+                            // var updatedConverted = _mapperCampaign.Convert(updated, campaign.Id);
+                            // await UpdateLocalCampaignAsync(updatedConverted, token);
 
-                            context.Entity[1] = updatedConverted;
+                            // context.Entity[1] = updatedConverted;
                             return;
 
                         case AdItemEntity adItem:
