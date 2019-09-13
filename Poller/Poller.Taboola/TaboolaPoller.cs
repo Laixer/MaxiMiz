@@ -53,18 +53,16 @@ namespace Poller.Taboola
             _provider = provider;
             _cache = cache;
 
-            _client = new HttpManager(options.BaseUrl)
-            {
-                TokenUri = "oauth/token",
-                RefreshUri = "oauth/token",
-                AuthorizationProvider = new OAuthAuthorizationProvider
+            // Create our http client
+            _client = new HttpManager(
+                new Uris(options.BaseUrl, "oauth/token", "oauth/token"),
+                new OAuthAuthorizationProvider
                 {
                     ClientId = options.OAuth2.ClientId,
                     ClientSecret = options.OAuth2.ClientSecret,
                     Username = options.OAuth2.Username,
                     Password = options.OAuth2.Password,
-                }
-            };
+                });
 
             _mapperAccount = new MapperAccount();
             _mapperCampaign = new MapperCampaign();
