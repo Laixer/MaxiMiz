@@ -106,6 +106,7 @@ namespace Poller
                 SendAsync(request, cancellationToken))
             {
                 httpResponse.EnsureSuccessStatusCode();
+                return await Json.DeserializeAsync<TResult>(httpResponse);
             }
         }
 

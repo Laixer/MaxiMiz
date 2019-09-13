@@ -67,7 +67,7 @@ namespace Poller.Taboola
         /// <summary>
         /// DEBUG FUNCTION
         /// </summary>
-        private async void DriveCrud()
+        private async void DriveCrudCampaign()
         {
             try
             {
@@ -84,7 +84,7 @@ namespace Poller.Taboola
                     BrandingText = "Dummy campaign branding text",
                     LocationInclude = new int[] { 0 },
                     LocationExclude = new int[] { 0 },
-                    Language = "NL",
+                    LanguageAsText = "NL",
                     InitialCpc = 0.01M,
                     Budget = 1,
                     DailyBudget = null,
@@ -97,31 +97,51 @@ namespace Poller.Taboola
                 // Create the object in the taboola API
                 var accounts = (await GetAllAccounts(token)).Items;
                 var account = _mapperAccount.Convert(accounts.ToList().Where(x => x.PartnerTypes.Contains("ADVERTISER")).First());
-                CreateOrUpdateObjectsContext context = new CreateOrUpdateObjectsContext(1, null)
+                CreateOrUpdateObjectsContext contextCreate = new CreateOrUpdateObjectsContext(1, null)
                 {
                     Action = Maximiz.Model.CrudAction.Create,
                     Entity = new Entity[] { account, campaignEntityToCommit }
                 };
-                await CreateOrUpdateObjectsAsync(context, token);
+                await CreateOrUpdateObjectsAsync(contextCreate, token);
 
                 // Validate
-                var created = context.Entity[1] as CampaignEntity;
-                var campaignFromTaboola = await GetCampaign(account, created.SecondaryId, token);
-                var campaignConverted = _mapperCampaign.Convert(campaignFromTaboola, created.Id);
-                var campaignFromLocal = await FetchCampaignFromGuidAsync(created.Id, token);
+                var campaignCreated = contextCreate.Entity[1] as CampaignEntity;
+                var campaignCreatedFromTaboola = await GetCampaignAsync(account, campaignCreated.SecondaryId, token);
+                var campaignCreatedConverted = _mapperCampaign.Convert(campaignCreatedFromTaboola, campaignCreated.Id);
+                var campaignCreatedFromLocal = await FetchCampaignFromGuidAsync(campaignCreated.Id, token);
+
+
 
                 // Update
-                campaignConverted.BrandingText = "Updated dummy branding text";
-                context = new CreateOrUpdateObjectsContext(1, null)
+                /*var campaignToUpdate = campaignCreatedFromLocal;
+                campaignToUpdate.BrandingText = "Updated dummy branding text";
+                await UpdateLocalCampaignAsync(campaignToUpdate, token);
+                var contextUpdate = new CreateOrUpdateObjectsContext(1, null)
                 {
                     Action = Maximiz.Model.CrudAction.Update,
-                    Entity = new Entity[] { account, campaignConverted }
+                    Entity = new Entity[] { account, campaignToUpdate }
                 };
-                await CreateOrUpdateObjectsAsync(context, token);
+                await CreateOrUpdateObjectsAsync(contextUpdate, token);
 
                 // Validate
-                var result2 = await GetCampaign(account, campaignEntityToCommit.SecondaryId, token);
-                var resultConverted2 = _mapperCampaign.Convert(result2);
+                var campaignUpdatedFromTaboola = await GetCampaign(account, campaignEntityToCommit.SecondaryId, token);
+                var campaignUpdatedConverted = _mapperCampaign.Convert(campaignUpdatedFromTaboola);
+                var campaignUpdatedFromLocal = await FetchCampaignFromGuidAsync(campaignCreated.Id, token);*/
+
+
+
+                // Delete
+                var contextDelete = new CreateOrUpdateObjectsContext(1, null)
+                {
+                    Action = Maximiz.Model.CrudAction.Delete,
+                    Entity = new Entity[] { account, campaignCreatedFromLocal }
+                };
+                await CreateOrUpdateObjectsAsync(contextDelete, token);
+                var campaignDeletedFromTaboola = await GetCampaignAsync(account, campaignEntityToCommit.SecondaryId, token);
+                var campaignDeletedFromLocal = await FetchCampaignFromGuidAsync(campaignCreated.Id, token);
+
+                // Clean up
+                await RemoveAccountDummyCampaignsAsync(account, token);
             }
             catch (Exception e)
             {
