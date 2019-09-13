@@ -129,5 +129,18 @@ namespace Poller.Taboola
             }
         }
 
+        /// <summary>
+        /// Validates if our entity has a guid.
+        /// </summary>
+        /// <remarks>Throws if guid is empty or null</remarks>
+        /// <param name="entity">The entity to check</param>
+        private void ValidateGuid(Entity<Guid> entity)
+        {
+            if (entity.Id == Guid.Empty || entity.Id == null)
+            {
+                throw new NullReferenceException("Entity GUID can't be null or empty");
+            }
+        }
+
     }
 }
