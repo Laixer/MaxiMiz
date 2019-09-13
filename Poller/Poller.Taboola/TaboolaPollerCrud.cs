@@ -65,8 +65,10 @@ namespace Poller.Taboola
         }
 
         /// <summary>
-        /// Gets a single campaign based on its ID.
+        /// Gets a single campaign based on its ID in the Taboola API.
         /// </summary>
+        /// <remarks>This returns null if the Taboola API returns a campaign
+        /// with Id set to null, indicating it does not exist.</remarks>
         /// <param name="account">The account</param>
         /// <param name="campaignId">The campaign id</param>
         /// <param name="token">The cancellation token</param>
@@ -80,9 +82,9 @@ namespace Poller.Taboola
 
         /// <summary>
         /// Creates a new campaign in the Taboola API, based on a campaign in
-        /// our database. All known parameters will be sent to Taboola. After
-        /// this is done, the parameters of our created campaign are put back
-        /// into our own database.
+        /// our database. All known parameters will be sent to Taboola. After 
+        /// creation the Taboola object is converted and returned, along with
+        /// the original GUID.
         /// </summary>
         /// <param name="account">The account</param>
         /// <param name="campaign">The core campaign</param>
