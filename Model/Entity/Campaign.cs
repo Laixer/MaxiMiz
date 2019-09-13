@@ -17,7 +17,7 @@ namespace Maximiz.Model.Entity
         /// <summary>
         /// Indicates the status of any requested local changes made by the user.
         /// </summary>
-        public ChangeRequestStatus ChangeRequestStatus { get; set; }
+        public ChangeRequestStatus? ChangeRequestStatus { get; set; }
 
         /// <summary>
         /// Group to which this campaign belongs to.
