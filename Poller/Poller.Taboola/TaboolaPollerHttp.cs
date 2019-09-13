@@ -78,7 +78,9 @@ namespace Poller.Taboola
 
             try
             {
-                _logger.LogTrace($"Executing {endpoint} with content {content.ToString()}");
+                var contentString = "no content";
+                if (content != null) { contentString = content.ReadAsStringAsync().ToString(); }
+                _logger.LogTrace($"Executing {endpoint} with content {contentString}");
 
                 return await _client.RemoteExecuteAsync<TResult>(
                     method, endpoint, content, cancellationToken);
