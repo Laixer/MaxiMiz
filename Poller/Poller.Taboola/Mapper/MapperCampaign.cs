@@ -29,6 +29,19 @@ namespace Poller.Taboola.Mapper
         private readonly int[] DefaultLocations = new int[0];
 
         /// <summary>
+        /// Converts our core model to taboola campaign. This preserves the GUID.
+        /// </summary>
+        /// <param name="core">The object to convert</param>
+        /// <param name="guid">The guid if we already know it</param>
+        /// <returns>The converted object</returns>
+        public CampaignCore Convert(CampaignTaboola core, Guid guid)
+        {
+            var converted = Convert(core);
+            converted.Id = guid;
+            return converted;
+        }
+
+        /// <summary>
         /// Converts our core model to taboola campaign.
         /// </summary>
         /// <param name="core">The object to convert</param>
