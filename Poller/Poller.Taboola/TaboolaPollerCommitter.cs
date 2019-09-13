@@ -269,16 +269,58 @@ namespace Poller.Taboola
         }
 
         /// <summary>
+        /// This commits our fetched campaigns to our local database.
         /// </summary>
+        /// <param name="campaigns">Core campaign list</param>
+        /// <param name="token"></param>
+        /// <returns>Task</returns>
+        private async Task CommitCampaigns(IEnumerable<CampaignEntity> campaigns,
+            CancellationToken token)
         {
+            if (campaigns == null || campaigns.Count() <= 0) { return; }
+
             var sql = @"
+                INSERT INTO
+	                public.campaign(
+                        secondary_id, name, branding_text, 
+                        language_as_text, initial_cpc, budget, 
+                        budget_daily, spent, delivery, 
+                        start_date, end_date, utm, 
+                        campaign_group, note, details,
 
+                        location_include, location_exclude, language)
+                VALUES
+                    (
+                        @SecondaryId,
+                        @Name,
+                        @BrandingText,
+                        @LanguageAsText,
+                        @InitialCpc,
+                        @Budget,
+                        @DailyBudget,
+                        @Spent,
+                        CAST (@DeliveryText AS delivery),
+                        COALESCE(@StartDate, CURRENT_TIMESTAMP),
+                        VALIDATE_TIMESTAMP(@EndDate),
+                        @Utm,
+                        48389,
+                        @Note,
+                        CAST (@Details AS json),
 
+                        @LocationInclude,
+                        @LocationExclude,
+                        '{AB}'
+                    )
+                ON CONFLICT (secondary_id) DO NOTHING;";
 
             using (var connection = _provider.ConnectionScope())
             {
+                await connection.ExecuteAsync(new CommandDefinition(
+                    sql, campaigns, cancellationToken: token));
             }
         }
 
     }
+
 }
+
