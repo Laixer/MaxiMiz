@@ -59,6 +59,7 @@ namespace Poller.Taboola
 
         /// <summary>
         /// Commits a single ad item.
+        /// TODO This must return GUID. Same structure.
         /// </summary>
         /// <param name="adItem">The ad item to commit</param>
         /// <param name="token">The cancellation token</param>
