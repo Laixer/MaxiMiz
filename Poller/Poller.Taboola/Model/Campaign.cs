@@ -182,7 +182,7 @@ namespace Poller.Taboola.Model
         /// The amount of money spent on this campaign.
         /// </summary>
         [DataMember(Name = "spent")]
-        public decimal Spent { get; set; }
+        public decimal? Spent { get; set; }
 
         /// <summary>
         /// The strategy we use for our bidding methods.
