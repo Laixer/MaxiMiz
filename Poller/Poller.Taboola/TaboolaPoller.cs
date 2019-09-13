@@ -161,7 +161,7 @@ namespace Poller.Taboola
                     var items = await GetCampaignAllItems(
                         account.Name, campaign.SecondaryId, token);
                     var convertedItems = _mapperAdItem.ConvertAll(items.Items);
-                    await CommitCampaignItems(convertedItems, token, true);
+                    await CommitAdItems(convertedItems, token, true);
 
                     // Prevent spamming.
                     await Task.Delay(250, token);
