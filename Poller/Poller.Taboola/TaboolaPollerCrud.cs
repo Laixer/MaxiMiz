@@ -89,6 +89,8 @@ namespace Poller.Taboola
         /// <param name="account">The account</param>
         /// <param name="campaign">The core campaign</param>
         /// <param name="token">Cancellation token</param>
+        /// <returns>A new campaign object converted from the created campaign
+        /// along with the correct GUID</returns>
         private async Task<CampaignCore> CreateCampaignAsync(AccountCore account,
             CampaignCore campaign, CancellationToken token)
         {
@@ -175,6 +177,7 @@ namespace Poller.Taboola
 
         /// <summary>
         /// Updates a given campaign from our core database to the taboola API.
+        /// The campaign entity MUST have a GUID attached to it.
         /// </summary>
         /// <param name="account">Account to which the campaign belongs</param>
         /// <param name="campaign">Campaign with parameters</param>
