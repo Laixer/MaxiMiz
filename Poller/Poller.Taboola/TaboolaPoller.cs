@@ -67,7 +67,8 @@ namespace Poller.Taboola
             _mapperAdItem = new MapperAdItem();
             _mapperTarget = new MapperTarget();
 
-            _logger.LogInformation("Taboola poller created");
+            // Log version
+            _logger.LogInformation($"Poller {Constants.ApplicationName} created with {Constants.ApplicationVersion}.");
         }
 
         /// <summary>
