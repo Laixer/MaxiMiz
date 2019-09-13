@@ -230,7 +230,7 @@ namespace Poller.Taboola
                             return;
 
                         case AdItemEntity adItem:
-                            await UpdateAdItemAsync(account, adItem, token);
+                            //await UpdateAdItemAsync(account, adItem, token);
                             break;
                     }
                     break;
@@ -248,7 +248,7 @@ namespace Poller.Taboola
                             return;
 
                         case AdItemEntity adItem:
-                            await DeleteAdItemAsync(account, adItem, token);
+                            //await DeleteAdItemAsync(account, adItem, token);
                             break;
                     }
                     break;
@@ -258,7 +258,7 @@ namespace Poller.Taboola
                     switch (entity)
                     {
                         case CampaignEntity campaign:
-                            await SyncbackCampaignAsync(account, campaign, token);
+                            // await SyncbackCampaignAsync(account, campaign, token);
                             break;
                     }
                     break;
