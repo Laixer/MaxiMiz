@@ -8,6 +8,7 @@ using Poller.Database;
 using Poller.Extensions;
 using Poller.OAuth;
 using Poller.Poller;
+using System.Collections.Generic;
 
 using AccountEntity = Maximiz.Model.Entity.Account;
 using CampaignEntity = Maximiz.Model.Entity.Campaign;
