@@ -181,73 +181,16 @@ namespace Poller.Taboola
         }
 
         /// <summary>
-        /// Gets all advertiser accounts from our database.
         /// </summary>
-        /// <param name="token">Cancellation token</param>
-        /// <returns>All advertiser accounts</returns>
-        private async Task<IEnumerable<AccountEntity>>
-            FetchAdvertiserAccounts(CancellationToken token)
         {
             var sql = @"
-                SELECT
-                    *
-	            FROM
-                    public.account
-                WHERE
-                    publisher = 'taboola'::publisher AND
-                    (details::json #>> '{partner_types}')::jsonb ? 'advertiser'";
+
+
 
             using (var connection = _provider.ConnectionScope())
             {
-                var result = await connection.QueryAsync<AccountEntity>
-                    (new CommandDefinition(sql, cancellationToken: token));
-                return result;
             }
         }
 
-        /// <summary>
-        /// Gets all publisher accounts from our database.
-        /// </summary>
-        /// <param name="token">Cancellation token</param>
-        /// <returns>All publisher accounts</returns>
-        private async Task<IEnumerable<AccountEntity>>
-            FetchPublisherAccounts(CancellationToken token)
-        {
-            var sql = @"
-                SELECT
-                    *
-	            FROM
-                    public.account
-                WHERE
-                    publisher = 'taboola'::publisher AND
-                    (details::json #>> '{partner_types}')::jsonb ? 'publisher'";
-
-            using (var connection = _provider.ConnectionScope())
-            {
-                var result = await connection.QueryAsync<AccountEntity>
-                    (new CommandDefinition(sql, cancellationToken: token));
-                return result;
-            }
-        }
-
-        /// <summary>
-        /// This adds the accounts that are present in
-        /// our OWN database to the cache.
-        /// TODO: Return account model according to
-        /// database scheme.
-        /// </summary>
-        /// <param name="token"></param>
-        /// <returns></returns>
-        private Task<IEnumerable<AccountEntity>>
-            FetchLocalAdvertiserAccountsForCache
-            (CancellationToken token)
-        {
-            return _cache.GetOrCreateAsync(
-                "AdvertiserAccounts", async entry =>
-            {
-                entry.SlidingExpiration = TimeSpan.FromDays(1);
-                return await FetchAdvertiserAccounts(token);
-            });
-        }
     }
 }
