@@ -176,27 +176,26 @@ namespace Poller.Taboola
         }
 
         /// <summary>
-        /// Implements our CRUD interface. This handles
-        /// CRUD operations on given objects. The type
-        /// of operation and the objects are specified
-        /// within the context.
+        /// Implements our CRUD interface. This handles CRUD operations on given
+        /// objects. The type of operation and the objects are specified within
+        /// the context.
         /// 
-        /// The context must contain an account and an
-        /// entity to be updated. This function will throw
-        /// if this is not the case.
+        /// The context must contain an account and an entity to be updated. 
+        /// This function will throw if this is not the case.
         /// 
-        /// The entity must either be an ad item or a
-        /// campaign. No other entites can be crudded.
+        /// The entity must either be an ad item or a campaign. No other entites
+        /// can be crudded.
         /// 
         /// The operation can not be a read operation.
+        /// 
+        /// TODO Returning what we created in a clean way.
         /// </summary>
         /// <param name="context">CRUD context</param>
         /// <param name="token">Cancellation token</param>
-        /// <returns>Nothing (task)</returns>
-        public Task CreateOrUpdateObjectsAsync(
-            CreateOrUpdateObjectsContext context,
-            CancellationToken token)
         private async Task RemoveAllDummyCampaignsAsync()
+        /// <returns>Task</returns>
+        public async Task CreateOrUpdateObjectsAsync(
+            CreateOrUpdateObjectsContext context, CancellationToken token)
         {
             if (context.Entity.Length != 2)
             var token = new CancellationTokenSource().Token;
@@ -214,86 +213,80 @@ namespace Poller.Taboola
                    await DeleteCampaignAsync(account, _mapperCampaign.Convert(dummy), token);
                 }
             }
+            // Throws if invalid
+            ValidateCrudContext(context);
 
-            // First item *must* be an account entity
-            if (!(context.Entity[0] is AccountEntity))
-            {
-                throw new InvalidOperationException("Entity account is expected");
-            }
-
-            foreach (var item in context.Entity)
-            {
-                if (!(item is CampaignEntity || item is AdItemEntity))
-                {
-                    throw new InvalidOperationException("Entity is invalid for this operation");
-                }
-            }
-
-            // TODO: 
-            // 1.) Convert into Taboola model
-
+            var account = (AccountEntity)context.Entity[0];
+            var entity = context.Entity[1];
             switch (context.Action)
             {
+                // Create an entity
+                // The entity must aleady exist in our own database
                 case Maximiz.Model.CrudAction.Create:
-                    if (context.Entity[1] is CampaignEntity)
+                    switch (entity)
                     {
-                        // TODO: CreateCampaign(account, token);
-                    }
-                    else if (context.Entity[1] is AdItemEntity)
-                    {
-                        // TODO: CreateAdItem(account, campaign, token);
-                    }
-                    else
-                    {
-                        throw new Exception(); // TODO: Define exception.
+                        case CampaignEntity campaign:
+                            var createdConverted = await CreateCampaignAsync(account, campaign, token);
+                            await UpdateLocalCampaignAsync(createdConverted, token);
+
+                            context.Entity[1] = createdConverted;
+                            return;
+
+                        case AdItemEntity adItem:
+                            // var createdConverted = await CreateAdItemAsync(account, adItem, token);
+                            // await UpdateLocalAdItemAsync(createdConverted, token);
+                            break;
                     }
                     break;
 
-                case Maximiz.Model.CrudAction.Read:
-                    throw new InvalidOperationException("Read is invalid for this operation");
-
+                // Update an entity
                 case Maximiz.Model.CrudAction.Update:
-                    if (context.Entity[1] is CampaignEntity)
+                    switch (entity)
                     {
-                        // TODO: UpdateCampaign(account, campaign, token);
-                    }
-                    else if (context.Entity[1] is AdItemEntity)
-                    {
-                        // TODO: UpdateAdItem(account, campaign, item, token);
-                    }
-                    else
-                    {
-                        throw new Exception(); // TODO: Define exception.
+                        case CampaignEntity campaign:
+                            var updated = await UpdateCampaignAsync(account, campaign, token);
+                            var updatedConverted = _mapperCampaign.Convert(updated, campaign.Id);
+                            await UpdateLocalCampaignAsync(updatedConverted, token);
+
+                            context.Entity[1] = updatedConverted;
+                            return;
+
+                        case AdItemEntity adItem:
+                            await UpdateAdItemAsync(account, adItem, token);
+                            break;
                     }
                     break;
-
+                // Delete an entity
                 case Maximiz.Model.CrudAction.Delete:
-                    if (context.Entity[1] is CampaignEntity)
+                    switch (entity)
                     {
-                        // TODO: DeleteCampaign(account, campaign, token);
-                    }
-                    else if (context.Entity[1] is AdItemEntity)
-                    {
-                        // TODO: DeleteAdItem(account, campaign, item, token);
-                    }
-                    else
-                    {
-                        throw new Exception(); // TODO: Define exception.
+                        // TODO Do we want to delete this or update this to some delete status? I'd say delete the thing.
+                        case CampaignEntity campaign:
+                            var deleted = await DeleteCampaignAsync(account, campaign, token);
+                            var deletedConverted = _mapperCampaign.Convert(deleted, campaign.Id);
+                            await LocalDeleteCampaignAsync(deletedConverted.Id, token);
+
+                            context.Entity[1] = deletedConverted;
+                            return;
+
+                        case AdItemEntity adItem:
+                            await DeleteAdItemAsync(account, adItem, token);
+                            break;
                     }
                     break;
 
+                // Syncback for campaign
                 case Maximiz.Model.CrudAction.Syncback:
-                    if (!(context.Entity[1] is CampaignEntity))
+                    switch (entity)
                     {
-                        throw new Exception(); // TODO: Define exception.
+                        case CampaignEntity campaign:
+                            await SyncbackCampaignAsync(account, campaign, token);
+                            break;
                     }
+                    break;
+            }
+        }
 
-                    //var result = await GetCampaigns(account, campaign, token);
-                    //await CommitCampaigns(result, token);
-                    // for each result.Items
-                    //  var result = await GetCampaignItems(account, campaign, item, token);
-                    //  await CommitCampaignItems(result, token, true);
-                    // endforeach
         /// <summary>
         /// Validates if our CRUD context has the correct format.
         /// </summary>
@@ -305,7 +298,6 @@ namespace Poller.Taboola
             var entity = context.Entity[1];
             var action = context.Action;
 
-                    break;
             // Check format
             if (context.Entity.Length != 2)
             {
@@ -316,7 +308,6 @@ namespace Poller.Taboola
                 throw new InvalidOperationException("Entity account is expected");
             }
 
-            return Task.CompletedTask;
             // Check type
             if (!(entity is CampaignEntity || entity is AdItemEntity))
             {
