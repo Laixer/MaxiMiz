@@ -135,20 +135,60 @@ namespace Poller.Taboola
         /// <summary>
         /// This commits our fetched campaigns to our local
         /// database.
+        /// Use this to update values for a campaign in our own database. The
+        /// campaign MUST have a (nonzero) GUID to it, else we can't push the
+        /// changes to the corresponding database row. This value is stored in
+        /// the Id property.
         /// </summary>
         /// <param name="campaigns">Core campaign list</param>
         /// <param name="token"></param>
         /// <returns></returns>
         private async Task CommitCampaigns(
             IEnumerable<CampaignEntity> campaigns,
+        /// <param name="campaign">Campaign with valuid GUID</param>
+        /// <param name="token">The cancellation token</param>
+        /// <returns>Task</returns>
+        private async Task UpdateLocalCampaignAsync(CampaignEntity campaign,
             CancellationToken token)
         {
             if (campaigns == null || campaigns.Count() <= 0) { return; }
+            // Throw on invalid GUID.
+            ValidateGuid(campaign);
+
+            var sql = @"
+                UPDATE public.campaign
+	            SET
+                    secondary_id = @SecondaryId,
+                    name = @Name, 
+                    branding_text = @BrandingText, 
+                    language_as_text = @LanguageAsText, 
+                    initial_cpc = @InitialCpc, 
+                    budget = @Budget, 
+                    budget_daily = @DailyBudget, 
+                    spent = @Spent, 
+                    delivery = CAST (@DeliveryText AS delivery), 
+                    start_date = COALESCE(@StartDate, CURRENT_TIMESTAMP),     
+                    end_date = VALIDATE_TIMESTAMP(@EndDate), 
+                    utm = @Utm, 
+                    campaign_group = 48389, 
+                    note = @Note, 
+                    details = CAST (@Details AS json),
+
+                    location_include = @LocationInclude, 
+                    location_exclude = @LocationExclude,
+                    language = '{AB}'
+                WHERE Id = @Id;";
 
             //foreach (var campaign in campaigns)
             //{
             //    if (!(campaign.InitialCpc < campaign.DailyBudget || campaign.DailyBudget != null)) { }
             //}
+            using (var connection = _provider.ConnectionScope())
+            {
+                await connection.ExecuteAsync(new CommandDefinition(
+                    sql, campaign, cancellationToken: token));
+            }
+        }
 
             var sql = @"
                 INSERT INTO
