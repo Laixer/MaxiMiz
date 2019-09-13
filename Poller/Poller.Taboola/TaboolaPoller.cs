@@ -84,10 +84,8 @@ namespace Poller.Taboola
 
             foreach (var account in accounts.ToList().Shuffle())
             {
-                var result = await GetTopCampaignReportAsync(
-                    account.Name, token);
+                var result = await GetTopCampaignReportAsync(account.Name, token);
                 var converted = _mapperAdItem.ConvertAll(result.Items);
-
                 await CommitAdItems(converted, token);
 
                 // Prevent spamming our API
