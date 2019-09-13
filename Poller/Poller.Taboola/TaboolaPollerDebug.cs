@@ -28,31 +28,31 @@ namespace Poller.Taboola
     /// </summary>
     internal partial class TaboolaPoller
     {
-     
 
         /// <summary>
         /// Remove all created dummy campaigns. Use this after a debug session
         /// in which a lot of dummy campaigns were created.
-        /// TODO This seems to be very non-parallel.
         /// </summary>
         private async Task RemoveAllDummyCampaignsAsync()
         {
             var token = new CancellationTokenSource().Token;
             var accounts = await FetchAdvertiserAccounts(token);
-            var allDummies = new List<Model.Campaign>();
-            foreach (var account in accounts.AsParallel())
+            foreach (var account in accounts)
             {
-                var campaigns = await GetAllCampaigns(account, token);
-                var dummies = new List<Model.Campaign>();
-                dummies.AddRange(campaigns.Items.Where(x => x.Name.Equals("Dummy campaign name")).ToList());
-                allDummies.AddRange(dummies);
-                foreach (var dummy in dummies.AsParallel())
-                {
-                   await DeleteCampaignAsync(account, _mapperCampaign.Convert(dummy), token);
-                }
+                // Use discard to optimize memory allocation management
+                _ = RemoveAccountDummyCampaignsAsync(account, token);
+
+                // Prevent spamming
+                await Task.Delay(250);
             }
         }
 
+        /// <summary>
+        /// Remove dummy campaigns for a specific account.
+        /// </summary>
+        /// <param name="account">The account</param>
+        /// <param name="token">The cancellation token</param>
+        /// <returns></returns>
         private async Task RemoveAccountDummyCampaignsAsync(AccountEntity account, CancellationToken token)
         {
             var campaigns = await GetAllCampaigns(account, token);
