@@ -141,5 +141,11 @@ namespace Poller.Taboola.Model
         [DataMember(Name = "is_active")]
         public bool Active { get; set; }
 
+        /// <summary>
+        /// Indicates the marketing objective of this campaign.
+        /// </summary>
+        [DataMember(Name = "marketing_objective")]
+        public MarketingObjective MarketingObjective { get; set; }
+
     }
 }
