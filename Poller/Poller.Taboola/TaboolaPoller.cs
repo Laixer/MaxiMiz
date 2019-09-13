@@ -121,8 +121,8 @@ namespace Poller.Taboola
             }
 
             // Get local accounts and extract some campaign data.
-            var accounts = await FetchLocalAdvertiserAccountsForCache(token);
             foreach (var account in accounts.ToList().Shuffle().Take(2))
+            var accounts = await FetchLocalAdvertiserAccountsForCacheAsync(token);
             {
                 _logger.LogDebug($"Extracting data for account: {account.Name}");
                 var result = (await GetAllCampaigns(account, token)).Items;
