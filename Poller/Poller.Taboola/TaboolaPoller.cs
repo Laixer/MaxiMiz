@@ -92,7 +92,7 @@ namespace Poller.Taboola
                     account.Name, token);
                 var converted = _mapperAdItem.ConvertAll(result.Items);
 
-                await CommitCampaignItems(converted, token);
+                await CommitAdItems(converted, token);
 
                 // Prevent spamming our API
                 await Task.Delay(250, token);
