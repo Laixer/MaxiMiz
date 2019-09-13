@@ -74,7 +74,7 @@ namespace Maximiz.Model.Entity
         /// <summary>
         /// Budget spent.
         /// </summary>
-        public decimal Spent { get; set; }
+        public decimal? Spent { get; set; }
 
         /// <summary>
         /// Campaign start date.
