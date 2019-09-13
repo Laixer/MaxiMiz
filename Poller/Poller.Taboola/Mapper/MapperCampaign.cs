@@ -202,7 +202,7 @@ namespace Poller.Taboola.Mapper
             {
                 SecondaryId = DefaultCampaignIdNumber,
                 Name = DefaultCampaignIdName,
-                Language = DefaultLanguage,
+                LanguageAsText = DefaultLanguage,
                 Budget = DefaultNumber,
                 DailyBudget = null,
                 Delivery = DefaultDelivery,
