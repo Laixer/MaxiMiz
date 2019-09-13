@@ -143,11 +143,8 @@ namespace Poller.Taboola
         /// <param name="campaigns">Campaign list</param>
         /// <param name="token">Cancellation token</param>
         /// <returns></returns>
-        private async Task ProcessCampainItems(
-            PollerContext context,
-            AccountEntity account,
-            IEnumerable<CampaignEntity> campaigns,
-            CancellationToken token)
+        private async Task ProcessCampainItems(PollerContext context, AccountEntity account,
+            IEnumerable<CampaignEntity> campaigns, CancellationToken token)
         {
             foreach (var campaign in campaigns)
             {
