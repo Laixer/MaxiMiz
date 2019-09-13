@@ -205,6 +205,20 @@ namespace Poller.Taboola
                     sql, cancellationToken: token));
             }
         }
+
+        /// <summary>
+        /// Push a single campaign to our own database. The database assigns a 
+        /// GUID to the campaign we just pushed. This function writes this GUID
+        /// to the campaign and returns it.
+        /// 
+        /// TODO Duplicate code
+        /// 
+        /// </summary>
+        /// <param name="campaign">The core campaign</param>
+        /// <param name="token">The cancellation token</param>
+        /// <returns>Campaign entity with corresponding GUID</returns>
+        private async Task<CampaignEntity> CommitCampaignWriteGuid(CampaignEntity campaign, CancellationToken token)
+        {
             var sql = @"
                 INSERT INTO
 	                public.campaign(
@@ -214,14 +228,13 @@ namespace Poller.Taboola
                         start_date, end_date, utm, 
                         campaign_group, note, details,
 
-                        location_include, location_exclude,
-                        language)
+                        location_include, location_exclude, language)
                 VALUES
                     (
                         @SecondaryId,
                         @Name,
                         @BrandingText,
-                        @Language,
+                        @LanguageAsText,
                         @InitialCpc,
                         @Budget,
                         @DailyBudget,
@@ -238,12 +251,20 @@ namespace Poller.Taboola
                         @LocationExclude,
                         '{AB}'
                     )
-                ON CONFLICT (secondary_id) DO NOTHING";
+                ON CONFLICT (secondary_id) DO NOTHING
+                RETURNING Id;";
 
             using (var connection = _provider.ConnectionScope())
             {
-                await connection.ExecuteAsync(new CommandDefinition(
-                    sql, campaigns, cancellationToken: token));
+                var guid = await connection.ExecuteScalarAsync<Guid>(
+                    new CommandDefinition(sql, campaign, cancellationToken: token));
+
+                // TODO This should be done differently
+                if (campaign.Id == Guid.Empty || campaign.Id == null)
+                {
+                    campaign.Id = guid;
+                }
+                return campaign;
             }
         }
 
