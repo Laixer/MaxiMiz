@@ -100,7 +100,7 @@ namespace Poller.Taboola
         /// <param name="adItem">Integer id of our ad group</param>
         /// <param name="token">Cancellation token</param>
         /// <returns></returns>
-        private async Task<string> FetchCampaignIdFromAdItem(
+        private async Task<string> FetchCampaignIdFromAdItemAsync(
             AdItemEntity adItem, CancellationToken token)
         {
             // Get the ad group
