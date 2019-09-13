@@ -1,10 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
-using Maximiz.Model.Entity;
 using Maximiz.Model.Enums;
 using Poller.Helper;
 using Poller.Model.Data;
