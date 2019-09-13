@@ -188,10 +188,18 @@ namespace Poller.Taboola
         private async Task<Campaign> UpdateCampaignAsync(AccountCore account,
             CampaignCore campaign, CancellationToken token)
         {
-            var push = _mapperCampaign.Convert(campaign);
-            var content = BuildStringContent(push);
+            // Throw if we don't have a valid GUID
+            ValidateGuid(campaign);
+
+            var convertedAndNullified = _mapperCampaign.ConvertAndNullifyReadOnly(campaign);
+            var content = BuildStringContent(convertedAndNullified);
+            var contentString = content.ReadAsStringAsync();
             var endpoint = $"api/1.0/{account}/campaigns/{campaign.SecondaryId}";
-            await RemoteExecuteAndLogAsync(HttpMethod.Put, endpoint, content, token);
+
+            // TODO intermediate result
+            var result = await RemoteExecuteAndLogAsync<Campaign>(
+                HttpMethod.Post, endpoint, content, token);
+            return result;
         }
 
         /// <summary>
