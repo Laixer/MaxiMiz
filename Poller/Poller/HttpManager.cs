@@ -98,7 +98,7 @@ namespace Poller
         public async Task<TResult> RemoteExecuteAsync<TResult>(
             HttpMethod method, string endpoint, HttpContent content,
             CancellationToken cancellationToken)
-            where TResult : class 
+            where TResult : class
         {
             var request = new HttpRequestMessage(method, endpoint);
             request.Content = content;
