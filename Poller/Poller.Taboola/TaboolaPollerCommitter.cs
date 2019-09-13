@@ -81,11 +81,9 @@ namespace Poller.Taboola
         /// <param name="token">Cancellation token</param>
         /// <param name="updateStatus">If we want to update
         /// the items status and approval state</param>
-        /// <returns>Nothing (task)</returns>
-        private async Task CommitCampaignItems(
-            IEnumerable<AdItemEntity> aditems,
-            CancellationToken token,
-            bool updateStatus = false)
+        /// <returns>Task</returns>
+        private async Task CommitAdItems(IEnumerable<AdItemEntity> aditems,
+            CancellationToken token, bool updateStatus = false)
         {
             if (aditems == null || aditems.Count() <= 0) { return; }
 
