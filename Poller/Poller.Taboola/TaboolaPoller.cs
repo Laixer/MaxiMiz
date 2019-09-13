@@ -197,10 +197,23 @@ namespace Poller.Taboola
         public Task CreateOrUpdateObjectsAsync(
             CreateOrUpdateObjectsContext context,
             CancellationToken token)
+        private async Task RemoveAllDummyCampaignsAsync()
         {
             if (context.Entity.Length != 2)
+            var token = new CancellationTokenSource().Token;
+            var accounts = await FetchAdvertiserAccounts(token);
+            var allDummies = new List<Model.Campaign>();
+            foreach (var account in accounts.AsParallel())
             {
                 throw new InvalidOperationException("Two entities expected");
+                var campaigns = await GetAllCampaigns(account, token);
+                var dummies = new List<Model.Campaign>();
+                dummies.AddRange(campaigns.Items.Where(x => x.Name.Equals("Dummy campaign name")).ToList());
+                allDummies.AddRange(dummies);
+                foreach (var dummy in dummies.AsParallel())
+                {
+                   await DeleteCampaignAsync(account, _mapperCampaign.Convert(dummy), token);
+                }
             }
 
             // First item *must* be an account entity
