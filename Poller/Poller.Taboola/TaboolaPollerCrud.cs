@@ -95,11 +95,13 @@ namespace Poller.Taboola
             CampaignCore campaign, CancellationToken token)
         {
             var endpoint = $"api/1.0/{account.Name}/campaigns/";
-            var converted = _mapperCampaign.Convert(campaign);
-            var content = BuildStringContent(converted);
-            var result = await RemoteExecuteAndLogAsync<Campaign>(HttpMethod.Post, endpoint, content, token);
-            var campaignFetched = _mapperCampaign.Convert(result);
-            await UpdateCampaign(account, campaignFetched, token);
+            var convertedAndNullified = _mapperCampaign.ConvertAndNullifyReadOnly(campaign);
+            var content = BuildStringContent(convertedAndNullified);
+
+            var createdCampaign = await RemoteExecuteAndLogAsync<Campaign>(HttpMethod.Post, endpoint, content, token);
+            var convertedCampaign = _mapperCampaign.Convert(createdCampaign);
+            convertedCampaign.Id = campaign.Id;
+            return convertedCampaign;
         }
 
         /// <summary>
