@@ -88,7 +88,7 @@ namespace Poller.Taboola
                 var converted = _mapperAdItem.ConvertAll(result.Items);
                 await CommitAdItems(converted, token);
 
-                // Prevent spamming our API
+                // Prevent spamming our database
                 await Task.Delay(250, token);
             }
         }
