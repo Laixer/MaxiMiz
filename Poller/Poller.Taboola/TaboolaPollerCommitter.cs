@@ -57,6 +57,20 @@ namespace Poller.Taboola
         }
 
         /// <summary>
+        /// Commits a single ad item.
+        /// </summary>
+        /// <param name="adItem">The ad item to commit</param>
+        /// <param name="token">The cancellation token</param>
+        /// <returns>Task</returns>
+        private async Task CommitAdItem(AdItemEntity adItem,
+            CancellationToken token)
+        {
+            var list = new List<AdItemEntity>();
+            list.Add(adItem);
+            await CommitAdItems(list, token);
+        }
+
+        /// <summary>
         /// Commits a list of campaign items to our database.
         /// These entries have already been converted.
         /// TODO Bulk insert.
