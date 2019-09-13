@@ -3,6 +3,10 @@ using System.Threading;
 
 namespace Poller.Scheduler
 {
+
+    /// <summary>
+    /// Schedules our operations.
+    /// </summary>
     public static class Scheduler
     {
         private static readonly Random rand = new Random();
@@ -22,6 +26,7 @@ namespace Poller.Scheduler
         public static Timer ScheduleTimer(Timer timer, TimeSpan timeSpan, bool withBias = true)
         {
             var timerOffset = TimeSpan.FromSeconds(rand.Next(15, 45));
+
             timer.Change(withBias
                 ? timeSpan.Add(timerOffset)
                 : timeSpan, TimeSpan.FromMilliseconds(-1));
