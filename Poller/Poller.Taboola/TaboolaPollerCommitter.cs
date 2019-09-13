@@ -190,6 +190,21 @@ namespace Poller.Taboola
             }
         }
 
+        /// <summary>
+        /// Deletes a local campaign based on the guid.
+        /// </summary>
+        /// <param name="guid">The GUID to delete</param>
+        /// <param name="token">The cancellation token</param>
+        /// <returns>Task</returns>
+        private async Task LocalDeleteCampaignAsync(Guid guid, CancellationToken token)
+        {
+            var sql = $"DELETE FROM public.campaign WHERE id::text = '{guid.ToString()}'";
+            using (var connection = _provider.ConnectionScope())
+            {
+                await connection.ExecuteAsync(new CommandDefinition(
+                    sql, cancellationToken: token));
+            }
+        }
             var sql = @"
                 INSERT INTO
 	                public.campaign(
