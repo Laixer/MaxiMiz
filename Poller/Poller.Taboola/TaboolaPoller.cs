@@ -294,11 +294,50 @@ namespace Poller.Taboola
                     //  var result = await GetCampaignItems(account, campaign, item, token);
                     //  await CommitCampaignItems(result, token, true);
                     // endforeach
+        /// <summary>
+        /// Validates if our CRUD context has the correct format.
+        /// </summary>
+        /// <exception cref="InvalidOperationException">Invalid format</exception>
+        /// <param name="context">The CRUD context</param>
+        private void ValidateCrudContext(CreateOrUpdateObjectsContext context)
+        {
+            var account = context.Entity[0];
+            var entity = context.Entity[1];
+            var action = context.Action;
 
                     break;
+            // Check format
+            if (context.Entity.Length != 2)
+            {
+                throw new InvalidOperationException("Two entities expected");
+            }
+            if (!(account is AccountEntity))
+            {
+                throw new InvalidOperationException("Entity account is expected");
             }
 
             return Task.CompletedTask;
+            // Check type
+            if (!(entity is CampaignEntity || entity is AdItemEntity))
+            {
+                throw new InvalidOperationException(
+                    "Entity is invalid for this operation");
+            }
+
+            // Check operation
+            if (action == Maximiz.Model.CrudAction.Read)
+            {
+                throw new InvalidOperationException(
+                    "Read is invalid for this operation");
+            }
+
+            // Check syncback
+            if (action == Maximiz.Model.CrudAction.Syncback &&
+                !(entity is CampaignEntity))
+            {
+                throw new InvalidOperationException(
+                    "Can only syncback for campaigns");
+            }
         }
 
         /// <summary>
