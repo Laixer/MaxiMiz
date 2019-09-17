@@ -19,19 +19,19 @@ namespace Poller.Taboola.Model
         /// <summary>
         /// All are included.
         /// </summary>
-        [EnumMember(Value = "include")]
+        [EnumMember(Value = "INCLUDE")]
         Include,
 
         /// <summary>
         /// All are excluded.
         /// </summary>
-        [EnumMember(Value = "exclude")]
+        [EnumMember(Value = "EXCLUDE")]
         Exclude,
 
         /// <summary>
         /// All.
         /// </summary>
-        [EnumMember(Value = "all")]
+        [EnumMember(Value = "ALL")]
         All
     }
 

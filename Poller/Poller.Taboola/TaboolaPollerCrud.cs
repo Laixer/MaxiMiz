@@ -14,6 +14,7 @@ using Poller.Helper;
 using System.Linq;
 using System.Diagnostics;
 using System.Text;
+using Newtonsoft.Json.Linq;
 
 namespace Poller.Taboola
 {
@@ -308,13 +309,27 @@ namespace Poller.Taboola
         /// </summary>
         /// <param name="obj">The object to serialize</param>
         /// <returns>Stringcontent object</returns>
-        private StringContent BuildStringContent(object obj)
+        private StringContent BuildStringContent(object obj, bool sanetizeForUpdate = false)
         {
             // Nullify all read only parameters
             var serialized = Json.Serialize(obj);
             var parsed = JObject.Parse(serialized);
             NullifyReadOnlyCampaign(parsed);
 
+            // If we are doing an update call
+            if (sanetizeForUpdate)
+            {
+                // Target sanetizing
+                // TODO Not very elegant
+                if (obj as Campaign != null)
+                {
+                    SanetizeCampaignTarget(parsed, "country_targeting");
+                    SanetizeCampaignTarget(parsed, "contextual_targeting");
+                    SanetizeCampaignTarget(parsed, "platform_targeting");
+
+                    // TODO Beun fix
+                    RemoveIfPresent(parsed, "sub_country_targeting"); // This should be country dependent, as this can only exist when we target a specific country
+                }
 
             }
 
@@ -340,6 +355,35 @@ namespace Poller.Taboola
             RemoveIfPresent(obj, "postal_code_targeting");
         }
 
+        /// <summary>
+        /// Sanetize a campaign target object.
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <param name="key"></param>
+        private void SanetizeCampaignTarget(JObject obj, string key)
+        {
+            if (obj.ContainsKey(key))
+            {
+                obj[key] = SanetizeTarget(obj[key] as JObject);
+            }
+        }
+
+        /// <summary>
+        /// If the value array is empty, we set the array to null.
+        /// TODO Also during INCLUDE or EXCLUDE?
+        /// TODO This seems like a Taboola bug.
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <returns></returns>
+        private JObject SanetizeTarget(JObject obj)
+        {
+            if (obj.ContainsKey("type") && obj.ContainsKey("value") &&
+                obj.GetValue("type").ToString().Equals("ALL"))
+            {
+                obj["value"] = null;
+            }
+            return obj;
+        }
 
         /// <summary>
         /// Removes a key-value combination if the key is present.
