@@ -197,7 +197,7 @@ namespace Poller.Taboola
             var converted = _mapperCampaign.Convert(campaign);
             var content = BuildStringContent(converted, true);
             var contentString = content.ReadAsStringAsync();
-            var endpoint = $"api/1.0/{account}/campaigns/{campaign.SecondaryId}";
+            var endpoint = $"api/1.0/{account.Name}/campaigns/{campaign.SecondaryId}";
 
             // TODO intermediate result
             var result = await RemoteExecuteAndLogAsync<Campaign>(
