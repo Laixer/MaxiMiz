@@ -61,7 +61,8 @@ namespace Maximiz.Model.Entity
         public int Actions { get; set; }
 
         /// <summary>
-        /// Represents our approval state.
+        /// Indicates the status of any changes made in our own database. These
+        /// changes have to be pushed to the corresponding external API.
         /// </summary>
         public ApprovalState ApprovalState { get; set; }
         public string ApprovalStateText { get => ApprovalState.GetEnumMemberName(); }
