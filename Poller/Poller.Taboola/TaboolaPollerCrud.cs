@@ -304,8 +304,9 @@ namespace Poller.Taboola
 
         /// <summary>
         /// Does a proper encoding of any object. This returns a JSON string
-        /// content object with UTF-8 encoding and application/json added to
-        /// it.
+        /// content object with UTF-8 encoding and application/json added to it. 
+        /// This also sets all read-only parameters to null to prevent errors   
+        /// in the Taboola API.
         /// </summary>
         /// <param name="obj">The object to serialize</param>
         /// <returns>Stringcontent object</returns>
