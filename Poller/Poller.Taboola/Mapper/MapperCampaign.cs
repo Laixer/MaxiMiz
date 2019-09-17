@@ -225,39 +225,6 @@ namespace Poller.Taboola.Mapper
         }
 
         /// <summary>
-        /// Converts a core campaign to a taboola API campaign. This also sets
-        /// all read-only fields to null. This will prevent the API from returning
-        /// 400 BAD REQUEST http response codes.
-        /// </summary>
-        /// <param name="campaign">The campaign</param>
-        /// <returns>The converted and nullified converted campaign</returns>
-        public CampaignTaboola ConvertAndNullifyReadOnly(CampaignCore campaign)
-        {
-            var converted = Convert(campaign);
-            return NullifyReadOnly(converted);
-        }
-
-        /// <summary>
-        /// Sets all read-only parameters to null. Use this when you want to
-        /// send a campaign to the taboola API for creation or updates. All 
-        /// fields which are set to null will be ignored by the Taboola API.
-        /// 
-        /// The <see cref="CampaignTaboola.ApprovalState"/> is not actually
-        /// read only, but requires certain permission to modify. We treat it
-        /// as null, so that the API ignores the field.
-        /// </summary>
-        /// <param name="campaign">Campaign to be sent</param>
-        /// <returns>Input campaign with read-only fields set to null</returns>
-        private CampaignTaboola NullifyReadOnly(CampaignTaboola campaign)
-        {
-            campaign.Id = null;
-            campaign.Spent = null;
-            campaign.Status = null;
-            campaign.ApprovalState = null;
-            return campaign;
-        }
-
-        /// <summary>
         /// Converts an enum to all caps. This is because Taboola uses upper 
         /// case to denote these enums, while we use lower case.
         /// </summary>

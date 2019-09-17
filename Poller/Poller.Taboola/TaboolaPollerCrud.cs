@@ -97,8 +97,8 @@ namespace Poller.Taboola
             CampaignCore campaign, CancellationToken token)
         {
             var endpoint = $"api/1.0/{account.Name}/campaigns/";
-            var convertedAndNullified = _mapperCampaign.ConvertAndNullifyReadOnly(campaign);
-            var content = BuildStringContent(convertedAndNullified);
+            var converted = _mapperCampaign.Convert(campaign);
+            var content = BuildStringContent(converted);
 
             var createdCampaign = await RemoteExecuteAndLogAsync<Campaign>(HttpMethod.Post, endpoint, content, token);
             var convertedCampaign = _mapperCampaign.Convert(createdCampaign);
@@ -193,8 +193,8 @@ namespace Poller.Taboola
             // Throw if we don't have a valid GUID
             ValidateGuid(campaign);
 
-            var convertedAndNullified = _mapperCampaign.ConvertAndNullifyReadOnly(campaign);
-            var content = BuildStringContent(convertedAndNullified);
+            var converted = _mapperCampaign.Convert(campaign);
+            var content = BuildStringContent(converted, true);
             var contentString = content.ReadAsStringAsync();
             var endpoint = $"api/1.0/{account}/campaigns/{campaign.SecondaryId}";
 
@@ -310,8 +310,45 @@ namespace Poller.Taboola
         /// <returns>Stringcontent object</returns>
         private StringContent BuildStringContent(object obj)
         {
+            // Nullify all read only parameters
             var serialized = Json.Serialize(obj);
+            var parsed = JObject.Parse(serialized);
+            NullifyReadOnlyCampaign(parsed);
+
+
+            }
+
+            serialized = Json.Serialize(parsed);
             return new StringContent(serialized, Encoding.UTF8, "application/json");
+        }
+
+        /// <summary>
+        /// Removes all read-only keys from the object. If the Taboola API
+        /// receives a read-only field, it returns a 400 BAD REQUEST response.
+        /// This also works for non-campaign objects.
+        /// 
+        /// TODO Safety?
+        /// </summary>
+        /// <param name="obj">The campaign object to sanetize</param>
+        private void NullifyReadOnlyCampaign(JObject obj)
+        {
+            RemoveIfPresent(obj, "id");
+            RemoveIfPresent(obj, "advertiser_id");
+            RemoveIfPresent(obj, "spent");
+            RemoveIfPresent(obj, "status");
+            RemoveIfPresent(obj, "approval_state");
+            RemoveIfPresent(obj, "postal_code_targeting");
+        }
+
+
+        /// <summary>
+        /// Removes a key-value combination if the key is present.
+        /// </summary>
+        /// <param name="obj">The JSON object</param>
+        /// <param name="key">The key</param>
+        private void RemoveIfPresent(JObject obj, string key)
+        {
+            if (obj.ContainsKey(key)) { obj.Remove(key); }
         }
     }
 }
