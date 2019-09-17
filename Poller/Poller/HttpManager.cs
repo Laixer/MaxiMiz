@@ -111,7 +111,7 @@ namespace Poller
         }
 
         /// <summary>
-        /// Dispose objects.
+        /// Called upon graceful shutdown.
         /// </summary>
         public void Dispose() => _client?.Dispose();
     }
