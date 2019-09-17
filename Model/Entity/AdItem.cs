@@ -5,7 +5,9 @@ using Maximiz.Model.Enums;
 namespace Maximiz.Model.Entity
 {
     /// <summary>
-    /// Advertisement item.
+    /// Advertisement item. This points to an actual advertisement item in one
+    /// of the external API's. This belongs to one campaign, and points back
+    /// to the ad group from which this was derived.
     /// </summary>
     [Serializable]
     public class AdItem : EntityAudit<Guid>
@@ -16,9 +18,19 @@ namespace Maximiz.Model.Entity
         public string SecondaryId { get; set; }
 
         /// <summary>
-        /// Group to which this item belongs to.
+        /// The ad group from which this item was derived.
         /// </summary>
         public int AdGroup { get; set; }
+
+        /// <summary>
+        /// The index of the string used from the ad group.
+        /// </summary>
+        public int AdGroupTextIndex { get; set; }
+
+        /// <summary>
+        /// The index of the image used from the ad group.
+        /// </summary>
+        public int AdGroupImageIndex { get; set; }
 
         /// <summary>
         /// Advertisement title.
@@ -78,5 +90,5 @@ namespace Maximiz.Model.Entity
         /// we do have to store.
         /// </summary>
         public string Details { get; set; }
-}
+    }
 }

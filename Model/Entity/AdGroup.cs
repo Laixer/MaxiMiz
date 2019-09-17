@@ -15,23 +15,14 @@ namespace Maximiz.Model.Entity
         public string Name { get; set; }
 
         /// <summary>
-        /// Uuid string of the campaign this adgroup belongs to.
+        /// Array of image links.
         /// </summary>
-        public string CampaignUuid { get; set; }
+        public string[] ImageLinks { get; set; }
 
         /// <summary>
-        /// URL for all items in the group.
+        /// Array of titles.
         /// </summary>
-        public string Url { get; set; }
+        public string[] Titles { get; set; }
 
-        /// <summary>
-        /// Description for all items in the group.
-        /// </summary>
-        public string Description { get; set; }
-
-        /// <summary>
-        /// Indicates the (creation) status of this object.
-        /// </summary>
-        public Status Status { get; set; }
     }
 }
