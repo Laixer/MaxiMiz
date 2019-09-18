@@ -4,12 +4,11 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
-using Microsoft.Extensions.Logging;
 using Poller.Taboola.Model;
 
-using AccountCore = Maximiz.Model.Entity.Account;
-using CampaignCore = Maximiz.Model.Entity.Campaign;
-using AdItemCore = Maximiz.Model.Entity.AdItem;
+using AccountEntity = Maximiz.Model.Entity.Account;
+using CampaignEntity = Maximiz.Model.Entity.Campaign;
+using AdItemEntity = Maximiz.Model.Entity.AdItem;
 using Poller.Helper;
 using System.Linq;
 using System.Diagnostics;
@@ -58,7 +57,7 @@ namespace Poller.Taboola
         /// <param name="token">Cancellation token</param>
         /// <returns>The campaign list</returns>
         private Task<EntityList<Campaign>> GetAllCampaigns(
-            AccountCore account, CancellationToken token)
+            AccountEntity account, CancellationToken token)
         {
             var endpoint = $"api/1.0/{account.Name}/campaigns";
             return RemoteQueryAndLogAsync<EntityList<Campaign>>
@@ -74,7 +73,7 @@ namespace Poller.Taboola
         /// <param name="campaignId">The campaign id</param>
         /// <param name="token">The cancellation token</param>
         /// <returns>Task</returns>
-        private async Task<Campaign> GetCampaignAsync(AccountCore account,
+        private async Task<Campaign> GetCampaignAsync(AccountEntity account,
             string campaignId, CancellationToken token)
         {
             var endpoint = $"api/1.0/{account.Name}/campaigns/{campaignId}";
@@ -94,8 +93,8 @@ namespace Poller.Taboola
         /// <param name="token">Cancellation token</param>
         /// <returns>A new campaign object converted from the created campaign
         /// along with the correct GUID</returns>
-        private async Task<CampaignCore> CreateCampaignAsync(AccountCore account,
-            CampaignCore campaign, CancellationToken token)
+        private async Task<CampaignEntity> CreateCampaignAsync(AccountEntity account,
+            CampaignEntity campaign, CancellationToken token)
         {
             var endpoint = $"api/1.0/{account.Name}/campaigns/";
             var converted = _mapperCampaign.Convert(campaign);
@@ -119,22 +118,23 @@ namespace Poller.Taboola
         /// <param name="account">The account</param>
         /// <param name="adItem">The ad item</param>
         /// <param name="token">The cancellation token</param>
-        /// <returns></returns>
-        private async Task CreateAdItemAsync(AccountCore account, AdItemCore adItem,
+        /// <returns>The created ad item entity</returns>
+        private async Task<AdItemEntity> CreateAdItemAsync(AccountEntity account, AdItemEntity adItem,
             CancellationToken token)
         {
             // Get campaign this belongs to
-            var campaignId = FetchCampaignIdFromAdItemAsync(adItem, token).Result;
+            var campaignExternalId = GetLocalCampaignFromGuidAsync(adItem.CampaignGuid, token).Result.SecondaryId;
 
             // First create the ad item
-            var endpoint = $"api/1.0 /{account.Name}/campaigns/{campaignId}/items/";
-            var content = BuildStringContent(adItem.Url);
+            var endpoint = $"api/1.0 /{account.Name}/campaigns/{campaignExternalId}/items/";
+            var content = BuildStringContent(adItem.TargetUrl);
             var createdAdItem = RemoteExecuteAndLogAsync<AdItem>(HttpMethod.Post,
                 endpoint, content, token).Result;
 
             // Validate if the ad item has been created --> not crawling.
-            var createdWithFields = await ValidateAdItemAsync(account, campaignId, createdAdItem, token);
+            var createdWithFields = await ValidateAdItemAsync(account, campaignExternalId, createdAdItem, token);
             await CommitAdItem(createdWithFields, token);
+            return createdWithFields;
         }
 
         /// <summary>
@@ -148,8 +148,8 @@ namespace Poller.Taboola
         /// this ad item belolngs to</param>
         /// <param name="createdAdItem">The created Taboola ad item</param>
         /// <param name="token">The cancellation token</param>
-        /// <returns></returns>
-        private async Task<AdItemCore> ValidateAdItemAsync(AccountCore account,
+        /// <returns>The validated ad item</returns>
+        private async Task<AdItemEntity> ValidateAdItemAsync(AccountEntity account,
             string campaignId, AdItem createdAdItem, CancellationToken token)
         {
             var stopwatch = new Stopwatch();
@@ -160,7 +160,7 @@ namespace Poller.Taboola
                 var selected = result.Where(x => x.Id == createdAdItem.Id).FirstOrDefault();
 
                 // Not crawling means we are done
-                if (selected.CampaignItemStatus != CampaignItemStatus.Crawling)
+                if (selected != null && selected.CampaignItemStatus != CampaignItemStatus.Crawling)
                 {
                     return _mapperAdItem.Convert(selected);
                 }
@@ -188,8 +188,8 @@ namespace Poller.Taboola
         /// <param name="campaign">Campaign with parameters</param>
         /// <param name="token">Cancellation token</param>
         /// <returns>Task</returns>
-        private async Task<Campaign> UpdateCampaignAsync(AccountCore account,
-            CampaignCore campaign, CancellationToken token)
+        private async Task<Campaign> UpdateCampaignAsync(AccountEntity account,
+            CampaignEntity campaign, CancellationToken token)
         {
             // Throw if we don't have a valid GUID
             ValidateGuid(campaign);
@@ -212,11 +212,11 @@ namespace Poller.Taboola
         /// <param name="adItem">The ad item</param>
         /// <param name="token">The cancellation token</param>
         /// <returns>Task</returns>
-        private async Task UpdateAdItemAsync(AccountCore account, AdItemCore adItem,
+        private async Task UpdateAdItemAsync(AccountEntity account, AdItemEntity adItem,
             CancellationToken token)
         {
             var content = BuildStringContent(adItem);
-            var campaignId = await FetchCampaignIdFromAdItemAsync(adItem, token);
+            var campaignId = await GetLocalCampaignFromGuidAsync(adItem.CampaignGuid, token);
             var endpoint = $"api/1.0/{account}/campaigns/{campaignId}/{adItem.SecondaryId}/";
             await RemoteExecuteAndLogAsync(HttpMethod.Post, endpoint, content, token);
         }
@@ -228,8 +228,8 @@ namespace Poller.Taboola
         /// <param name="campaign">The campaign</param>
         /// <param name="token">The cancellation token</param>
         /// <returns>Task</returns>
-        private async Task<Campaign> DeleteCampaignAsync(AccountCore account,
-            CampaignCore campaign, CancellationToken token)
+        private async Task<Campaign> DeleteCampaignAsync(AccountEntity account,
+            CampaignEntity campaign, CancellationToken token)
         {
             var endpoint = $"api/1.0/{account.Name}/campaigns/{campaign.SecondaryId}/";
             return await RemoteExecuteAndLogAsync<Campaign>(HttpMethod.Delete, endpoint, null, token);
@@ -238,15 +238,15 @@ namespace Poller.Taboola
         /// <summary>
         /// Deletes an ad item from the Taboola API.
         /// </summary>
-        /// <param name="account"></param>
-        /// <param name="adItem"></param>
-        /// <param name="token"></param>
-        /// <returns></returns>
-        private async Task DeleteAdItemAsync(AccountCore account, AdItemCore adItem,
+        /// <param name="account">The account</param>
+        /// <param name="adItem">The ad item to remove</param>
+        /// <param name="token">The cancellation token</param>
+        /// <returns>Task</returns>
+        private async Task DeleteAdItemAsync(AccountEntity account, AdItemEntity adItem,
             CancellationToken token)
         {
-            var campaignId = await FetchCampaignIdFromAdItemAsync(adItem, token);
-            var endpoint = $"api/1.0/{account.Name}/campaigns/{campaignId}/items/{adItem.SecondaryId}";
+            var campaign = await GetLocalCampaignFromGuidAsync(adItem.CampaignGuid, token);
+            var endpoint = $"api/1.0/{account.Name}/campaigns/{campaign.SecondaryId}/items/{adItem.SecondaryId}";
             await RemoteExecuteAndLogAsync(HttpMethod.Delete, endpoint, null, token);
         }
 
@@ -259,7 +259,7 @@ namespace Poller.Taboola
         /// <param name="token">Cancellation token</param>
         /// <returns>Task with entity list of ad items</returns>
         private Task<EntityList<AdItem>> GetCampaignAllItemsAsync(
-            AccountCore account, CampaignCore campaign, CancellationToken token)
+            AccountEntity account, CampaignEntity campaign, CancellationToken token)
         {
             return GetCampaignAllItemsAsync(account, campaign.SecondaryId, token);
         }
@@ -273,7 +273,7 @@ namespace Poller.Taboola
         /// <param name="token">Cancellation token</param>
         /// <returns>Task with entity list of ad items</returns>
         private Task<EntityList<AdItem>> GetCampaignAllItemsAsync(
-           AccountCore account, string campaignId, CancellationToken token)
+           AccountEntity account, string campaignId, CancellationToken token)
         {
             var endpoint = $"api/1.0/{account.Name}/campaigns/{campaignId}/items";
             return RemoteQueryAndLogAsync<EntityList<AdItem>>(HttpMethod.Get, endpoint, token);
@@ -286,13 +286,13 @@ namespace Poller.Taboola
         /// <param name="campaign">The campaign</param>
         /// <param name="token">The cancellation token</param>
         /// <returns>Task</returns>
-        private async Task SyncbackCampaignAsync(AccountCore account,
-            CampaignCore campaign, CancellationToken token)
+        private async Task SyncbackCampaignAsync(AccountEntity account,
+            CampaignEntity campaign, CancellationToken token)
         {
             // First syncback the campaign
             var campaignApi = await GetCampaignAsync(account, campaign.SecondaryId, token);
             var converted = _mapperCampaign.Convert(campaignApi);
-            var list = new List<CampaignCore>();
+            var list = new List<CampaignEntity>();
             list.Add(converted);
             await CommitCampaigns(list, token);
 
