@@ -18,14 +18,19 @@ namespace Maximiz.Model.Entity
         public string SecondaryId { get; set; }
 
         /// <summary>
+        /// Reference to the campaign this belongs to.
+        /// </summary>
+        public Guid CampaignGuid { get; set; }
+
+        /// <summary>
         /// The ad group from which this item was derived.
         /// </summary>
-        public int AdGroup { get; set; }
+        public int AdGroupId { get; set; }
 
         /// <summary>
         /// The index of the string used from the ad group.
         /// </summary>
-        public int AdGroupTextIndex { get; set; }
+        public int AdGroupTitleIndex { get; set; }
 
         /// <summary>
         /// The index of the image used from the ad group.
@@ -40,7 +45,7 @@ namespace Maximiz.Model.Entity
         /// <summary>
         /// Destination URL.
         /// </summary>
-        public string Url { get; set; }
+        public string TargetUrl { get; set; }
 
         /// <summary>
         /// Advertisement content.
@@ -84,6 +89,11 @@ namespace Maximiz.Model.Entity
         /// </summary>
         public Status Status { get; set; }
         public string StatusText { get => Status.GetEnumMemberName(); }
+
+        /// <summary>
+        /// True if this was modified beyond the properties given from the ad group.
+        /// </summary>
+        public bool ChangedBeyondAdGroup { get; set; }
 
         /// <summary>
         /// JSON string containing unused data which

@@ -4,7 +4,7 @@ using System;
 namespace Maximiz.Model.Entity
 {
     /// <summary>
-    /// Campaign.
+    /// Represents a single campaign in some external publisher.
     /// </summary>
     [Serializable]
     public class Campaign : EntityAudit<Guid>
@@ -25,10 +25,20 @@ namespace Maximiz.Model.Entity
         public string Name { get; set; }
 
         /// <summary>
+        /// Reference to the publisher.
+        /// </summary>
+        public Publisher Publisher { get; set; }
+
+        /// <summary>
         /// Indicates the status of any changes made in our own database. These
         /// changes have to be pushed to the corresponding external API.
         /// </summary>
         public ApprovalState ApprovalState { get; set; }
+
+        /// <summary>
+        /// Target URL for this campaign. This is where we lead our clicks.
+        /// </summary>
+        public string TargetUrl { get; set; }
 
         /// <summary>
         /// Language of the campaign, 2 chars.
