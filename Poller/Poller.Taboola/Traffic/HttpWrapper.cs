@@ -4,7 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 
-namespace Poller.Taboola
+namespace Poller.Taboola.Traffic
 {
 
     /// <summary>
@@ -12,8 +12,29 @@ namespace Poller.Taboola
     /// requests are placed within this file. All http requests are handled
     /// by our <see cref="HttpManager"/>.
     /// </summary>
-    internal partial class TaboolaPoller
+    internal class HttpWrapper
     {
+
+        /// <summary>
+        /// Used to log our operations.
+        /// </summary>
+        private ILogger _logger;
+
+        /// <summary>
+        /// Http manager client.
+        /// </summary>
+        private HttpManager _client;
+
+        /// <summary>
+        /// Constructor for dependency injection.
+        /// </summary>
+        /// <param name="logger">The logger object</param>
+        /// <param name="client">The http client implementation</param>
+        public HttpWrapper(ILogger logger, HttpManager client)
+        {
+            _logger = logger;
+            _client = client;
+        }
 
         /// <summary>
         /// Run the remote query and catch all exceptions  before letting them 
@@ -24,7 +45,7 @@ namespace Poller.Taboola
         /// <param name="endpoint">API endpoint.</param>
         /// <param name="cancellationToken">Cancellation token.</param>
         /// <returns>Task with TResult object</returns>
-        protected async Task<TResult> RemoteQueryAndLogAsync
+        public async Task<TResult> RemoteQueryAndLogAsync
             <TResult>(HttpMethod method, string endpoint,
             CancellationToken cancellationToken)
             where TResult : class
@@ -53,7 +74,7 @@ namespace Poller.Taboola
         /// <param name="content">Http content</param>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Task</returns>
-        protected async Task RemoteExecuteAndLogAsync(HttpMethod method,
+        public async Task RemoteExecuteAndLogAsync(HttpMethod method,
             string endpoint, HttpContent content, CancellationToken cancellationToken)
         {
             await RemoteExecuteAndLogAsync<object>(method, endpoint, content, cancellationToken);
@@ -69,7 +90,7 @@ namespace Poller.Taboola
         /// <param name="content">Http content</param>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Task</returns>
-        protected async Task<TResult> RemoteExecuteAndLogAsync<TResult>(
+        public async Task<TResult> RemoteExecuteAndLogAsync<TResult>(
             HttpMethod method, string endpoint, HttpContent content,
             CancellationToken cancellationToken)
             where TResult : class
