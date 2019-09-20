@@ -68,7 +68,7 @@ namespace Poller.Taboola.Mapper
             var result = DefaultAdItemCore();
             result.SecondaryId = from.Id;
             result.Title = from.Title;
-            result.Url = from.Url;
+            result.TargetUrl = from.Url;
             result.Cpc = from.Cpc;
             result.Spent = from.Spent;
             result.Impressions = (int)from.Impressions;
@@ -121,7 +121,7 @@ namespace Poller.Taboola.Mapper
             {
                 SecondaryId = external.Id,
                 Title = external.Title,
-                Url = external.Url,
+                TargetUrl = external.Url,
                 Details = ExtractDetailsToString(external)
             };
         }
@@ -169,7 +169,7 @@ namespace Poller.Taboola.Mapper
                 // Properties
                 Id = from.SecondaryId,
                 Title = from.Title,
-                Url = from.Url,
+                Url = from.TargetUrl,
                 Cpc = from.Cpc,
                 Spent = from.Spent,
                 Impressions = from.Impressions,
@@ -232,7 +232,7 @@ namespace Poller.Taboola.Mapper
             // TODO Should we overwrite the secondary id?
             core.SecondaryId = from.Id;
             core.Title = from.Title;
-            core.Url = from.Url;
+            core.TargetUrl = from.Url;
 
             // Details
             AdItemDetails details = Json.Deserialize
@@ -273,7 +273,7 @@ namespace Poller.Taboola.Mapper
             // TODO Should we overwrite the secondary id?
             core.SecondaryId = from.Id;
             core.Title = from.Title;
-            core.Url = from.Url;
+            core.TargetUrl = from.Url;
             core.Cpc = from.Cpc;
             core.Spent = from.Spent;
             core.Impressions = (int)from.Impressions;
@@ -393,7 +393,7 @@ namespace Poller.Taboola.Mapper
                 // Properties
                 Id = core.SecondaryId,
                 Title = core.Title,
-                Url = core.Url,
+                Url = core.TargetUrl,
 
                 // Details
                 CampaignId = details.CampaignId,
@@ -413,7 +413,7 @@ namespace Poller.Taboola.Mapper
             return new AdItemCore
             {
                 SecondaryId = DefaultString,
-                AdGroup = DefaultNumber,
+                AdGroupId = DefaultNumber,
                 Title = DefaultString,
                 // Url = DefaultString,             May be null
                 // Content = DefaultString,         May be null
