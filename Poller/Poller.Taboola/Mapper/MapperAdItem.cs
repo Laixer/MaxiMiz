@@ -25,6 +25,32 @@ namespace Poller.Taboola.Mapper
         private const string DefaultJson = "{}";
 
         /// <summary>
+        /// TODO Doc
+        /// </summary>
+        /// <param name="external"></param>
+        /// <param name="guid"></param>
+        /// <returns></returns>
+        public AdItemCore Convert(AdItemCoResult external, Guid guid)
+        {
+            var converted = Convert(external);
+            converted.Id = guid;
+            return converted;
+        }
+
+        /// <summary>
+        /// TODO Doc
+        /// </summary>
+        /// <param name="external"></param>
+        /// <param name="guid"></param>
+        /// <returns></returns>
+        public AdItemCore Convert(AdItemTaboola external, Guid guid)
+        {
+            var converted = Convert(external);
+            converted.Id = guid;
+            return converted;
+        }
+
+        /// <summary>
         /// This converts a Taboola co result ad item 
         /// to our core ad item. This is the result we
         /// get when calling the ad items API. This only
