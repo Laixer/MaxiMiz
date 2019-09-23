@@ -25,52 +25,48 @@ namespace Poller.Taboola.Traffic
         /// <summary>
         /// Logging interface.
         /// </summary>
-        private ILogger _logger;
+        private readonly ILogger _logger;
 
         /// <summary>
         /// Mapper for campaigns.
         /// </summary>
-        private MapperCampaign _mapperCampaign;
+        private readonly MapperCampaign _mapperCampaign;
 
         /// <summary>
         /// Mapper for ad items.
         /// </summary>
-        private MapperAdItem _mapperAdItem;
+        private readonly MapperAdItem _mapperAdItem;
+
+        /// <summary>
+        /// Mapper for accounts.
+        /// </summary>
+        private readonly MapperAccount _mapperAccount;
 
         /// <summary>
         /// Transforms Taboola entities to properly formatted http content objects.
         /// </summary>
-        private ContentBuilder _contentBuilder;
+        private readonly ContentBuilder _contentBuilder;
 
         /// <summary>
         /// Used to wrap our http operations.
         /// </summary>
-        private HttpWrapper _httpWrapper;
-
-        /// <summary>
-        /// Communicates with our own database.
-        /// </summary>
-        private CrudInternal _crudInternal;
+        private readonly HttpWrapper _httpWrapper;
 
         /// <summary>
         /// Constructor for dependency injection.
         /// TODO Abstraction for mappers
         /// </summary>
         /// <param name="logger">Logger</param>
-        /// <param name="mapperCampaign">Mapper for campaigns</param>
-        /// <param name="mapperAdItem">Mapper for ad items</param>
         /// <param name="httpWrapper">Wrapper for html operations</param>
-        /// <param name="crudInternal">Communicates with our own database</param>
-        public CrudExternal(ILogger logger, MapperCampaign mapperCampaign,
-            MapperAdItem mapperAdItem, HttpWrapper httpWrapper, CrudInternal crudInternal)
+        public CrudExternal(ILogger logger, HttpWrapper httpWrapper)
         {
             _logger = logger;
-            _mapperCampaign = mapperCampaign;
-            _mapperAdItem = mapperAdItem;
             _httpWrapper = httpWrapper;
-            _crudInternal = crudInternal;
 
             _contentBuilder = new ContentBuilder();
+            _mapperAccount = new MapperAccount();
+            _mapperAdItem = new MapperAdItem();
+            _mapperCampaign = new MapperCampaign();
         }
 
         /// <summary>
@@ -224,7 +220,7 @@ namespace Poller.Taboola.Traffic
 
             // Delete
             var endpoint = $"api/1.0/{account.Name}/campaigns/{campaignId}/";
-            var deleted = await _httpWrapper.RemoteExecuteAndLogAsync<AdItem>
+            var deleted = await _httpWrapper.RemoteExecuteAndLogAsync<AdItemMain>
                 (HttpMethod.Delete, endpoint, null, token);
 
             // Convert back, assign explicitly and return
