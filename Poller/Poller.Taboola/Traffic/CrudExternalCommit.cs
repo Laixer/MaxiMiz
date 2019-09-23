@@ -150,24 +150,20 @@ namespace Poller.Taboola.Traffic
         /// <remarks>Also assigns the result to the ad item parameter</remarks>
         /// <param name="account">The ad item account</param>
         /// <param name="adItem">The ad item to create</param>
+        /// <param name="campaignId">The campaign Taboola id</param>
         /// <param name="token">The cancellation token</param>
         /// <returns>The created and converted ad item</returns>
         public async Task<AdItemInternal> CreateAdItem(Account account,
-            AdItemInternal adItem, CancellationToken token)
+            AdItemInternal adItem, string campaignId, CancellationToken token)
         {
-            // Get corresponding campaign
-            var campaignId = (await _crudInternal.GetCampaignFromGuid(
-                adItem.CampaignGuid, token)).SecondaryId;
-
             // Create an empty ad item
             var endpoint = $"api/1.0 /{account.Name}/campaigns/{campaignId}/items/";
             var content = _contentBuilder.BuildStringContent(adItem.TargetUrl);
-            var adItemExternal = _httpWrapper.RemoteExecuteAndLogAsync<AdItem>(
+            var adItemExternal = _httpWrapper.RemoteExecuteAndLogAsync<AdItemMain>(
                 HttpMethod.Post, endpoint, content, token).Result;
 
             // Wait for creation approval
-            var createdWithFields = await ValidateAdItemAsync(
-                account, campaignId, adItemExternal, token);
+            var createdWithFields = await AwaitAdItemCreationAsync(account, adItemExternal, token);
 
             // Convert back, assign explicitly and return
             adItem = _mapperAdItem.Convert(createdWithFields, adItem.Id);
@@ -180,23 +176,20 @@ namespace Poller.Taboola.Traffic
         /// <remarks>Also assigns the result to the ad item parameter</remarks>
         /// <param name="account">The ad item account</param>
         /// <param name="adItem">The ad item to update</param>
+        /// <param name="campaignId">The campaign Taboola id</param>
         /// <param name="token">The cancellation token</param>
         /// <returns>The updated and converted ad item</returns>
         public async Task<AdItemInternal> UpdateAdItem(Account account,
-            AdItemInternal adItem, CancellationToken token)
+            AdItemInternal adItem, string campaignId, CancellationToken token)
         {
-            // Get corresponding campaign
-            var campaignId = (await _crudInternal.GetCampaignFromGuid(
-                adItem.CampaignGuid, token)).SecondaryId;
-
             // Convert
-            var converted = _mapperAdItem.Convert(adItem);
+            var converted = _mapperAdItem.ConvertAdditional(adItem);
 
             // Update
             var content = _contentBuilder.BuildStringContent(converted);
             var endpoint = $"api/1.0/{account}/campaigns/{campaignId}/{adItem.SecondaryId}/";
             var adItemExternal = await _httpWrapper.RemoteExecuteAndLogAsync
-                <AdItem>(HttpMethod.Post, endpoint, content, token);
+                <AdItemMain>(HttpMethod.Post, endpoint, content, token);
 
             // Convert back, assign explicitly and return
             adItem = _mapperAdItem.Convert(adItemExternal, adItem.Id);
@@ -209,15 +202,12 @@ namespace Poller.Taboola.Traffic
         /// <remarks>Also assigns the result to the ad item parameter</remarks>
         /// <param name="account">The ad item account</param>
         /// <param name="adItem">The ad item to delete</param>
+        /// <param name="campaignId">The campaign Taboola id</param>
         /// <param name="token">The cancellation token</param>
         /// <returns>The deleted and converted ad item</returns>
-        public async Task<AdItemInternal> DeleteAdItem(Account account, 
-            AdItemInternal adItem, CancellationToken token)
+        public async Task<AdItemInternal> DeleteAdItem(Account account,
+            AdItemInternal adItem, string campaignId, CancellationToken token)
         {
-            // Get corresponding campaign
-            var campaignId = (await _crudInternal.GetCampaignFromGuid(
-                adItem.CampaignGuid, token)).SecondaryId;
-
             // Delete
             var endpoint = $"api/1.0/{account.Name}/campaigns/{campaignId}/";
             var deleted = await _httpWrapper.RemoteExecuteAndLogAsync<AdItemMain>
@@ -241,19 +231,20 @@ namespace Poller.Taboola.Traffic
         /// <param name="createdAdItem">The created Taboola ad item</param>
         /// <param name="token">The cancellation token</param>
         /// <returns>The validated ad item</returns>
-        private async Task<AdItem> ValidateAdItemAsync(Account account,
-            string campaignId, AdItem createdAdItem, CancellationToken token)
+        private async Task<AdItemInternal> AwaitAdItemCreationAsync(Account account, 
+            AdItemMain createdAdItem, CancellationToken token)
         {
             var stopwatch = new Stopwatch();
             stopwatch.Start();
             while (stopwatch.IsRunning)
             {
-                var item = await GetAdItemAsync(account, campaignId, createdAdItem.CampaignId, token);
+                var item = await GetAdItemAsync(account, createdAdItem.CampaignId, createdAdItem.Id, token);
+                var itemConverted = _mapperAdItem.Convert(item);
 
                 // Not crawling means we are done
-                if (item != null && item.CampaignItemStatus != CampaignItemStatus.Crawling)
+                if (item != null && itemConverted.CampaignItemStatus != CampaignItemStatus.Crawling)
                 {
-                    createdAdItem = item;
+                    createdAdItem = itemConverted;
                     return item;
                 }
 
