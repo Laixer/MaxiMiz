@@ -36,7 +36,8 @@ namespace Poller.Taboola.Traffic
         }
 
         /// <summary>
-        /// Gets all our onverted campaigns for a given account.
+        /// Gets all our onverted campaigns for a given account. This also deals
+        /// with the correct conversion of our target objects.
         /// </summary>
         /// <param name="account">The core account</param>
         /// <param name="token">Cancellation token</param>
@@ -49,7 +50,8 @@ namespace Poller.Taboola.Traffic
                 <EntityList<Campaign>>(HttpMethod.Get, endpoint, token);
 
             // Convert and return
-            return _mapperCampaign.ConvertAll(campaignsExternal.Items);
+            campaignsExternal = _mapperTarget.ConvertAll(campaignsExternal);
+            return _mapperCampaign.ConvertAll(campaignsExternal);
         }
 
         /// <summary>
@@ -72,6 +74,7 @@ namespace Poller.Taboola.Traffic
             if (string.IsNullOrEmpty(campaignExternal.Id)) { return null; }
 
             // Convert and return
+            campaignExternal = _mapperTarget.ConvertTarget(campaignExternal);
             return _mapperCampaign.Convert(campaignExternal);
         }
 

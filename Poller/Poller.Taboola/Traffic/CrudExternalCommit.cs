@@ -43,6 +43,11 @@ namespace Poller.Taboola.Traffic
         private readonly MapperAccount _mapperAccount;
 
         /// <summary>
+        /// Mapper for targets.
+        /// </summary>
+        private readonly MapperTarget _mapperTarget;
+
+        /// <summary>
         /// Transforms Taboola entities to properly formatted http content objects.
         /// </summary>
         private readonly ContentBuilder _contentBuilder;
@@ -67,6 +72,7 @@ namespace Poller.Taboola.Traffic
             _mapperAccount = new MapperAccount();
             _mapperAdItem = new MapperAdItem();
             _mapperCampaign = new MapperCampaign();
+            _mapperTarget = new MapperTarget();
         }
 
         /// <summary>
