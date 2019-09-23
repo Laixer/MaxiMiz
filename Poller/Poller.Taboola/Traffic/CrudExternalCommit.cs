@@ -232,13 +232,12 @@ namespace Poller.Taboola.Traffic
         /// <remarks>This throws after 30 seconds without result. This also
         /// explicitly assigns the result to the ad item parameter</remarks>
         /// <param name="account">The account</param>
-        /// <param name="campaignId">The numeric id as string of the campaign
-        /// this ad item belolngs to</param>
         /// <param name="createdAdItem">The created Taboola ad item</param>
         /// <param name="token">The cancellation token</param>
+        /// <param name="guid">The internal guid of the created item</param>
         /// <returns>The validated ad item</returns>
         private async Task<AdItemInternal> AwaitAdItemCreationAsync(Account account, 
-            AdItemMain createdAdItem, CancellationToken token)
+            AdItemMain createdAdItem, Guid guid, CancellationToken token)
         {
             var stopwatch = new Stopwatch();
             stopwatch.Start();
@@ -250,7 +249,7 @@ namespace Poller.Taboola.Traffic
                 // Not crawling means we are done
                 if (item != null && itemConverted.CampaignItemStatus != CampaignItemStatus.Crawling)
                 {
-                    createdAdItem = itemConverted;
+                    item.Id = guid;
                     return item;
                 }
 
