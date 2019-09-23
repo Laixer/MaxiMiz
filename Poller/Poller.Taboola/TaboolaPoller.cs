@@ -31,7 +31,7 @@ namespace Poller.Taboola
         private readonly ILogger _logger;
         private readonly DbProvider _provider;
         private readonly IMemoryCache _cache;
-        private readonly HttpManager _client;
+        private readonly HttpWrapper _httpWrapper;
 
         private readonly MapperAccount _mapperAccount;
         private readonly MapperCampaign _mapperCampaign;
@@ -62,16 +62,19 @@ namespace Poller.Taboola
             _provider = provider;
             _cache = cache;
 
-            // Create our http client
-            _client = new HttpManager(
-                new Uris(options.BaseUrl, "oauth/token", "oauth/token"),
-                new OAuthAuthorizationProvider
-                {
-                    ClientId = options.OAuth2.ClientId,
-                    ClientSecret = options.OAuth2.ClientSecret,
-                    Username = options.OAuth2.Username,
-                    Password = options.OAuth2.Password,
-                });
+            // Create our http wrapper with client
+            _httpWrapper = new HttpWrapper(
+                _logger,
+                new HttpManager(
+                    new Uris(options.BaseUrl, "oauth/token", "oauth/token"),
+                    new OAuthAuthorizationProvider
+                    {
+                        ClientId = options.OAuth2.ClientId,
+                        ClientSecret = options.OAuth2.ClientSecret,
+                        Username = options.OAuth2.Username,
+                        Password = options.OAuth2.Password,
+                    })
+                );
 
             // Create all our mappers
             _mapperAccount = new MapperAccount();
