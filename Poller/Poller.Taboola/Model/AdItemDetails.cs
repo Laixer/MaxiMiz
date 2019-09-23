@@ -17,8 +17,8 @@ namespace Poller.Taboola.Model
         /// <summary>
         /// Unique numeric ID of the items parent campaign
         /// returned as a string. This is ported from both
-        /// <see cref="AdItem.CampaignId"/> and from
-        /// <see cref="AdItemCoResult.Campaign"/>. These 
+        /// <see cref="AdItemMain.CampaignId"/> and from
+        /// <see cref="AdItemReports.Campaign"/>. These 
         /// two parameters are the same, but get extracted
         /// differently in different API calls.
         /// </summary>

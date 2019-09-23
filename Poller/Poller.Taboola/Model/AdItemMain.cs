@@ -9,10 +9,13 @@ namespace Poller.Taboola.Model
     /// <summary>
     /// Mirrors the Taboola AdItem result we get
     /// from all ad item functions. This is coupled 
-    /// with <see cref="AdItemCoResult"/>.
+    /// with <see cref="AdItemReports"/>.
     /// </summary>
+    /// <remarks>
+    /// We skip type [ITEM, RSS] because it is not relevant for our specific
+    /// implementation. </remarks>
     [DataContract]
-    internal class AdItem
+    internal class AdItemMain
     {
         /// <summary>
         /// The id supplied by the remote network.
@@ -32,6 +35,12 @@ namespace Poller.Taboola.Model
         /// </summary>
         [DataMember(Name = "url")]
         public string Url { get; set; }
+
+        /// <summary>
+        /// The url for the thumbnail of the image.
+        /// </summary>
+        [DataMember(Name = "thumbnnail_url")]
+        public string ThumbnailUrl { get; set; }
 
         /// <summary>
         /// The ad title.
