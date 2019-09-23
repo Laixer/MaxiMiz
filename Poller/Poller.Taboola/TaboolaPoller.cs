@@ -13,7 +13,9 @@ using System.Collections.Generic;
 using AccountEntity = Maximiz.Model.Entity.Account;
 using CampaignEntity = Maximiz.Model.Entity.Campaign;
 using AdItemEntity = Maximiz.Model.Entity.AdItem;
+
 using Poller.Taboola.Mapper;
+using Poller.Taboola.Traffic;
 
 namespace Poller.Taboola
 {
@@ -35,6 +37,16 @@ namespace Poller.Taboola
         private readonly MapperCampaign _mapperCampaign;
         private readonly MapperAdItem _mapperAdItem;
         private readonly MapperTarget _mapperTarget;
+
+        /// <summary>
+        /// Used to perform all operations with our internal database.
+        /// </summary>
+        private readonly CrudInternal _crudInternal;
+
+        /// <summary>
+        /// Used to perform all operations with the external Taboola API.
+        /// </summary>
+        private readonly CrudExternal _crudExternal;
 
         /// <summary>
         /// Constructor with dependency injection.
@@ -67,6 +79,10 @@ namespace Poller.Taboola
             _mapperAdItem = new MapperAdItem();
             _mapperTarget = new MapperTarget();
 
+            // Create all our crud objects
+            _crudInternal = new CrudInternal(_logger, provider, cache);
+            _crudExternal = new CrudExternal(_logger, _httpWrapper);
+
             // Log version
             _logger.LogInformation($"Poller {Constants.ApplicationName} created with {Constants.ApplicationVersion}.");
         }
@@ -81,13 +97,12 @@ namespace Poller.Taboola
         public async Task RefreshAdvertisementDataAsync(PollerContext context,
             CancellationToken token)
         {
-            var accounts = await FetchLocalAdvertiserAccountsForCacheAsync(token);
+            var accounts = await _crudInternal.GetAdvertiserAccountsCachedAsync(token);
 
             foreach (var account in accounts.ToList().Shuffle())
             {
-                var result = await GetTopCampaignReportAsync(account.Name, token);
-                var converted = _mapperAdItem.ConvertAll(result.Items);
-                await CommitAdItems(converted, token);
+                var adItems = await _crudExternal.GetAdItemsReportFromAccountAsync(account, token);
+                await _crudInternal.CommitAdItemBulk(adItems, token);
 
                 // Prevent spamming our database
                 await Task.Delay(250, token);
@@ -95,75 +110,43 @@ namespace Poller.Taboola
         }
 
         /// <summary>
-        /// Implements our data syncback interface. This is used
-        /// to check if any values have been changed in Taboola's
-        /// own interface. With this we will always remain up to
-        /// date.
+        /// Implements our data syncback interface. This is used to check if any
+        /// values have been changed in Taboola's own interface. With this we will
+        /// always remain up to date.
+        /// 
+        /// TODO Maybe split?
+        /// TODO Take parallel into account
         /// </summary>
         /// <param name="context">The poller context</param>
         /// <param name="token">Cancellation token</param>
-        /// <returns>Nothing (task)</returns>
+        /// <returns>Task</returns>
         public async Task DataSyncbackAsync(PollerContext context, CancellationToken token)
         {
             // Accounts almost never change, only do this once every 4 iterations.
-            // TODO Update account details when they are changed
             if (context.RunCount + 1 % 4 == 0)
             {
                 _logger.LogInformation("Syncback account information");
-                var result = await GetAllAccounts(token);
-                var converted = _mapperAccount.ConvertAll(result.Items);
-                await CommitAccounts(converted, token);
+                var accountsExternal = await _crudExternal.GetAllAccounts(token);
+                await _crudInternal.CommitAccountBulk(accountsExternal, token);
             }
 
             // Get local accounts and extract some campaign data.
-            var accounts = await FetchLocalAdvertiserAccountsForCacheAsync(token);
+            _logger.LogInformation("Syncback campaigns and ad items");
+            var accounts = await _crudInternal.GetAdvertiserAccountsCachedAsync(token);
             foreach (var account in accounts.ToList().Shuffle().Take(2))
             {
-                _logger.LogDebug($"Extracting data for account: {account.Name}");
-                var result = (await GetAllCampaigns(account, token)).Items;
-                result = _mapperTarget.ConvertAll(result);
-                var converted = _mapperCampaign.ConvertAll(result);
+                var campaigns = await _crudExternal.GetAllCampaignsFromAccountAsync(account, token);
+                await _crudInternal.CommitCampaignBulk(campaigns, token);
 
-                await CommitCampaigns(converted, token);
+                // Process campaign items for a select amount.
+                foreach (var campaign in campaigns.ToList().Shuffle().Take(100)) {
 
-                // NOTE: We cannot process all items in one go since it takes
-                //       too long, and this is only a secondary function. We
-                //       choose 100 items at random and sync them. Over time
-                //       all items must be synced eventually.
-                // await ProcessCampainItems(context, account, converted.ToList(), token);
-                await ProcessCampainItems(context, account, converted.ToList().Shuffle().Take(100), token);
-            }
-        }
+                    var adItems = await _crudExternal.GetAdItemsFromCampaignAsync(account, campaign.SecondaryId, token);
+                    await _crudInternal.CommitAdItemBulk(adItems, token, true);
 
-        /// <summary>
-        /// This will get all campaign items for each campaign
-        /// in the specified list.
-        /// </summary>
-        /// <param name="context">The poller context</param>
-        /// <param name="account">Account object</param>
-        /// <param name="campaigns">Campaign list</param>
-        /// <param name="token">Cancellation token</param>
-        /// <returns></returns>
-        private async Task ProcessCampainItems(PollerContext context, AccountEntity account,
-            IEnumerable<CampaignEntity> campaigns, CancellationToken token)
-        {
-            foreach (var campaign in campaigns)
-            {
-                try
-                {
-                    var items = await GetCampaignAllItemsAsync(account, campaign, token);
-                    var convertedItems = _mapperAdItem.ConvertAll(items.Items);
-                    await CommitAdItems(convertedItems, token, true);
-                    _logger.LogDebug($"Processed items for campaign {campaign.SecondaryId}");
-
-                    // Prevent spamming.
-                    await Task.Delay(250, token);
-
+                    // Mark our progress and prevent spamming
                     context.MarkProgress(token);
-                }
-                catch (TaskCanceledException)
-                {
-                    token.ThrowIfCancellationRequested();
+                    await Task.Delay(250, token);
                 }
             }
         }
@@ -172,16 +155,6 @@ namespace Poller.Taboola
         /// Implements our CRUD interface. This handles CRUD operations on given
         /// objects. The type of operation and the objects are specified within
         /// the context.
-        /// 
-        /// The context must contain an account and an entity to be updated. 
-        /// This function will throw if this is not the case.
-        /// 
-        /// The entity must either be an ad item or a campaign. No other entites
-        /// can be crudded.
-        /// 
-        /// The operation can not be a read operation.
-        /// 
-        /// TODO Returning what we created in a clean way.
         /// </summary>
         /// <param name="context">CRUD context</param>
         /// <param name="token">Cancellation token</param>
@@ -202,16 +175,17 @@ namespace Poller.Taboola
                     switch (entity)
                     {
                         case CampaignEntity campaign:
-                            var createdConverted = await CreateCampaignAsync(account, campaign, token);
-                            await UpdateLocalCampaignAsync(createdConverted, token);
-
-                            context.Entity[1] = createdConverted;
+                            await _crudExternal.CreateCampaignAsync(account, campaign, token);
+                            await _crudInternal.UpdateCampaignAsync(campaign, token);
+                            context.Entity[1] = campaign;
                             return;
 
                         case AdItemEntity adItem:
-                            // var createdConverted = await CreateAdItemAsync(account, adItem, token);
-                            // await UpdateLocalAdItemAsync(createdConverted, token);
-                            break;
+                            var campaignId = (await _crudInternal.GetCampaignFromGuidAsync(adItem.CampaignGuid, token)).SecondaryId;
+                            await _crudExternal.CreateAdItemAsync(account, adItem, campaignId, token);
+                            await _crudInternal.UpdateAdItemAsync(adItem, token);
+                            context.Entity[1] = adItem;
+                            return;
                     }
                     break;
 
@@ -220,34 +194,37 @@ namespace Poller.Taboola
                     switch (entity)
                     {
                         case CampaignEntity campaign:
-                            var updated = await UpdateCampaignAsync(account, campaign, token);
-                            var updatedConverted = _mapperCampaign.Convert(updated, campaign.Id);
-                            await UpdateLocalCampaignAsync(updatedConverted, token);
-
-                            context.Entity[1] = updatedConverted;
+                            await _crudExternal.UpdateCampaignAsync(account, campaign, token);
+                            await _crudInternal.UpdateCampaignAsync(campaign, token);
+                            context.Entity[1] = campaign;
                             return;
 
                         case AdItemEntity adItem:
-                            //await UpdateAdItemAsync(account, adItem, token);
-                            break;
+                            var campaignId = (await _crudInternal.GetCampaignFromGuidAsync(adItem.CampaignGuid, token)).SecondaryId;
+                            await _crudExternal.UpdateAdItemAsync(account, adItem, campaignId, token);
+                            await _crudInternal.UpdateAdItemAsync(adItem, token);
+                            context.Entity[1] = adItem;
+                            return;
                     }
                     break;
+
                 // Delete an entity
                 case Maximiz.Model.CrudAction.Delete:
                     switch (entity)
                     {
                         // TODO Do we want to delete this or update this to some delete status? I'd say delete the thing.
                         case CampaignEntity campaign:
-                            var deleted = await DeleteCampaignAsync(account, campaign, token);
-                            var deletedConverted = _mapperCampaign.Convert(deleted, campaign.Id);
-                            await LocalDeleteCampaignAsync(deletedConverted.Id, token);
-
-                            context.Entity[1] = deletedConverted;
+                            await _crudExternal.DeleteCampaignAsync(account, campaign, token);
+                            await _crudInternal.DeleteCampaignAsync(campaign, token);
+                            context.Entity[1] = campaign;
                             return;
 
                         case AdItemEntity adItem:
-                            //await DeleteAdItemAsync(account, adItem, token);
-                            break;
+                            var campaignId = (await _crudInternal.GetCampaignFromGuidAsync(adItem.CampaignGuid, token)).SecondaryId;
+                            await _crudExternal.DeleteAdItemAsync(account, adItem, campaignId, token);
+                            await _crudInternal.DeleteAdItemAsync(adItem, token);
+                            context.Entity[1] = adItem;
+                            return;
                     }
                     break;
 
@@ -256,7 +233,8 @@ namespace Poller.Taboola
                     switch (entity)
                     {
                         case CampaignEntity campaign:
-                            // await SyncbackCampaignAsync(account, campaign, token);
+                            await _crudInternal.UpdateCampaignAsync(await _crudExternal.GetCampaignAsync(account, campaign.SecondaryId, token), token);
+                            await _crudInternal.CommitAdItemBulk(await _crudExternal.GetAdItemsFromCampaignAsync(account, campaign.SecondaryId, token), token);
                             break;
                     }
                     break;
