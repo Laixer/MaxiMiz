@@ -172,8 +172,9 @@ namespace Poller.Taboola.Traffic
             var createdWithFields = await AwaitAdItemCreationAsync(account, adItemExternal, adItem.Id, token);
 
             // Convert back, assign explicitly and return
-            adItem = _mapperAdItem.Convert(createdWithFields, adItem.Id);
-            return adItem;
+            createdWithFields.Id = adItem.Id;
+            adItem = createdWithFields;
+            return createdWithFields;
         }
 
         /// <summary>
