@@ -2,8 +2,6 @@
 using Maximiz.Model.Entity;
 using Poller.Taboola.Model;
 using AdItemCore = Maximiz.Model.Entity.AdItem;
-using AdItemTaboola = Poller.Taboola.Model.AdItem;
-using AdItemCoResult = Poller.Taboola.Model.AdItemCoResult;
 using System;
 using Poller.Helper;
 using System.Collections.Generic;
@@ -15,9 +13,9 @@ namespace Poller.Taboola.Mapper
     /// <summary>
     /// Our Ad Item mapper.
     /// TODO Details handling might be possible in a more elegant manner.
-    /// TODO Weird inheritance inaccessibility fix.
+    /// TODO Weird inheritance inaccessibility fix --> fixx LEFT RIGTH
     /// </summary>
-    class MapperAdItem : IMapperSplit<AdItemTaboola, AdItemCoResult, AdItemCore>
+    class MapperAdItem : IMapperSplit<AdItemMain, AdItemReports, AdItemCore>
     {
 
         private const string DefaultString = "default";
@@ -30,22 +28,9 @@ namespace Poller.Taboola.Mapper
         /// <param name="external"></param>
         /// <param name="guid"></param>
         /// <returns></returns>
-        public AdItemCore Convert(AdItemCoResult external, Guid guid)
+        public AdItemCore ConvertAdditional(AdItemReports external, Guid guid)
         {
-            var converted = Convert(external);
-            converted.Id = guid;
-            return converted;
-        }
-
-        /// <summary>
-        /// TODO Doc
-        /// </summary>
-        /// <param name="external"></param>
-        /// <param name="guid"></param>
-        /// <returns></returns>
-        public AdItemCore Convert(AdItemTaboola external, Guid guid)
-        {
-            var converted = Convert(external);
+            var converted = ConvertAdditional(external);
             converted.Id = guid;
             return converted;
         }
@@ -60,7 +45,7 @@ namespace Poller.Taboola.Mapper
         /// </summary>
         /// <param name="from">Taboola co result</param>
         /// <returns>Core ad item</returns>
-        public AdItemCore Convert(AdItemCoResult from)
+        public AdItemCore ConvertAdditional(AdItemReports from)
         {
             if (from == null) throw new
                     ArgumentNullException(nameof(from));
@@ -79,75 +64,6 @@ namespace Poller.Taboola.Mapper
         }
 
         /// <summary>
-        /// Extracts the details from a Taboola co result.
-        /// This then converts it to a JSON string.
-        /// </summary>
-        /// <param name="from">The Taboola co result</param>
-        /// <returns>The details object as JSON string</returns>
-        private string ExtractDetailsToString(
-            AdItemCoResult from)
-        {
-            if (from == null) throw new
-                    ArgumentNullException(nameof(from));
-
-            return Json.Serialize(new AdItemDetails
-            {
-                ThumbnailUrl = from.ThumbnailUrl,
-                CampaignName = from.CampaignName,
-                ContentProvider = from.ContentProvider,
-                ContentProviderName = from.ContentProviderName,
-                Clicks = from.Clicks,
-                Cpm = from.Cpm,
-                Currency = from.Currency,
-                Cpa = from.Cpa,
-                Cvr = from.Cvr
-            });
-        }
-
-        /// <summary>
-        /// This converts a Taboola ad item to our
-        /// core ad item. This is the result we get 
-        /// when we call the report API. This only
-        /// maps the available parameters.
-        /// </summary>
-        /// <param name="external">The Taboola ad item</param>
-        /// <returns>The core ad item</returns>
-        public AdItemCore Convert(AdItemTaboola external)
-        {
-            if (external == null) throw new
-                    ArgumentNullException(nameof(external));
-
-            return new AdItemCore
-            {
-                SecondaryId = external.Id,
-                Title = external.Title,
-                TargetUrl = external.Url,
-                Details = ExtractDetailsToString(external)
-            };
-        }
-
-        /// <summary>
-        /// Extracts the details from a Taboola ad item.
-        /// This then converts it to a JSON string.
-        /// </summary>
-        /// <param name="from">The Taboola ad item</param>
-        /// <returns>The details object as JSON string</returns>
-        private string ExtractDetailsToString(
-            AdItemTaboola from)
-        {
-            if (from == null) throw new
-                    ArgumentNullException(nameof(from));
-
-            return Json.Serialize(new AdItemDetails
-            {
-                CampaignId = from.CampaignId,
-                Active = from.Active,
-                ApprovalState = from.ApprovalState,
-                CampaignItemStatus = from.CampaignItemStatus
-            });
-        }
-
-        /// <summary>
         /// This converts a core item to a Taboola
         /// co result. This is the result we get 
         /// when calling the report API.
@@ -156,7 +72,7 @@ namespace Poller.Taboola.Mapper
         /// </summary>
         /// <param name="from">Core ad item</param>
         /// <returns>Taboola co result ad item</returns>
-        public AdItemCoResult Convert(AdItemCore from)
+        public AdItemReports ConvertAdditional(AdItemCore from)
         {
             if (from == null) throw new
                     ArgumentNullException(nameof(from));
@@ -164,7 +80,7 @@ namespace Poller.Taboola.Mapper
             AdItemDetails details = Json.Deserialize
                 <AdItemDetails>(from.Details);
 
-            return new AdItemCoResult
+            return new AdItemReports
             {
                 // Properties
                 Id = from.SecondaryId,
@@ -191,6 +107,41 @@ namespace Poller.Taboola.Mapper
         }
 
         /// <summary>
+        /// TODO Doc
+        /// </summary>
+        /// <param name="external"></param>
+        /// <param name="guid"></param>
+        /// <returns></returns>
+        public AdItemCore Convert(AdItemMain external, Guid guid)
+        {
+            var converted = Convert(external);
+            converted.Id = guid;
+            return converted;
+        }
+
+        /// <summary>
+        /// This converts a Taboola ad item to our
+        /// core ad item. This is the result we get 
+        /// when we call the report API. This only
+        /// maps the available parameters.
+        /// </summary>
+        /// <param name="external">The Taboola ad item</param>
+        /// <returns>The core ad item</returns>
+        public AdItemCore Convert(AdItemMain external)
+        {
+            if (external == null) throw new
+                    ArgumentNullException(nameof(external));
+
+            return new AdItemCore
+            {
+                SecondaryId = external.Id,
+                Title = external.Title,
+                TargetUrl = external.Url,
+                Details = ExtractDetailsToString(external)
+            };
+        }
+
+        /// <summary>
         /// This converts a core item to a Taboola
         /// ad item. This is the result we get when 
         /// calling the ad item API.
@@ -199,13 +150,56 @@ namespace Poller.Taboola.Mapper
         /// </summary>
         /// <param name="core">Core ad item</param>
         /// <returns>Taboola ad item</returns>
-        AdItemTaboola IMapper<AdItemTaboola, AdItemCore>
-            .Convert(AdItemCore core)
+        public AdItemMain Convert(AdItemCore core)
         {
             throw new NotImplementedException("This function " +
                 "was moved due to inheritance inaccessibility");
         }
 
+        /// <summary>
+        /// Extracts the details from a Taboola co result.
+        /// This then converts it to a JSON string.
+        /// </summary>
+        /// <param name="from">The Taboola co result</param>
+        /// <returns>The details object as JSON string</returns>
+        private string ExtractDetailsToString(AdItemReports from)
+        {
+            if (from == null) throw new
+                    ArgumentNullException(nameof(from));
+
+            return Json.Serialize(new AdItemDetails
+            {
+                ThumbnailUrl = from.ThumbnailUrl,
+                CampaignName = from.CampaignName,
+                ContentProvider = from.ContentProvider,
+                ContentProviderName = from.ContentProviderName,
+                Clicks = from.Clicks,
+                Cpm = from.Cpm,
+                Currency = from.Currency,
+                Cpa = from.Cpa,
+                Cvr = from.Cvr
+            });
+        }
+
+        /// <summary>
+        /// Extracts the details from a Taboola ad item.
+        /// This then converts it to a JSON string.
+        /// </summary>
+        /// <param name="from">The Taboola ad item</param>
+        /// <returns>The details object as JSON string</returns>
+        private string ExtractDetailsToString(AdItemMain from)
+        {
+            if (from == null) throw new
+                    ArgumentNullException(nameof(from));
+
+            return Json.Serialize(new AdItemDetails
+            {
+                CampaignId = from.CampaignId,
+                Active = from.Active,
+                ApprovalState = from.ApprovalState,
+                CampaignItemStatus = from.CampaignItemStatus
+            });
+        }
         /// <summary>
         /// Add Taboola item values to a core ad item.
         /// 
@@ -214,7 +208,7 @@ namespace Poller.Taboola.Mapper
         /// <param name="core">The core ad item</param>
         /// <param name="from">The taboola ad item</param>
         /// <returns>Core ad item with additional values</returns>
-        public AdItemCore AddOnto(AdItemCore core, AdItemTaboola from)
+        public AdItemCore AddOnto(AdItemCore core, AdItemMain from)
         {
             if (core == null) throw new
                     ArgumentNullException(nameof(core));
@@ -255,7 +249,7 @@ namespace Poller.Taboola.Mapper
         /// <param name="core">The core ad item</param>
         /// <param name="from">The taboola co result ad item</param>
         /// <returns>Core ad item with additional values</returns>
-        public AdItemCore AddOnto(AdItemCore core, AdItemCoResult from)
+        public AdItemCore AddOnto(AdItemCore core, AdItemReports from)
         {
             if (core == null) throw new
                     ArgumentNullException(nameof(core));
@@ -297,7 +291,6 @@ namespace Poller.Taboola.Mapper
             return core;
         }
 
-        // TODO This is just re-using our current functions.
         /// <summary>
         /// This merges the two types of ad items into
         /// one. TODO Do we need this?
@@ -305,8 +298,7 @@ namespace Poller.Taboola.Mapper
         /// <param name="from"></param>
         /// <param name="to"></param>
         /// <returns></returns>
-        public AdItemCoResult Merge(
-            AdItemTaboola from, AdItemCoResult to)
+        public AdItemReports Merge(AdItemMain from, AdItemReports to)
         {
             if (from == null) throw new
                     ArgumentNullException(nameof(from));
@@ -322,7 +314,7 @@ namespace Poller.Taboola.Mapper
         /// <param name="from"></param>
         /// <param name="to"></param>
         /// <returns></returns>
-        public AdItemTaboola Merge(AdItemCoResult from, AdItemTaboola to)
+        public AdItemMain Merge(AdItemReports from, AdItemMain to)
         {
             throw new System.NotImplementedException();
         }
@@ -332,8 +324,7 @@ namespace Poller.Taboola.Mapper
         /// </summary>
         /// <param name="list">Taboola items</param>
         /// <returns>Core items</returns>
-        public IEnumerable<AdItemCore> ConvertAll(
-            IEnumerable<AdItemTaboola> list)
+        public IEnumerable<AdItemCore> ConvertAll(IEnumerable<AdItemMain> list)
         {
             List<AdItemCore> result = new List<AdItemCore>();
             foreach (var x in list.AsParallel())
@@ -348,13 +339,12 @@ namespace Poller.Taboola.Mapper
         /// </summary>
         /// <param name="list">Taboola items</param>
         /// <returns>Core items</returns>
-        public IEnumerable<AdItemCore> ConvertAll(
-            IEnumerable<AdItemCoResult> list)
+        public IEnumerable<AdItemCore> ConvertAll(IEnumerable<AdItemReports> list)
         {
             List<AdItemCore> result = new List<AdItemCore>();
             foreach (var x in list)
             {
-                result.Add(Convert(x));
+                result.Add(ConvertAdditional(x));
             }
             return result;
         }
@@ -364,10 +354,9 @@ namespace Poller.Taboola.Mapper
         /// </summary>
         /// <param name="list"></param>
         /// <returns></returns>
-        public IEnumerable<AdItemTaboola> ConvertAll(
-            IEnumerable<AdItemCore> list)
+        public IEnumerable<AdItemMain> ConvertAll(IEnumerable<AdItemCore> list)
         {
-            List<AdItemTaboola> result = new List<AdItemTaboola>();
+            List<AdItemMain> result = new List<AdItemMain>();
             foreach (var x in list)
             {
                 result.Add(InternalConvert(x));
@@ -380,7 +369,7 @@ namespace Poller.Taboola.Mapper
         /// </summary>
         /// <param name="core"></param>
         /// <returns></returns>
-        private AdItemTaboola InternalConvert(AdItemCore core)
+        private AdItemMain InternalConvert(AdItemCore core)
         {
             if (core == null) throw new
                     ArgumentNullException(nameof(core));
@@ -388,7 +377,7 @@ namespace Poller.Taboola.Mapper
             AdItemDetails details = Json.Deserialize
                 <AdItemDetails>(core.Details);
 
-            return new AdItemTaboola
+            return new AdItemMain
             {
                 // Properties
                 Id = core.SecondaryId,
