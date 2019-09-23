@@ -310,6 +310,7 @@ namespace Poller.Taboola
         /// <summary>
         /// Called upon graceful shutdown.
         /// </summary>
-        public void Dispose() => _client?.Dispose();
+        /// 
+        public void Dispose() => _httpWrapper.Dispose();
     }
 }

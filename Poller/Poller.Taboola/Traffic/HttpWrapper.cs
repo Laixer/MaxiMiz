@@ -12,7 +12,7 @@ namespace Poller.Taboola.Traffic
     /// requests are placed within this file. All http requests are handled
     /// by our <see cref="HttpManager"/>.
     /// </summary>
-    internal class HttpWrapper
+    internal class HttpWrapper : IDisposable
     {
 
         /// <summary>
@@ -114,5 +114,12 @@ namespace Poller.Taboola.Traffic
             }
         }
 
+        /// <summary>
+        /// Called upon graceful shutdown.
+        /// </summary>
+        public void Dispose()
+        {
+            _client.Dispose();
+        }
     }
 }
