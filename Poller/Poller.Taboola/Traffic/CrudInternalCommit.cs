@@ -3,6 +3,7 @@ using Maximiz.Model.Entity;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using Poller.Database;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -165,7 +166,7 @@ namespace Poller.Taboola.Traffic
         /// <param name="campaigns">Core campaign list</param>
         /// <param name="token"></param>
         /// <returns>Task</returns>
-        private async Task CommitCampaignBulk(IEnumerable<Campaign> campaigns,
+        public async Task CommitCampaignBulk(IEnumerable<Campaign> campaigns,
             CancellationToken token)
         {
             if (campaigns == null || campaigns.ToList().Count() <= 0) { return; }
@@ -223,7 +224,7 @@ namespace Poller.Taboola.Traffic
         /// <param name="updateStatus">If we want to update
         /// the items status and approval state</param>
         /// <returns>Task</returns>
-        private async Task CommitAdItemBulk(IEnumerable<AdItem> aditems,
+        public async Task CommitAdItemBulk(IEnumerable<AdItem> aditems,
             CancellationToken token, bool updateStatus = false)
         {
             if (aditems == null || aditems.Count() <= 0) { return; }
@@ -279,7 +280,7 @@ namespace Poller.Taboola.Traffic
         /// <param name="accounts">The core accounts</param>
         /// <param name="token">Cancellation token</param>
         /// <returns>Nothing (task)</returns>
-        private async Task CommitAccountBulk(IEnumerable<Account> accounts,
+        public async Task CommitAccountBulk(IEnumerable<Account> accounts,
             CancellationToken token)
         {
             if (accounts == null || accounts.Count() <= 0) { return; }

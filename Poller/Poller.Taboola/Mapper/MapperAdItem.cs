@@ -53,7 +53,7 @@ namespace Poller.Taboola.Mapper
             var result = DefaultAdItemCore();
             result.SecondaryId = from.Id;
             result.Title = from.Title;
-            result.TargetUrl = from.Url;
+            result.Url = from.Url;
             result.Cpc = from.Cpc;
             result.Spent = from.Spent;
             result.Impressions = (int)from.Impressions;
@@ -85,7 +85,7 @@ namespace Poller.Taboola.Mapper
                 // Properties
                 Id = from.SecondaryId,
                 Title = from.Title,
-                Url = from.TargetUrl,
+                Url = from.Url,
                 Cpc = from.Cpc,
                 Spent = from.Spent,
                 Impressions = from.Impressions,
@@ -136,7 +136,7 @@ namespace Poller.Taboola.Mapper
             {
                 SecondaryId = external.Id,
                 Title = external.Title,
-                TargetUrl = external.Url,
+                Url = external.Url,
                 Details = ExtractDetailsToString(external)
             };
         }
@@ -226,7 +226,7 @@ namespace Poller.Taboola.Mapper
             // TODO Should we overwrite the secondary id?
             core.SecondaryId = from.Id;
             core.Title = from.Title;
-            core.TargetUrl = from.Url;
+            core.Url = from.Url;
 
             // Details
             AdItemDetails details = Json.Deserialize
@@ -267,7 +267,7 @@ namespace Poller.Taboola.Mapper
             // TODO Should we overwrite the secondary id?
             core.SecondaryId = from.Id;
             core.Title = from.Title;
-            core.TargetUrl = from.Url;
+            core.Url = from.Url;
             core.Cpc = from.Cpc;
             core.Spent = from.Spent;
             core.Impressions = (int)from.Impressions;
@@ -382,7 +382,7 @@ namespace Poller.Taboola.Mapper
                 // Properties
                 Id = core.SecondaryId,
                 Title = core.Title,
-                Url = core.TargetUrl,
+                Url = core.Url,
 
                 // Details
                 CampaignId = details.CampaignId,

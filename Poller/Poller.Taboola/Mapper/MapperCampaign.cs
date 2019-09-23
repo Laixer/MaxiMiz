@@ -14,6 +14,7 @@ namespace Poller.Taboola.Mapper
 
     /// <summary>
     /// Our converter for campaigns.
+    /// TODO Update for new entity model.
     /// </summary>
     class MapperCampaign : IMapper<CampaignTaboola, CampaignCore>
     {

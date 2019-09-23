@@ -8,7 +8,6 @@ using Microsoft.Extensions.Caching.Memory;
 using Poller.Publisher;
 using Poller.Database;
 using Poller.Scheduler.Activator;
-using Poller.Scheduler.Delegate;
 
 namespace Poller.Taboola
 {

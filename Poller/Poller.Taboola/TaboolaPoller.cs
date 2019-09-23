@@ -21,9 +21,7 @@ namespace Poller.Taboola
 {
 
     /// <summary>
-    /// Partial class for our Taboola Poller. This
-    /// part implements all required activator base
-    /// interfaces.
+    /// Implementation of our Taboola poller.
     /// </summary>
     internal partial class TaboolaPoller : IPollerRefreshAdvertisementData,
         IPollerDataSyncback, IPollerCreateOrUpdateObjects, IDisposable
@@ -91,8 +89,10 @@ namespace Poller.Taboola
         }
 
         /// <summary>
-        /// Implementation from our data refresh interface. This function calls 
-        /// the Taboola API and retrieves our accounts, campaigns and ad items.
+        /// Implementation of our data refresh interface. This function calls 
+        /// the Taboola API and retrieves data about the performance of our ad
+        /// items. This is used to retreive metrics, not to validate that all
+        /// data we have is is still up to date.
         /// </summary>
         /// <param name="context">The poller context</param>
         /// <param name="token">Cancellation token</param>

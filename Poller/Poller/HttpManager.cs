@@ -94,7 +94,7 @@ namespace Poller
         /// <param name="endpoint">Endpoint url without the base</param>
         /// <param name="content">Http content</param>
         /// <param name="cancellationToken">Cancellation token</param>
-        /// <returns></returns>
+        /// <returns>Object with specified type</returns>
         public async Task<TResult> RemoteExecuteAsync<TResult>(
             HttpMethod method, string endpoint, HttpContent content,
             CancellationToken cancellationToken)

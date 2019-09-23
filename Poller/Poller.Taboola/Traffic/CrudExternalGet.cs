@@ -25,7 +25,7 @@ namespace Poller.Taboola.Traffic
         /// </summary>
         /// <param name="token">Cancellation token</param>
         /// <returns>Fetched converted accounts</returns>
-        private async Task<IEnumerable<AccountInternal>> GetAllAccounts(CancellationToken token)
+        public async Task<IEnumerable<AccountInternal>> GetAllAccounts(CancellationToken token)
         {
             var endpoint = $"api/1.0/users/current/allowed-accounts/";
             var accountsExternal = await _httpWrapper.RemoteQueryAndLogAsync
@@ -42,12 +42,12 @@ namespace Poller.Taboola.Traffic
         /// <param name="account">The core account</param>
         /// <param name="token">Cancellation token</param>
         /// <returns>The converted campaign list</returns>
-        private async Task<IEnumerable<CampaignInternal>> GetAllCampaigns(
+        public async Task<IEnumerable<CampaignInternal>> GetAllCampaignsFromAccountAsync(
             AccountInternal account, CancellationToken token)
         {
             var endpoint = $"api/1.0/{account.Name}/campaigns";
-            var campaignsExternal = await _httpWrapper.RemoteQueryAndLogAsync
-                <EntityList<Campaign>>(HttpMethod.Get, endpoint, token);
+            var campaignsExternal = (await _httpWrapper.RemoteQueryAndLogAsync
+                <EntityList<Campaign>>(HttpMethod.Get, endpoint, token)).Items;
 
             // Convert and return
             campaignsExternal = _mapperTarget.ConvertAll(campaignsExternal);
@@ -55,10 +55,10 @@ namespace Poller.Taboola.Traffic
         }
 
         /// <summary>
-        /// Gets a campaign from the Taboola API based on its external id.
+        /// Gets a campaign from the Taboola API based on its external id. This
+        /// also deals with the conversion of the target objects.
         /// </summary>
-        /// <remarks>This has no method of retreiving the campaign GUID. This
-        /// returns null if the campaign is not present in the API.</remarks>
+        /// <remarks>This returns null if the campaign does not exist</remarks>
         /// <param name="account">The campaign account</param>
         /// <param name="externalCampaignId">The campaign Taboola id</param>
         /// <param name="token">The cancellation token</param>
@@ -85,11 +85,10 @@ namespace Poller.Taboola.Traffic
         /// TODO We can't merge ad items at the moment!
         /// </summary>
         /// <param name="account">The campaign Taboola account</param>
-        /// <param name="campaignExternalId">The external campaign id</param>
         /// <param name="token">The cancellation token</param>
         /// <returns>The converted ad items</returns>
-        public async Task<IEnumerable<AdItemInternal>> GetAdItemsReportFromCampaignAsync(
-            AccountInternal account, string campaignExternalId, CancellationToken token)
+        public async Task<IEnumerable<AdItemInternal>> GetAdItemsReportFromAccountAsync(
+            AccountInternal account, CancellationToken token)
         {
             var query = HttpUtility.ParseQueryString(string.Empty);
             query["end_date"] = query["start_date"] = DateTime.Now.ToString("yyyy-MM-dd");

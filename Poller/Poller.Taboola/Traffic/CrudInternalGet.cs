@@ -28,7 +28,7 @@ namespace Poller.Taboola.Traffic
         /// <param name="guid">The campaign GUID</param>
         /// <param name="token">The cancellation token</param>
         /// <returns>Our internal database campaign</returns>
-        public async Task<CampaignInternal> GetCampaignFromGuid(
+        public async Task<CampaignInternal> GetCampaignFromGuidAsync(
             Guid guid, CancellationToken token)
         {
             var sql = $"SELECT * FROM public.campaign WHERE id::text = '{guid.ToString()}';";
@@ -52,7 +52,7 @@ namespace Poller.Taboola.Traffic
         /// </summary>
         /// <param name="token">The cancellation token</param>
         /// <returns>All advertiser accounts</returns>
-        private Task<IEnumerable<AccountInternal>>
+        public Task<IEnumerable<AccountInternal>>
             GetAdvertiserAccountsCachedAsync(CancellationToken token)
         {
             return GetAccountsCachedAsync(AccountType.Advertiser, token);
@@ -65,7 +65,7 @@ namespace Poller.Taboola.Traffic
         /// </summary>
         /// <param name="token">The cancellation token</param>
         /// <returns>All publisher accounts</returns>
-        private Task<IEnumerable<AccountInternal>>
+        public Task<IEnumerable<AccountInternal>>
             GetPublisherAccountsCachedAsync(CancellationToken token)
         {
             return GetAccountsCachedAsync(AccountType.Publisher, token);

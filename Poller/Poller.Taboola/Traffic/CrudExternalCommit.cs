@@ -83,7 +83,7 @@ namespace Poller.Taboola.Traffic
         /// <param name="campaign">The core campaign to create external</param>
         /// <param name="token">The cancellation token</param>
         /// <returns>The created campaign</returns>
-        public async Task<CampaignInternal> CreateCampaign(Account account,
+        public async Task<CampaignInternal> CreateCampaignAsync(Account account,
             CampaignInternal campaign, CancellationToken token)
         {
             // Convert
@@ -108,7 +108,7 @@ namespace Poller.Taboola.Traffic
         /// <param name="campaign">The campaign to update</param>
         /// <param name="token">The cancellation token</param>
         /// <returns>The updated campaign</returns>
-        public async Task<CampaignInternal> UpdateCampaign(Account account,
+        public async Task<CampaignInternal> UpdateCampaignAsync(Account account,
             CampaignInternal campaign, CancellationToken token)
         {
             // Validate and convert
@@ -135,7 +135,7 @@ namespace Poller.Taboola.Traffic
         /// <param name="campaign">The campaign to delete</param>
         /// <param name="token">The cancellation token</param>
         /// <returns>The deleted campaign</returns>
-        public async Task<CampaignInternal> DeleteCampaign(Account account,
+        public async Task<CampaignInternal> DeleteCampaignAsync(Account account,
             CampaignInternal campaign, CancellationToken token)
         {
             // Delete
@@ -159,17 +159,17 @@ namespace Poller.Taboola.Traffic
         /// <param name="campaignId">The campaign Taboola id</param>
         /// <param name="token">The cancellation token</param>
         /// <returns>The created and converted ad item</returns>
-        public async Task<AdItemInternal> CreateAdItem(Account account,
+        public async Task<AdItemInternal> CreateAdItemAsync(Account account,
             AdItemInternal adItem, string campaignId, CancellationToken token)
         {
             // Create an empty ad item
             var endpoint = $"api/1.0 /{account.Name}/campaigns/{campaignId}/items/";
-            var content = _contentBuilder.BuildStringContent(adItem.TargetUrl);
+            var content = _contentBuilder.BuildStringContent(adItem.Url);
             var adItemExternal = _httpWrapper.RemoteExecuteAndLogAsync<AdItemMain>(
                 HttpMethod.Post, endpoint, content, token).Result;
 
             // Wait for creation approval
-            var createdWithFields = await AwaitAdItemCreationAsync(account, adItemExternal, token);
+            var createdWithFields = await AwaitAdItemCreationAsync(account, adItemExternal, adItem.Id, token);
 
             // Convert back, assign explicitly and return
             adItem = _mapperAdItem.Convert(createdWithFields, adItem.Id);
@@ -185,7 +185,7 @@ namespace Poller.Taboola.Traffic
         /// <param name="campaignId">The campaign Taboola id</param>
         /// <param name="token">The cancellation token</param>
         /// <returns>The updated and converted ad item</returns>
-        public async Task<AdItemInternal> UpdateAdItem(Account account,
+        public async Task<AdItemInternal> UpdateAdItemAsync(Account account,
             AdItemInternal adItem, string campaignId, CancellationToken token)
         {
             // Convert
@@ -211,7 +211,7 @@ namespace Poller.Taboola.Traffic
         /// <param name="campaignId">The campaign Taboola id</param>
         /// <param name="token">The cancellation token</param>
         /// <returns>The deleted and converted ad item</returns>
-        public async Task<AdItemInternal> DeleteAdItem(Account account,
+        public async Task<AdItemInternal> DeleteAdItemAsync(Account account,
             AdItemInternal adItem, string campaignId, CancellationToken token)
         {
             // Delete

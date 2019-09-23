@@ -17,8 +17,8 @@ namespace Poller.Taboola.Mapper
     {
 
         /// <summary>
-        /// Converts the OsTarget target type to the
-        /// correct subtype for all in the specified list.
+        /// Converts the OsTarget target type to the correct subtype for all 
+        /// in the specified list.
         /// </summary>
         /// <param name="input">Campaign list</param>
         /// <returns>Converted campaign list</returns>
@@ -33,8 +33,8 @@ namespace Poller.Taboola.Mapper
         }
 
         /// <summary>
-        /// Converts the OsTargeting target type to the
-        /// correct subtype. This can be either of two:
+        /// Converts the OsTargeting target type to the correct subtype. This 
+        /// can be either of two:
         /// <see cref="TargetDefault"/> or
         /// <see cref="TargetOsFamily"/>.
         /// TODO This should be cleaner.
@@ -104,8 +104,6 @@ namespace Poller.Taboola.Mapper
                     "Could not convert OsTarget type for given campaign");
             }
         }
-
-
 
         private string RemoveBrackets(string input)
         {
