@@ -3,6 +3,8 @@ using Maximiz.Model.Entity;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using Poller.Database;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -153,6 +155,154 @@ namespace Poller.Taboola.Traffic
             {
                 await connection.ExecuteAsync(new CommandDefinition(
                     sql, cancellationToken: token));
+            }
+        }
+
+        /// <summary>
+        /// TODO Revise
+        /// This commits our fetched campaigns to our local database.
+        /// </summary>
+        /// <param name="campaigns">Core campaign list</param>
+        /// <param name="token"></param>
+        /// <returns>Task</returns>
+        private async Task CommitCampaignBulk(IEnumerable<Campaign> campaigns,
+            CancellationToken token)
+        {
+            if (campaigns == null || campaigns.ToList().Count() <= 0) { return; }
+
+            var sql = @"
+                INSERT INTO
+	                public.campaign(
+                        secondary_id, name, branding_text, 
+                        language_as_text, initial_cpc, budget, 
+                        budget_daily, spent, delivery, 
+                        start_date, end_date, utm, 
+                        campaign_group, note, details,
+
+                        location_include, location_exclude, language)
+                VALUES
+                    (
+                        @SecondaryId,
+                        @Name,
+                        @BrandingText,
+                        @LanguageAsText,
+                        @InitialCpc,
+                        @Budget,
+                        @DailyBudget,
+                        @Spent,
+                        CAST (@DeliveryText AS delivery),
+                        COALESCE(@StartDate, CURRENT_TIMESTAMP),
+                        VALIDATE_TIMESTAMP(@EndDate),
+                        @Utm,
+                        48389,
+                        @Note,
+                        CAST (@Details AS json),
+
+                        @LocationInclude,
+                        @LocationExclude,
+                        '{AB}'
+                    )
+                ON CONFLICT (secondary_id) DO NOTHING;";
+
+            using (var connection = _dbProvider.ConnectionScope())
+            {
+                await connection.ExecuteAsync(new CommandDefinition(
+                    sql, campaigns, cancellationToken: token));
+            }
+        }
+
+        /// <summary>
+        /// TODO Revise.
+        /// Commits a list of campaign items to our database.
+        /// These entries have already been converted.
+        /// TODO Bulk insert.
+        /// TODO ad_group
+        /// </summary>
+        /// <param name="aditems">The list of ad items</param>
+        /// <param name="token">Cancellation token</param>
+        /// <param name="updateStatus">If we want to update
+        /// the items status and approval state</param>
+        /// <returns>Task</returns>
+        private async Task CommitAdItemBulk(IEnumerable<AdItem> aditems,
+            CancellationToken token, bool updateStatus = false)
+        {
+            if (aditems == null || aditems.Count() <= 0) { return; }
+
+            var sql = @"
+                INSERT INTO
+	                public.ad_item AS INCLUDED (secondary_id, ad_group, title, url, content, cpc, spent, clicks, impressions, actions, details, status, approval_state)
+                VALUES
+                    (
+                        @SecondaryId,
+                        2,
+                        LEFT(@Title, 128),
+                        @Url,
+                        @Content,
+                        @Cpc,
+                        @Spent,
+                        @Clicks,
+                        @Impressions,
+                        @Actions,
+                        CAST (@Details AS json),
+                        CAST (@StatusText AS ad_item_status),
+                        CAST (@ApprovalStateText AS approval_state)
+                    )
+                ON CONFLICT (secondary_id) DO UPDATE
+                SET
+                    cpc = GREATEST(INCLUDED.cpc, EXCLUDED.cpc),
+                    spent = GREATEST(INCLUDED.spent, EXCLUDED.spent),
+                    clicks = GREATEST(INCLUDED.clicks, EXCLUDED.clicks),
+                    impressions = GREATEST(INCLUDED.impressions, EXCLUDED.impressions),
+                    actions = GREATEST(INCLUDED.actions, EXCLUDED.actions),
+                    details = COALESCE(INCLUDED.details, EXCLUDED.details)";
+
+            // If we update the items status we also
+            // include the status and approval state.
+            if (updateStatus)
+            {
+                sql += @",
+                    status = EXCLUDED.status,
+                    approval_state = EXCLUDED.approval_state";
+            }
+
+            // Call for execution
+            using (var connection = _dbProvider.ConnectionScope())
+            {
+                await connection.ExecuteAsync(new CommandDefinition(
+                    sql, aditems, cancellationToken: token));
+            }
+        }
+
+        /// <summary>
+        /// Commits our accounts to the database.
+        /// </summary>
+        /// <param name="accounts">The core accounts</param>
+        /// <param name="token">Cancellation token</param>
+        /// <returns>Nothing (task)</returns>
+        private async Task CommitAccountBulk(IEnumerable<Account> accounts,
+            CancellationToken token)
+        {
+            if (accounts == null || accounts.Count() <= 0) { return; }
+            // TODO Validate format? Or assume format? I think we should validate here.
+
+            // TODO char name 265 should be 256? Don't care I guess? Or optimized because 2^8?
+            var sql = @"
+                INSERT INTO
+	                public.account(secondary_id, publisher, name, currency, details)
+                VALUES
+                    (
+                        @SecondaryId,
+                        CAST (@PublisherText AS publisher),
+                        LEFT(@Name, 265),
+                        @Currency,
+                        CAST (@Details AS json)
+                    )
+                ON CONFLICT (name) DO NOTHING";
+
+            using (var connection = _dbProvider.ConnectionScope())
+            {
+                await connection.ExecuteAsync(new CommandDefinition(
+                    sql, accounts, cancellationToken: token));
             }
         }
 
