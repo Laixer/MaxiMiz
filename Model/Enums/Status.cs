@@ -9,7 +9,7 @@ namespace Maximiz.Model.Enums
 {
 
     /// <summary>
-    /// Model enum to represent an item status.
+    /// Model enum to represent an ad item status.
     /// </summary>
     [JsonConverter(typeof(StringEnumConverter))]
     public enum Status

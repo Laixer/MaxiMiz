@@ -45,7 +45,7 @@ namespace Maximiz.Model.Entity
         /// <summary>
         /// Destination URL.
         /// </summary>
-        public string TargetUrl { get; set; }
+        public string Url { get; set; }
 
         /// <summary>
         /// Advertisement content.
@@ -93,7 +93,7 @@ namespace Maximiz.Model.Entity
         /// <summary>
         /// True if this was modified beyond the properties given from the ad group.
         /// </summary>
-        public bool ChangedBeyondAdGroup { get; set; }
+        public bool ModifiedBeyondAdGroup { get; set; }
 
         /// <summary>
         /// JSON string containing unused data which

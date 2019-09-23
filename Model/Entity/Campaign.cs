@@ -5,6 +5,7 @@ namespace Maximiz.Model.Entity
 {
     /// <summary>
     /// Represents a single campaign in some external publisher.
+    /// TODO Nullable enums.
     /// </summary>
     [Serializable]
     public class Campaign : EntityAudit<Guid>
@@ -83,6 +84,16 @@ namespace Maximiz.Model.Entity
         public decimal? DailyBudget { get; set; }
 
         /// <summary>
+        /// Indicates our budget model.
+        /// </summary>
+        public BudgetModel BudgetModel { get; set; }
+
+        /// <summary>
+        /// Represents our bid strategy.
+        /// </summary>
+        public BidStrategy BidStrategy { get; set; }
+
+        /// <summary>
         /// Budget spent.
         /// </summary>
         public decimal? Spent { get; set; }
@@ -106,6 +117,27 @@ namespace Maximiz.Model.Entity
         /// Note.
         /// </summary>
         public string Note { get; set; }
+
+        /// <summary>
+        /// Indicates our status.
+        /// TODO This is currently set to ad item status.
+        /// </summary>
+        public Status Status { get; set; }
+
+        /// <summary>
+        /// Indicates all devices that this campaign operates on.
+        /// </summary>
+        public Device[] Devices { get; set; }
+
+        /// <summary>
+        /// Indicates all operating systems this campaign operates on.
+        /// </summary>
+        public OS[] OperatingSystems { get; set; }
+
+        /// <summary>
+        /// Indicates all connection types this campaign operates on.
+        /// </summary>
+        public ConnectionType[] ConnectionTypes { get; set; }
 
         /// <summary>
         /// JSON string containing unused data which
