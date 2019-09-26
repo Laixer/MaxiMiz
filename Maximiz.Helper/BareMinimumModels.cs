@@ -7,45 +7,10 @@ namespace Maximiz.Helper
 
     /// <summary>
     /// Used to generate bare minimum entities.
+    /// TODO Sometimes your group or campaign is null. Handle this.
     /// </summary>
     public class BareMinimumModels
     {
-
-        /// <summary>
-        /// Creates a default bare minimum campaign.
-        /// </summary>
-        /// <remarks>
-        /// These are all default values:
-        /// - name: "default name"
-        /// - brandingText: "default branding text"
-        /// - language: "XX"
-        /// - inititalCpc: 0
-        /// - budget: 1
-        /// - devices: <see cref="Device.Desktop"/>
-        /// - operatingSystems: <see cref="Windows"/>
-        /// - connectionTypes: <see cref="ConnectionType.Wifi"/>
-        /// - delivery: <see cref="Delivery.Balanced"/>
-        /// - bidStrategy: <see cref="BidStrategy.Fixed"/>
-        /// - budgetModel: <see cref="BudgetModel.Campaign"/>
-        /// </remarks>
-        /// <param name="campaignGroup">The campaign group for this campaign</param>
-        /// <returns>A new bare minimum campaign</returns>
-        public Campaign CreateDefaultBareMinimumCampaign(CampaignGroup campaignGroup)
-        {
-            return CreateBareMinimumCampaign(
-                name: "default name",
-                campaignGroup,
-                brandingText: "default branding text",
-                language: "XX",
-                inititalCpc: 0,
-                budget: 1,
-                devices: new[] { Device.Desktop },
-                operatingSystems: new[] { OS.Windows },
-                connectionTypes: new[] { ConnectionType.Wifi },
-                delivery: Delivery.Balanced,
-                bidStrategy: BidStrategy.Fixed,
-                budgetModel: BudgetModel.Campaign);
-        }
 
         /// <summary>
         /// Creates a bare minimum campaign. All these fields are required in
@@ -66,18 +31,32 @@ namespace Maximiz.Helper
         /// <param name="bidStrategy">The bid strategy</param>
         /// <param name="budgetModel">The budget model</param>
         /// <returns>A new bare minimum campaign</returns>
-        public Campaign CreateBareMinimumCampaign(string name, CampaignGroup campaignGroup,
-            string brandingText, string language, decimal inititalCpc, decimal budget,
-            Device[] devices, OS[] operatingSystems, ConnectionType[] connectionTypes,
-            Delivery delivery, BidStrategy bidStrategy, BudgetModel budgetModel)
+        public Campaign CreateBareMinimumCampaign(
+            string name,
+            CampaignGroup campaignGroup,
+            string brandingText = "default branding text",
+            string language = "XX",
+            decimal inititalCpc = 0,
+            decimal budget = 1,
+            Device[] devices = null,
+            OS[] operatingSystems = null,
+            ConnectionType[] connectionTypes = null,
+            Delivery delivery = Delivery.Strict,
+            BidStrategy bidStrategy = BidStrategy.Fixed,
+            BudgetModel budgetModel = BudgetModel.Campaign)
         {
+            // Edge cases
             if (inititalCpc < 0) { throw new ArgumentException("Cpc must be > 0"); }
             if (budget < inititalCpc) { throw new ArgumentException("Budget must be > cpc"); }
 
-            return new Campaign
+            // Assign arrays explicitly
+            devices = devices ?? new[] { Device.Desktop };
+            operatingSystems = operatingSystems ?? new[] { OS.Windows };
+
+            // Create new object
+            var result = new Campaign
             {
                 Name = name,
-                CampaignGroupGuid = campaignGroup.Id,
                 BrandingText = brandingText,
                 LanguageAsText = language,
                 InitialCpc = inititalCpc,
@@ -88,9 +67,14 @@ namespace Maximiz.Helper
                 Delivery = delivery,
                 BidStrategy = bidStrategy,
                 BudgetModel = budgetModel,
-                Status = Status.PendingApproval,
+                Status = CampaignStatus.Unknown,
                 ApprovalState = ApprovalState.Submitted
             };
+
+            // Only assign if not null
+            if (campaignGroup != null) { result.CampaignGroupGuid = campaignGroup.Id; }
+
+            return result;
         }
 
         /// <summary>
@@ -105,23 +89,32 @@ namespace Maximiz.Helper
         public AdItem CreateBareMinimumAdItem(Campaign campaign, AdGroup adGroup,
             int adGroupImageIndex, int adGroupTitleIndex)
         {
-            if (adGroupImageIndex >= adGroup.ImageLinks.Length
-                || adGroupImageIndex < 0) { throw new Exception("Image index invalid"); }
-            if (adGroupTitleIndex >= adGroup.Titles.Length
-                || adGroupTitleIndex < 0) { throw new Exception("Title index invalid"); }
-
-            return new AdItem
+            if (adGroup != null)
             {
-                CampaignGuid = campaign.Id,
-                AdGroupGuid = adGroup.Id,
+                if (adGroupImageIndex >= adGroup.ImageLinks.Length
+                    || adGroupImageIndex < 0) { throw new Exception("Image index invalid"); }
+                if (adGroupTitleIndex >= adGroup.Titles.Length
+                    || adGroupTitleIndex < 0) { throw new Exception("Title index invalid"); }
+
+            }
+
+            var result = new AdItem
+            {
                 AdGroupImageIndex = adGroupImageIndex,
                 AdGroupTitleIndex = adGroupTitleIndex,
-                ImageUrl = adGroup.ImageLinks[adGroupImageIndex],
-                Title = adGroup.Titles[adGroupTitleIndex],
-                Status = Status.PendingApproval,
+                Status = AdItemStatus.Unknown,
                 ApprovalState = ApprovalState.Submitted
             };
-        }
 
+            if (campaign != null) { result.CampaignGuid = campaign.Id; }
+            if (adGroup != null)
+            {
+                result.AdGroupGuid = adGroup.Id;
+                result.ImageUrl = adGroup.ImageLinks[adGroupImageIndex];
+                result.Title = adGroup.Titles[adGroupTitleIndex];
+            }
+
+            return result;
+        }
     }
 }
