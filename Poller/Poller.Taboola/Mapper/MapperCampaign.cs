@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.RegularExpressions;
-using Maximiz.Model.Enums;
+using Maximiz.Helper;
 using Poller.Helper;
 using Poller.Model.Data;
 using Poller.Taboola.Model;
@@ -13,32 +12,59 @@ namespace Poller.Taboola.Mapper
 {
 
     /// <summary>
-    /// Our converter for campaigns.
+    /// Our converter for campaigns. This section of the partial class contains
+    /// all main conversion functions.
     /// TODO Update for new entity model.
     /// </summary>
-    class MapperCampaign : IMapper<CampaignTaboola, CampaignCore>
+    internal partial class MapperCampaign : IMapper<CampaignTaboola, CampaignCore>
     {
 
-        private const string DefaultString = "default";
-        private const int DefaultNumber = -1;
-        private const string DefaultJson = "{}";
-        private const string DefaultCampaignIdNumber = "xxxxxxxx";
-        private const string DefaultCampaignIdName = "invalid-campaign-id";
-        private const string DefaultCurrency = "XXX";
-        private const Delivery DefaultDelivery = Delivery.Unknown;
-        private const string DefaultLanguage = "NL";
-        private readonly int[] DefaultLocations = new int[0];
+        /// <summary>
+        /// Mapper for our target objects and relevant fields.
+        /// </summary>
+        private MapperTarget _mapperTarget { get; set; }
+
+        /// <summary>
+        /// Generates bare minimum internal entities.
+        /// </summary>
+        private BareMinimumModels _bareMinimumInternal { get; set; }
+
+        /// <summary>
+        /// Generates bare minimum external entities.
+        /// </summary>
+        private BareMinimumTaboola _bareMinimumExternal { get; set; }
+
+        /// <summary>
+        /// Used for utility functions.
+        /// </summary>
+        private MapperUtility _utility { get; set; }
+
+        /// <summary>
+        /// Constructor to create instances.
+        /// </summary>
+        public MapperCampaign()
+        {
+            _utility = new MapperUtility();
+            _bareMinimumInternal = new BareMinimumModels();
+            _bareMinimumExternal = new BareMinimumTaboola();
+            _mapperTarget = new MapperTarget();
+        }
 
         /// <summary>
         /// Converts our core model to taboola campaign. This preserves the GUID.
         /// </summary>
         /// <param name="core">The object to convert</param>
         /// <param name="guid">The guid if we already know it</param>
+        /// <param name="campaignGroupGuid">The campaign group guid</param>
         /// <returns>The converted object</returns>
-        public CampaignCore Convert(CampaignTaboola core, Guid guid)
+        public CampaignCore Convert(CampaignTaboola core, Guid guid, Guid? campaignGroupGuid = null)
         {
             var converted = Convert(core);
             converted.Id = guid;
+            if (campaignGroupGuid != null && campaignGroupGuid != Guid.Empty)
+            {
+                converted.CampaignGroupGuid = (Guid)campaignGroupGuid;
+            }
             return converted;
         }
 
@@ -51,26 +77,35 @@ namespace Poller.Taboola.Mapper
         {
             if (core == null) throw new ArgumentNullException(nameof(core));
 
-            var result = new CampaignTaboola
-            {
-                Id = core.SecondaryId,
-                Name = core.Name,
-                BrandingText = core.BrandingText,
-                Cpc = core.InitialCpc,
-                SpendingLimit = core.Budget,
-                DailyCap = core.DailyBudget,
-                Spent = core.Spent,
-                StartDate = core.StartDate,
-                EndDate = core.EndDate,
-                Utm = core.Utm,
-                Note = core.Note,
-            };
+            // Create a base
+            var external = _bareMinimumExternal.CreateBareMinimumCampaign();
 
-            CampaignDetails details = Json.Deserialize
-               <CampaignDetails>(core.Details);
-            PushDetails(result, details);
+            // Append all
+            external.Id = core.SecondaryId;
+            external.Name = core.Name;
+            external.BrandingText = core.BrandingText;
+            external.Utm = core.Utm;
+            external.Cpc = core.InitialCpc;
+            external.SpendingLimit = core.Budget;
+            external.SpendingLimitModel = BudgetModelToString(core.BudgetModel);
+            external.Note = core.Note;
+            external.Spent = core.Spent;
+            external.BidStrategy = BidStrategyToString(core.BidStrategy);
+            external.DailyCap = core.DailyBudget;
+            external.StartDate = core.StartDate;
+            external.EndDate = core.EndDate;
+            external.ApprovalState = _utility.ApprovalStateToString(core.ApprovalState);
+            external.Status = CampaignStatusToString(core.Status);
+            external.DailyAdDeliveryModel = DeliveryToString(core.Delivery);
 
-            return result;
+            // Append details
+            PushDetails(external, core.Details);
+
+            // Map targets
+            // TODO This should be implemented!!!!
+            // _mapperTarget.ConvertAndApply(core, external);
+
+            return external;
         }
 
         /// <summary>
@@ -115,19 +150,30 @@ namespace Poller.Taboola.Mapper
         {
             if (external == null) throw new ArgumentNullException(nameof(external));
 
-            var result = GetDefault();
+            // Create a base
+            var result = _bareMinimumInternal.CreateBareMinimumCampaign(
+                name: external.Name,
+                campaignGroup: null);
 
+            // Append everything
             result.SecondaryId = external.Id;
             result.Name = external.Name;
             result.BrandingText = external.BrandingText;
+            result.Utm = external.Utm;
             result.InitialCpc = external.Cpc;
-            result.Budget = external.SpendingLimit;
             result.DailyBudget = external.DailyCap;
+            result.BidStrategy = BidStrategyToInternal(external.BidStrategy);
+            result.Budget = external.SpendingLimit;
+            result.BudgetModel = BudgetModelToInternal(external.SpendingLimitModel);
+            result.Note = external.Note;
             result.Spent = external.Spent;
             result.StartDate = external.StartDate;
             result.EndDate = external.EndDate;
-            result.Utm = external.Utm;
-            result.Note = external.Note;
+            result.ApprovalState = _utility.ApprovalStateToInternal(external.ApprovalState);
+            result.Status = CampaignStatusToInternal(external.Status);
+            result.Delivery = DeliveryToInternal(external.DailyAdDeliveryModel);
+
+            // Append details
             result.Details = ExtractDetailsToString(external);
 
             // Daily cap of 0 means unlimited, which we denote as null
@@ -169,8 +215,7 @@ namespace Poller.Taboola.Mapper
         /// </summary>
         /// <param name="list">Taboola list</param>
         /// <returns>Core list</returns>
-        public IEnumerable<CampaignCore> ConvertAll(
-            IEnumerable<CampaignTaboola> list)
+        public IEnumerable<CampaignCore> ConvertAll(IEnumerable<CampaignTaboola> list)
         {
             IList<CampaignCore> result = new List<CampaignCore>();
             foreach (var item in list.AsParallel())
@@ -185,8 +230,7 @@ namespace Poller.Taboola.Mapper
         /// </summary>
         /// <param name="list">Core list</param>
         /// <returns>Taboola list</returns>
-        public IEnumerable<CampaignTaboola> ConvertAll(
-            IEnumerable<CampaignCore> list)
+        public IEnumerable<CampaignTaboola> ConvertAll(IEnumerable<CampaignCore> list)
         {
             IList<CampaignTaboola> result = new List<CampaignTaboola>();
             foreach (var item in list.AsParallel())
@@ -194,85 +238,6 @@ namespace Poller.Taboola.Mapper
                 result.Add(Convert(item));
             }
             return result;
-        }
-
-        /// <summary>
-        /// Creates a default without null values.
-        /// TODO Match db schema
-        /// TODO Fill up
-        /// </summary>
-        /// <returns>Default</returns>
-        private CampaignCore GetDefault()
-        {
-            return new CampaignCore
-            {
-                SecondaryId = DefaultCampaignIdNumber,
-                Name = DefaultCampaignIdName,
-                LanguageAsText = DefaultLanguage,
-                Budget = DefaultNumber,
-                DailyBudget = null,
-                Delivery = DefaultDelivery,
-                LocationInclude = DefaultLocations,
-                LocationExclude = DefaultLocations
-            };
-        }
-
-        /// <summary>
-        /// Converts an enum to all caps. This is because Taboola uses upper 
-        /// case to denote these enums, while we use lower case.
-        /// </summary>
-        /// <typeparam name="T">Enum type</typeparam>
-        /// <param name="input">Input enum</param>
-        /// <returns>Upper case string</returns>
-        private string ToUpperString<T>(T input)
-            where T : Enum
-        {
-            var split = Regex.Split(input.ToString(), @"(?<!^)(?=[A-Z])");
-
-            if (split.Length > 1)
-            {
-                string result = "";
-                for (int i = 0; i < split.Length - 1; i++)
-                {
-                    result += split[i].ToUpper() + "_";
-                }
-                result += split[split.Length - 1].ToUpper();
-                return result;
-            }
-            else
-            {
-                return input.ToString().ToUpper();
-            }
-        }
-
-        /// <summary>
-        /// Attempt to convert an enum from all caps snake case.
-        /// </summary>
-        /// <typeparam name="TEnum">The enum type</typeparam>
-        /// <param name="input">The input string, IN_THIS_FORMAT</param>
-        /// <param name="defaultReturn">If we can't parse we return this</param>
-        /// <returns>Converted enum</returns>
-        public static TEnum FromUpperString<TEnum>(string input, TEnum defaultReturn)
-            where TEnum : struct
-        {
-            if (string.IsNullOrWhiteSpace(input)) { return defaultReturn; }
-
-            var words = input.Split(new char[] { '_' }, StringSplitOptions.RemoveEmptyEntries);
-            var pascal = "";
-            for (int i = 0; i < words.Length; i++)
-            {
-                words[i] = words[i].Trim('_');
-                pascal += words[i].Substring(0, 1).ToUpper() + words[i].Substring(1).ToLower();
-            }
-
-            if (Enum.TryParse(pascal, out TEnum result))
-            {
-                return result;
-            }
-            else
-            {
-                return defaultReturn;
-            }
         }
 
     }
