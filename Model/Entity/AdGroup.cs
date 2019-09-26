@@ -7,7 +7,7 @@ namespace Maximiz.Model.Entity
     /// Group of advertisement items.
     /// </summary>
     [Serializable]
-    public class AdGroup : EntityAudit<int>
+    public class AdGroup : EntityAudit<Guid>
     {
         /// <summary>
         /// Group name.

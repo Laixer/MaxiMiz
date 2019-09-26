@@ -28,6 +28,11 @@ namespace Maximiz.Model.Entity
         public int AdGroupId { get; set; }
 
         /// <summary>
+        /// The corresponding ad group uuid.
+        /// </summary>
+        public Guid AdGroupGuid { get; set; }
+
+        /// <summary>
         /// The index of the string used from the ad group.
         /// </summary>
         public int AdGroupTitleIndex { get; set; }
