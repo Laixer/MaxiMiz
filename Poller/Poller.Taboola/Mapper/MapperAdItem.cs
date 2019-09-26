@@ -157,10 +157,10 @@ namespace Poller.Taboola.Mapper
         }
 
         /// <summary>
-        /// Extracts the details from a Taboola co result.
-        /// This then converts it to a JSON string.
+        /// Extracts the details from a Taboola reports result. This then converts 
+        /// it to a JSON string.
         /// </summary>
-        /// <param name="from">The Taboola co result</param>
+        /// <param name="from">The Taboola reports result</param>
         /// <returns>The details object as JSON string</returns>
         private string ExtractDetailsToString(AdItemReports from)
         {
@@ -169,21 +169,17 @@ namespace Poller.Taboola.Mapper
 
             return Json.Serialize(new AdItemDetails
             {
-                ThumbnailUrl = from.ThumbnailUrl,
+                CampaignId = from.Campaign,
                 CampaignName = from.CampaignName,
                 ContentProvider = from.ContentProvider,
                 ContentProviderName = from.ContentProviderName,
-                Clicks = from.Clicks,
-                Cpm = from.Cpm,
-                Currency = from.Currency,
-                Cpa = from.Cpa,
-                Cvr = from.Cvr
+                Currency = from.Currency
             });
         }
 
         /// <summary>
-        /// Extracts the details from a Taboola ad item.
-        /// This then converts it to a JSON string.
+        /// Extracts the details from a Taboola ad item. This then converts it 
+        /// to a JSON string.
         /// </summary>
         /// <param name="from">The Taboola ad item</param>
         /// <returns>The details object as JSON string</returns>
@@ -196,8 +192,7 @@ namespace Poller.Taboola.Mapper
             {
                 CampaignId = from.CampaignId,
                 Active = from.Active,
-                ApprovalState = from.ApprovalState,
-                CampaignItemStatus = from.CampaignItemStatus
+                Type = from.Type
             });
         }
         /// <summary>

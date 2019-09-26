@@ -24,24 +24,11 @@ namespace Poller.Taboola.Model
         public string Account { get; set; }
 
         /// <summary>
-        /// Defines the way our campaign will be delivered
-        /// on a daily basis.
-        /// </summary>
-        [DataMember(Name = "daily_ad_delivery_model")]
-        public DailyAdDeliveryModel DailyAdDeliveryModel { get; set; }
-
-        /// <summary>
         /// An object representing the wanted publisher
         /// bid modifiers for this campaign.
         /// </summary>
         [DataMember(Name = "publisher_bid_modifier")]
         public PublisherBidModifier PublisherBidModifier { get; set; }
-
-        /// <summary>
-        /// Determines the type of spending limit.
-        /// </summary>
-        [DataMember(Name = "spending_limit_model")]
-        public SpendingLimitModel SpendingLimitModel { get; set; }
 
         /// <summary>
         /// Lists all countries the campaign will
@@ -112,28 +99,10 @@ namespace Poller.Taboola.Model
         public decimal CpaGoal { get; set; }
 
         /// <summary>
-        /// The strategy we use for our bidding methods.
-        /// </summary>
-        [DataMember(Name = "bid_type")]
-        public BidType BidStrategy { get; set; }
-
-        /// <summary>
         /// The type of traffic optimization.
         /// </summary>
         [DataMember(Name = "traffic_allocation_mode")]
         public TrafficAllocationMode TrafficAllocationMode { get; set; }
-
-        /// <summary>
-        /// Current approval state by Taboola.
-        /// </summary>
-        [DataMember(Name = "approval_state")]
-        public ApprovalState ApprovalState { get; set; }
-
-        /// <summary>
-        /// Current campaign status.
-        /// </summary>
-        [DataMember(Name = "status")]
-        public CampaignStatus Status { get; set; }
 
         /// <summary>
         /// True if the campaign is running.

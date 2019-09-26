@@ -77,19 +77,20 @@ namespace Poller.Taboola.Mapper
         /// Pushes our details to a given taboola campaign object. This will 
         /// overwrite in all cases.
         /// </summary>
+        /// <remarks>This does nothing if the details string is empty or null</remarks>
         /// <param name="to">The object to push to</param>
-        /// <param name="details">The extracted details</param>
+        /// <param name="detailsJson">The json formatted details string</param>
         /// <return>The pushed object with extracted details</return>
-        private CampaignTaboola PushDetails(CampaignTaboola to,
-            CampaignDetails details)
+        private CampaignTaboola PushDetails(CampaignTaboola to, string detailsJson)
         {
+            if (string.IsNullOrEmpty(detailsJson)) { return to; }
+            var details = Json.Deserialize<CampaignDetails>(detailsJson);
+
             if (to == null) throw new ArgumentNullException(nameof(to));
             if (details == null) throw new ArgumentNullException(nameof(details));
 
             to.Account = details.Account;
-            to.DailyAdDeliveryModel = ToUpperString(details.DailyAdDeliveryModel);
             to.PublisherBidModifier = details.PublisherBidModifier;
-            to.SpendingLimitModel = ToUpperString(details.SpendingLimitModel);
             to.CountryTargeting = details.CountryTargeting;
             to.SubCountryTargeting = details.SubCountryTargeting;
             to.PostalCodeTargeting = details.PostalCodeTargeting;
@@ -98,12 +99,9 @@ namespace Poller.Taboola.Mapper
             to.OsTargeting = details.OsTargeting;
             to.ConnectionTypeTargeting = details.ConnectionTypeTargeting;
             to.CpaGoal = details.CpaGoal;
-            to.BidStrategy = ToUpperString(details.BidStrategy);
-            to.TrafficAllocationMode = ToUpperString(details.TrafficAllocationMode);
-            to.ApprovalState = ToUpperString(details.ApprovalState); ;
-            to.Status = ToUpperString(details.Status);
+            to.TrafficAllocationMode = _utility.ToUpperString(details.TrafficAllocationMode);
             to.Active = details.Active;
-            to.MarketingObjective = ToUpperString(details.MarketingObjective);
+            to.MarketingObjective = _utility.ToUpperString(details.MarketingObjective);
 
             return to;
         }
@@ -144,17 +142,14 @@ namespace Poller.Taboola.Mapper
         /// </summary>
         /// <param name="from">The Taboola campaign</param>
         /// <returns>The details object as JSON string</returns>
-        private string ExtractDetailsToString(
-            CampaignTaboola from)
+        private string ExtractDetailsToString(CampaignTaboola from)
         {
             if (from == null) throw new ArgumentNullException(nameof(from));
 
             return Json.Serialize(new CampaignDetails
             {
                 Account = from.Account,
-                DailyAdDeliveryModel = FromUpperString(from.DailyAdDeliveryModel, DailyAdDeliveryModel.Unknown),
                 PublisherBidModifier = from.PublisherBidModifier,
-                SpendingLimitModel = FromUpperString(from.SpendingLimitModel, SpendingLimitModel.Entire),
                 CountryTargeting = from.CountryTargeting,
                 SubCountryTargeting = from.SubCountryTargeting,
                 PostalCodeTargeting = from.PostalCodeTargeting,
@@ -163,12 +158,9 @@ namespace Poller.Taboola.Mapper
                 OsTargeting = from.OsTargeting,
                 ConnectionTypeTargeting = from.ConnectionTypeTargeting,
                 CpaGoal = from.CpaGoal,
-                BidStrategy = FromUpperString(from.BidStrategy, BidType.Fixed),
-                TrafficAllocationMode = FromUpperString(from.TrafficAllocationMode, TrafficAllocationMode.Even),
-                ApprovalState = FromUpperString(from.ApprovalState, Model.ApprovalState.Pending),
-                Status = FromUpperString(from.Status, CampaignStatus.PendingApproval),
+                TrafficAllocationMode = _utility.FromUpperString(from.TrafficAllocationMode, TrafficAllocationMode.Even),
                 Active = from.Active,
-                MarketingObjective = FromUpperString(from.MarketingObjective, MarketingObjective.DriveWebsiteTraffic)
+                MarketingObjective = _utility.FromUpperString(from.MarketingObjective, MarketingObjective.DriveWebsiteTraffic)
             });
         }
 
