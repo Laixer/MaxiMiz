@@ -11,10 +11,6 @@ namespace Maximiz.Model.Enums
     [JsonConverter(typeof(StringEnumConverter))]
     public enum Delivery
     {
-        [EnumMember(Value = "unknown")]
-        Unknown,
-        [EnumMember(Value = "balaned")]
-        Balaned,
         [EnumMember(Value = "balanced")]
         Balanced,
         [EnumMember(Value = "accelerated")]

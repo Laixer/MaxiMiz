@@ -53,6 +53,11 @@ namespace Maximiz.Model.Entity
         public string Url { get; set; }
 
         /// <summary>
+        /// Link to the image.
+        /// </summary>
+        public string ImageUrl { get; set; }
+
+        /// <summary>
         /// Advertisement content.
         /// </summary>
         public string Content { get; set; }

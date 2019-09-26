@@ -16,9 +16,9 @@ namespace Maximiz.Model.Entity
         public string SecondaryId { get; set; }
 
         /// <summary>
-        /// Group to which this campaign belongs to.
+        /// Indicates the corresponding campaign group guid.
         /// </summary>
-        public int CampaignGroup { get; set; }
+        public Guid CampaignGroupGuid { get; set; }
 
         /// <summary>
         /// Campaign name.

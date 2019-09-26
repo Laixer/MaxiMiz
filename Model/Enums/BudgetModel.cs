@@ -12,11 +12,14 @@ namespace Maximiz.Model.Enums
     public enum BudgetModel
     {
 
+        /// <summary>
+        /// 
+        /// </summary>
         [EnumMember(Value = "campaign")]
         Campaign,
 
         /// <summary>
-        /// Item exists externally and is approved.
+        /// 
         /// </summary>
         [EnumMember(Value = "monthly")]
         Monthly
