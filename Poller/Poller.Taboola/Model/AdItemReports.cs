@@ -67,6 +67,13 @@ namespace Poller.Taboola.Model
         public string ContentProviderName { get; set; }        
 
         /// <summary>
+        /// The currency in which all monetary units  are calculated, represented
+        /// as a string according to the ISO 4217 standard.
+        /// </summary>
+        [DataMember(Name = "currency")]
+        public string Currency { get; set; }
+
+        /// <summary>
         /// The amount of clicks on this item.
         /// </summary>
         [DataMember(Name = "clicks")]
@@ -79,29 +86,10 @@ namespace Poller.Taboola.Model
         public long Impressions { get; set; }
 
         /// <summary>
-        /// Cost per click.
-        /// </summary>
-        [DataMember(Name = "cpc")]
-        public decimal Cpc { get; set; }
-
-        /// <summary>
-        /// Cost per 1000 impressions.
-        /// </summary>
-        [DataMember(Name = "cpm")]
-        public decimal Cpm { get; set; }
-
-        /// <summary>
         /// The amount spent on this item.
         /// </summary>
         [DataMember(Name = "spent")]
         public decimal Spent { get; set; }
-
-        /// <summary>
-        /// The currency in which all monetary units 
-        /// are calculated, represented as a string.
-        /// </summary>
-        [DataMember(Name = "currency")]
-        public string Currency { get; set; }
 
         /// <summary>
         /// The amount of actions on the item.
@@ -110,16 +98,10 @@ namespace Poller.Taboola.Model
         public long Actions { get; set; }
 
         /// <summary>
-        /// Cost per action.
+        /// Cost per click.
         /// </summary>
-        [DataMember(Name = "cpa")]
-        public decimal Cpa { get; set; }
-
-        /// <summary>
-        /// Conversion rate.
-        /// </summary>
-        [DataMember(Name = "cvr")]
-        public decimal Cvr { get; set; }
+        [DataMember(Name = "cpc")]
+        public decimal Cpc { get; set; }
 
     }
 }

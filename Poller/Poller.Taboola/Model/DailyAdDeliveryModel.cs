@@ -6,7 +6,8 @@ namespace Poller.Model.Data
 {
 
     /// <summary>
-    /// This indicates the way we want to deliver our ads on a daily basis.
+    /// This indicates the way we want to deliver our ads on a daily basis in
+    /// the Taboola network.
     /// </summary>
     [JsonConverter(typeof(StringEnumConverter))]
     public enum DailyAdDeliveryModel
@@ -27,12 +28,6 @@ namespace Poller.Model.Data
         /// Following daily cap.
         /// </summary>
         [EnumMember(Value = "strict")]
-        Strict,
-
-        /// <summary>
-        /// When we don't know, this is default.
-        /// </summary>
-        [EnumMember(Value = "unknown")]
-        Unknown
+        Strict
     }
 }

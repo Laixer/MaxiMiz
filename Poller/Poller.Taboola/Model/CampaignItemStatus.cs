@@ -22,6 +22,6 @@ namespace Poller.Taboola.Model
         [EnumMember(Value = "pending_approval")]
         PendingApproval,
         [EnumMember(Value = "rejected")]
-        Rejected,
+        Rejected
     }
 }

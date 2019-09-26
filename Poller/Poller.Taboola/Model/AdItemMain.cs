@@ -1,7 +1,4 @@
-using System;
 using System.Runtime.Serialization;
-using Poller.Extensions;
-using Poller.Model.Data;
 
 namespace Poller.Taboola.Model
 {
@@ -58,14 +55,20 @@ namespace Poller.Taboola.Model
         /// Item approval status.
         /// </summary>
         [DataMember(Name = "approval_state")]
-        public ApprovalState ApprovalState { get; set; }
-
+        public string ApprovalState { get; set; }
 
         /// <summary>
-        /// Campaign item status.
+        /// Ad item status.
         /// </summary>
         [DataMember(Name = "status")]
-        public CampaignItemStatus CampaignItemStatus { get; set; }
+        public string AdItemStatus { get; set; }
+
+        /// <summary>
+        /// Indicates the type of the ad item. We do not use this at this moment.
+        /// The possibilities are RSS and ITEM.
+        /// </summary>
+        [DataMember(Name = "type")]
+        public string Type { get; set; }
 
     }
 }
