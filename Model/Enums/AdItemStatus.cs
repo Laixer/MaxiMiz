@@ -12,7 +12,7 @@ namespace Maximiz.Model.Enums
     /// Model enum to represent an ad item status.
     /// </summary>
     [JsonConverter(typeof(StringEnumConverter))]
-    public enum Status
+    public enum AdItemStatus
     {
         [EnumMember(Value = "unknown")]
         Unknown,
