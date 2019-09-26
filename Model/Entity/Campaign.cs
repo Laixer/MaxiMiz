@@ -29,12 +29,14 @@ namespace Maximiz.Model.Entity
         /// Reference to the publisher.
         /// </summary>
         public Publisher Publisher { get; set; }
+        public string PublisherText { get => Publisher.GetEnumMemberName(); }
 
         /// <summary>
         /// Indicates the status of any changes made in our own database. These
         /// changes have to be pushed to the corresponding external API.
         /// </summary>
         public ApprovalState ApprovalState { get; set; }
+        public string ApprovalStateText { get => ApprovalState.GetEnumMemberName(); }
 
         /// <summary>
         /// Target URL for this campaign. This is where we lead our clicks.
@@ -87,11 +89,13 @@ namespace Maximiz.Model.Entity
         /// Indicates our budget model.
         /// </summary>
         public BudgetModel BudgetModel { get; set; }
+        public string BudgetModelText { get => BudgetModel.GetEnumMemberName(); }
 
         /// <summary>
         /// Represents our bid strategy.
         /// </summary>
         public BidStrategy BidStrategy { get; set; }
+        public string BidStrategyText { get => BidStrategy.GetEnumMemberName(); }
 
         /// <summary>
         /// Budget spent.
@@ -122,7 +126,8 @@ namespace Maximiz.Model.Entity
         /// Indicates our status.
         /// TODO This is currently set to ad item status.
         /// </summary>
-        public Status Status { get; set; }
+        public CampaignStatus Status { get; set; }
+        public string StatusText { get => Status.GetEnumMemberName(); }
 
         /// <summary>
         /// Indicates all devices that this campaign operates on.

@@ -87,7 +87,7 @@ namespace Maximiz.Model.Entity
         /// <summary>
         /// Represents our item status.
         /// </summary>
-        public Status Status { get; set; }
+        public AdItemStatus Status { get; set; }
         public string StatusText { get => Status.GetEnumMemberName(); }
 
         /// <summary>
