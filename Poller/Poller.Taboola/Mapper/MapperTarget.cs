@@ -1,114 +1,319 @@
-﻿using Newtonsoft.Json.Linq;
-using Poller.Helper;
+﻿using Maximiz.Model.Enums;
 using Poller.Taboola.Model;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
+
+using CampaignInternal = Maximiz.Model.Entity.Campaign;
+using CampaignExternal = Poller.Taboola.Model.Campaign;
 
 namespace Poller.Taboola.Mapper
 {
 
     /// <summary>
-    /// Used to convert our target object.
+    /// Used to convert certain target types to their corresponding target
+    /// objects and vice versa. This gets called from the <see cref="MapperCampaign"/>.
+    /// TODO Clean this up.
     /// </summary>
-    internal class MapperTarget
+    internal partial class MapperTarget
     {
 
         /// <summary>
-        /// Converts the OsTarget target type to the correct subtype for all 
-        /// in the specified list.
+        /// Does all target conversion for a campaign.
         /// </summary>
-        /// <param name="input">Campaign list</param>
-        /// <returns>Converted campaign list</returns>
-        internal IEnumerable<Campaign> ConvertAll(IEnumerable<Campaign> input)
+        /// <param name="campaignInternal">The internal campaign after conversion</param>
+        /// <param name="campaignExternal">The external campaign as conversion source</param>
+        /// <returns>The same internal campaign but with mapped targets</returns>
+        public CampaignInternal MapAllTargeting(CampaignInternal campaignInternal,
+            CampaignExternal campaignExternal)
         {
-            IList<Campaign> result = new List<Campaign>();
-            foreach (var campaign in input.AsParallel())
-            {
-                result.Add(ConvertTarget(campaign));
-            }
-            return result;
+            // Convert all target objects to the correct format
+            // ConvertTarget(campaignExternal);
+
+            // Map the locations
+            var locations = TargetToLocationInts(campaignExternal.CountryTargeting);
+            campaignInternal.LocationInclude = locations.Item1;
+            campaignInternal.LocationExclude = locations.Item2;
+
+            // Map other used targeting
+            campaignInternal.Devices = MapDevices(campaignExternal.PlatformTargeting);
+            // campaignInternal.OperatingSystems = MapOperatingSystems(campaignExternal.OsTargeting);
+            campaignInternal.ConnectionTypes = AllConnectionTypes();
+
+            // Return result explicitly
+            return campaignInternal;
         }
 
         /// <summary>
-        /// Converts the OsTargeting target type to the correct subtype. This 
-        /// can be either of two:
-        /// <see cref="TargetDefault"/> or
-        /// <see cref="TargetOsFamily"/>.
-        /// TODO This should be cleaner.
+        /// Does all target conversion for a campaign.
         /// </summary>
-        /// <param name="input">Campaign</param>
-        /// <returns>Campaign with converted os target</returns>
-        internal Campaign ConvertTarget(Campaign input)
+        /// <remarks>
+        /// Unused targeting is set to null, being:
+        /// - <see cref="CampaignExternal.SubCountryTargeting"/>.
+        /// - <see cref="CampaignExternal.PostalCodeTargeting"/>.
+        /// - <see cref="CampaignExternal.ContextualTargeting"/>.
+        /// - <see cref="CampaignExternal.PublisherTargeting"/>.
+        /// - <see cref="CampaignExternal.ConnectionTypeTargeting"/>.
+        /// </remarks>
+        /// <param name="campaignExternal">The external campaign after conversion</param>
+        /// <param name="campaignInternal">The internal campaign as conversion source</param>
+        /// <returns>The same external campaign but with mapped targets</returns>
+        public CampaignExternal MapAllTargeting(CampaignExternal campaignExternal,
+            CampaignInternal campaignInternal)
         {
-            // Do nothing if conversion already happened
-            if (input.OsTargeting is TargetDefault ||
-                input.OsTargeting is TargetOsFamily) return input;
+            // Map the locations
+            campaignExternal.CountryTargeting = LocationIntsToTarget(
+                campaignInternal.LocationInclude, campaignInternal.LocationExclude);
 
-            // Convert
+            // Map other used targeting
+            campaignExternal.PlatformTargeting = MapDevices(campaignInternal.Devices);
+            // campaignExternal.OsTargeting = MapOperatingSystems(campaignInternal.OperatingSystems);
+            campaignExternal.ConnectionTypeTargeting = TargetAll() as TargetDefault;
+
+            // Set unused to null to prevent errors
+            NullifyUnusedTargets(campaignExternal);
+
+            // Return result explicitly
+            return campaignExternal;
+        }
+
+        /// <summary>
+        /// Sets all unused targets for version 1 to null.
+        /// TODO Remove
+        /// </summary>
+        /// <param name="campaignExternal">The external campaign object</param>
+        private void NullifyUnusedTargets(CampaignExternal campaignExternal)
+        {
+            campaignExternal.SubCountryTargeting = null;
+            campaignExternal.PostalCodeTargeting = null;
+            campaignExternal.ContextualTargeting = null;
+            campaignExternal.PublisherTargeting = null;
+            campaignExternal.ConnectionTypeTargeting = null;
+        }
+
+        /// <summary>
+        /// Converts our location include and exclude integer arrays to a valid target object.
+        /// </summary>
+        /// <remarks>
+        /// This returns an include all target object if we fail to convert
+        /// any of the locations.
+        /// </remarks>
+        /// <param name="locationIncludeInts">The includes</param>
+        /// <param name="locationExcludeInts">The excludes</param>
+        /// <returns>The target object</returns>
+        public TargetDefault LocationIntsToTarget(IEnumerable<int> locationIncludeInts,
+            IEnumerable<int> locationExcludeInts)
+        {
             try
             {
-                var targetBase = (TargetBase)input.OsTargeting;
-                var array = (JArray)Json.Deserialize<object>
-                    (targetBase.Value.ToString());
-                TargetBase targetConverted = null;
+                var locationsInclude = locationIncludeInts.Select(x => IntToLocation(x)).ToList();
+                var locationsExclude = locationIncludeInts.Select(x => IntToLocation(x)).ToList();
+                var type = DetermineType(locationsInclude, locationsExclude);
 
-                // If we are os family type
-                if (array.Count > 0 && array[0] is JObject)
+                // Format correctly for type ALL
+                if (type == TargetType.All)
                 {
-                    JObject jObject = (JObject)array[0];
-                    if (jObject.ContainsKey("os_family") &&
-                        jObject.ContainsKey("sub_categories"))
+                    return new TargetDefault
                     {
-
-                        string osFamily = (string)jObject.GetValue("os_family");
-                        JArray strings = (JArray)jObject.GetValue("sub_categories");
-                        string[] subCategories = strings.ToObject<string[]>();
-
-                        targetConverted = new TargetOsFamily
-                        {
-                            Type = targetBase.Type,
-                            Href = targetBase.Href,
-                            OsFamily = osFamily,
-                            SubCategories = subCategories
-                        };
-                    }
-                    else throw new InvalidOperationException(
-                        "Json object does not contain the required " +
-                        "properties to convert to TargetOsFamily");
-                }
-
-                // If we are string array type
-                // TODO Might want to failsafe this
-                else
-                {
-                    string[] strings = array.ToObject<string[]>();
-                    targetConverted = new TargetDefault
-                    {
-                        Type = targetBase.Type,
-                        Href = targetBase.Href,
-                        Value = strings
+                        Type = type,
+                        Value = null
                     };
                 }
 
-                // Apply and return
-                input.OsTargeting = targetConverted;
-                return input;
+                // TODO This is unsafe for another enum in targettype!
+                var values = new List<string>();
+                foreach (var location in (type == TargetType.Include) ? locationsInclude : locationsExclude)
+                {
+                    values.Add(LocationToTaboolaString(location));
+                }
 
+                // Construct result and return
+                return new TargetDefault
+                {
+                    Type = type,
+                    Value = values.ToArray()
+                };
             }
-            catch (Exception)
+
+            // If we fail to convert we return an all target.
+            catch (ArgumentException e)
             {
-                throw new InvalidOperationException(
-                    "Could not convert OsTarget type for given campaign");
+                // TODO Log
+                return new TargetDefault
+                {
+                    Type = TargetType.All,
+                    Value = null
+                };
+            }
+
+        }
+
+        /// <summary>
+        /// Converts our target object to the corresponding location include and exclude
+        /// integer arrays.
+        /// </summary>
+        /// <remarks>
+        /// In case of conversion failure this returns two empty arrays.
+        /// </remarks>
+        /// <param name="target">The target object</param>
+        /// <returns>Locations include, locations exclude</returns>
+        public (int[], int[]) TargetToLocationInts(TargetDefault target)
+        {
+            try
+            {
+                // In the case of all
+                if (target.Type == TargetType.All) { return (AllLocationInts(), new int[0]); }
+
+                // Else construct int arrays
+                var locationEnums = target.Value.Select(x => TaboolaStringToLocation(x)).ToList();
+                var locationInts = locationEnums.Select(x => LocationToInt(x)).ToArray();
+
+                if (target.Type == TargetType.Include) { return (locationInts, new int[0]); }
+                else { return (new int[0], locationInts); }
+            }
+
+            // Return default lists upon target conversion exception
+            catch (ArgumentException e)
+            {
+                // TODO Log e
+                return (new int[0], new int[0]);
             }
         }
 
-        private string RemoveBrackets(string input)
+        /// <summary>
+        /// Determines our target type based on the include and exclude arrays.
+        /// </summary>
+        /// <param name="locationsInclude">The include locations</param>
+        /// <param name="locationsExclude">The exclude locations</param>
+        /// <returns></returns>
+        private TargetType DetermineType(IEnumerable<Location> locationsInclude,
+            IEnumerable<Location> locationsExclude)
         {
-            if (input[0] != '{' || input[input.Length - 1] != '}') return input;
-            return input.Substring(1, input.Length - 2);
+            // Null can occur, this is for safety
+            var include = (locationsInclude ?? new List<Location>()).ToList();
+            var exclude = (locationsExclude ?? new List<Location>()).ToList();
+
+            // 2-dimensional switch statement construction
+            if (include.Count == 0 && exclude.Count == 0) { return TargetType.All; }
+            else if (include.Count > exclude.Count) { return TargetType.Include; }
+            else if (include.Count < exclude.Count) { return TargetType.Exclude; }
+            else
+            {
+                throw new ArgumentException(
+             "Could not determine include or exclude type from locations.");
+            }
+        }
+
+        /// <summary>
+        /// Converts an integer from the location include or exclude integer
+        /// array to the corresponding internal location model enum.
+        /// </summary>
+        /// <param name="integer">The used integer</param>
+        /// <returns>The corresponding location enum</returns>
+        private Location IntToLocation(int integer)
+        {
+            switch (integer)
+            {
+                case 0:
+                    return Location.NL;
+                case 1:
+                    return Location.UK;
+                case 2:
+                    return Location.DE;
+                case 3:
+                    return Location.ES;
+                case 4:
+                    return Location.FR;
+                default:
+                    throw new ArgumentException($"Could not convert" +
+                        $" location integer {integer} to location enum.");
+            }
+        }
+
+        /// <summary>
+        /// Converts a location enum to corresponding integer.
+        /// </summary>
+        /// <remarks>Throws an <see cref="ArgumentException"/> if we can't convert.</remarks>
+        /// <param name="location">The location enum</param>
+        /// <returns>The used integer</returns>
+        private int LocationToInt(Location location)
+        {
+            switch (location)
+            {
+                case Location.NL:
+                    return 0;
+                case Location.UK:
+                    return 1;
+                case Location.DE:
+                    return 2;
+                case Location.ES:
+                    return 3;
+                case Location.FR:
+                    return 4;
+                default:
+                    throw new ArgumentException($"Could not convert location" +
+               $"{location} to corresponding internal used integer.");
+            }
+        }
+
+        /// <summary>
+        /// Converts a location object to a location string that Tabool accepts.
+        /// </summary>
+        /// <remarks>Throws if unable to convert</remarks>
+        /// <param name="location">The location</param>
+        /// <returns>The converted string</returns>
+        private string LocationToTaboolaString(Location location)
+        {
+            switch (location)
+            {
+                case Location.NL:
+                    return "NL";
+                case Location.UK:
+                    return "UK";
+                case Location.ES:
+                    return "ES";
+                case Location.DE:
+                    return "DE";
+                case Location.FR:
+                    return "FR";
+                default:
+                    throw new ArgumentException($"Could not convert location: {location.ToString()}");
+            }
+        }
+
+        /// <summary>
+        /// Converts a Taboola location string to an internal enum.
+        /// </summary>
+        /// <remarks>Throws an <see cref="ArgumentException"/> if we can't convert.</remarks>
+        /// <param name="taboolaString">The Taboola string</param>
+        /// <returns>The corresponding location enum</returns>
+        private Location TaboolaStringToLocation(string taboolaString)
+        {
+            switch (taboolaString)
+            {
+                case "NL":
+                    return Location.NL;
+                case "UK":
+                    return Location.UK;
+                case "ES":
+                    return Location.ES;
+                case "DE":
+                    return Location.DE;
+                case "FR":
+                    return Location.FR;
+                default:
+                    throw new ArgumentException($"Could not convert Taboola" +
+                        $" location string {taboolaString} to internal location enum.");
+            }
+        }
+
+        /// <summary>
+        /// TODO Reconstruct! This is not bulletproof at all.
+        /// </summary>
+        /// <returns>An array representing all current known locations</returns>
+        private int[] AllLocationInts()
+        {
+            return new[] { 0, 1, 2, 3, 4 };
         }
 
     }
