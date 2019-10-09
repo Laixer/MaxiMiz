@@ -6,14 +6,14 @@ using Poller.Helper;
 using Poller.Taboola.Model;
 
 using AdItemInternal = Maximiz.Model.Entity.AdItem;
-using AdItemExternal = Poller.Taboola.Model.AdItemMain;
+using AdItemExternal = Poller.Taboola.Model.AdItemExternal;
 using AdItemReports = Poller.Taboola.Model.AdItemReports;
 using ApprovalStateInternal = Maximiz.Model.Enums.ApprovalState;
 using ApprovalStateExternal = Poller.Taboola.Model.ApprovalState;
 using AdItemStatusExternal = Poller.Taboola.Model.CampaignItemStatus;
 using AdItemStatusInternal = Maximiz.Model.Enums.AdItemStatus;
 
-namespace Poller.Test.Taboola
+namespace Poller.Test.Taboola.Mappers
 {
 
     /// <summary>
@@ -83,6 +83,15 @@ namespace Poller.Test.Taboola
         private BareMinimumTaboola _bareMinimumExternal;
 
         /// <summary>
+        /// Constructor to prevent nullpointers.
+        /// TODO This is bad design. (is it?)
+        /// </summary>
+        public MapperAdItemTest()
+        {
+            Setup();
+        }
+
+        /// <summary>
         /// Sets up our objects before testing.
         /// </summary>
         [TestInitialize]
@@ -120,7 +129,8 @@ namespace Poller.Test.Taboola
             // Create and convert
             var internalAdItem = CreateAdItemInternal();
             var externalAdItem = _mapperAdItem.Convert(internalAdItem);
-            var internalAdItemConverted = _mapperAdItem.Convert(externalAdItem, internalAdItem.Id);
+            var internalAdItemConverted = _mapperAdItem.Convert(externalAdItem, 
+                internalAdItem.Id, internalAdItem.CampaignGuid);
 
             // Assert
             AssertOverlappingPropertiesMain(internalAdItem, externalAdItem);
@@ -134,7 +144,7 @@ namespace Poller.Test.Taboola
         /// </summary>
         /// <param name="adItemInternal">Internal item</param>
         /// <param name="adItemExternal">External item, main, not reports</param>
-        private void AssertOverlappingPropertiesMain(AdItemInternal adItemInternal,
+        internal void AssertOverlappingPropertiesMain(AdItemInternal adItemInternal,
             AdItemExternal adItemExternal)
         {
             // Regular values
@@ -235,10 +245,11 @@ namespace Poller.Test.Taboola
                 null,
                 null,
                 adGroupImageIndex: adGroupImageIndex,
-                adGroupTitleIndex: adGroupTitleIndex);
+                adGroupTitleIndex: adGroupTitleIndex,
+                title: title,
+                url: url);
 
             result.Id = internalId;
-            result.Title = title;
             result.ApprovalState = approvalStateInternal;
             result.Status = adItemStatusInternal;
             result.Spent = spent;
