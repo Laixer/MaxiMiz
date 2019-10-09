@@ -78,7 +78,6 @@ namespace Poller.Taboola.Traffic
         /// <summary>
         /// Creates a campaign in the Taboola API and returns the created object.
         /// </summary>
-        /// <remarks>Also assigns the result to the campaign parameter</remarks>
         /// <param name="account">The campaign account</param>
         /// <param name="campaign">The core campaign to create external</param>
         /// <param name="token">The cancellation token</param>
@@ -95,9 +94,8 @@ namespace Poller.Taboola.Traffic
             var campaignExternal = await _httpWrapper.RemoteExecuteAndLogAsync
                 <Campaign>(HttpMethod.Post, endpoint, content, token);
 
-            // Convert back, assign explicitly and return
-            campaign = _mapperCampaign.Convert(campaignExternal, campaign.Id);
-            return campaign;
+            // Convert back and return
+            return _mapperCampaign.Convert(campaignExternal, campaign.Id, campaign.CampaignGroupGuid);
         }
 
         /// <summary>
@@ -152,6 +150,8 @@ namespace Poller.Taboola.Traffic
         /// Creates an ad item in the Taboola API. This call will take some time
         /// as the item must be created and approved before the rest of its
         /// fields are populated.
+        /// 
+        /// TODO These explicit id assignments are dangerous. Reconsider design strategy.
         /// </summary>
         /// <remarks>Also assigns the result to the ad item parameter</remarks>
         /// <param name="account">The ad item account</param>
@@ -163,18 +163,23 @@ namespace Poller.Taboola.Traffic
             AdItemInternal adItem, string campaignId, CancellationToken token)
         {
             // Create an empty ad item
-            var endpoint = $"api/1.0 /{account.Name}/campaigns/{campaignId}/items/";
-            var content = _contentBuilder.BuildStringContent(adItem.Url);
-            var adItemExternal = _httpWrapper.RemoteExecuteAndLogAsync<AdItemMain>(
+            var endpoint = $"api/1.0/{account.Name}/campaigns/{campaignId}/items/";
+            var content = _contentBuilder.BuildStringContent(new { url = adItem.Url });
+            var adItemExternal = _httpWrapper.RemoteExecuteAndLogAsync<AdItemExternal>(
                 HttpMethod.Post, endpoint, content, token).Result;
 
             // Wait for creation approval
-            var createdWithFields = await AwaitAdItemCreationAsync(account, adItemExternal, adItem.Id, token);
+            var adItemWithId = await AwaitAdItemCreationAsync(account, adItemExternal, 
+                adItem.Id, adItem.CampaignGuid, token);
+
+            // Update rest of fields
+            adItem.SecondaryId = adItemWithId.SecondaryId;
+            var adItemWithFields = await UpdateAdItemAsync(account, adItem, campaignId, token);
 
             // Convert back, assign explicitly and return
-            createdWithFields.Id = adItem.Id;
-            adItem = createdWithFields;
-            return createdWithFields;
+            adItemWithFields.Id = adItem.Id;
+            adItemWithFields.CampaignGuid = adItem.CampaignGuid;
+            return adItemWithFields;
         }
 
         /// <summary>
@@ -190,16 +195,16 @@ namespace Poller.Taboola.Traffic
             AdItemInternal adItem, string campaignId, CancellationToken token)
         {
             // Convert
-            var converted = _mapperAdItem.ConvertAdditional(adItem);
+            var converted = _mapperAdItem.Convert(adItem);
 
             // Update
-            var content = _contentBuilder.BuildStringContent(converted);
-            var endpoint = $"api/1.0/{account}/campaigns/{campaignId}/{adItem.SecondaryId}/";
+            var content = _contentBuilder.BuildStringContent(converted, true);
+            var endpoint = $"api/1.0/{account.Name}/campaigns/{campaignId}/items/{adItem.SecondaryId}/";
             var adItemExternal = await _httpWrapper.RemoteExecuteAndLogAsync
-                <AdItemMain>(HttpMethod.Post, endpoint, content, token);
+                <AdItemExternal>(HttpMethod.Post, endpoint, content, token);
 
             // Convert back, assign explicitly and return
-            adItem = _mapperAdItem.Convert(adItemExternal, adItem.Id);
+            adItem = _mapperAdItem.Convert(adItemExternal, adItem.Id, adItem.CampaignGuid);
             return adItem;
         }
 
@@ -216,12 +221,12 @@ namespace Poller.Taboola.Traffic
             AdItemInternal adItem, string campaignId, CancellationToken token)
         {
             // Delete
-            var endpoint = $"api/1.0/{account.Name}/campaigns/{campaignId}/";
-            var deleted = await _httpWrapper.RemoteExecuteAndLogAsync<AdItemMain>
+            var endpoint = $"api/1.0/{account.Name}/campaigns/{campaignId}/items/{adItem.SecondaryId}";
+            var deleted = await _httpWrapper.RemoteExecuteAndLogAsync<AdItemExternal>
                 (HttpMethod.Delete, endpoint, null, token);
 
             // Convert back, assign explicitly and return
-            adItem = _mapperAdItem.Convert(deleted, adItem.Id);
+            adItem = _mapperAdItem.Convert(deleted, adItem.Id, adItem.CampaignGuid);
             return adItem;
         }
 
@@ -235,22 +240,25 @@ namespace Poller.Taboola.Traffic
         /// <param name="account">The account</param>
         /// <param name="createdAdItem">The created Taboola ad item</param>
         /// <param name="token">The cancellation token</param>
-        /// <param name="guid">The internal guid of the created item</param>
+        /// <param name="adItemGuid">The internal guid of the created item</param>
+        /// <param name="campaignGuid">The internal guid of the campaign</param>
         /// <returns>The validated ad item</returns>
-        private async Task<AdItemInternal> AwaitAdItemCreationAsync(Account account, 
-            AdItemMain createdAdItem, Guid guid, CancellationToken token)
+        private async Task<AdItemInternal> AwaitAdItemCreationAsync(Account account,
+            AdItemExternal createdAdItem, Guid adItemGuid, Guid campaignGuid, CancellationToken token)
         {
             var stopwatch = new Stopwatch();
             stopwatch.Start();
             while (stopwatch.IsRunning)
             {
-                var item = await GetAdItemAsync(account, createdAdItem.CampaignId, createdAdItem.Id, token);
+                var item = await GetAdItemMainAsync(account, createdAdItem.CampaignId, createdAdItem.Id, token);
                 var itemConverted = _mapperAdItem.Convert(item);
+                var convertedStatus = _mapperAdItem.AdItemStatusToInternal(itemConverted.AdItemStatus);
 
                 // Not crawling means we are done
-                if (item != null && itemConverted.CampaignItemStatus != CampaignItemStatus.Crawling)
+                if (item != null && convertedStatus != Maximiz.Model.Enums.AdItemStatus.Crawling)
                 {
-                    item.Id = guid;
+                    item.Id = adItemGuid;
+                    item.CampaignGuid = campaignGuid;
                     return item;
                 }
 

@@ -61,27 +61,32 @@ namespace Poller.Taboola.Traffic
                     secondary_id = @SecondaryId,
                     name = @Name,
                     branding_text = @BrandingText,
+                    utm = @Utm, 
+                    initial_cpc = @InitialCpc, 
+                    budget_daily = @BudgetDaily, 
+                    bid_strategy = CAST (@BidStrategyText AS bid_strategy),
+                    budget = @Budget, 
+                    budget_model = CAST (@BudgetModelText AS budget_model),
+                    note = @Note, 
+                    spent = @Spent, 
+                    start_date = @StartDate,     
+                    end_date = VALIDATE_TIMESTAMP(@EndDate), 
+                    approval_state = CAST (@ApprovalStateText AS approval_state),
+                    status = CAST (@StatusText AS campaign_status),
+                    delivery = CAST (@DeliveryText AS delivery), 
+
+                    details = CAST (@Details AS json),
+
                     location_include = @LocationInclude, 
                     location_exclude = @LocationExclude,
-                    language_as_text = @LanguageAsText, 
-                    devices = CAST (@Devices AS device[]),
-                    os = CAST (@OperatingSystems AS operating_system[]), 
-                    initial_cpc = @InitialCpc, 
-                    budget = @Budget, 
-                    budget_daily = @DailyBudget, 
-                    budget_model = CAST (@BudgetModelText AS budget_model),
-                    delivery = CAST (@DeliveryText AS delivery), 
-                    bid_strategy = CAST (@BidStrategyText AS bid_strategy),
-                    start_date = COALESCE(@StartDate, CURRENT_TIMESTAMP),     
-                    end_date = VALIDATE_TIMESTAMP(@EndDate), 
-                    utm = @Utm, 
-                    status = CAST (@StatusText AS ad_item_status),
-                    note = @Note, 
-                    campaign_group = @CampaignGroup, 
-                    connection_types = CAST (@ConnectionTypes AS connection[]),
-                    spent = @Spent, 
-                    details = CAST (@Details AS json),
-                    approval_state = CAST (@ApprovalStateText AS approval_state)
+                    devices = @Devices,
+                    operating_systems = @OperatingSystems, 
+                    connection_types = @ConnectionTypes,                    
+
+                    target_url = @TargetUrl,
+                    campaign_group_guid = @CampaignGroupGuid, 
+                    publisher = CAST (@PublisherText as publisher),
+                    language = @Language
                 WHERE Id = @Id;";
 
             using (var connection = _dbProvider.ConnectionScope())
@@ -116,30 +121,41 @@ namespace Poller.Taboola.Traffic
         public async Task UpdateAdItemAsync(AdItem adItem, CancellationToken token)
         {
             var sql = @"
-                UPDATE public.campaign
+                UPDATE public.ad_item
 	            SET
                     secondary_id = @SecondaryId,
-                    ad_group_id = @AdGroupId,
-                    title = @Title,
                     url = @Url,
-                    content = @Content,
-                    cpc = @Cpc,
+                    image_url = @ImageUrl,
+                    title = @Title,
+                    approval_state = CAST (@ApprovalStateText as approval_state),
+                    status = CAST (@StatusText AS ad_item_status),
                     spent = @Spent,
                     clicks = @Clicks,
                     impressions = @Impressions,
                     actions = @Actions,
+                    cpc = @Cpc,
+
                     details = CAST (@Details AS json),
-                    status = CAST (@StatusText AS ad_item_status),
-                    approval_state = CAST (@ApprovalStateText as approval_state),
+
+                    content = @Content,
                     campaign_guid = @CampaignGuid,
+                    ad_group_guid = @AdGroupGuid,
                     ad_group_image_index = @AdGroupImageIndex,
-                    ad_group_title_index = @AdGroupTitleIndex
+                    ad_group_title_index = @AdGroupTitleIndex,
+                    modified_beyond_ad_group = @ModifiedBeyondAdGroup
                 WHERE Id = @Id;";
 
-            using (var connection = _dbProvider.ConnectionScope())
+            try
             {
-                await connection.ExecuteAsync(new CommandDefinition(
-                    sql, adItem, cancellationToken: token));
+                using (var connection = _dbProvider.ConnectionScope())
+                {
+                    await connection.ExecuteAsync(new CommandDefinition(
+                        sql, adItem, cancellationToken: token));
+                }
+            }
+            catch (Exception e)
+            {
+                throw e;
             }
         }
 
@@ -160,11 +176,10 @@ namespace Poller.Taboola.Traffic
         }
 
         /// <summary>
-        /// TODO Revise
         /// This commits our fetched campaigns to our local database.
         /// </summary>
         /// <param name="campaigns">Core campaign list</param>
-        /// <param name="token"></param>
+        /// <param name="token">The cancellation token</param>
         /// <returns>Task</returns>
         public async Task CommitCampaignBulk(IEnumerable<Campaign> campaigns,
             CancellationToken token)
@@ -174,34 +189,66 @@ namespace Poller.Taboola.Traffic
             var sql = @"
                 INSERT INTO
 	                public.campaign(
-                        secondary_id, name, branding_text, 
-                        language_as_text, initial_cpc, budget, 
-                        budget_daily, spent, delivery, 
-                        start_date, end_date, utm, 
-                        campaign_group, note, details,
+                        secondary_id, 
+                        name, 
+                        branding_text, 
+                        utm, 
+                        initial_cpc, 
+                        budget_daily,
+                        bid_strategy,
+                        budget, 
+                        budget_model,
+                        note, 
+                        spent, 
+                        start_date, 
+                        end_date,
+                        approval_state,
+                        status,
+                        delivery,
 
-                        location_include, location_exclude, language)
+                        details,
+
+                        location_include, 
+                        location_exclude, 
+                        devices,
+                        operating_systems,
+                        connection_types,
+
+                        target_url,
+                        campaign_group_guid, 
+                        publisher,
+                        language)
                 VALUES
                     (
                         @SecondaryId,
                         @Name,
                         @BrandingText,
-                        @LanguageAsText,
-                        @InitialCpc,
-                        @Budget,
-                        @DailyBudget,
-                        @Spent,
-                        CAST (@DeliveryText AS delivery),
-                        COALESCE(@StartDate, CURRENT_TIMESTAMP),
-                        VALIDATE_TIMESTAMP(@EndDate),
                         @Utm,
-                        48389,
+                        @InitialCpc,
+                        @BudgetDaily,
+                        CAST (@BidStrategyText AS bid_strategy),
+                        @Budget,
+                        CAST (@BudgetModelText AS budget_model),
                         @Note,
+                        @Spent,
+                        @StartDate,
+                        VALIDATE_TIMESTAMP(@EndDate),
+                        CAST (@ApprovalStateText AS approval_state),
+                        CAST (@StatusText AS campaign_status),
+                        CAST (@DeliveryText AS delivery),
+
                         CAST (@Details AS json),
 
                         @LocationInclude,
                         @LocationExclude,
-                        '{AB}'
+                        @Devices,
+                        @OperatingSystems,
+                        @ConnectionTypes,
+
+                        @TargetUrl,
+                        @CampaignGroupGuid,
+                        CAST (@PublisherText as publisher),
+                        @Language
                     )
                 ON CONFLICT (secondary_id) DO NOTHING;";
 
@@ -213,40 +260,69 @@ namespace Poller.Taboola.Traffic
         }
 
         /// <summary>
-        /// TODO Revise.
-        /// Commits a list of campaign items to our database.
-        /// These entries have already been converted.
-        /// TODO Bulk insert.
-        /// TODO ad_group
+        /// Commits a list of ad items to our database that belong to a single campaign.
         /// </summary>
         /// <param name="aditems">The list of ad items</param>
+        /// <param name="campaignGuid">The guid of the campaign for these ad items</param>
         /// <param name="token">Cancellation token</param>
-        /// <param name="updateStatus">If we want to update
-        /// the items status and approval state</param>
+        /// <param name="updateStatus">If we want to update the items status and 
+        /// approval state</param>
         /// <returns>Task</returns>
         public async Task CommitAdItemBulk(IEnumerable<AdItem> aditems,
-            CancellationToken token, bool updateStatus = false)
+            Guid campaignGuid, CancellationToken token, bool updateStatus = false)
         {
             if (aditems == null || aditems.Count() <= 0) { return; }
+            if (campaignGuid == null || campaignGuid.Equals(Guid.Empty))
+            {
+                throw new ArgumentException($"Can't syncback ad items without" +
+                    "a valid campaign GUID: {campaignGuid}.");
+            }
 
             var sql = @"
-                INSERT INTO
-	                public.ad_item AS INCLUDED (secondary_id, ad_group, title, url, content, cpc, spent, clicks, impressions, actions, details, status, approval_state)
+                INSERT INTO 
+                    public.ad_item AS INCLUDED (
+                        secondary_id, 
+                        url, 
+                        image_url,
+                        title, 
+                        approval_state,
+                        status, 
+                        spent, 
+                        clicks, 
+                        impressions, 
+                        actions, 
+                        cpc, 
+
+                        details, 
+
+                        content, 
+                        campaign_guid,
+                        ad_group_guid,
+                        ad_group_image_index,
+                        ad_group_title_index,
+                        modified_beyond_ad_group)
                 VALUES
                     (
                         @SecondaryId,
-                        2,
-                        LEFT(@Title, 128),
                         @Url,
-                        @Content,
-                        @Cpc,
+                        @ImageUrl,
+                        LEFT(@Title, 128),
+                        CAST (@ApprovalStateText AS approval_state),
+                        CAST (@StatusText AS ad_item_status),
                         @Spent,
                         @Clicks,
                         @Impressions,
                         @Actions,
+                        @Cpc,
+
                         CAST (@Details AS json),
-                        CAST (@StatusText AS ad_item_status),
-                        CAST (@ApprovalStateText AS approval_state)
+
+                        @Content,
+                        '" + campaignGuid + @"',
+                        @AdGroupGuid,
+                        @AdGroupImageIndex,
+                        @AdGroupTitleIndex,
+                        @ModifiedBeyondAdGroup
                     )
                 ON CONFLICT (secondary_id) DO UPDATE
                 SET
@@ -275,11 +351,80 @@ namespace Poller.Taboola.Traffic
         }
 
         /// <summary>
+        /// Commits a list of ad items to our database that belong to a single campaign.
+        /// </summary>
+        /// <param name="aditems">The list of ad items</param>
+        /// <param name="token">Cancellation token</param>
+        /// <param name="updateStatus">If we want to update the items status and 
+        /// approval state</param>
+        /// <returns>Task</returns>
+        public async Task CommitAdItemReportsBulk(IEnumerable<AdItem> aditems,
+            CancellationToken token, bool updateStatus = false)
+        {
+            if (aditems == null || aditems.Count() <= 0) { return; }
+
+            var sql = @"
+                INSERT INTO 
+                    public.ad_item AS INCLUDED (
+                        secondary_id, 
+                        url, 
+                        image_url,
+                        title, 
+
+                        spent, 
+                        clicks, 
+                        impressions, 
+                        actions, 
+                        cpc)
+                VALUES
+                    (
+                        @SecondaryId,
+                        @Url,
+                        @ImageUrl,
+                        LEFT(@Title, 128),
+
+                        @Spent,
+                        @Clicks,
+                        @Impressions,
+                        @Actions,
+                        @Cpc
+                    )
+                ON CONFLICT (secondary_id) DO UPDATE
+                SET
+                    cpc = GREATEST(INCLUDED.cpc, EXCLUDED.cpc),
+                    spent = GREATEST(INCLUDED.spent, EXCLUDED.spent),
+                    clicks = GREATEST(INCLUDED.clicks, EXCLUDED.clicks),
+                    impressions = GREATEST(INCLUDED.impressions, EXCLUDED.impressions),
+                    actions = GREATEST(INCLUDED.actions, EXCLUDED.actions),
+                    details = COALESCE(INCLUDED.details, EXCLUDED.details)";
+
+            // If we update the items status we also
+            // include the status and approval state.
+            if (updateStatus)
+            {
+                sql += @",
+                    status = EXCLUDED.status,
+                    approval_state = EXCLUDED.approval_state";
+            }
+
+            try
+            {
+                // Call for execution
+                using (var connection = _dbProvider.ConnectionScope())
+                {
+                    await connection.ExecuteAsync(new CommandDefinition(
+                        sql, aditems, cancellationToken: token));
+                }
+            } catch (Exception e) { throw e; }
+        }
+
+
+        /// <summary>
         /// Commits our accounts to the database.
         /// </summary>
         /// <param name="accounts">The core accounts</param>
         /// <param name="token">Cancellation token</param>
-        /// <returns>Nothing (task)</returns>
+        /// <returns>Task</returns>
         public async Task CommitAccountBulk(IEnumerable<Account> accounts,
             CancellationToken token)
         {

@@ -50,7 +50,6 @@ namespace Poller.Taboola.Traffic
                 <EntityList<Campaign>>(HttpMethod.Get, endpoint, token)).Items;
 
             // Convert and return
-            campaignsExternal = _mapperTarget.ConvertAll(campaignsExternal);
             return _mapperCampaign.ConvertAll(campaignsExternal);
         }
 
@@ -92,12 +91,12 @@ namespace Poller.Taboola.Traffic
         {
             var query = HttpUtility.ParseQueryString(string.Empty);
             query["end_date"] = query["start_date"] = DateTime.Now.ToString("yyyy-MM-dd");
-            var endpoint = $"api/1.0/{account}/reports/top-campaign-content/dimensions/item_breakdown?{query}";
+            var endpoint = $"api/1.0/{account.Name}/reports/top-campaign-content/dimensions/item_breakdown?{query}";
             var adItemsExternal = await _httpWrapper.RemoteQueryAndLogAsync
                 <EntityList<AdItemReports>>(HttpMethod.Get, endpoint, token);
 
             // Convert and return
-            return _mapperAdItem.ConvertAll(adItemsExternal.Items);
+            return _mapperAdItem.ConvertAllAdditional(adItemsExternal.Items);
         }
 
         /// <summary>
@@ -114,7 +113,7 @@ namespace Poller.Taboola.Traffic
             // Get the ad items
             var endpoint = $"api/1.0/{account.Name}/campaigns/{campaignExternalId}/items";
             var externalAdItems = await _httpWrapper.RemoteQueryAndLogAsync
-                <EntityList<AdItemMain>>(HttpMethod.Get, endpoint, token);
+                <EntityList<AdItemExternal>>(HttpMethod.Get, endpoint, token);
 
             // Convert and return
             return _mapperAdItem.ConvertAll(externalAdItems.Items);
@@ -122,25 +121,24 @@ namespace Poller.Taboola.Traffic
 
         /// <summary>
         /// Gets a single ad item from the Taboola API and converts it.
-        /// TODO Merging ad items
         /// </summary>
         /// <param name="account">The campaign Taboola account</param>
         /// <param name="campaignId">The campaign Taboola id</param>
         /// <param name="adItemId">The ad item Taboola id</param>
         /// <param name="token">The cancellation token</param>
         /// <returns>The converted ad item</returns>
-        public async Task<AdItemInternal> GetAdItemAsync(AccountInternal account,
+        public async Task<AdItemInternal> GetAdItemMainAsync(AccountInternal account,
             string campaignId, string adItemId, CancellationToken token)
         {
             var endpoint = $"api/1.0/{account.Name}/campaigns/{campaignId}/items/{adItemId}";
             var adItemExternal = await _httpWrapper.RemoteQueryAndLogAsync
-                <AdItemReports>(HttpMethod.Get, endpoint, token);
+                <AdItemExternal>(HttpMethod.Get, endpoint, token);
 
             // Return null if campaign was non existent
             if (string.IsNullOrEmpty(adItemExternal.Id)) { return null; }
 
             // Convert and return
-            return _mapperAdItem.ConvertAdditional(adItemExternal);
+            return _mapperAdItem.Convert(adItemExternal);
         }
 
     }

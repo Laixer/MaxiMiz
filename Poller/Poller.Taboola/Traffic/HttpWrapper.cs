@@ -3,6 +3,7 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using Poller.Http;
 
 namespace Poller.Taboola.Traffic
 {
@@ -45,9 +46,8 @@ namespace Poller.Taboola.Traffic
         /// <param name="endpoint">API endpoint.</param>
         /// <param name="cancellationToken">Cancellation token.</param>
         /// <returns>Task with TResult object</returns>
-        public async Task<TResult> RemoteQueryAndLogAsync
-            <TResult>(HttpMethod method, string endpoint,
-            CancellationToken cancellationToken)
+        public async Task<TResult> RemoteQueryAndLogAsync<TResult>(HttpMethod method, 
+            string endpoint, CancellationToken cancellationToken)
             where TResult : class
         {
             cancellationToken.ThrowIfCancellationRequested();
@@ -74,8 +74,8 @@ namespace Poller.Taboola.Traffic
         /// <param name="content">Http content</param>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Task</returns>
-        public async Task RemoteExecuteAndLogAsync(HttpMethod method,
-            string endpoint, HttpContent content, CancellationToken cancellationToken)
+        public async Task RemoteExecuteAndLogAsync(HttpMethod method, string endpoint, 
+            HttpContent content, CancellationToken cancellationToken)
         {
             await RemoteExecuteAndLogAsync<object>(method, endpoint, content, cancellationToken);
         }
@@ -90,9 +90,8 @@ namespace Poller.Taboola.Traffic
         /// <param name="content">Http content</param>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Task</returns>
-        public async Task<TResult> RemoteExecuteAndLogAsync<TResult>(
-            HttpMethod method, string endpoint, HttpContent content,
-            CancellationToken cancellationToken)
+        public async Task<TResult> RemoteExecuteAndLogAsync<TResult>(HttpMethod method, 
+            string endpoint, HttpContent content, CancellationToken cancellationToken)
             where TResult : class
         {
             cancellationToken.ThrowIfCancellationRequested();
@@ -121,5 +120,6 @@ namespace Poller.Taboola.Traffic
         {
             _client.Dispose();
         }
+
     }
 }

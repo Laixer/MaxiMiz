@@ -20,7 +20,6 @@ namespace Poller.Taboola.Traffic
     /// </summary>
     internal partial class CrudInternal
     {
-
         /// <summary>
         /// Gets a campaign from our local database based on the GUID.
         /// </summary>
@@ -39,6 +38,78 @@ namespace Poller.Taboola.Traffic
                 if (result.ToArray().Length > 0)
                 {
                     var x = result.ToArray()[0] as CampaignInternal;
+                    return x;
+                }
+                else { return null; }
+            }
+        }
+
+        /// <summary>
+        /// Gets a campaign based on its external id.
+        /// TODO Can this ever conflict? YES --> when using other publishers as well secondary_id can overlap --> add publisher to query too
+        /// </summary>
+        /// <param name="externalId">The external taboola string id</param>
+        /// <param name="token">The cancellation token</param>
+        /// <returns>The campaign</returns>
+        public async Task<CampaignInternal> GetCampaignFromExternalIdAsync(
+            string externalId, CancellationToken token)
+        {
+            var sql = $"SELECT * FROM public.campaign WHERE secondary_id = '{externalId}';";
+            using (var connection = _dbProvider.ConnectionScope())
+            {
+                var result = await connection.QueryAsync<CampaignInternal>(
+                    new CommandDefinition(sql, cancellationToken: token));
+                if (result.ToArray().Length > 0)
+                {
+                    var x = result.ToArray()[0] as CampaignInternal;
+                    return x;
+                }
+                else { return null; }
+            }
+        }
+
+        /// <summary>
+        /// Gets an ad item from our local database based on the GUID.
+        /// </summary>
+        /// <remarks>Returns null if item is not found</remarks>
+        /// <param name="guid">The ad item GUID</param>
+        /// <param name="token">The cancellation token</param>
+        /// <returns>Our internal database ad item</returns>
+        public async Task<AdItemInternal> GetAdItemFromGuidAsync(
+            Guid guid, CancellationToken token)
+        {
+            var sql = $"SELECT * FROM public.ad_item WHERE id::text = '{guid.ToString()}';";
+            using (var connection = _dbProvider.ConnectionScope())
+            {
+                var result = await connection.QueryAsync<AdItemInternal>(
+                    new CommandDefinition(sql, cancellationToken: token));
+                if (result.ToArray().Length > 0)
+                {
+                    var x = result.ToArray()[0] as AdItemInternal;
+                    return x;
+                }
+                else { return null; }
+            }
+        }
+
+        /// <summary>
+        /// Gets an ad item from our local database based on the GUID.
+        /// </summary>
+        /// <remarks>Returns null if item is not found</remarks>
+        /// <param name="externalId">The external id</param>
+        /// <param name="token">The cancellation token</param>
+        /// <returns>Our internal database ad item</returns>
+        public async Task<AdItemInternal> GetAdItemFromExternalIdAsync(
+            string externalId, CancellationToken token)
+        {
+            var sql = $"SELECT * FROM public.ad_item WHERE secondary_id = '{externalId}';";
+            using (var connection = _dbProvider.ConnectionScope())
+            {
+                var result = await connection.QueryAsync<AdItemInternal>(
+                    new CommandDefinition(sql, cancellationToken: token));
+                if (result.ToArray().Length > 0)
+                {
+                    var x = result.ToArray()[0] as AdItemInternal;
                     return x;
                 }
                 else { return null; }
@@ -105,7 +176,6 @@ namespace Poller.Taboola.Traffic
                     }
                 });
         }
-
-
+       
     }
 }

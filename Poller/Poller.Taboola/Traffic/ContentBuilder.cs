@@ -6,6 +6,9 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Text;
 
+using AdItemInternal = Maximiz.Model.Entity.AdItem;
+using Maximiz.Model.Enums;
+
 namespace Poller.Taboola.Traffic
 {
 
@@ -23,15 +26,14 @@ namespace Poller.Taboola.Traffic
         /// in the Taboola API.
         /// </summary>
         /// <param name="obj">The object to serialize</param>
+        /// <param name="sanetizeForUpdate">Set to true if we have to nullify
+        /// read only parameters and prepare the content for an UPDATE</param>
         /// <returns>Stringcontent object</returns>
         public StringContent BuildStringContent(object obj, bool sanetizeForUpdate = false)
         {
             // Nullify all read only parameters
             var serialized = Json.Serialize(obj);
             var parsed = JObject.Parse(serialized);
-            // TODO This might clash with similarly named parameters
-            NullifyReadOnlyCampaign(parsed);
-            NullifyReadOnlyAdItem(parsed);
 
             // If we are doing an update call
             if (sanetizeForUpdate)
@@ -48,8 +50,22 @@ namespace Poller.Taboola.Traffic
                     RemoveIfPresent(parsed, "sub_country_targeting"); // This should be country dependent, as this can only exist when we target a specific country
                 }
 
+                // TODO Not very elegant, ontbeun
+                if (obj as AdItemExternal != null)
+                {
+                    var status = parsed.GetValue("status");
+                    if (!status.Equals("RUNNING") && !status.Equals("PAUSED"))
+                    {
+                        RemoveIfPresent(parsed, "is_active");
+                    }
+                }
             }
 
+            // TODO This might clash with similarly named parameters
+            NullifyReadOnlyCampaign(parsed);
+            NullifyReadOnlyAdItem(parsed);
+
+            // Serialize and return as content
             serialized = Json.Serialize(parsed);
             return new StringContent(serialized, Encoding.UTF8, "application/json");
         }
@@ -72,9 +88,20 @@ namespace Poller.Taboola.Traffic
             RemoveIfPresent(obj, "postal_code_targeting");
         }
 
+        /// <summary>
+        /// Removes all read-only keys from the ad item. If the Taboola API
+        /// receives a read-only field, it returns a 400 BAD REQUEST response.
+        /// This also works for non-ad-item objects.
+        /// 
+        /// TODO Safety?
+        /// </summary>
+        /// <param name="obj">The ad itiem object to sanetize</param>
         private void NullifyReadOnlyAdItem(JObject obj)
         {
-            throw new NotImplementedException("Implement ad item sanetization!");
+            RemoveIfPresent(obj, "id");
+            RemoveIfPresent(obj, "campaign_id");
+            RemoveIfPresent(obj, "type");
+            RemoveIfPresent(obj, "status");
         }
 
         /// <summary>
