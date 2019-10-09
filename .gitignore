@@ -265,3 +265,4 @@ __pycache__/
 **/launchSettings.json
 Poller/Poller.Test/Taboola/testsettings.json
 Poller/Poller.Test/Taboola/testconfig.json
+*.json
