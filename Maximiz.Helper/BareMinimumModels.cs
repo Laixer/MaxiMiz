@@ -36,29 +36,30 @@ namespace Maximiz.Helper
             CampaignGroup campaignGroup,
             string brandingText = "default branding text",
             string language = "XX",
-            decimal inititalCpc = 0,
+            decimal inititalCpc = 0.01M,
             decimal budget = 1,
             Device[] devices = null,
             OS[] operatingSystems = null,
             ConnectionType[] connectionTypes = null,
-            Delivery delivery = Delivery.Strict,
+            Delivery delivery = Delivery.Balanced,
             BidStrategy bidStrategy = BidStrategy.Fixed,
             BudgetModel budgetModel = BudgetModel.Campaign)
         {
             // Edge cases
-            if (inititalCpc < 0) { throw new ArgumentException("Cpc must be > 0"); }
+            if (inititalCpc < 0M) { throw new ArgumentException("Cpc must be > 0"); }
             if (budget < inititalCpc) { throw new ArgumentException("Budget must be > cpc"); }
 
             // Assign arrays explicitly
             devices = devices ?? new[] { Device.Desktop };
             operatingSystems = operatingSystems ?? new[] { OS.Windows };
+            connectionTypes = connectionTypes ?? new[] { ConnectionType.Wifi };
 
             // Create new object
             var result = new Campaign
             {
                 Name = name,
                 BrandingText = brandingText,
-                LanguageAsText = language,
+                Language = language,
                 InitialCpc = inititalCpc,
                 Budget = budget,
                 Devices = devices,
@@ -68,11 +69,16 @@ namespace Maximiz.Helper
                 BidStrategy = bidStrategy,
                 BudgetModel = budgetModel,
                 Status = CampaignStatus.Unknown,
-                ApprovalState = ApprovalState.Submitted
+                ApprovalState = ApprovalState.Submitted,
+
+                // TODO This has to be removed for location implementation
+                LocationInclude = new int[] { },
+                LocationExclude = new int[] { }
             };
 
             // Only assign if not null
             if (campaignGroup != null) { result.CampaignGroupGuid = campaignGroup.Id; }
+            else { result.CampaignGroupGuid = null; }
 
             return result;
         }
@@ -85,9 +91,11 @@ namespace Maximiz.Helper
         /// <param name="adGroup">The corresponding ad group</param>
         /// <param name="adGroupImageIndex">The image index</param>
         /// <param name="adGroupTitleIndex">The title index</param>
+        /// <param name="title">The title</param>
+        /// <param name="url">Where the ad item takes us</param>
         /// <returns>A new bare minimum ad item</returns>
         public AdItem CreateBareMinimumAdItem(Campaign campaign, AdGroup adGroup,
-            int adGroupImageIndex, int adGroupTitleIndex)
+            int adGroupImageIndex, int adGroupTitleIndex, string title, string url)
         {
             if (adGroup != null)
             {
@@ -103,16 +111,21 @@ namespace Maximiz.Helper
                 AdGroupImageIndex = adGroupImageIndex,
                 AdGroupTitleIndex = adGroupTitleIndex,
                 Status = AdItemStatus.Unknown,
-                ApprovalState = ApprovalState.Submitted
+                ApprovalState = ApprovalState.Submitted,
+                Title = title,
+                Url = url
             };
 
+            // Only assign if not null
             if (campaign != null) { result.CampaignGuid = campaign.Id; }
+
+            // Only assign if not null
             if (adGroup != null)
             {
                 result.AdGroupGuid = adGroup.Id;
                 result.ImageUrl = adGroup.ImageLinks[adGroupImageIndex];
                 result.Title = adGroup.Titles[adGroupTitleIndex];
-            }
+            } else { result.AdGroupGuid = null; }
 
             return result;
         }
