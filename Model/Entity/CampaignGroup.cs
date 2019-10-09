@@ -60,7 +60,7 @@ namespace Maximiz.Model.Entity
         /// <summary>
         /// Budget per day. Can be null.
         /// </summary>
-        public decimal? DailyBudget { get; set; }
+        public decimal? BudgetDaily { get; set; }
 
         /// <summary>
         /// Budget spent.

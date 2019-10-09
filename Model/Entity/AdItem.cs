@@ -30,7 +30,7 @@ namespace Maximiz.Model.Entity
         /// <summary>
         /// The corresponding ad group uuid.
         /// </summary>
-        public Guid AdGroupGuid { get; set; }
+        public Guid? AdGroupGuid { get; set; }
 
         /// <summary>
         /// The index of the string used from the ad group.

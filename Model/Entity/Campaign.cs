@@ -16,9 +16,15 @@ namespace Maximiz.Model.Entity
         public string SecondaryId { get; set; }
 
         /// <summary>
+        /// Represents the account to which this campaign belongs.
+        /// TODO Implement!
+        /// </summary>
+        public Guid? AccountGuid { get; set; }
+
+        /// <summary>
         /// Indicates the corresponding campaign group guid.
         /// </summary>
-        public Guid CampaignGroupGuid { get; set; }
+        public Guid? CampaignGroupGuid { get; set; }
 
         /// <summary>
         /// Campaign name.
@@ -42,12 +48,6 @@ namespace Maximiz.Model.Entity
         /// Target URL for this campaign. This is where we lead our clicks.
         /// </summary>
         public string TargetUrl { get; set; }
-
-        /// <summary>
-        /// Language of the campaign, 2 chars.
-        /// TODO Why do we need this?
-        /// </summary>
-        public string LanguageAsText { get; set; }
 
         /// <summary>
         /// Delivery mode of this ad.
@@ -83,7 +83,7 @@ namespace Maximiz.Model.Entity
         /// <summary>
         /// Budget per day. Can be null.
         /// </summary>
-        public decimal? DailyBudget { get; set; }
+        public decimal? BudgetDaily { get; set; }
 
         /// <summary>
         /// Indicates our budget model.
@@ -123,6 +123,11 @@ namespace Maximiz.Model.Entity
         public string Note { get; set; }
 
         /// <summary>
+        /// Language.
+        /// </summary>
+        public string Language { get; set; }
+
+        /// <summary>
         /// Indicates our status.
         /// TODO This is currently set to ad item status.
         /// </summary>
@@ -149,6 +154,7 @@ namespace Maximiz.Model.Entity
         /// we do have to store.
         /// </summary>
         public string Details { get; set; }
+
     }
 
 }
