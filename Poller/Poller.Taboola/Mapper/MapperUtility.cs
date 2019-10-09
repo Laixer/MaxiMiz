@@ -128,5 +128,17 @@ namespace Poller.Taboola.Mapper
             }
         }
 
+        /// <summary>
+        /// Converts an external datetime object to UTC.
+        /// </summary>
+        /// <param name="external">The external taboola datetime</param>
+        /// <returns>UTC datetime properly formatted</returns>
+        internal DateTime? ConvertTaboolaDateTime(DateTime? external)
+        {
+            if (external == null) { return null; }
+            var dateTime = external ?? DateTime.Now;
+            return new DateTime(dateTime.Ticks, DateTimeKind.Utc);            
+        }
+
     }
 }

@@ -5,8 +5,8 @@ using Maximiz.Helper;
 using Poller.Helper;
 using Poller.Model.Data;
 using Poller.Taboola.Model;
-using CampaignCore = Maximiz.Model.Entity.Campaign;
-using CampaignTaboola = Poller.Taboola.Model.Campaign;
+using CampaignInternal = Maximiz.Model.Entity.Campaign;
+using CampaignExternal = Poller.Taboola.Model.Campaign;
 
 namespace Poller.Taboola.Mapper
 {
@@ -16,7 +16,7 @@ namespace Poller.Taboola.Mapper
     /// all main conversion functions.
     /// TODO Update for new entity model.
     /// </summary>
-    internal partial class MapperCampaign : IMapper<CampaignTaboola, CampaignCore>
+    internal partial class MapperCampaign : IMapper<CampaignExternal, CampaignInternal>
     {
 
         /// <summary>
@@ -57,7 +57,7 @@ namespace Poller.Taboola.Mapper
         /// <param name="guid">The guid if we already know it</param>
         /// <param name="campaignGroupGuid">The campaign group guid</param>
         /// <returns>The converted object</returns>
-        public CampaignCore Convert(CampaignTaboola core, Guid guid, Guid? campaignGroupGuid = null)
+        public CampaignInternal Convert(CampaignExternal core, Guid guid, Guid? campaignGroupGuid = null)
         {
             var converted = Convert(core);
             converted.Id = guid;
@@ -71,41 +71,40 @@ namespace Poller.Taboola.Mapper
         /// <summary>
         /// Converts our core model to taboola campaign.
         /// </summary>
-        /// <param name="core">The object to convert</param>
+        /// <param name="campaignInternal">The object to convert</param>
         /// <returns>The converted object</returns>
-        public CampaignTaboola Convert(CampaignCore core)
+        public CampaignExternal Convert(CampaignInternal campaignInternal)
         {
-            if (core == null) throw new ArgumentNullException(nameof(core));
+            if (campaignInternal == null) throw new ArgumentNullException(nameof(campaignInternal));
 
             // Create a base
-            var external = _bareMinimumExternal.CreateBareMinimumCampaign();
+            var campaignExternal = _bareMinimumExternal.CreateBareMinimumCampaign();
 
             // Append all
-            external.Id = core.SecondaryId;
-            external.Name = core.Name;
-            external.BrandingText = core.BrandingText;
-            external.Utm = core.Utm;
-            external.Cpc = core.InitialCpc;
-            external.SpendingLimit = core.Budget;
-            external.SpendingLimitModel = BudgetModelToString(core.BudgetModel);
-            external.Note = core.Note;
-            external.Spent = core.Spent;
-            external.BidStrategy = BidStrategyToString(core.BidStrategy);
-            external.DailyCap = core.DailyBudget;
-            external.StartDate = core.StartDate;
-            external.EndDate = core.EndDate;
-            external.ApprovalState = _utility.ApprovalStateToString(core.ApprovalState);
-            external.Status = CampaignStatusToString(core.Status);
-            external.DailyAdDeliveryModel = DeliveryToString(core.Delivery);
+            campaignExternal.Id = campaignInternal.SecondaryId;
+            campaignExternal.Name = campaignInternal.Name;
+            campaignExternal.BrandingText = campaignInternal.BrandingText;
+            campaignExternal.Utm = campaignInternal.Utm;
+            campaignExternal.Cpc = campaignInternal.InitialCpc;
+            campaignExternal.SpendingLimit = campaignInternal.Budget;
+            campaignExternal.SpendingLimitModel = BudgetModelToString(campaignInternal.BudgetModel);
+            campaignExternal.Note = campaignInternal.Note;
+            campaignExternal.Spent = campaignInternal.Spent;
+            campaignExternal.BidStrategy = BidStrategyToString(campaignInternal.BidStrategy);
+            campaignExternal.DailyCap = campaignInternal.BudgetDaily;
+            campaignExternal.StartDate = campaignInternal.StartDate;
+            campaignExternal.EndDate = campaignInternal.EndDate;
+            campaignExternal.ApprovalState = _utility.ApprovalStateToString(campaignInternal.ApprovalState);
+            campaignExternal.Status = CampaignStatusToString(campaignInternal.Status);
+            campaignExternal.DailyAdDeliveryModel = DeliveryToString(campaignInternal.Delivery);
 
             // Append details
-            PushDetails(external, core.Details);
+            PushDetails(campaignExternal, campaignInternal.Details);
 
             // Map targets
-            // TODO This should be implemented!!!!
-            // _mapperTarget.ConvertAndApply(core, external);
+            _mapperTarget.MapAllTargeting(campaignExternal, campaignInternal);
 
-            return external;
+            return campaignExternal;
         }
 
         /// <summary>
@@ -116,7 +115,7 @@ namespace Poller.Taboola.Mapper
         /// <param name="to">The object to push to</param>
         /// <param name="detailsJson">The json formatted details string</param>
         /// <return>The pushed object with extracted details</return>
-        private CampaignTaboola PushDetails(CampaignTaboola to, string detailsJson)
+        private CampaignExternal PushDetails(CampaignExternal to, string detailsJson)
         {
             if (string.IsNullOrEmpty(detailsJson)) { return to; }
             var details = Json.Deserialize<CampaignDetails>(detailsJson);
@@ -146,7 +145,7 @@ namespace Poller.Taboola.Mapper
         /// </summary>
         /// <param name="external">The object to convert</param>
         /// <returns>The converted object</returns>
-        public CampaignCore Convert(CampaignTaboola external)
+        public CampaignInternal Convert(CampaignExternal external)
         {
             if (external == null) throw new ArgumentNullException(nameof(external));
 
@@ -161,14 +160,14 @@ namespace Poller.Taboola.Mapper
             result.BrandingText = external.BrandingText;
             result.Utm = external.Utm;
             result.InitialCpc = external.Cpc;
-            result.DailyBudget = external.DailyCap;
+            result.BudgetDaily = external.DailyCap;
             result.BidStrategy = BidStrategyToInternal(external.BidStrategy);
             result.Budget = external.SpendingLimit;
             result.BudgetModel = BudgetModelToInternal(external.SpendingLimitModel);
             result.Note = external.Note;
             result.Spent = external.Spent;
-            result.StartDate = external.StartDate;
-            result.EndDate = external.EndDate;
+            result.StartDate = _utility.ConvertTaboolaDateTime(external.StartDate);
+            result.EndDate = _utility.ConvertTaboolaDateTime(external.EndDate);
             result.ApprovalState = _utility.ApprovalStateToInternal(external.ApprovalState);
             result.Status = CampaignStatusToInternal(external.Status);
             result.Delivery = DeliveryToInternal(external.DailyAdDeliveryModel);
@@ -176,8 +175,11 @@ namespace Poller.Taboola.Mapper
             // Append details
             result.Details = ExtractDetailsToString(external);
 
-            // Daily cap of 0 means unlimited, which we denote as null
-            if (result.DailyBudget == 0) { result.DailyBudget = null; }
+            // Sanetize edge cases.
+            // End date of 12-31-9999 means null.
+            // Daily cap of 0 means unlimited, which we denote as null.
+            if (external.EndDate.Equals(new DateTime(9999, 12, 31))) { result.EndDate = null; }
+            if (result.BudgetDaily == 0) { result.BudgetDaily = null; }
 
             return result;
         }
@@ -188,7 +190,7 @@ namespace Poller.Taboola.Mapper
         /// </summary>
         /// <param name="from">The Taboola campaign</param>
         /// <returns>The details object as JSON string</returns>
-        private string ExtractDetailsToString(CampaignTaboola from)
+        private string ExtractDetailsToString(CampaignExternal from)
         {
             if (from == null) throw new ArgumentNullException(nameof(from));
 
@@ -215,9 +217,9 @@ namespace Poller.Taboola.Mapper
         /// </summary>
         /// <param name="list">Taboola list</param>
         /// <returns>Core list</returns>
-        public IEnumerable<CampaignCore> ConvertAll(IEnumerable<CampaignTaboola> list)
+        public IEnumerable<CampaignInternal> ConvertAll(IEnumerable<CampaignExternal> list)
         {
-            IList<CampaignCore> result = new List<CampaignCore>();
+            IList<CampaignInternal> result = new List<CampaignInternal>();
             foreach (var item in list.AsParallel())
             {
                 result.Add(Convert(item));
@@ -230,9 +232,9 @@ namespace Poller.Taboola.Mapper
         /// </summary>
         /// <param name="list">Core list</param>
         /// <returns>Taboola list</returns>
-        public IEnumerable<CampaignTaboola> ConvertAll(IEnumerable<CampaignCore> list)
+        public IEnumerable<CampaignExternal> ConvertAll(IEnumerable<CampaignInternal> list)
         {
-            IList<CampaignTaboola> result = new List<CampaignTaboola>();
+            IList<CampaignExternal> result = new List<CampaignExternal>();
             foreach (var item in list.AsParallel())
             {
                 result.Add(Convert(item));

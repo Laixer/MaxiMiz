@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Maximiz.Helper;
 
-using AdItemCore = Maximiz.Model.Entity.AdItem;
+using AdItemInternal = Maximiz.Model.Entity.AdItem;
 
 namespace Poller.Taboola.Mapper
 {
@@ -14,7 +14,7 @@ namespace Poller.Taboola.Mapper
     /// Our Ad Item mapper. This section of the partial class contains the main
     /// conversion functions.
     /// </summary>
-    internal partial class MapperAdItem : IMapperAdditional<AdItemMain, AdItemCore, AdItemReports>
+    internal partial class MapperAdItem : IMapperAdditional<AdItemExternal, AdItemInternal, AdItemReports>
     {
 
         /// <summary>
@@ -47,11 +47,13 @@ namespace Poller.Taboola.Mapper
         /// </summary>
         /// <param name="external">The external ad item</param>
         /// <param name="guid">The internal ad item GUID</param>
+        /// <param name="campaignGuid">The internal campaign GUID</param>
         /// <returns>Internal ad item with all properties and guid</returns>
-        public AdItemCore Convert(AdItemMain external, Guid guid)
+        public AdItemInternal Convert(AdItemExternal external, Guid guid, Guid campaignGuid)
         {
             var converted = Convert(external);
             converted.Id = guid;
+            converted.CampaignGuid = campaignGuid;
             return converted;
         }
 
@@ -62,7 +64,7 @@ namespace Poller.Taboola.Mapper
         /// </summary>
         /// <param name="external">The Taboola ad item</param>
         /// <returns>The core ad item</returns>
-        public AdItemCore Convert(AdItemMain external)
+        public AdItemInternal Convert(AdItemExternal external)
         {
             if (external == null) throw new
                     ArgumentNullException(nameof(external));
@@ -72,18 +74,22 @@ namespace Poller.Taboola.Mapper
                 campaign: null,
                 adGroup: null,
                 adGroupImageIndex: -1,
-                adGroupTitleIndex: -1);
+                adGroupTitleIndex: -1,
+                title: external.Title,
+                url: external.Url);
 
             // Append values
             result.SecondaryId = external.Id;
             result.Url = external.Url;
             result.ImageUrl = external.ThumbnailUrl;
-            result.Title = external.Title;
             result.ApprovalState = _utility.ApprovalStateToInternal(external.ApprovalState);
             result.Status = AdItemStatusToInternal(external.AdItemStatus);
 
             // Append details
             result.Details = ExtractDetailsToString(external);
+
+            // TODO Fic to counter "the title violates null constraint bug"
+            if (string.IsNullOrEmpty(result.Title)) { result.Title = ""; }
 
             return result;
         }
@@ -94,7 +100,7 @@ namespace Poller.Taboola.Mapper
         /// </summary>
         /// <param name="core">Internal ad item</param>
         /// <returns>Taboola ad item</returns>
-        public AdItemMain Convert(AdItemCore core)
+        public AdItemExternal Convert(AdItemInternal core)
         {
             // Edge cases (TODO)
 
@@ -110,7 +116,7 @@ namespace Poller.Taboola.Mapper
             result.AdItemStatus = AdItemStatusToString(core.Status);
 
             // Extract details
-            var details = Json.Deserialize<AdItemDetails>(core.Details);
+            var details = Json.Deserialize<AdItemDetails>(core.Details ?? "{}");
             result.Active = details.Active;
             result.Type = details.Type;
             result.CampaignId = details.CampaignId;
@@ -124,7 +130,7 @@ namespace Poller.Taboola.Mapper
         /// <param name="external"></param>
         /// <param name="guid"></param>
         /// <returns></returns>
-        public AdItemCore ConvertAdditional(AdItemReports external, Guid guid)
+        public AdItemInternal ConvertAdditional(AdItemReports external, Guid guid)
         {
             var converted = ConvertAdditional(external);
             converted.Id = guid;
@@ -141,7 +147,7 @@ namespace Poller.Taboola.Mapper
         /// </summary>
         /// <param name="external">Taboola co result</param>
         /// <returns>Core ad item</returns>
-        public AdItemCore ConvertAdditional(AdItemReports external)
+        public AdItemInternal ConvertAdditional(AdItemReports external)
         {
             if (external == null) throw new
                     ArgumentNullException(nameof(external));
@@ -151,13 +157,14 @@ namespace Poller.Taboola.Mapper
                 campaign: null,
                 adGroup: null,
                 adGroupImageIndex: -1,
-                adGroupTitleIndex: -1);
+                adGroupTitleIndex: -1,
+                title: external.Title,
+                url: external.Url);
 
             // Append values
             result.SecondaryId = external.Id;
             result.Url = external.Url;
             result.ImageUrl = external.ThumbnailUrl;
-            result.Title = external.Title;
             result.Spent = external.Spent;
             result.Clicks = (int)external.Clicks;
             result.Impressions = (int)external.Impressions;
@@ -197,7 +204,7 @@ namespace Poller.Taboola.Mapper
         /// </summary>
         /// <param name="from">The Taboola ad item</param>
         /// <returns>The details object as JSON string</returns>
-        private string ExtractDetailsToString(AdItemMain from)
+        private string ExtractDetailsToString(AdItemExternal from)
         {
             if (from == null) throw new
                     ArgumentNullException(nameof(from));
@@ -215,9 +222,9 @@ namespace Poller.Taboola.Mapper
         /// </summary>
         /// <param name="list">Taboola items</param>
         /// <returns>Core items</returns>
-        public IEnumerable<AdItemCore> ConvertAll(IEnumerable<AdItemMain> list)
+        public IEnumerable<AdItemInternal> ConvertAll(IEnumerable<AdItemExternal> list)
         {
-            List<AdItemCore> result = new List<AdItemCore>();
+            List<AdItemInternal> result = new List<AdItemInternal>();
             foreach (var x in list.AsParallel())
             {
                 result.Add(Convert(x));
@@ -230,9 +237,9 @@ namespace Poller.Taboola.Mapper
         /// </summary>
         /// <param name="list">Taboola items</param>
         /// <returns>Core items</returns>
-        public IEnumerable<AdItemCore> ConvertAllAdditional(IEnumerable<AdItemReports> list)
+        public IEnumerable<AdItemInternal> ConvertAllAdditional(IEnumerable<AdItemReports> list)
         {
-            List<AdItemCore> result = new List<AdItemCore>();
+            List<AdItemInternal> result = new List<AdItemInternal>();
             foreach (var x in list)
             {
                 result.Add(ConvertAdditional(x));
@@ -245,9 +252,9 @@ namespace Poller.Taboola.Mapper
         /// </summary>
         /// <param name="list"></param>
         /// <returns></returns>
-        public IEnumerable<AdItemMain> ConvertAll(IEnumerable<AdItemCore> list)
+        public IEnumerable<AdItemExternal> ConvertAll(IEnumerable<AdItemInternal> list)
         {
-            List<AdItemMain> result = new List<AdItemMain>();
+            List<AdItemExternal> result = new List<AdItemExternal>();
             foreach (var x in list)
             {
                 result.Add(Convert(x));

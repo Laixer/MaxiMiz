@@ -249,6 +249,5 @@ namespace Poller.Taboola.Mapper
                     return Delivery.Strict;
             }
         }
-
     }
 }
