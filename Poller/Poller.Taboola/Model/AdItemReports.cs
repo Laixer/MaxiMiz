@@ -10,7 +10,7 @@ namespace Poller.Taboola.Model
     /// Mirrors the Taboola AdItem result we get
     /// from the reports function 1.4 which list 
     /// all campaign items. This is coupled with 
-    /// <see cref="AdItemMain"/>.
+    /// <see cref="AdItemExternal"/>.
     /// </summary>
     [DataContract]
     internal class AdItemReports

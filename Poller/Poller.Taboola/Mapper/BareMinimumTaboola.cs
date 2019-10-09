@@ -70,9 +70,9 @@ namespace Poller.Taboola.Mapper
         /// </summary>
         /// <param name="url">The target url</param>
         /// <returns>A new bare minimum ad item</returns>
-        public AdItemMain CreateBareMinimumAdItem(string url)
+        public AdItemExternal CreateBareMinimumAdItem(string url)
         {
-            return new AdItemMain
+            return new AdItemExternal
             {
                 Url = url
             };

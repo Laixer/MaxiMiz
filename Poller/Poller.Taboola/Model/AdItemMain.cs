@@ -12,7 +12,7 @@ namespace Poller.Taboola.Model
     /// We skip type [ITEM, RSS] because it is not relevant for our specific
     /// implementation. </remarks>
     [DataContract]
-    internal class AdItemMain
+    internal class AdItemExternal
     {
         /// <summary>
         /// The id supplied by the remote network.
@@ -36,7 +36,7 @@ namespace Poller.Taboola.Model
         /// <summary>
         /// The url for the thumbnail of the image.
         /// </summary>
-        [DataMember(Name = "thumbnnail_url")]
+        [DataMember(Name = "thumbnail_url")]
         public string ThumbnailUrl { get; set; }
 
         /// <summary>
