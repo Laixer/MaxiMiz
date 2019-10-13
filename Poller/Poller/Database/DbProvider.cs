@@ -6,7 +6,11 @@ using Npgsql;
 
 namespace Poller.Database
 {
-    public class DbProvider
+
+    /// <summary>
+    /// Object to provide database connections for us.
+    /// </summary>
+    public class DbProvider : IDbProvider
     {
         private readonly DbProviderOptions _options;
         private readonly string connectionString;
