@@ -79,6 +79,8 @@ namespace Poller
             using (var httpResponse = await BuildAuthorizedHttpClient().SendAsync(
                 new HttpRequestMessage(method, endpoint), cancellationToken))
             {
+                var debugContent = httpResponse.Content.ReadAsStringAsync();
+
                 httpResponse.EnsureSuccessStatusCode();
                 return await Json.DeserializeAsync<TResult>(httpResponse);
             }
@@ -95,16 +97,23 @@ namespace Poller
         /// <param name="content">Http content</param>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Object with specified type</returns>
-        public async Task<TResult> RemoteExecuteAsync<TResult>(
-            HttpMethod method, string endpoint, HttpContent content,
-            CancellationToken cancellationToken)
+        public async Task<TResult> RemoteExecuteAsync<TResult>(HttpMethod method,
+            string endpoint, HttpContent content, CancellationToken cancellationToken)
             where TResult : class
         {
             var request = new HttpRequestMessage(method, endpoint);
             request.Content = content;
+
+            // Debug
+            Task<string> debugExtracted;
+            if (content != null) { debugExtracted = content.ReadAsStringAsync(); }
+
             using (var httpResponse = await BuildAuthorizedHttpClient().
                 SendAsync(request, cancellationToken))
             {
+                // Debug
+                var returnedContent = httpResponse.Content.ReadAsStringAsync();
+
                 httpResponse.EnsureSuccessStatusCode();
                 return await Json.DeserializeAsync<TResult>(httpResponse);
             }
