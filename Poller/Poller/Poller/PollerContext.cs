@@ -6,7 +6,9 @@ namespace Poller.Poller
 
     /// <summary>
     /// Context for our poller object. This contains basic information about
-    /// the status of our relevant poller.
+    /// the status of our relevant poller operation type, containing metadata
+    /// like the amount of runs and the datetime for the last run of said
+    /// operation.
     /// </summary>
     public class PollerContext
     {
