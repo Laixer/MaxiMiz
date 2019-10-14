@@ -1,4 +1,5 @@
-﻿using System.Data;
+﻿using System;
+using System.Data;
 using Maximiz.Model.Enums;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
@@ -46,7 +47,18 @@ namespace Poller.Database
         {
             Configuration = configuration;
             _options = options?.Value;
-            connectionString = Configuration.GetConnectionString(_options.ConnectionStringName);
+
+            // Extract connection string, possible from connectionstring section or values in options
+            // This is done for Azure Functions
+            // TODO This might need cleaning up later, Azure Functions itself is still in development
+            connectionString = Configuration.GetConnectionString(_options.ConnectionStringName) ??
+                Environment.GetEnvironmentVariable(_options.ConnectionStringName);
+
+            // Extra exception clarity
+            if (connectionString == null)
+            {
+                throw new ArgumentNullException("Database connectionstring can't be null");
+            }
         }
 
 
