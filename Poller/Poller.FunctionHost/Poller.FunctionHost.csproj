@@ -9,9 +9,10 @@
     <PackageReference Include="Microsoft.Azure.WebJobs" Version="3.0.13" />
     <PackageReference Include="Microsoft.Azure.WebJobs.Extensions" Version="3.0.2" />
     <PackageReference Include="Microsoft.Azure.WebJobs.Extensions.ServiceBus" Version="3.1.1" />
-    <PackageReference Include="Microsoft.Azure.WebJobs.ServiceBus" Version="2.3.0" />
-    <PackageReference Include="Microsoft.NET.Sdk.Functions" Version="1.0.29" />
-    <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
+    <PackageReference Include="Microsoft.Azure.WebJobs.Extensions.Storage" Version="3.0.8" />
+    <PackageReference Include="Microsoft.Azure.WebJobs.ServiceBus" Version="3.0.0-beta8" />
+    <PackageReference Include="Microsoft.NET.Sdk.Functions" Version="1.0.30-beta1" />
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.3-beta2" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Poller.Taboola\Poller.Taboola.csproj" />
@@ -21,7 +22,7 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="local.settings.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <CopyToPublishDirectory>Never</CopyToPublishDirectory>
     </None>
   </ItemGroup>
