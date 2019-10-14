@@ -3,8 +3,20 @@ using System.Threading;
 
 namespace Poller.Poller
 {
+
+    /// <summary>
+    /// Context for our poller object. This contains basic information about
+    /// the status of our relevant poller operation type, containing metadata
+    /// like the amount of runs and the datetime for the last run of said
+    /// operation.
+    /// </summary>
     public class PollerContext
     {
+
+        /// <summary>
+        /// Action to invoke when we mark our progress. This is generally used
+        /// to tell our runner service about the progress.
+        /// </summary>
         protected Action _progressCallback;
 
         /// <summary>
@@ -22,6 +34,8 @@ namespace Poller.Poller
         /// </summary>
         /// <param name="runCount">Number of successful runs.</param>
         /// <param name="lastRun">Last sucessful run.</param>
+        /// <param name="progressCallback">Action to execute when we want to 
+        /// mark our operation progress.</param>
         public PollerContext(int runCount, DateTime? lastRun, Action progressCallback = null)
         {
             RunCount = runCount;
@@ -30,7 +44,8 @@ namespace Poller.Poller
         }
 
         /// <summary>
-        /// Notify the runner service of the operation progress.
+        /// Notify the runner service of the operation progress. This throws
+        /// if our cancellation token has been cancelled.
         /// </summary>
         public virtual void MarkProgress(CancellationToken cancellationToken)
         {

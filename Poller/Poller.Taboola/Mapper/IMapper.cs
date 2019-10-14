@@ -6,8 +6,7 @@ namespace Poller.Taboola.Mapper
 {
 
     /// <summary>
-    /// Interface for mapping objects from Taboola
-    /// to our Core.
+    /// Interface for mapping objects from Taboola to our Core.
     /// </summary>
     public interface IMapper<TExternal, TCore>
     {
@@ -43,4 +42,5 @@ namespace Poller.Taboola.Mapper
             IEnumerable<TCore> list);
 
     }
+
 }

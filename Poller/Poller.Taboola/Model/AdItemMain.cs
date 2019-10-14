@@ -1,7 +1,4 @@
-using System;
 using System.Runtime.Serialization;
-using Poller.Extensions;
-using Poller.Model.Data;
 
 namespace Poller.Taboola.Model
 {
@@ -9,10 +6,13 @@ namespace Poller.Taboola.Model
     /// <summary>
     /// Mirrors the Taboola AdItem result we get
     /// from all ad item functions. This is coupled 
-    /// with <see cref="AdItemCoResult"/>.
+    /// with <see cref="AdItemReports"/>.
     /// </summary>
+    /// <remarks>
+    /// We skip type [ITEM, RSS] because it is not relevant for our specific
+    /// implementation. </remarks>
     [DataContract]
-    internal class AdItem
+    internal class AdItemExternal
     {
         /// <summary>
         /// The id supplied by the remote network.
@@ -34,6 +34,12 @@ namespace Poller.Taboola.Model
         public string Url { get; set; }
 
         /// <summary>
+        /// The url for the thumbnail of the image.
+        /// </summary>
+        [DataMember(Name = "thumbnail_url")]
+        public string ThumbnailUrl { get; set; }
+
+        /// <summary>
         /// The ad title.
         /// </summary>
         [DataMember(Name = "title")]
@@ -49,14 +55,20 @@ namespace Poller.Taboola.Model
         /// Item approval status.
         /// </summary>
         [DataMember(Name = "approval_state")]
-        public ApprovalState ApprovalState { get; set; }
-
+        public string ApprovalState { get; set; }
 
         /// <summary>
-        /// Campaign item status.
+        /// Ad item status.
         /// </summary>
         [DataMember(Name = "status")]
-        public CampaignItemStatus CampaignItemStatus { get; set; }
+        public string AdItemStatus { get; set; }
+
+        /// <summary>
+        /// Indicates the type of the ad item. We do not use this at this moment.
+        /// The possibilities are RSS and ITEM.
+        /// </summary>
+        [DataMember(Name = "type")]
+        public string Type { get; set; }
 
     }
 }

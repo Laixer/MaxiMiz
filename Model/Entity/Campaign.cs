@@ -4,7 +4,8 @@ using System;
 namespace Maximiz.Model.Entity
 {
     /// <summary>
-    /// Campaign.
+    /// Represents a single campaign in some external publisher.
+    /// TODO Nullable enums.
     /// </summary>
     [Serializable]
     public class Campaign : EntityAudit<Guid>
@@ -15,14 +16,15 @@ namespace Maximiz.Model.Entity
         public string SecondaryId { get; set; }
 
         /// <summary>
-        /// Indicates the status of any requested local changes made by the user.
+        /// Represents the account to which this campaign belongs.
+        /// TODO Implement!
         /// </summary>
-        public ChangeRequestStatus? ChangeRequestStatus { get; set; }
+        public Guid? AccountGuid { get; set; }
 
         /// <summary>
-        /// Group to which this campaign belongs to.
+        /// Indicates the corresponding campaign group guid.
         /// </summary>
-        public int CampaignGroup { get; set; }
+        public Guid? CampaignGroupGuid { get; set; }
 
         /// <summary>
         /// Campaign name.
@@ -30,10 +32,22 @@ namespace Maximiz.Model.Entity
         public string Name { get; set; }
 
         /// <summary>
-        /// Language of the campaign, 2 chars.
-        /// TODO Why do we need this?
+        /// Reference to the publisher.
         /// </summary>
-        public string LanguageAsText { get; set; }
+        public Publisher Publisher { get; set; }
+        public string PublisherText { get => Publisher.GetEnumMemberName(); }
+
+        /// <summary>
+        /// Indicates the status of any changes made in our own database. These
+        /// changes have to be pushed to the corresponding external API.
+        /// </summary>
+        public ApprovalState ApprovalState { get; set; }
+        public string ApprovalStateText { get => ApprovalState.GetEnumMemberName(); }
+
+        /// <summary>
+        /// Target URL for this campaign. This is where we lead our clicks.
+        /// </summary>
+        public string TargetUrl { get; set; }
 
         /// <summary>
         /// Delivery mode of this ad.
@@ -69,7 +83,19 @@ namespace Maximiz.Model.Entity
         /// <summary>
         /// Budget per day. Can be null.
         /// </summary>
-        public decimal? DailyBudget { get; set; }
+        public decimal? BudgetDaily { get; set; }
+
+        /// <summary>
+        /// Indicates our budget model.
+        /// </summary>
+        public BudgetModel BudgetModel { get; set; }
+        public string BudgetModelText { get => BudgetModel.GetEnumMemberName(); }
+
+        /// <summary>
+        /// Represents our bid strategy.
+        /// </summary>
+        public BidStrategy BidStrategy { get; set; }
+        public string BidStrategyText { get => BidStrategy.GetEnumMemberName(); }
 
         /// <summary>
         /// Budget spent.
@@ -97,10 +123,38 @@ namespace Maximiz.Model.Entity
         public string Note { get; set; }
 
         /// <summary>
+        /// Language.
+        /// </summary>
+        public string Language { get; set; }
+
+        /// <summary>
+        /// Indicates our status.
+        /// TODO This is currently set to ad item status.
+        /// </summary>
+        public CampaignStatus Status { get; set; }
+        public string StatusText { get => Status.GetEnumMemberName(); }
+
+        /// <summary>
+        /// Indicates all devices that this campaign operates on.
+        /// </summary>
+        public Device[] Devices { get; set; }
+
+        /// <summary>
+        /// Indicates all operating systems this campaign operates on.
+        /// </summary>
+        public OS[] OperatingSystems { get; set; }
+
+        /// <summary>
+        /// Indicates all connection types this campaign operates on.
+        /// </summary>
+        public ConnectionType[] ConnectionTypes { get; set; }
+
+        /// <summary>
         /// JSON string containing unused data which
         /// we do have to store.
         /// </summary>
         public string Details { get; set; }
+
     }
 
 }

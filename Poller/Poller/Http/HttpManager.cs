@@ -79,6 +79,8 @@ namespace Poller
             using (var httpResponse = await BuildAuthorizedHttpClient().SendAsync(
                 new HttpRequestMessage(method, endpoint), cancellationToken))
             {
+                var debugContent = httpResponse.Content.ReadAsStringAsync();
+
                 httpResponse.EnsureSuccessStatusCode();
                 return await Json.DeserializeAsync<TResult>(httpResponse);
             }
@@ -94,24 +96,31 @@ namespace Poller
         /// <param name="endpoint">Endpoint url without the base</param>
         /// <param name="content">Http content</param>
         /// <param name="cancellationToken">Cancellation token</param>
-        /// <returns></returns>
-        public async Task<TResult> RemoteExecuteAsync<TResult>(
-            HttpMethod method, string endpoint, HttpContent content,
-            CancellationToken cancellationToken)
+        /// <returns>Object with specified type</returns>
+        public async Task<TResult> RemoteExecuteAsync<TResult>(HttpMethod method,
+            string endpoint, HttpContent content, CancellationToken cancellationToken)
             where TResult : class
         {
             var request = new HttpRequestMessage(method, endpoint);
             request.Content = content;
+
+            // Debug
+            Task<string> debugExtracted;
+            if (content != null) { debugExtracted = content.ReadAsStringAsync(); }
+
             using (var httpResponse = await BuildAuthorizedHttpClient().
                 SendAsync(request, cancellationToken))
             {
+                // Debug
+                var returnedContent = httpResponse.Content.ReadAsStringAsync();
+
                 httpResponse.EnsureSuccessStatusCode();
                 return await Json.DeserializeAsync<TResult>(httpResponse);
             }
         }
 
         /// <summary>
-        /// Dispose objects.
+        /// Called upon graceful shutdown.
         /// </summary>
         public void Dispose() => _client?.Dispose();
     }

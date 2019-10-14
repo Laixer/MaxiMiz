@@ -9,7 +9,6 @@ namespace Poller.Taboola.Model
     // - activity_schedule
     // - verification_pixel --> doen we niets me
 
-
     /// <summary>
     /// Represents all Taboola API parameters for
     /// a single campaign.
