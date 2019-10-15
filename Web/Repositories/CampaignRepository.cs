@@ -1,14 +1,8 @@
 ﻿using Dapper;
-using Dapper.Contrib.Extensions;
-using Maximiz.InputModels.Campaigns;
-using Maximiz.Model;
+using Laixer.Library.Injection.Database;
+using Maximiz.Database;
 using Maximiz.Model.Entity;
-using Maximiz.Model.Enums;
-using Maximiz.Repositories.Interfaces;
-using Maximiz.ServiceBus;
-using Microsoft.Azure.ServiceBus;
-using Microsoft.Extensions.Configuration;
-using Npgsql;
+using Maximiz.Repositories.Abstraction;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -16,155 +10,75 @@ using System.Threading.Tasks;
 
 namespace Maximiz.Repositories
 {
+
     /// <summary>
-    /// Repository layer for operations related to <see cref="Campaign"></see> data.
+    /// Repository layer for operations related to <see cref="Campaign"/> data.
+    /// TODO Fix ugly interface implementation
     /// </summary>
     public class CampaignRepository : ICampaignRepository
     {
-        private readonly IConfiguration _configuration;
 
-        public CampaignRepository(IConfiguration configuration)
+        /// <summary>
+        /// Provides database connections for us.
+        /// </summary>
+        private readonly IDatabaseProvider _databaseProvider;
+
+        /// <summary>
+        /// Constructor for dependency injection.
+        /// </summary>
+        /// <param name="databaseProvider">The database provider</param>
+        public CampaignRepository(IDatabaseProvider databaseProvider)
         {
-            _configuration = configuration;
+            _databaseProvider = databaseProvider;
         }
 
         /// <summary>
-        /// Returns a new instance of <see cref="NpgsqlConnection"/> for the MaxiMiz database
+        /// Gets all campaigns sorted by a column in given order.
         /// </summary>
-        public IDbConnection GetConnection => new NpgsqlConnection(_configuration.GetConnectionString("MaxiMizDatabase"));
-
-        /// <summary>
-        /// Returns a new instance of <see cref="QueueClient"/> for the MaxiMiz service bus
-        /// </summary>
-        /// <returns></returns>
-        public IQueueClient GetQueueClient => new QueueClient(_configuration.GetConnectionString("MaxiMizServiceBus"), "testqueue");
-
-        /// <summary>
-        /// Inserts a new campaign group and campaigns into the database and sends commands to the service bus.
-        /// </summary>
-        /// <param name="campaignGroup">Model to insert</param>
-        /// <returns></returns>
-        public async Task CreateGroup(CampaignGroup campaignGroup)
+        /// <param name="column">The column to order by</param>
+        /// <param name="order">Ascending or descending</param>
+        /// <returns>Retrieved list of campaigns</returns>
+        async Task<IEnumerable<Campaign>> ICampaignRepository.GetAll(ColumnCampaign column, Order order)
         {
-            // SQL query to insert campaign group and select inserted row ID
-            var sql_group_insert = @" 
-            INSERT INTO PUBLIC.campaign_group
-                (NAME, branding_text, location_include, location_exclude, language, language_as_text, device, os, initial_cpc, budget, budget_daily, budget_model, delivery, bid_strategy, start_date, end_date, connection)
-                VALUES  (
-                    @Name,
-                    @BrandingText,
-                    @LocationInclude, @LocationExclude,
-                    '{NL}', 
-                    @Language, @Device, @OS,
-                    @InitialCPC,
-                    @Budget, @DailyBudget, @BudgetModelText::budget_model,
-                    @DeliveryText::delivery,
-                    @BidStrategyText::bid_strategy,
-                    COALESCE(@StartDate, CURRENT_TIMESTAMP),
-                    @EndDate,
-                    @Connection
-                )
-                RETURNING id";
-
-            // SQL query to insert a new campaign
-            string sql_campaign_insert = @"INSERT INTO
-	                public.campaign(secondary_id, campaign_group, name, branding_text, location_include, location_exclude, language, language_as_text, device, os, initial_cpc, budget, budget_daily, budget_model, delivery, start_date, end_date, utm, connection)
-                VALUES
-                    (
-                        @SecondaryId,
-                        @CampaignGroup,
-                        @Name,
-                        @BrandingText,
-                        '{0}','{0}',
-                        '{NL}',
-                        @Language, @Device, @OS,
-                        @InitialCpc,
-                        @Budget, @DailyBudget, @BudgetModelText::budget_model,
-                        @DeliveryText::delivery,
-                        COALESCE(@StartDate, CURRENT_TIMESTAMP),
-                        @EndDate,
-                        @Utm,
-                        @Connection
-                    );";
-
-            // For temporary storage of the campaigns to create
-            List<Campaign> campaignsToCreate = new List<Campaign>();
-
-            Parallel.ForEach(campaignGroup.Device, device =>
+            using (IDbConnection connection = _databaseProvider.GetConnectionScope())
             {
-                Parallel.ForEach(campaignGroup.Os, os =>
-                {
-                    Parallel.ForEach(campaignGroup.LocationInclude, location =>
-                    {
-                        // Generate the campaign
-                        Campaign campaign = Campaign.FromGroup(campaignGroup);
-                        campaign.Device = new Device[] { device };
-                        campaign.Os = new OS[] { os };
-                        campaign.LocationInclude = new int[1] { location };
-
-                        campaign.Name = CampaignNameGenerator.Generate(campaignGroup.Name, campaign.Language[0], location.ToString(), os, device);
-
-                        campaignsToCreate.Add(campaign);
-                    });
-                });
-            });
-
-            using (IDbConnection connection = GetConnection)
-            {
-                connection.Open();
-
-                IDbTransaction transaction = connection.BeginTransaction();
-
+                var columnString = new OrderTranslator().Convert(column);
+                var orderString = new OrderTranslator().Convert(order);
                 try
                 {
-                    // Create a new campaign group record.
-                    int newCampaignGroupId = await connection.ExecuteScalarAsync<int>
-                        (sql_group_insert, campaignGroup, transaction: transaction);
-
-                    campaignGroup.Id = newCampaignGroupId;
-
-                    // Insert the campaigns.
-                    foreach (Campaign campaign in campaignsToCreate)
-                    {
-                        campaign.CampaignGroup = newCampaignGroupId;
-                        campaign.SecondaryId = $"TEST{Guid.NewGuid().ToString().Substring(0, 8)}";
-
-                        await connection.ExecuteAsync(sql_campaign_insert, campaign, transaction: transaction);
-                    }
-
-                    // Send create messages to the service bus.
-                    await ServiceBusQueue.SendObjectMessage(campaignGroup, CrudAction.Create);
-                    await ServiceBusQueue.SendObjectMessages(campaignsToCreate, CrudAction.Create);
-
-                    transaction.Commit();
+                    var sql = $"SELECT * FROM public.campaign ORDER BY {columnString} {orderString} LIMIT 100";
+                    var result = await connection.QueryAsync<Campaign>(sql);
+                    return result;
                 }
-                catch (Exception)
-                {
-                    transaction.Rollback();
-                    throw;
-                }
+                catch (Exception e) { throw; }
             }
-
-        }
-
-        public Task<Guid> Create(Campaign entity)
-        {
-            throw new NotImplementedException();
         }
 
         /// <summary>
-        /// Delete a campaign out of the database.
+        /// Search the database based on query string. At the moment this only
+        /// targets the name and the branding text.
+        /// 
+        /// TODO Implement other kind of searching as well.
+        /// TODO Consider performance with UPPER strings
         /// </summary>
-        /// <param name="entity"> The campaign that should be deleted</param>
-        /// <returns></returns>
-        public async Task Delete(Campaign entity)
+        /// <param name="query">The search query</param>
+        /// <returns>Retrieved list of campaigns</returns>
+        async Task<IEnumerable<Campaign>> ICampaignRepository.Search(string query)
         {
-            using (IDbConnection connection = GetConnection)
+            try
             {
-                await connection.DeleteAsync(entity);
+                using (var connection = _databaseProvider.GetConnectionScope())
+                {
+                    var sql = $"SELECT * FROM campaign " +
+                        $"WHERE UPPER(name) LIKE UPPER('%{query}%') " +
+                        $"OR UPPER(branding_text) LIKE UPPER('%{query}%') " +
+                        $"LIMIT 100";
+                    var result = await connection.QueryAsync<Campaign>(sql);
+                    return result;
+                }
             }
+            catch (Exception e) { throw; }
         }
-
 
         /// <summary>
         /// Get a specific campaign out the database.
@@ -173,7 +87,7 @@ namespace Maximiz.Repositories
         /// <returns>one specific campaign in the database</returns>
         public async Task<Campaign> Get(Guid id)
         {
-            using (IDbConnection connection = GetConnection)
+            using (IDbConnection connection = _databaseProvider.GetConnectionScope())
             {
                 var result = await connection.QueryFirstOrDefaultAsync<Campaign>(@"
                     SELECT * FROM campaign WHERE id = @Id", new { Id = id });
@@ -181,61 +95,19 @@ namespace Maximiz.Repositories
             }
         }
 
-        /// <summary>
-        /// Get all the campaigns on the database
-        /// </summary>
-        /// <returns>All the campaigns in the database</returns>
-        public Task<IEnumerable<Campaign>> GetAll() => GetAll(CampaignModel.Budget, Order.DESC);
-
-        public async Task<IEnumerable<Campaign>> GetAll(CampaignModel query, Order order)
+        public Task<Guid> Create(Campaign entity)
         {
-            using (IDbConnection connection = GetConnection)
-            {
-                var queryString = query.GetEnumMemberName();
-                var orderString = order.GetEnumMemberName();
-                var sql = $"SELECT * FROM campaign ORDER BY {queryString} {orderString} LIMIT 100";
-                return await connection.QueryAsync<Campaign>(sql);
-            }
+            throw new NotImplementedException();
         }
 
-        /// <summary>
-        /// Search for a specific campaign in the database by name
-        /// name = the name of the campaign and branding text is the  brand of the campaign 
-        /// </summary>
-        /// <param name="query">The full or part of the name of the campaign</param>
-        /// <returns>Every campaign that matches with the query</returns>
-        public async Task<IEnumerable<Campaign>> Search(string query)
+        public Task Delete(Campaign entity)
         {
-            using (IDbConnection connection = GetConnection)
-            {
-                IEnumerable<Campaign> result =
-                    await connection.QueryAsync<Campaign>(
-                    $"SELECT * FROM campaign WHERE name LIKE '%{query}%' OR branding_text LIKE '%{query}%'");
-
-                return result;
-            }
+            throw new NotImplementedException();
         }
 
-        // TODO: Fix mapping for Dapper Contrib
-        /// <summary>
-        /// Update a campaign.
-        /// </summary>
-        /// <param name="entity"></param>
-        /// <returns></returns>
-        public async Task<Campaign> Update(Campaign entity)
+        public Task<Campaign> Update(Campaign entity)
         {
-            using (IDbConnection connection = GetConnection)
-            {
-                bool success = await connection.UpdateAsync(entity);
-
-                if (success)
-                {
-                    return entity;
-                }
-
-                //TODO: Update failed
-                return null;
-            }
+            throw new NotImplementedException();
         }
 
     }

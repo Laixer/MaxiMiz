@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Maximiz.Repositories.Interfaces
+namespace Maximiz.Repositories.Abstraction
 {
     public interface IAdItemRepository : IEntityRepository<AdItem, Guid>
     {

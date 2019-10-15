@@ -1,6 +1,6 @@
 ﻿using Dapper;
 using Maximiz.Model.Entity;
-using Maximiz.Repositories.Interfaces;
+using Maximiz.Repositories.Abstraction;
 using Microsoft.Extensions.Configuration;
 using Npgsql;
 using System;

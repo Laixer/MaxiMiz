@@ -2,7 +2,7 @@
 using Maximiz.InputModels;
 using Maximiz.Model;
 using Maximiz.Model.Entity;
-using Maximiz.Repositories.Interfaces;
+using Maximiz.Repositories.Abstraction;
 using Maximiz.ServiceBus;
 using Microsoft.Extensions.Configuration;
 using Npgsql;
@@ -56,7 +56,7 @@ namespace Maximiz.Repositories
             {
                 Name = adGroupInput.Name,
                 Description = adGroupInput.Description,
-                Url = adGroupInput.Url
+                //Url = adGroupInput.Url
             };
 
             // Generate ad items to insert beforehand. 
@@ -67,7 +67,7 @@ namespace Maximiz.Repositories
                     new AdItem
                     {
                         Title = adItemInput.Title,
-                        Url = adGroup.Url, // The URL is the same for all Ad Items.
+                        //Url = adGroup.Url, // The URL is the same for all Ad Items.
                         Content = adItemInput.Content
                     }
                 );
@@ -88,19 +88,19 @@ namespace Maximiz.Repositories
                     foreach (AdItem adItem in adItemsToCreate)
                     {
                         // Add the ID from the newly inserted Ad Group
-                        adItem.AdGroup = newAdGroupId;
+                        //adItem.AdGroup = newAdGroupId;
 
                         // Insert Ad Item into database table
                         await connection.ExecuteAsync(sql_ad_item_insert, adItem, transaction: transaction);
                     }
 
-                    adGroup.Id = newAdGroupId;
+                    //adGroup.Id = newAdGroupId;
 
                     //  Send create messages to the service bus.
-                    await ServiceBusQueue.SendObjectMessage(adGroup, CrudAction.Create);
-                    await ServiceBusQueue.SendObjectMessages(adItemsToCreate, CrudAction.Create);
+                    //await ServiceBusQueue.SendObjectMessage(adGroup, CrudAction.Create);
+                    //await ServiceBusQueue.SendObjectMessages(adItemsToCreate, CrudAction.Create);
 
-                    transaction.Commit();
+                    //transaction.Commit();
                 }
                 catch
                 {
