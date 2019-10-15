@@ -7,6 +7,23 @@
     <StartupObject>Maximiz.Program</StartupObject>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Compile Remove="Creation\**" />
+    <Content Remove="Creation\**" />
+    <EmbeddedResource Remove="Creation\**" />
+    <None Remove="Creation\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Remove="appsettings.development.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="appsettings.development.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 
   <ItemGroup>
     <PackageReference Include="Dapper" Version="1.60.6" />
@@ -15,11 +32,12 @@
     <PackageReference Include="Microsoft.AspNetCore.Razor.Design" Version="2.2.0" PrivateAssets="All" />
     <PackageReference Include="Microsoft.Azure.ServiceBus" Version="4.0.0" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.2.3" />
-    <PackageReference Include="Npgsql" Version="4.0.8" />
+    <PackageReference Include="Npgsql" Version="4.1.1" />
   </ItemGroup>
 
 
   <ItemGroup>
+    <ProjectReference Include="..\Laixer.Library\Laixer.Library.csproj" />
     <ProjectReference Include="..\Model\Maximiz.Model.csproj" />
   </ItemGroup>
 
