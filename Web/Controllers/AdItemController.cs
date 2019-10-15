@@ -1,4 +1,4 @@
-﻿using Maximiz.Repositories.Interfaces;
+﻿using Maximiz.Repositories.Abstraction;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 

@@ -1,6 +1,6 @@
 ﻿using Maximiz.InputModels;
 using Maximiz.Model.Entity;
-using Maximiz.Repositories.Interfaces;
+using Maximiz.Repositories.Abstraction;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Protocols;
