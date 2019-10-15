@@ -1,5 +1,5 @@
 ﻿@*
-    Details for a single campaign.
+    Displays the details for a single campaign.
 *@
 
 @using Maximiz.Model.Entity
@@ -22,10 +22,10 @@
             @Html.DisplayFor(model => model.SecondaryId)
         </dd>
         <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.CampaignGroup)
+            @Html.DisplayNameFor(model => model.CampaignGroupGuid)
         </dt>
         <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.CampaignGroup)
+            @Html.DisplayFor(model => model.CampaignGroupGuid)
         </dd>
         <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.Name)
@@ -52,10 +52,10 @@
             @Html.DisplayFor(model => model.Budget)
         </dd>
         <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.DailyBudget)
+            @Html.DisplayNameFor(model => model.BudgetDaily)
         </dt>
         <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.DailyBudget)
+            @Html.DisplayFor(model => model.BudgetDaily)
         </dd>
         <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.BudgetModel)

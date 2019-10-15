@@ -1,5 +1,5 @@
 ﻿@*
-    View that lists all the existing advertisements
+    View that lists all the existing ad items.
 *@
 
 @using Maximiz.Model.Entity
@@ -11,6 +11,7 @@
 
 <h1>All Advertisements</h1>
 
+<!-- TODO Doc this -->
 <div class="row">
     <div class="col-md-6"></div>
     <div class="col-md-6">
@@ -18,6 +19,7 @@
     </div>
 </div>
 
+<!-- Ad item property table -->
 <table class="table table-bordered">
     <tr>
         <th><input id="check_all" name="check_all" type="checkbox" /></th>
@@ -32,12 +34,14 @@
         <th>Cpc</th>
         <th>Impressions</th>
     </tr>
+
+    <!-- Displays the properties of each ad item in the viewmodel -->
     @foreach (Maximiz.Model.Entity.AdItem ad in Model)
     {
         <tr>
             <td><input type="checkbox" name="check_ad" id="@ad.Id" /></td>
             <td>N/A</td>
-            <td>@ad.AdGroup</td>
+            <td>@ad.AdGroupGuid</td>
             <td>@ad.Title</td>
             <td>@ad.Clicks</td>
             <td>@ad.Status.ToString()</td>

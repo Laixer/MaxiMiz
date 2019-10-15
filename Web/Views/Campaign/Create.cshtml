@@ -77,16 +77,21 @@
             <select asp-for="BudgetModel" asp-items="Html.GetEnumSelectList<BudgetModel>()" class="form-control"></select>
             <span asp-validation-for="BudgetModel" class="text-danger"></span>
         </div>
+
         <div class="form-group">
             <label asp-for="BidStrategy" class="control-label"></label>
             <select asp-for="BidStrategy" asp-items="Html.GetEnumSelectList<BidStrategy>()" class="form-control"></select>
             <span asp-validation-for="BidStrategy" class="text-danger"></span>
         </div>
-        <div class="form-group">
-            <label asp-for="Language" class="control-label"></label>
-            <select asp-for="Language" asp-items="Html.GetEnumSelectList<Language>()" class="form-control"></select>
-            <span asp-validation-for="Language" class="text-danger"></span>
-        </div>
+
+        <!--
+            <div class="form-group">
+                <label asp-for="Language" class="control-label"></label>
+                <select asp-for="Language" asp-items="Html.GetEnumSelectList<Lan>()" class="form-control"></select>
+                <span asp-validation-for="Language" class="text-danger"></span>
+            </div>
+        -->
+
         <div class="form-group">
             <label asp-for="BrandingText" class="control-label"></label>
             <input asp-for="BrandingText" class="form-control" />
@@ -169,24 +174,6 @@
             {
                 <span class="text-danger">
                     <span id="Os-error" class="">Please select 1 or more operating systems.</span>
-                </span>
-            }
-        </div>
-
-        @* Supported Connections *@
-        <div class="form-group row">
-            <label>@Html.DisplayNameFor(m => m.Connections)</label>
-            @foreach (Connection con in Enum.GetValues(typeof(Connection)))
-            {
-                <div class="col-sm-12">
-                    <input id="con_@con" type="checkbox" name="@Html.IdFor(m => m.Connections)" value="@con" @(Model != null && Model.Connections != null && Model.Connections.Contains(@con) ? "checked" : "") />
-                    <span>@con.ToString()</span>
-                </div>
-            }
-            @if (Model != null && Model.Connections == null)
-            {
-                <span class="text-danger">
-                    <span id="Connection-error" class="">Please select 1 or more connections.</span>
                 </span>
             }
         </div>
