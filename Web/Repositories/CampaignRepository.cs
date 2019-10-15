@@ -1,4 +1,4 @@
-﻿using Dapper;
+using Dapper;
 using Laixer.Library.Injection.Database;
 using Maximiz.Database;
 using Maximiz.Model.Entity;
@@ -6,6 +6,7 @@ using Maximiz.Repositories.Abstraction;
 using System;
 using System.Collections.Generic;
 using System.Data;
+
 using System.Threading.Tasks;
 
 namespace Maximiz.Repositories
@@ -109,6 +110,6 @@ namespace Maximiz.Repositories
         {
             throw new NotImplementedException();
         }
-
+        
     }
 }

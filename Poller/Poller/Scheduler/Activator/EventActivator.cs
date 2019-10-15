@@ -15,6 +15,12 @@ namespace Poller.Scheduler.Activator
     {
         private readonly IQueueClient queueClient;
 
+        /// <summary>
+        /// This subscribes the event activator to the specified service bus.
+        /// </summary>
+        /// <param name="serviceProvider">The service bus provider</param>
+        /// <param name="operation">The operation delegate</param>
+        /// <param name="queueName">The name of the queue (not the connection string)</param>
         public EventActivator(IServiceProvider serviceProvider, IOperationDelegate operation, string queueName)
             : base(serviceProvider, operation)
         {

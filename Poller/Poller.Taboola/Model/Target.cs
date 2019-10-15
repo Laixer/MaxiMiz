@@ -34,6 +34,7 @@ namespace Poller.Taboola.Model
     /// <summary>
     /// Base abstraction with unconverted Json object.
     /// </summary>
+    [DataContract]
     internal class TargetBase : ITarget
     {
         /// <summary>
@@ -44,18 +45,18 @@ namespace Poller.Taboola.Model
         public TargetType? Type { get; set; }
 
         /// <summary>
-        /// Object which is to be converted.
-        /// </summary>
-        [DataMember(Name = "value")]
-        public object Value { get; set; }
-
-        /// <summary>
         /// If the value list is too long, this link
         /// contains an API call to retrieve all our
         /// values.
         /// </summary>
         [DataMember(Name = "href")]
         public string Href { get; set; }
+
+        /// <summary>
+        /// Object which is to be converted.
+        /// </summary>
+        [DataMember(Name = "value")]
+        public object Value { get; set; }
     }
 
 
@@ -64,6 +65,7 @@ namespace Poller.Taboola.Model
     /// Externds the target base. This is our most 
     /// common result.
     /// </summary>
+    [DataContract]
     internal class TargetDefault : TargetBase
     {
         /// <summary>
@@ -95,6 +97,7 @@ namespace Poller.Taboola.Model
     /// Extends the target base. This only occurs
     /// when we target specific iOS families.
     /// </summary>
+    [DataContract]
     internal class TargetOsFamily : TargetBase
     {
         /// <summary>

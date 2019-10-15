@@ -4,8 +4,14 @@ using Maximiz.Model.Entity;
 
 namespace Poller.Poller
 {
+
+    /// <summary>
+    /// Contains the type of operation a poller should execute with regards 
+    /// to modifying entities in external APIs.
+    /// </summary>
     public class CreateOrUpdateObjectsContext : PollerContext
     {
+
         /// <summary>
         /// Action on entity.
         /// </summary>
@@ -26,5 +32,7 @@ namespace Poller.Poller
             : base(runCount, lastRun, progressCallback)
         {
         }
+
     }
+
 }

@@ -26,7 +26,8 @@ namespace Poller.EventBus
         /// <summary>
         /// Create a new queue instance.
         /// </summary>
+        /// <param name="queueName">The name (not connection string) of the queue</param>
         /// <returns><see cref="IQueueClient"/> instance.</returns>
-        public IQueueClient QueueClient(string queue) => new QueueClient(connectionString, queue);
+        public IQueueClient QueueClient(string queueName) => new QueueClient(connectionString, queueName);
     }
 }

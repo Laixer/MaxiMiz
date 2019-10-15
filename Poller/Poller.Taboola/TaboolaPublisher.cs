@@ -25,17 +25,15 @@ namespace Poller.Taboola
         private readonly TaboolaPollerOptions _options;
 
         /// <summary>
-        /// Creates a TaboolaPoller for fetching Data from Taboola.
+        /// Constructor with dependency injection.
         /// </summary>
         /// <param name="logger">A logger for this poller.</param>
         /// <param name="options">An instance of options required for requests.</param>
-        /// <param name="connection">The database connections to use for inserting fetched data.</param>
-        public TaboolaPublisher(
-            ILoggerFactory logger,
-            IOptions<TaboolaPollerOptions> options,
-            DbProvider provider,
-            IMemoryCache cache,
-            ActivatorFactory activatorFactory)
+        /// <param name="provider">The database provider to use for inserting fetched data.</param>
+        /// <param name="cache">The cache</param>
+        /// <param name="activatorFactory">The activator factory</param>
+        public TaboolaPublisher(ILoggerFactory logger, IOptions<TaboolaPollerOptions> options,
+            DbProvider provider, IMemoryCache cache, ActivatorFactory activatorFactory)
         {
             _poller = new TaboolaPoller(logger, options?.Value, provider, cache);
             _activatorFactory = activatorFactory;

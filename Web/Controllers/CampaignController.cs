@@ -1,4 +1,4 @@
-﻿using Maximiz.Database;
+using Maximiz.Database;
 using Maximiz.InputModels;
 using Maximiz.Model.Entity;
 using Maximiz.Model.Enums;
@@ -205,6 +205,5 @@ namespace Maximiz.Controllers
             return NotFound();
             _campaignRepository.Delete(campaign);
         }
-
     }
 }

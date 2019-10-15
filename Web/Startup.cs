@@ -1,4 +1,4 @@
-﻿using Maximiz.ServiceBus;
+using Maximiz.ServiceBus;
 using Maximiz.Repositories;
 using Maximiz.Repositories.Abstraction;
 using Microsoft.AspNetCore.Builder;

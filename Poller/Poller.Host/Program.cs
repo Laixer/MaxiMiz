@@ -29,7 +29,6 @@ namespace Poller.Host
                 .ConfigureAppConfiguration((hostContext, configApp) =>
                 {
                     hostContext.HostingEnvironment.ApplicationName = "Poller.Host";
-
                     configApp.AddJsonFile($"appsettings.{hostContext.HostingEnvironment.EnvironmentName}.json", optional: true);
                 })
                 .ConfigureServices((hostContext, services) =>
