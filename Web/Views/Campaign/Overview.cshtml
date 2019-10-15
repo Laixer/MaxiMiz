@@ -1,0 +1,87 @@
+﻿@*
+    Displays an overview of all campaigns in our viewmodel.
+*@
+
+@using Maximiz.Model.Enums
+@using Maximiz.Model.Entity
+@using Maximiz.Database
+
+@model OverviewCampaignModel
+@{
+    ViewData["Title"] = "Campaigns";
+}
+
+<body>
+    <h1>All Campaigns</h1>
+
+    <!-- Search textbox and button -->
+    <!-- TODO Clean up -->
+    <div>
+        <form method="get">
+            <input asp-for="Query" />
+            <input asp-controller="Campaign" asp-action="Search" type="submit" />
+        </form>
+    </div>
+
+    <!-- Displays a table with campaign properties -->
+    <!-- TODO Make these buttons programmatically -->
+    <table class="table table-bordered">
+        <tr>
+            <th><input id="check_all" name="check_all" type="checkbox" /></th>
+            <th>
+                <
+                Name
+                <form>
+                    <button asp-action="OverviewSorted" asp-route-column="@ColumnCampaign.Name" asp-route-order="@Order.Descending" type="submit">\/</button>
+                </form>
+                <form>
+                    <button asp-action="OverviewSorted" asp-route-column="@ColumnCampaign.Name" asp-route-order="@Order.Ascending" type="submit">/\</button>
+                </form>
+            </th>
+            <th>CPC</th>
+            <th>Device</th>
+            <th>OS</th>
+            <th>Status</th>
+            <th>Budget</th>
+            <th>Spent</th>
+            <th>Start Date</th>
+            <th>End Date</th>
+            <th>CTR</th>
+            <th>PVPS</th>
+            <th>Clicks</th>
+            <th>Revenue</th>
+            <th>ROI</th>
+            <th>Taboola</th>
+            <th>Adsense</th>
+            <th>Profit</th>
+            <th>Actions</th>
+        </tr>
+
+        <!-- Displays the properties of each campaign in the viewmodel -->
+        @foreach (Maximiz.Model.Entity.Campaign campaign in Model.Campaigns)
+        {
+            <tr>
+                <td><input type="checkbox" name="check_campaign" id="@campaign.Id" /></td>
+                <td>@Html.ActionLink(@campaign.Name, "Details", "Campaign", new { id = campaign.Id })</td>
+                <td>@campaign.InitialCpc</td>
+                <td>@campaign.Devices.FirstOrDefault()</td>
+                <td>@campaign.OperatingSystems.FirstOrDefault()</td>
+                <td>@campaign.Status</td>
+                <td>@campaign.Budget</td>
+                <td>@campaign.Spent</td>
+                <td>@campaign.StartDate</td>
+                <td>@campaign.EndDate</td>
+                <td>?</td>
+                <td>?</td>
+                <td>?</td>
+                <td>?</td>
+                <td>?</td>
+                <td>?</td>
+                <td>?</td>
+                <td>?</td>
+                <td>...</td>
+            </tr>
+        }
+    </table>
+
+</body>

@@ -1,0 +1,14 @@
+﻿@*
+   Page for a new Ad Group.
+*@
+
+@using Maximiz.InputModels
+@model AdGroupInputModel
+
+@{
+    ViewData["Title"] = "New Ad Group";
+}
+
+<h1>New Ad Group</h1>
+
+<partial name="AdGroupForm" model="@Model" />

@@ -1,0 +1,189 @@
+﻿@*
+    Form for creating a new Campaign Group.
+*@
+
+@using Maximiz.Model.Enums
+@using Maximiz.InputModels
+@model CampaignGroupInputModel
+
+@{
+    ViewData["Title"] = "New";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/stepwizard.css" />
+
+    <style>
+        label {
+            font-weight: bold;
+        }
+    </style>
+}
+
+<h1>New Campaign Group</h1>
+
+<br />
+<br />
+<br />
+
+<div class="container">
+    <!--Step navigation buttons-->
+    <div class="stepwizard">
+        <div class="stepwizard-row row setup-panel">
+            <div class="stepwizard-step col-md-2">
+                <a href="#step-1" type="button" class="btn btn-primary btn-circle"></a>
+                <p><small>Account</small></p>
+            </div>
+            <div class="stepwizard-step col-md-2">
+                <a href="#step-2" type="button" class="btn btn-default btn-circle" disabled="disabled"></a>
+                <p><small>Marketing</small></p>
+            </div>
+            <div class="stepwizard-step col-md-2">
+                <a href="#step-3" type="button" class="btn btn-default btn-circle" disabled="disabled"></a>
+                <p><small>Targeting</small></p>
+            </div>
+            <div class="stepwizard-step col-md-2">
+                <a href="#step-4" type="button" class="btn btn-default btn-circle" disabled="disabled"></a>
+                <p><small>Schedule</small></p>
+            </div>
+            <div class="stepwizard-step col-md-4">
+                <a href="#step-5" type="button" class="btn btn-default btn-circle" disabled="disabled"></a>
+                <p><small>Summary</small></p>
+            </div>
+        </div>
+    </div>
+
+    <form asp-controller="Campaign" asp-action="Create" method="post" role="form">
+        <div class="form-group">
+            <label class="control-label text-warning">Campaign</label>
+            <div class="row">
+                <img style="padding:8px; width:128px; height:48px;" src="https://www.taboola.com/sites/all/themes/taboola2017/images/taboola/logo-blue.png" />
+                <img style="padding:8px;  width:96px; border-radius:50%" src="data:image/jpeg;base64,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" />
+                <img style="padding:8px;  width:128px; height:48px;" src="https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png" />
+            </div>
+        </div>
+        <div class="form-group">
+            <label asp-for="Name" class="control-label"></label>
+            <input asp-for="Name" class="form-control" />
+            <span asp-validation-for="Name" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="Budget" class="control-label"></label>
+            <input asp-for="Budget" class="form-control" />
+            <span asp-validation-for="Budget" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="BudgetModel" class="control-label"></label>
+            <select asp-for="BudgetModel" asp-items="Html.GetEnumSelectList<BudgetModel>()" class="form-control"></select>
+            <span asp-validation-for="BudgetModel" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="BidStrategy" class="control-label"></label>
+            <select asp-for="BidStrategy" asp-items="Html.GetEnumSelectList<BidStrategy>()" class="form-control"></select>
+            <span asp-validation-for="BidStrategy" class="text-danger"></span>
+        </div>
+
+        <!--
+            <div class="form-group">
+                <label asp-for="Language" class="control-label"></label>
+                <select asp-for="Language" asp-items="Html.GetEnumSelectList<Lan>()" class="form-control"></select>
+                <span asp-validation-for="Language" class="text-danger"></span>
+            </div>
+        -->
+
+        <div class="form-group">
+            <label asp-for="BrandingText" class="control-label"></label>
+            <input asp-for="BrandingText" class="form-control" />
+            <span asp-validation-for="BrandingText" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="Utm" class="control-label"></label>
+            <input asp-for="Utm" class="form-control" />
+            <span asp-validation-for="Utm" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="Delivery" class="control-label"></label>
+            <select asp-for="Delivery" asp-items="Html.GetEnumSelectList<Delivery>()" class="form-control"></select>
+            <span asp-validation-for="Delivery" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="InitialCpc" class="control-label"></label>
+            <input asp-for="InitialCpc" class="form-control" />
+            <span asp-validation-for="InitialCpc" class="text-danger"></span>
+        </div>
+
+        @* Geo-Location *@
+        <div class="form-group row">
+            <label>@Html.DisplayNameFor(m => m.LocationInclude)</label>
+            <div class="col-sm-12">
+                <input id="location_0" type="checkbox" name="@Html.IdFor(m => m.LocationInclude)" value="0" checked disabled />
+                @* The disabled checkbox will be ignored and the one below this comment will not be shown but posted (temporary)  *@
+                <input id="location_0_temp" type="hidden" name="@Html.IdFor(m => m.LocationInclude)" value="0" />
+                <span>United States - Country</span>
+            </div>
+            <div class="col-sm-12">
+                <input id="location_1" type="checkbox" name="@Html.IdFor(m => m.LocationInclude)" value="1" checked disabled />
+                @* The disabled checkbox will be ignored and the one below this comment will not be shown but posted (temporary)  *@
+                <input id="location_1_temp" type="hidden" name="@Html.IdFor(m => m.LocationInclude)" value="1" />
+                <span>Netherlands - Country</span>
+            </div>
+        </div>
+
+        @* Targeted Devices *@
+        <div class="form-group row">
+            <label>@Html.DisplayNameFor(m => m.Devices)</label>
+            @foreach (Device device in Enum.GetValues(typeof(Device)))
+            {
+                <div class="col-sm-12">
+                    <input id="device_@device" type="checkbox" name="@Html.IdFor(m => m.Devices)" value="@device" @(Model != null && Model.Devices != null && Model.Devices.Contains(@device) ? "checked" : "") />
+                    <span>@device</span>
+                </div>
+            }
+            @if (Model != null && Model.Devices == null)
+            {
+                <span class="text-danger">
+                    <span id="Device-error" class="">Please select 1 or more devices.</span>
+                </span>
+            }
+        </div>
+
+        @* Start and End Date *@
+        <div class="form-group">
+            <label asp-for="StartDate" class="control-label"></label>
+            <input asp-for="StartDate" placeholder="Immediately" class="form-control" />
+            <span asp-validation-for="StartDate" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="EndDate" class="control-label"></label>
+            <input asp-for="EndDate" class="form-control" />
+            <span asp-validation-for="EndDate" class="text-danger"></span>
+        </div>
+
+        @* Targeted Operating Systems *@
+        <div class="form-group row">
+            <label>@Html.DisplayNameFor(m => m.OperatingSystems)</label>
+            @foreach (OS os in Enum.GetValues(typeof(OS)))
+            {
+                <div class="col-sm-12">
+                    <input id="os_@os" type="checkbox" name="@Html.IdFor(m => m.OperatingSystems)" value="@os" @(Model != null && Model.OperatingSystems != null && Model.OperatingSystems.Contains(@os) ? "checked" : "") />
+                    <span>@os.ToString()</span>
+                </div>
+            }
+            @if (Model != null && Model.OperatingSystems == null)
+            {
+                <span class="text-danger">
+                    <span id="Os-error" class="">Please select 1 or more operating systems.</span>
+                </span>
+            }
+        </div>
+
+        <a class="btn btn-outline-primary pull-left" href="../">Back</a>
+        <button class="btn btn-primary pull-right" type="submit">Create</button>
+    </form>
+</div>
+
+@section Scripts {
+    <script src="~/lib/jquery-validation/dist/jquery.validate.js"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.js"></script>
+}
