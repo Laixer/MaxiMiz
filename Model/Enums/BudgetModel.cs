@@ -6,14 +6,23 @@ namespace Maximiz.Model.Enums
 {
 
     /// <summary>
-    /// Model enum to represent the budget model of a campaign.
+    /// Model enum to represent our budget model.
     /// </summary>
     [JsonConverter(typeof(StringEnumConverter))]
     public enum BudgetModel
     {
+
+        /// <summary>
+        /// 
+        /// </summary>
         [EnumMember(Value = "campaign")]
         Campaign,
+
+        /// <summary>
+        /// 
+        /// </summary>
         [EnumMember(Value = "monthly")]
         Monthly
+
     }
 }

@@ -6,15 +6,17 @@ namespace Maximiz.Model.Enums
 {
 
     /// <summary>
-    /// Model enum to represent a connection.
+    /// Model enum to represent a connection type.
     /// </summary>
     [JsonConverter(typeof(StringEnumConverter))]
-    public enum Connection
+    public enum ConnectionType
     {
         [EnumMember(Value = "cable")]
         Cable,
+
         [EnumMember(Value = "wifi")]
         Wifi,
+
         [EnumMember(Value = "cellular")]
         Cellular
     }

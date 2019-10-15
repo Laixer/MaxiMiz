@@ -4,15 +4,33 @@ using System;
 namespace Maximiz.Model.Entity
 {
     /// <summary>
-    /// Campaign Group.
+    /// Represents a campaign group.
+    /// TODO Make campaign inherit from this?
     /// </summary>
     [Serializable]
-    public class CampaignGroup : EntityAudit<int>
-    {
+    public class CampaignGroup : EntityAudit<Guid>
+    { 
         /// <summary>
         /// Campaign name.
         /// </summary>
         public string Name { get; set; }
+
+        /// <summary>
+        /// Reference to the publisher.
+        /// </summary>
+        public Publisher Publisher { get; set; }
+
+        /// <summary>
+        /// Indicates the status of any changes made in our own database. These
+        /// changes have to be pushed to the corresponding external API.
+        /// </summary>
+        public ApprovalState ApprovalState { get; set; }
+
+        /// <summary>
+        /// Delivery mode of this ad.
+        /// </summary>
+        public Delivery Delivery { get; set; }
+        public string DeliveryText { get => Delivery.GetEnumMemberName(); }
 
         /// <summary>
         /// Campaign branding text.
@@ -30,22 +48,6 @@ namespace Maximiz.Model.Entity
         public int[] LocationExclude { get; set; }
 
         /// <summary>
-        /// Language of the campaign, 2 chars.
-        /// TODO Why do we need this?
-        /// </summary>
-        public string Language { get; set; }
-
-        /// <summary>
-        /// Targeted devices.
-        /// </summary>
-        public Device[] Device { get; set; }
-
-        /// <summary>
-        /// Targeted operating systems.
-        /// </summary>
-        public OS[] Os { get; set; }
-
-        /// <summary>
         /// The initial CPC per item.
         /// </summary>
         public decimal InitialCpc { get; set; }
@@ -58,25 +60,12 @@ namespace Maximiz.Model.Entity
         /// <summary>
         /// Budget per day. Can be null.
         /// </summary>
-        public decimal? DailyBudget { get; set; }
+        public decimal? BudgetDaily { get; set; }
 
         /// <summary>
-        /// Budget Model.
+        /// Budget spent.
         /// </summary>
-        public BudgetModel BudgetModel { get; set; }
-        public string BudgetModelText => BudgetModel.GetEnumMemberName();
-
-        /// <summary>
-        /// Delivery mode of this ad.
-        /// </summary>
-        public Delivery Delivery { get; set; }
-        public string DeliveryText { get => Delivery.GetEnumMemberName(); }
-
-        /// <summary>
-        /// Bid strategy.
-        /// </summary>
-        public BidStrategy BidStrategy { get; set; }
-        public string BidStrategyText => BidStrategy.GetEnumMemberName();
+        public decimal? Spent { get; set; }
 
         /// <summary>
         /// Campaign start date.
@@ -88,31 +77,6 @@ namespace Maximiz.Model.Entity
         /// </summary>
         public DateTime? EndDate { get; set; }
 
-        /// <summary>
-        /// The current status of the Campaign Group.
-        /// </summary>
-        public Status Status { get; set; }
-        public string StatusText => Status.GetEnumMemberName();
-
-        /// <summary>
-        /// Tracking code.
-        /// </summary>
-        public string Utm { get; set; }
-
-        /// <summary>
-        /// Note.
-        /// </summary>
-        public string Note { get; set; }
-
-        /// <summary>
-        /// Connections.
-        /// </summary>
-        public Connection[] Connection { get; set; }
-
-        /// <summary>
-        /// Represents the state of approval within our system.
-        /// </summary>
-        public ApprovalState ApprovalState { get; set; }
-        public string ApprovalStateText => ApprovalState.GetEnumMemberName();
     }
+
 }

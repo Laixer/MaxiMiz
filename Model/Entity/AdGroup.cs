@@ -1,5 +1,5 @@
-﻿using Maximiz.Model.Enums;
-using System;
+﻿using System;
+using Maximiz.Model.Enums;
 
 namespace Maximiz.Model.Entity
 {
@@ -7,7 +7,7 @@ namespace Maximiz.Model.Entity
     /// Group of advertisement items.
     /// </summary>
     [Serializable]
-    public class AdGroup : EntityAudit<int>
+    public class AdGroup : EntityAudit<Guid>
     {
         /// <summary>
         /// Group name.
@@ -15,19 +15,19 @@ namespace Maximiz.Model.Entity
         public string Name { get; set; }
 
         /// <summary>
-        /// URL for all items in the group.
-        /// </summary>
-        public string Url { get; set; }
-
-        /// <summary>
-        /// Description for all items in the group.
+        /// User description to describe this ad group.
         /// </summary>
         public string Description { get; set; }
 
         /// <summary>
-        /// The current status of the group.
+        /// Array of image links.
         /// </summary>
-        public Status Status { get; set; }
-        public string StatusText => Status.GetEnumMemberName();
+        public string[] ImageLinks { get; set; }
+
+        /// <summary>
+        /// Array of titles.
+        /// </summary>
+        public string[] Titles { get; set; }
+
     }
 }
