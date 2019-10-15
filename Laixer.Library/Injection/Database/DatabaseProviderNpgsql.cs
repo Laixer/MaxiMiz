@@ -24,30 +24,25 @@ namespace Laixer.Library.Injection.Database
         /// <summary>
         /// Contains our connection string.
         /// </summary>
-        private readonly string _connectionString;
+        private readonly string connectionString;
 
         /// <summary>
         /// Constructor to setup our database provider configuration through DI.
         /// </summary>
-        /// <param name="configuration">The configuration file</param>
-        /// <param name="connectionStringName">The name of the connection string</param>
+        /// <param name="configuration"><see cref="IConfiguration"/>.</param>
+        /// <param name="options">Injected options file</param>
         public DatabaseProviderNpgsql(IConfiguration configuration, IOptionsMonitor<DatabaseProviderOptions> options)
         {
             _options = options.CurrentValue;
-            _connectionString = configuration.GetConnectionString(_options.ConnectionStringName);
-
-            // Throw if we can't connect to the database for quick debug
-            if (_connectionString == null)
-            {
-                throw new ConfigurationException("Missing database connection string");
-            }
+            connectionString = configuration.GetConnectionString(_options.ConnectionStringName)
+                ?? throw new ConfigurationException("Missing database connection string");
         }
 
         /// <summary>
         /// Creates a new connection to the database.
         /// </summary>
         /// <returns>The new connection</returns>
-        public IDbConnection GetConnectionScope() => new NpgsqlConnection(_connectionString);
+        public IDbConnection GetConnectionScope() => new NpgsqlConnection(connectionString);
 
     }
 }
