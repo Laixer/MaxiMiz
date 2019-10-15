@@ -265,3 +265,4 @@ __pycache__/
 **/launchSettings.json
 Poller/Poller.Test/testconfig.json
 Poller/Poller.FunctionHost/local.settings.json
+Web/appsettings.json
