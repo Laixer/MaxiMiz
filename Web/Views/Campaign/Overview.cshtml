@@ -18,7 +18,7 @@
     <!-- TODO Clean up -->
     <div>
         <form method="get">
-            <input asp-for="Query" />
+            <input asp-for="Query"/>
             <input asp-controller="Campaign" asp-action="Search" type="submit" />
         </form>
     </div>
@@ -29,12 +29,9 @@
         <tr>
             <th><input id="check_all" name="check_all" type="checkbox" /></th>
             <th>
-                <
-                Name
-                <form>
+                <form> <!-- TODO ASP FORM -->
+                    Name
                     <button asp-action="OverviewSorted" asp-route-column="@ColumnCampaign.Name" asp-route-order="@Order.Descending" type="submit">\/</button>
-                </form>
-                <form>
                     <button asp-action="OverviewSorted" asp-route-column="@ColumnCampaign.Name" asp-route-order="@Order.Ascending" type="submit">/\</button>
                 </form>
             </th>

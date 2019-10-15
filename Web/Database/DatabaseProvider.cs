@@ -14,6 +14,7 @@ namespace Maximiz.Database
     /// </summary>
     public class DatabaseProvider : DatabaseProviderNpgsql
     {
+        /// <summary>
         /// Gets called once to ensure proper enum mapping.
         /// </summary>
         static DatabaseProvider()

@@ -6,6 +6,7 @@ namespace Maximiz.Models
 
     /// <summary>
     /// A viewmodel used with the campaign overview.
+    /// TODO Moet viewmodel worden
     /// </summary>
     public class OverviewCampaignModel
     {

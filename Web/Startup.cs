@@ -73,13 +73,15 @@ namespace Maximiz
         /// <param name="env">The hosting environment</param>
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
-            if (env.IsDevelopment()) {
+            if (env.IsDevelopment())
+            {
                 app.UseDeveloperExceptionPage();
             }
-            else {
+            else
+            {
                 app.UseExceptionHandler("/Home/Error");
                 app.UseHsts();
-            }
+            }            
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();

@@ -9,7 +9,6 @@ namespace Maximiz
     /// </summary>
     public class Program
     {
-
         /// <summary>
         /// Application main entry point.
         /// </summary>
@@ -23,7 +22,8 @@ namespace Maximiz
         /// <param name="args">The command line arguments</param>
         /// <returns>A web host builder</returns>
         public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
-            WebHost.CreateDefaultBuilder(args).UseStartup<Startup>();
+            WebHost.CreateDefaultBuilder(args)
+            .UseStartup<Startup>();
 
     }
 }
