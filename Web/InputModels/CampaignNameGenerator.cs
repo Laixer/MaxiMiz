@@ -2,7 +2,7 @@
 using Maximiz.Model.Enums;
 using System.Text;
 
-namespace Maximiz.InputModels.Campaigns
+namespace Maximiz.InputModels
 {
     /// <summary>
     /// Name generator for the <see cref="Campaign"></see> class.

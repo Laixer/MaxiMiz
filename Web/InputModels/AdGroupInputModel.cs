@@ -1,15 +1,15 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using Maximiz.Model.Entity;
-using Microsoft.AspNetCore.Http;
 
 namespace Maximiz.InputModels
 {
     /// <summary>
-    /// A model containing the user based input for a single <see cref="AdGroup"></see> entity.
+    /// A model containing the user based input for a single <see cref="AdGroup"/>.
     /// </summary>
     public class AdGroupInputModel
     {
+
         /// <summary>
         /// Group name.
         /// </summary>
@@ -36,6 +36,11 @@ namespace Maximiz.InputModels
         /// </summary>
         public List<AdItemInputModel> AdItems { get; set; }
 
-        public string ImagePath{ get; set; }
+        /// <summary>
+        /// The link to the image.
+        /// TODO Is this correct?
+        /// </summary>
+        public string ImagePath { get; set; }
+
     }
 }

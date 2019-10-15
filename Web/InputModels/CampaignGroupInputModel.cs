@@ -125,35 +125,7 @@ namespace Maximiz.InputModels
         /// <summary>
         /// Supported connections.
         /// </summary>
-        public Connection[] Connections { get; set; }
+        //public Connection[] Connections { get; set; }
 
-        /// <summary>
-        /// Returns a new <see cref="CampaignGroup"></see> model from an existing <see cref="CampaignGroupInputModel"></see> instance.
-        /// </summary>
-        /// <returns></returns>
-        public CampaignGroup ToEntityModel()
-        {
-            return new CampaignGroup
-            {
-                Name = Name,
-                BrandingText = BrandingText,
-                LocationInclude = LocationInclude,
-                LocationExclude = LocationExclude,
-                Language = Language,
-                Device = Devices,
-                Os = OperatingSystems,
-                InitialCpc = InitialCpc,
-                Budget = Budget,
-                DailyBudget = DailyBudget,
-                BudgetModel = BudgetModel,
-                Delivery = Delivery,
-                BidStrategy = BidStrategy,
-                StartDate = StartDate,
-                EndDate = EndDate,
-                Status = Status.Unknown,
-                Utm = Utm,
-                Connection = Connections
-            };
-        }
     }
 }
