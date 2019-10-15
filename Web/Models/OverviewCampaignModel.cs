@@ -1,14 +1,11 @@
 ﻿using Maximiz.Model.Entity;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Maximiz.Models
 {
 
     /// <summary>
-    /// A Model for overview view from campaign
+    /// A viewmodel used with the campaign overview.
     /// </summary>
     public class OverviewCampaignModel
     {
@@ -19,7 +16,7 @@ namespace Maximiz.Models
         public IEnumerable<Campaign> Campaigns { get; set; }
 
         /// <summary>
-        /// Query input.
+        /// Query input string.
         /// </summary>
         public string Query { get; set; }
 
