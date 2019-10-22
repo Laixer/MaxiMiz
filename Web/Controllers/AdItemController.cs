@@ -7,7 +7,7 @@ namespace Maximiz.Controllers
     /// <summary>
     /// Controller for requests related to Ad Items.
     /// </summary>
-    public class AdItemController : Controller
+    internal class AdItemController : Controller
     {
         private readonly IAdItemRepository _adItemRepo;
 
@@ -34,8 +34,8 @@ namespace Maximiz.Controllers
         [Route("Advertisements")]
         public async Task<IActionResult> Overview()
         {
-            var ads = await _adItemRepo.GetAds();
-            return View(ads);
+            //var ads = await _adItemRepo.GetAds();
+            return View();
         }
 
     }

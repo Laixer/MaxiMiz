@@ -1,21 +1,16 @@
-﻿using Maximiz.InputModels;
-using Maximiz.Model.Entity;
-using System.Threading.Tasks;
+﻿using Maximiz.Model.Entity;
 
 namespace Maximiz.Repositories.Abstraction
-{ 
+{
 
     /// <summary>
-    /// Abstraction for an <see cref="AdGroup"/> repository.
+    /// Interface for a <see cref="AdGroupWithStats"/> repository, which is only 
+    /// responsible for performing read operations.
+    /// TODO Add methods.
     /// </summary>
-    public interface IAdGroupRepository : IEntityRepository<AdGroup, int>
+    public interface IAdGroupRepository : IRepository<AdGroupWithStats>
     {
 
-        /// <summary>
-        /// Create a new <see cref="AdGroup"/> with <see cref="AdItem"/>s.
-        /// </summary>
-        /// <param name="adGroupInputModel">The model containing the input for the ad group.</param>
-        Task CreateGroup(AdGroupInputModel adGroupInputModel);
 
     }
 }

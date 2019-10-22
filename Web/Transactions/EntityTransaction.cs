@@ -1,4 +1,5 @@
-﻿using Maximiz.Model.Entity;
+﻿using Maximiz.Model;
+using Maximiz.Model.Entity;
 using System.Collections.Generic;
 
 namespace Maximiz.Transactions
@@ -6,15 +7,19 @@ namespace Maximiz.Transactions
 
     /// <summary>
     /// Holds information over one single entity transaction.
-    /// TODO How to manage account?
     /// </summary>
     public class EntityTransaction
     {
 
         /// <summary>
-        /// List of all entities to CRUD.
+        /// Stores key-value pairs of each entity with its corresponding account.
         /// </summary>
-        public IEnumerable<Entity> AllEntities { get; set; }
+        public IEnumerable<KeyValuePair<Entity, Account>> EntitiesWithAccounts { get; set; }
+
+        /// <summary>
+        /// Represents the type of transaction.
+        /// </summary>
+        public CrudAction CrudAction { get; set; }
 
         /// <summary>
         /// True if completed successfully.
@@ -24,11 +29,29 @@ namespace Maximiz.Transactions
         /// <summary>
         /// Constructor.
         /// </summary>
-        /// <param name="allEntities">All entities to CRUD</param>
-        public EntityTransaction(IEnumerable<Entity> allEntities)
+        /// <param name="entitiesWithAccounts">Contains key value pairs where 
+        /// each entity also has a reference to the corresponding account.</param>
+        /// <param name="crudAction">The type of transaction</param>
+        public EntityTransaction(IEnumerable<KeyValuePair<Entity, Account>> entitiesWithAccounts,
+            CrudAction crudAction)
         {
-            AllEntities = allEntities;
+            CrudAction = crudAction;
+            EntitiesWithAccounts = entitiesWithAccounts;
             completed = false;
+        }
+
+        /// <summary>
+        /// Returns a list of all entities.
+        /// </summary>
+        /// <returns>All present entities.</returns>
+        public IEnumerable<Entity> GetAllEntities()
+        {
+            var result = new List<Entity>();
+            foreach (var pair in EntitiesWithAccounts)
+            {
+                result.Add(pair.Key);
+            }
+            return result;
         }
 
         /// <summary>
