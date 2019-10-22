@@ -20,17 +20,20 @@
 
 
   <ItemGroup>
-    <PackageReference Include="Dapper" Version="1.60.6" />
+    <PackageReference Include="AutoMapper" Version="9.0.0" />
+    <PackageReference Include="Dapper" Version="2.0.30" />
     <PackageReference Include="Microsoft.AspNetCore.App" />
     <PackageReference Include="Microsoft.AspNetCore.Razor.Design" Version="2.2.0" PrivateAssets="All" />
     <PackageReference Include="Microsoft.Azure.ServiceBus" Version="4.0.0" />
-    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.2.3" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.2.4" />
     <PackageReference Include="Npgsql" Version="4.1.1" />
   </ItemGroup>
 
 
   <ItemGroup>
     <ProjectReference Include="..\Laixer.Library\Laixer.Library.csproj" />
+    <ProjectReference Include="..\Maximiz.Database\Maximiz.Database.csproj" />
+    <ProjectReference Include="..\Maximiz.Helper\Maximiz.Helper.csproj" />
     <ProjectReference Include="..\Model\Maximiz.Model.csproj" />
   </ItemGroup>
 
