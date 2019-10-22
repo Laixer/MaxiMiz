@@ -1,35 +1,38 @@
-﻿using Dapper;
+using Dapper;
+using Laixer.Library.Injection.Database;
 using Maximiz.Database;
+using Maximiz.Database.Querying;
 using Maximiz.Model.Entity;
 using Maximiz.Repositories.Abstraction;
-using Microsoft.Extensions.Configuration;
-using Npgsql;
 using System;
 using System.Collections.Generic;
 using System.Data;
+
 using System.Threading.Tasks;
 
 namespace Maximiz.Repositories
 {
+
     /// <summary>
-    ///  Repository layer for operations related to <see cref="AdItem"></see> data.
+    /// Repository layer for operations related to <see cref="Campaign"/> data.
+    /// TODO Fix ugly interface implementation
     /// </summary>
-    internal class AdItemRepository : RepositoryBase, IAdItemRepository
+    internal class CampaignGroupRepository : RepositoryBase, ICampaignGroupRepository
     {
 
         /// <summary>
         /// Constructor for dependency injection.
         /// </summary>
         /// <param name="crudInternalWebClient"></param>
-        public AdItemRepository(ICrudInternalWebClient crudInternalWebClient)
+        public CampaignGroupRepository(ICrudInternalWebClient crudInternalWebClient)
             : base(crudInternalWebClient) { }
 
-        public Task<AdItemWithStats> Get(Guid id)
+        public Task<CampaignGroupWithStats> Get(Guid id)
         {
             throw new NotImplementedException();
         }
 
-        public Task<IEnumerable<AdItemWithStats>> GetAll(int page)
+        public Task<IEnumerable<CampaignGroupWithStats>> GetAll(int page)
         {
             throw new NotImplementedException();
         }

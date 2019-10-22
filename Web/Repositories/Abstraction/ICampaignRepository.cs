@@ -1,6 +1,4 @@
-﻿using Maximiz.Database;
-using Maximiz.Model.Entity;
-using System;
+﻿using Maximiz.Model.Entity;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -8,25 +6,25 @@ namespace Maximiz.Repositories.Abstraction
 {
 
     /// <summary>
-    /// Abstraction for a repository of campaigns.
+    /// Interface for a <see cref="CampaignWithStats"/> repository, which is only responsible
+    /// for performing read operations.
+    /// TODO Doc.
     /// </summary>
-    public interface ICampaignRepository : IEntityRepository<Campaign, Guid>
+    public interface ICampaignRepository : IRepository<CampaignWithStats>
     {
 
-        /// <summary>
-        /// Gets all campaigns sorted by column in given order.
-        /// </summary>
-        /// <param name="column">The column to order by</param>
-        /// <param name="order">Ascending or descending</param>
-        /// <returns>Retrieved list of campaigns</returns>
-        Task<IEnumerable<Campaign>> GetAll(ColumnCampaign column = ColumnCampaign.Name, Order order = Order.Descending);
+        Task<IEnumerable<CampaignWithStats>> GetActive(int page);
 
-        /// <summary>
-        /// Search the database based on query string.
-        /// </summary>
-        /// <param name="query">The search query</param>
-        /// <returns>Retrieved list of campaigns</returns>
-        Task<IEnumerable<Campaign>> Search(string query);
+        Task<IEnumerable<CampaignWithStats>> GetInactive(int page);
+
+        Task<IEnumerable<CampaignWithStats>> GetPending(int page);
+
+        Task<IEnumerable<CampaignWithStats>> GetHidden(int page);
+
+        Task<IEnumerable<CampaignWithStats>> GetConcept(int page);
+
+        Task<IEnumerable<CampaignWithStats>> GetDeleted(int page);
 
     }
+
 }

@@ -1,17 +1,16 @@
 ﻿using Maximiz.Model.Entity;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace Maximiz.Repositories.Abstraction
 {
-    public interface IAdItemRepository : IEntityRepository<AdItem, Guid>
+
+    /// <summary>
+    /// Interface for a <see cref="AdItemWithStats"/> repository, which is only 
+    /// responsible for performing read operations.
+    /// TODO Add methods.
+    /// </summary>
+    public interface IAdItemRepository : IRepository<AdItemWithStats>
     {
-        // TODO Temporary
-        /// <summary>
-        /// Returns ads
-        /// </summary>
-        /// <returns></returns>
-        Task<IEnumerable<AdItem>> GetAds();
+
+
     }
 }

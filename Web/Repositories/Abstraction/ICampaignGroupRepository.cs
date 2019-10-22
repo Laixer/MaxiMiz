@@ -4,11 +4,11 @@ namespace Maximiz.Repositories.Abstraction
 {
 
     /// <summary>
-    /// Interface for a <see cref="AdGroupWithStats"/> repository, which is only 
+    /// Interface for a <see cref="CampaignGroupWithStats"/> repository, which is only 
     /// responsible for performing read operations.
     /// TODO Add methods.
     /// </summary>
-    public interface IAdGroupRepository : IRepository<AdGroupWithStats>
+    public interface ICampaignGroupRepository : IRepository<CampaignGroupWithStats>
     {
 
 
