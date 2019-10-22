@@ -14,7 +14,7 @@ namespace Maximiz.Controllers
     /// <summary>
     /// Controller for handling requests related to Ad Groups.
     /// </summary>
-    public class AdGroupController : Controller
+    internal class AdGroupController : Controller
     {
         private readonly IAdGroupRepository _adGroupRepository;
 
@@ -103,9 +103,9 @@ namespace Maximiz.Controllers
                 return View(model);
             }
             // Remove empty ads before sending the model
-            model.AdItems.RemoveAll(x => string.IsNullOrEmpty(x.Title) && string.IsNullOrEmpty(x.Content));
+            //model.AdItems.RemoveAll(x => string.IsNullOrEmpty(x.Title) && string.IsNullOrEmpty(x.Content));
 
-            await _adGroupRepository.CreateGroup(model);
+            //await _adGroupRepository.CreateGroup(model);
 
             // TODO: Determine where to redirect after a succesful Ad Group creation. (AdGroup overview?)
             return RedirectToAction("Index", "Home");

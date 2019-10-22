@@ -1,10 +1,12 @@
-using Maximiz.Database;
+using Maximiz.Database.Querying;
 using Maximiz.InputModels;
+using Maximiz.Mapper;
 using Maximiz.Model.Entity;
 using Maximiz.Model.Enums;
-using Maximiz.Models;
 using Maximiz.Repositories.Abstraction;
 using Maximiz.Transactions;
+using Maximiz.ViewModels;
+using Maximiz.ViewModels.EntityModels;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Threading.Tasks;
@@ -15,13 +17,18 @@ namespace Maximiz.Controllers
     /// <summary>
     /// Controller for requests related to campaigns.
     /// </summary>
-    public class CampaignController : Controller
+    public sealed class CampaignOverviewController : Controller
     {
 
         /// <summary>
         /// Repository containing our campaigns retrieved from the database.
         /// </summary>
         private readonly ICampaignRepository _campaignRepository;
+
+        /// <summary>
+        /// Converts our campaigns.
+        /// </summary>
+        private readonly IMapper<CampaignWithStats, CampaignModel> _mapperCampaign;
 
         /// <summary>
         /// Manages entity transactions for us.
@@ -33,9 +40,11 @@ namespace Maximiz.Controllers
         /// </summary>
         /// <param name="campaignRepository">The campaign repository</param>
         /// <param name="transactionHandler">The transaction handler</param>
-        public CampaignController(ICampaignRepository campaignRepository, ITransactionHandler transactionHandler)
+        public CampaignOverviewController(ICampaignRepository campaignRepository,
+            IMapper<CampaignWithStats, CampaignModel> mapperCampaign, ITransactionHandler transactionHandler)
         {
             _campaignRepository = campaignRepository;
+            _mapperCampaign = mapperCampaign;
             _transactionHandler = transactionHandler;
         }
 
@@ -44,9 +53,9 @@ namespace Maximiz.Controllers
         /// GET: /Campaign/
         /// </summary>
         [HttpGet]
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            return RedirectToAction("Overview");
+            return await Overview();
         }
 
         /// <summary>
@@ -57,9 +66,13 @@ namespace Maximiz.Controllers
         [HttpGet]
         public async Task<IActionResult> Overview()
         {
-            return View(new OverviewCampaignModel
+            var campaigns = await _campaignRepository.GetAll(0);
+            var campaignsConverted = _mapperCampaign.ConvertAll(campaigns);
+
+            // Compose viewmodel and return view
+            return View("Index", new CampaignOverviewViewModel
             {
-                Campaigns = await _campaignRepository.GetAll()
+                Campaigns = campaignsConverted
             });
         }
 
@@ -76,9 +89,9 @@ namespace Maximiz.Controllers
         [HttpGet]
         public async Task<IActionResult> OverviewSorted(ColumnCampaign column, Order order)
         {
-            return View("Overview", new OverviewCampaignModel
+            return View("Overview", new CampaignOverviewViewModel
             {
-                Campaigns = await _campaignRepository.GetAll(column, order)
+                //Campaigns = await _campaignRepository.GetAll(column, order)
             });
         }
 
@@ -95,9 +108,9 @@ namespace Maximiz.Controllers
             if (string.IsNullOrEmpty(query)) { return RedirectToAction("Overview"); }
 
             // Create and return view with model
-            var model = new OverviewCampaignModel
+            var model = new CampaignOverviewViewModel
             {
-                Campaigns = await _campaignRepository.Search(query)
+                //Campaigns = await _campaignRepository.Search(query)
             };
             return View("Overview", model);
 
@@ -115,7 +128,6 @@ namespace Maximiz.Controllers
         {
             return RedirectToAction("Overview");
         }
-
 
 
         /// <summary>
@@ -187,7 +199,7 @@ namespace Maximiz.Controllers
         {
             // TODO
             return NotFound();
-            _campaignRepository.Update(campaign);
+            //_campaignRepository.Update(campaign);
         }
 
         [HttpPut]
@@ -195,7 +207,7 @@ namespace Maximiz.Controllers
         {
             // TODO
             return NotFound();
-            _campaignRepository.Create(campaign);
+            //_campaignRepository.Create(campaign);
         }
 
         [HttpDelete]
@@ -203,7 +215,7 @@ namespace Maximiz.Controllers
         {
             // TODO
             return NotFound();
-            _campaignRepository.Delete(campaign);
+            //_campaignRepository.Delete(campaign);
         }
     }
 }

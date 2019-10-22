@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics;
+using Maximiz.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 
-using Maximiz.Models;
 
 namespace Maximiz.Controllers
 {
