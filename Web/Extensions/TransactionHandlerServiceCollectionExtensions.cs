@@ -1,6 +1,6 @@
 ﻿using Maximiz.Model.Entity;
 using Maximiz.Transactions;
-using Maximiz.Transactions.Creation;
+using Maximiz.Transactions.CreateUpdateDelete;
 using Maximiz.Transactions.ServiceBus;
 
 namespace Microsoft.Extensions.DependencyInjection
@@ -23,7 +23,13 @@ namespace Microsoft.Extensions.DependencyInjection
             where TTransactionHandler : class, ITransactionHandler
         {
             // First add creation dependencies
-            services.AddSingleton<ICreator<Entity>, EntityCreator>();
+            services.AddSingleton<ICud<Campaign>, CudCampaign>();
+            services.AddSingleton<ICud<CampaignGroup>, CudCampaignGroup>();
+            services.AddSingleton<ICud<AdItem>, CudAdItem>();
+            services.AddSingleton<ICud<AdGroup>, CudAdGroup>();
+            services.AddSingleton<ICudProcessor, CudProcessor>();
+
+            // Then add sending dependencies
             services.AddSingleton<ISender<Entity>, Sender>();
 
             // Then add the transaction handler

@@ -56,8 +56,11 @@ namespace Maximiz
 
             // Setup custom made services
             services.AddTransactionHandler<TransactionHandler>();
+            services.AddCrudInternalWebClient<CrudInternalWebClient>();
+            services.AddMappers();
 
             // Add required repositories
+            // TODO Make scoped in stead of transient? Because of multiple queries & item preservation
             services.AddTransient<ICampaignRepository, CampaignRepository>();
             services.AddTransient<IAdGroupRepository, AdGroupRepository>();
             services.AddTransient<IAdItemRepository, AdItemRepository>();
