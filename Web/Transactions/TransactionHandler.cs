@@ -1,5 +1,5 @@
 ﻿using Maximiz.Model.Entity;
-using Maximiz.Transactions.Creation;
+using Maximiz.Transactions.CreateUpdateDelete;
 using Maximiz.Transactions.ServiceBus;
 using System;
 using System.Threading.Tasks;
@@ -15,9 +15,9 @@ namespace Maximiz.Transactions
     {
 
         /// <summary>
-        /// Provides database connections.
+        /// Manages our create, update and delete operations.
         /// </summary>
-        private ICreator<Entity> _creator;
+        private ICudProcessor _cudProcessor;
 
         /// <summary>
         /// Provides service bus connections.
@@ -27,11 +27,11 @@ namespace Maximiz.Transactions
         /// <summary>
         /// Constructor for dependency injection.
         /// </summary>
-        /// <param name="creator">Object to create items in our database</param>
+        /// <param name="cudProcessor">Object to manage entity cud operations</param>
         /// <param name="sender">Object to send items to the service bus</param>
-        public TransactionHandler(ICreator<Entity> creator, ISender<Entity> sender)
+        public TransactionHandler(ICudProcessor cudProcessor, ISender<Entity> sender)
         {
-            _creator = creator;
+            _cudProcessor = cudProcessor;
             _sender = sender;
         }
 
@@ -46,18 +46,18 @@ namespace Maximiz.Transactions
             try
             {
                 // First create all entities in the database
-                foreach (var entity in transaction.AllEntities)
+                foreach (var pair in transaction.EntitiesWithAccounts)
                 {
-                    await _creator.Create(entity);
+                    await _cudProcessor.ProcessOperationAsync(pair.Key, transaction.CrudAction);
                 }
 
                 // Then send all entities to the service bus
-                foreach (var entity in transaction.AllEntities)
+                foreach (var pair in transaction.EntitiesWithAccounts)
                 {
-                    await _sender.Send(entity);
+                    await _sender.SendAsync(pair.Key, pair.Value, transaction.CrudAction);
                 }
 
-                // Then return true
+                // Then mark and return true
                 transaction.MarkAsComplete();
                 return true;
             }
@@ -65,6 +65,7 @@ namespace Maximiz.Transactions
             // Return false if we failed
             catch (Exception e)
             {
+                // TODO Rollback
                 // TODO Log
                 return false;
             }
