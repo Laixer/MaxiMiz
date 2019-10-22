@@ -2,11 +2,9 @@
     Displays an overview of all campaigns in our viewmodel.
 *@
 
-@using Maximiz.Model.Enums
-@using Maximiz.Mvc.Models
-@using Maximiz.Database
-
-@model OverviewCampaignModel
+@using Maximiz.ViewModels
+@using Maximiz.ViewModels.EntityModels
+@model CampaignOverviewViewModel
 @{
     ViewData["Title"] = "Campaigns";
 }
@@ -80,7 +78,7 @@
               </tr>
             </thead>
             <tbody>
-              @foreach (Maximiz.Model.Entity.Campaign campaign in Model.Campaigns)
+              @foreach (CampaignModel campaign in Model.Campaigns)
               {
               <tr>
                 <th scope="row"><input type="checkbox" name="campaigncheck" value="@campaign.Id"></th>
