@@ -6,46 +6,68 @@
     ViewData["Title"] = "Dashboard";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Dashboard</h1>
-    <!--TODO this is temporary-->
-    <div class="row">
-        <div class="col-lg-2 col-md-6" style="font-size: 1.5em; padding:3px; margin:2em; background-color: #4EA1EA; color: white;">
-            <p>
-                Spent <b>today</b>
-                <br />$0
-            </p>
+ <main>
+    <div class="container-fluid dashboard-content">
+      <div class="section-overview">
+        <h1><span class="circle circle_blue"></span>Overview</h1>
+        <div class="row overview">
+          <div class="col col-spend-today">
+            <h2 class="font-weight-normal text-white">$14,864</h2>
+            <p class="font-weight-light text-white text-uppercase mb-0 mt-3"><span class="pre-text">Spend</span> Today</p>
+          </div>
+          <div class="col col-spend-yesterday">
+            <h2 class="font-weight-normal text-white">$44,479</h2>
+            <p class="font-weight-light text-white text-uppercase mb-0 mt-3"><span class="pre-text">Spend</span> Yesterday</p>
+          </div>
+          <div class="col col-spend-this_month">
+            <h2 class="font-weight-normal text-white">$59,343</h2>
+            <p class="font-weight-light text-white text-uppercase mb-0 mt-3"><span class="pre-text">Spend</span> This Month</p>
+          </div>
+          <div class="col col-spend-last_month">
+            <h2 class="font-weight-normal text-white">$1,043,260</h2>
+            <p class="font-weight-light text-white text-uppercase mb-0 mt-3"><span class="pre-text">Spend</span> Last Month</p>
+          </div>
         </div>
-        <div class="col-lg-2 col-md-6" style="font-size: 1.5em; padding:3px; margin:2em; background-color: #EF5499; color: white;">
-            <p>
-                Spent <b>yesterday</b>
-                <br />$0
-            </p>
+      </div>
+      <div class="section-spend_by_account">
+        <h1><span class="circle circle_blue"></span>Spend by Account</h1>
+        <div class="row spend_by_account">
+          <div class="col col-account">
+              <div class="pie"><p class="text-white font-weight-bold m-0">100%</p></div>
+              <div class="pie-listitems"><p><span class="circle circle_blue mb-0"></span><img src="img/taboola_logo.png" class="img-sm" alt="taboola_logo"> Taboola <span class="light-text ml-1">$14,864.04</span></p></div>
+          </div>
         </div>
-        <div class="col-lg-2 col-md-6" style="font-size: 1.5em; padding:3px; margin:2em; background-color: #A34AA0; color: white;">
-            <p>
-                Spent <b>this month</b>
-                <br />$0
-            </p>
+      </div>
+      <div class="section-spend_by_network">
+        <h1><span class="circle circle_blue"></span>Spend by Network</h1>
+        <div class="row spend_by_network">
+          <div class="col col-network">
+              <div class="pie">
+              </div>
+              <div class="pie-listitems">
+                <ul>
+                  <li>
+                    <p><span class="circle circle_blue mb-0"></span> WeBuy media - Japan - SC</p>
+                  </li>
+                  <li>
+                      <p><span class="circle circle_orange mb-0"></span> WeBuy Media - Family Chasers - SC</p>
+                  </li>
+                  <li>
+                      <p><span class="circle circle_yellow mb-0"></span> WeBuy Media - For Happy Hours</p>
+                  </li>
+                  <li>
+                      <p><span class="circle circle_red mb-0"></span> WeBuy Media - Tip Chasers - SC</p>
+                  </li>
+                  <li>
+                      <p><span class="circle circle_green mb-0"></span> WeBuy Media - Daily Chasers - SC</p>
+                  </li>
+                  <li>
+                      <p><span class="circle circle_purple mb-0"></span> WeBuy Media - Schience Chasers</p>
+                  </li>
+                </ul>
+              </div>
+          </div>
         </div>
-        <div class="col-lg-2 col-md-6" style="font-size: 1.5em; padding:3px; margin:2em; background-color: #00C3A4; color: white;">
-            <p>
-                Spent <b>last month</b>
-                <br />$0
-            </p>
-        </div>
+      </div>
     </div>
-    <div class="row text-center">
-        <h1>Spent by account</h1>
-        <div class="col-sm-12" style="height: 200px;">
-            <img style="width:100%; height:100%" src="https://image.flaticon.com/icons/svg/138/138339.svg" />
-        </div>
-    </div>
-    <hr />
-    <div class="row text-center">
-        <h1>Spent by network</h1>
-        <div class="col-sm-12" style="height:200px;">
-            <img style="width:100%; height:100%" src="https://image.flaticon.com/icons/svg/138/138339.svg" />
-        </div>
-    </div>
-</div>
+  </main>
