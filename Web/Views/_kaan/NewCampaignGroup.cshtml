@@ -1,0 +1,125 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css" integrity="sha384-mzrmE5qonljUremFsqc01SB46JvROS7bZs3IO2EmfFsd15uHvIt+Y8vEf7N7fWAU" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+  <link rel="stylesheet" href="../../css/style.css">
+  <title>ISA - Add Campaign Group</title>
+</head>
+<body>
+  <header class="sidebar">
+    <div class="sidebar-wrapper">
+      <ul class="nav flex-column mt-5">
+        <li class="active">
+          <a href="../../index.html" class="active">
+            <p><i class="fas fa-tachometer-alt"></i> Dashboards</p>
+          </a>
+        </li>
+        <li>
+          <a data-toggle="collapse" href="#collapseCampaigns" aria-expanded="false">
+            <p><i class="far fa-paper-plane"></i> Campaigns <i class="fas fa-chevron-down"></i></p>
+          </a>
+          <div class="collapse show" id="collapseCampaigns">
+            <div class="dropdown-divider"></div>
+            <ul class="nav">
+              <li class="dropright">
+                <a class="dropdown-toggle" data-toggle="dropdown" href="#">Recently opened</a>
+                <ul class="dropdown-menu">
+                  <li><a href="#">1</a></li>
+                  <li><a href="#">2</a></li>
+                  <li><a href="#">3</a></li>
+                  <li><a href="#">4</a></li>
+                  <li><a href="#">5</a></li>
+                </ul>
+              </li>
+              <li class="active">
+                <a href="overview.html">Overview</a>
+              </li>
+              <li>
+                <a href="ad_performance.html">Ad Performance</a>
+              </li>
+              <li>
+                <a href="publisher_performance.html">Publisher Performance</a>
+              </li>
+            </ul>
+          </div>
+        </li>
+        <li>
+          <a href="../ad_groups.html">
+            <p><i class="fas fa-rocket"></i> Ad Groups</p>
+          </a>
+        </li>
+        <li>
+          <a href="../rules.html">
+            <p><i class="far fa-file-alt"></i> Rules</p>
+          </a>
+        </li>
+        <li>
+          <a href="../targeting_lists.html">
+            <p><i class="fas fa-bullseye"></i> Targeting Lists</p>
+          </a>
+        </li>
+      </ul>
+    </div>
+  </header>
+  <nav class="navbar navbar-default">
+    <div class="container-fluid">
+      <div class="navbar-minimize">
+          <button class="btn btn-fill btn-icon"><i class="ti-more-alt"></i></button>
+      </div>
+      <div class="collapse navbar-collapse show">
+        <div class="logo float-left">
+          <p>ISA <b class="minimize"></b></p>
+        </div>
+        <ul class="nav navbar-right">
+          <li class="button dropdown"><button data-toggle="dropdown" class="dropdown-toggle btn btn-main btn-blue">Add new <i class="fas fa-chevron-down"></i></button>
+            <ul class="dropdown-menu">
+              <li><a href="new_campaign.html"> Campaign</a></li>
+              <li><a href="../ads/new_advertisement.html"> Advertisement</a></li>
+            </ul>
+          </li>
+          <li class="dropdown">
+            <a href="#" data-toggle="dropdown" class="dropdown-toggle">
+              <p>info@webuy.media</p>
+            </a>
+            <ul class="dropdown-menu dropdown-settings">
+              <li><a href="../settings/account.html"><i class="fas fa-user-circle"></i> Account</a></li>
+              <li><a href="../settings/preferences.html"><i class="fas fa-sliders-h"></i> Preferences</a></li>
+              <li><a href="../settings/billing.html"><i class="fas fa-dollar-sign"></i> Billing</a></li>
+              <li><a href="../settings/integrations.html"><i class="fas fa-plug"></i> Integrations</a></li>
+              <div class="dropdown-divider"></div>
+              <li><a href="sign-out.html"><i class="fas fa-sign-out-alt"></i> Sign Out</a></li>
+            </ul>
+          </li>
+          <li class="settings">
+            <a href="#"><i class="fas fa-cog"></i></a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+  <main>
+    <div class="container-fluid new-campaign">
+      <h1 class="font-weight-bolder mb-3">New Campaign Group</h1>
+      <a href="ncg-basic-account.html"> <!-- Refers to: New Campaign (Group) > Basic -->
+        <div class="col col-campaign col-basic">
+          <h2 class="font-weight-bold">Basic</h2>
+          <p>Fill in only important campaign fields <br> 2 steps in total</p>
+        </div>
+      </a>
+      <a href="#">
+        <div class="col col-campaign col-advanced">
+          <h2 class="font-weight-bold">Advanced</h2>
+          <p>Fill in every campaign field yourself <br> 4 steps in total</p>
+        </div>
+      </a>
+    </div>
+  </main>
+<script src="../../js/main.js"></script>
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+</body>

@@ -1,0 +1,241 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css" integrity="sha384-mzrmE5qonljUremFsqc01SB46JvROS7bZs3IO2EmfFsd15uHvIt+Y8vEf7N7fWAU" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+  <link rel="stylesheet" href="../../css/style.css">
+  <title>ISA - Settings | Integrations</title>
+</head>
+<body>
+  <header class="sidebar">
+    <div class="sidebar-wrapper">
+      <ul class="nav flex-column mt-5">
+        <li>
+          <a href="../../index.html">
+            <p><i class="fas fa-tachometer-alt"></i> Dashboards</p>
+          </a>
+        </li>
+        <li>
+          <a data-toggle="collapse" href="#collapseCampaigns" aria-expanded="false">
+            <p><i class="far fa-paper-plane"></i> Campaigns <i class="fas fa-chevron-down"></i></p>
+          </a>
+          <div class="collapse show" id="collapseCampaigns">
+            <div class="dropdown-divider"></div>
+            <ul class="nav">
+              <li class="dropright">
+                <a class="dropdown-toggle" data-toggle="dropdown" href="#">Recently opened</a>
+                <ul class="dropdown-menu">
+                  <li><a href="#">1</a></li>
+                  <li><a href="#">2</a></li>
+                  <li><a href="#">3</a></li>
+                  <li><a href="#">4</a></li>
+                  <li><a href="#">5</a></li>
+                </ul>
+              </li>
+              <li>
+                <a href="../campaigns/overview.html">Overview</a>
+              </li>
+              <li>
+                <a href="../campaigns/ad_performance.html">Ad Performance</a>
+              </li>
+              <li>
+                <a href="../campaigns/publisher_performance.html">Publisher Performance</a>
+              </li>
+            </ul>
+          </div>
+        </li>
+        <li>
+          <a href="../ad_groups.html">
+            <p><i class="fas fa-rocket"></i> Ad Groups</p>
+          </a>
+        </li>
+        <li>
+          <a href="../rules.html">
+            <p><i class="far fa-file-alt"></i> Rules</p>
+          </a>
+        </li>
+        <li>
+          <a href="../targeting_lists.html">
+            <p><i class="fas fa-bullseye"></i> Targeting Lists</p>
+          </a>
+        </li>
+      </ul>
+    </div>
+  </header>
+  <nav class="navbar navbar-default">
+    <div class="container-fluid">
+      <div class="navbar-minimize">
+          <button class="btn btn-fill btn-icon"><i class="ti-more-alt"></i></button>
+      </div>
+      <div class="collapse navbar-collapse show">
+        <div class="logo float-left">
+          <p>ISA <b class="minimize"></b></p>
+        </div>
+        <ul class="nav navbar-right">
+          <li class="button dropdown"><button data-toggle="dropdown" class="dropdown-toggle btn btn-main btn-blue">Add new <i class="fas fa-chevron-down"></i></button>
+            <ul class="dropdown-menu">
+              <li><a href="../campaigns/new_campaign.html"> Campaign</a></li>
+              <li><a href="../ads/new_advertisement.html"> Advertisement</a></li>
+            </ul>
+          </li>
+          <li class="dropdown">
+            <a href="#" data-toggle="dropdown" class="dropdown-toggle text-secondary">
+              <p>info@webuy.media</p>
+            </a>
+            <ul class="dropdown-menu dropdown-settings">
+              <li><a href="../settings/account.html"><i class="fas fa-user-circle"></i> Account</a></li>
+              <li><a href="../settings/preferences.html"><i class="fas fa-sliders-h"></i> Preferences</a></li>
+              <li><a href="../settings/billing.html"><i class="fas fa-dollar-sign"></i> Billing</a></li>
+              <li><a href="../settings/integrations.html"><i class="fas fa-plug"></i> Integrations</a></li>
+              <div class="dropdown-divider"></div>
+              <li><a href="sign-out.html"><i class="fas fa-sign-out-alt"></i> Sign Out</a></li>
+            </ul>
+          </li>
+          <li class="settings">
+            <a href="#"><i class="fas fa-cog"></i></a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+  <main>
+    <div class="settings">
+      <nav class="justify-content-between header">
+        <ul class="nav nav-tabs">
+          <li class="nav-item">
+            <a class="nav-link" href="account.html">Account</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="preferences.html">Preferences</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="billing.html">Billing</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link active-tab" href="#">Integrations</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="settings.html">Settings</a>
+          </li>
+        </ul>
+      </nav>
+      <div class="m-4">
+        <h1><span class="circle circle_blue"></span>Integrations</h1>
+        <section class="section-fw">
+          <div class="table-responsive px-2">
+            <table class="table table-striped table-hover table-bordered">
+              <thead class="thead-darkblue">
+                <tr>
+                  <th scope="col">Account Connections</th>
+                  <th scope="col">Source</th>
+                  <th scope="col">Email</th>
+                  <th scope="col"></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Webuy Media - Japan - SC</td>
+                  <td><img src="../../img/taboola_logo_xs.png" class="img-md" alt="taboola_logo"> Taboola</td>
+                  <td>leon@webuy.media</td>
+                  <td><a href="#" data-toggle="tooltip" title="Edit"><i class="fas fa-edit"></i></a></td>
+                </tr>
+                <tr>
+                  <td></td>
+                  <td><img src="../../img/taboola_logo_xs.png" class="img-md" alt="taboola_logo"> Taboola</td>
+                  <td>leon@webuy.media</td>
+                  <td><a href="#" data-toggle="tooltip" title="Edit"><i class="fas fa-edit"></i></a></td>
+                </tr>
+                <tr>
+                  <td>
+                    Webuy Media - Facts Chasers - SC - SC <br>
+                    Webuy Media - Daily Chasers - SC <br>
+                    Webuy Media - Family Chasers - SC <br>
+                    WeBuy Media - Tip Chasers - SC <br>
+                    Webuy Media - WBM - SC <br>
+                    Webuy Media - For Happy Home - SC
+                  </td>
+                  <td><img src="../../img/taboola_logo_xs.png" class="img-md" alt="taboola_logo"> Taboola</td>
+                  <td>leon@webuy.media</td>
+                  <td><a href="#" data-toggle="tooltip" title="Edit"><i class="fas fa-edit"></i></a></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </div>
+      <div class="m-4">
+        <h1><span class="circle circle_blue"></span>Google Analytics Traffic Sources</h1>
+        <section class="section-fw">
+          <div class="table-responsive px-2">
+            <table class="table table-striped table-hover table-bordered">
+              <thead class="thead-darkblue">
+                <tr>
+                  <th scope="col">Traffic Source Name</th>
+                  <th scope="col">GA Account Name</th>
+                  <th scope="col">Property</th>
+                  <th scope="col">Email</th>
+                  <th scope="col">Type</th>
+                  <th scope="col"></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Taboola Mapping</td>
+                  <td>Social Entertainment </td>
+                  <td>Familychasers</td>
+                  <td>info@webuy.media</td>
+                  <td><img src="../../img/taboola_logo_xs.png" class="img-lg" alt="taboola_logo"> Taboola</td>
+                  <td><a href="#" data-toggle="tooltip" title="Edit"><i class="fas fa-edit"></i></a> <a href="#" data-toggle="tooltip" title="Delete"><i class="fas fa-trash text-danger"></i></a></td>
+                </tr>
+                <tr>
+                  <td>Taboola Mapping</td>
+                  <td>Social Entertainment </td>
+                  <td>Tipchasers</td>
+                  <td>info@webuy.media</td>
+                  <td><img src="../../img/taboola_logo_xs.png" class="img-lg" alt="taboola_logo"> Taboola</td>
+                  <td><a href="#" data-toggle="tooltip" title="Edit"><i class="fas fa-edit"></i></a> <a href="#" data-toggle="tooltip" title="Delete"><i class="fas fa-trash text-danger"></i></a></td>
+                </tr>
+                <tr>
+                  <td>Taboola Mapping</td>
+                  <td>Social Entertainment </td>
+                  <td>Sciencechasers</td>
+                  <td>info@webuy.media</td>
+                  <td><img src="../../img/taboola_logo_xs.png" class="img-lg" alt="taboola_logo"> Taboola</td>
+                  <td><a href="#" data-toggle="tooltip" title="Edit"><i class="fas fa-edit"></i></a> <a href="#" data-toggle="tooltip" title="Delete"><i class="fas fa-trash text-danger"></i></a></td>
+                </tr>
+                <tr>
+                  <td>Taboola Mapping</td>
+                  <td>Social Entertainment </td>
+                  <td>Forhappyhome</td>
+                  <td>info@webuy.media</td>
+                  <td><img src="../../img/taboola_logo_xs.png" class="img-lg" alt="taboola_logo"> Taboola</td>
+                  <td><a href="#" data-toggle="tooltip" title="Edit"><i class="fas fa-edit"></i></a> <a href="#" data-toggle="tooltip" title="Delete"><i class="fas fa-trash text-danger"></i></a></td>
+                </tr>
+                <tr>
+                  <td>Taboola Mapping</td>
+                  <td>Social Entertainment </td>
+                  <td>Dailychasers</td>
+                  <td>info@webuy.media</td>
+                  <td><img src="../../img/taboola_logo_xs.png" class="img-lg" alt="taboola_logo"> Taboola</td>
+                  <td><a href="#" data-toggle="tooltip" title="Edit"><i class="fas fa-edit"></i></a> <a href="#" data-toggle="tooltip" title="Delete"><i class="fas fa-trash text-danger"></i></a></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </div>
+    </div>
+  </main>
+<script src="../../js/main.js"></script>
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+<script>
+  $(document).ready(function(){
+    $('[data-toggle="tooltip"]').tooltip();
+  });
+</script>
+</body>
