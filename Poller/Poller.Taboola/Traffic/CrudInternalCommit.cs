@@ -145,17 +145,10 @@ namespace Poller.Taboola.Traffic
                     modified_beyond_ad_group = @ModifiedBeyondAdGroup
                 WHERE Id = @Id;";
 
-            try
+            using (var connection = _dbProvider.ConnectionScope())
             {
-                using (var connection = _dbProvider.ConnectionScope())
-                {
-                    await connection.ExecuteAsync(new CommandDefinition(
-                        sql, adItem, cancellationToken: token));
-                }
-            }
-            catch (Exception e)
-            {
-                throw e;
+                await connection.ExecuteAsync(new CommandDefinition(
+                    sql, adItem, cancellationToken: token));
             }
         }
 
@@ -407,15 +400,12 @@ namespace Poller.Taboola.Traffic
                     approval_state = EXCLUDED.approval_state";
             }
 
-            try
+            // Call for execution
+            using (var connection = _dbProvider.ConnectionScope())
             {
-                // Call for execution
-                using (var connection = _dbProvider.ConnectionScope())
-                {
-                    await connection.ExecuteAsync(new CommandDefinition(
-                        sql, aditems, cancellationToken: token));
-                }
-            } catch (Exception e) { throw e; }
+                await connection.ExecuteAsync(new CommandDefinition(
+                    sql, aditems, cancellationToken: token));
+            }
         }
 
 

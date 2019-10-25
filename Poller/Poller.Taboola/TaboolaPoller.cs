@@ -1,21 +1,18 @@
-﻿using System;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Caching.Memory;
+﻿using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using Poller.Database;
 using Poller.Extensions;
 using Poller.OAuth;
 using Poller.Poller;
-
-using AccountInternal = Maximiz.Model.Entity.Account;
-using CampaignInternal = Maximiz.Model.Entity.Campaign;
-using AdItemInternal = Maximiz.Model.Entity.AdItem;
-
-using Poller.Taboola.Mapper;
 using Poller.Taboola.Traffic;
+using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using AccountInternal = Maximiz.Model.Entity.Account;
+using AdItemInternal = Maximiz.Model.Entity.AdItem;
+using CampaignInternal = Maximiz.Model.Entity.Campaign;
 
 namespace Poller.Taboola
 {
@@ -49,6 +46,11 @@ namespace Poller.Taboola
         public TaboolaPoller(ILoggerFactory logger, TaboolaPollerOptions options,
             DbProvider provider, IMemoryCache cache)
         {
+            if (logger == null) { throw new ArgumentNullException(nameof(ILoggerFactory)); }
+            if (options == null) { throw new ArgumentNullException(nameof(TaboolaPollerOptions)); }
+            if (provider == null) { throw new ArgumentNullException(nameof(DbProvider)); }
+            if (cache == null) { throw new ArgumentNullException(nameof(IMemoryCache)); }
+
             _logger = logger.CreateLogger(typeof(TaboolaPoller).FullName);
 
             // Create our http wrapper with client
@@ -85,6 +87,9 @@ namespace Poller.Taboola
         public async Task RefreshAdvertisementDataAsync(PollerContext context,
             CancellationToken token)
         {
+            if (context == null) { throw new ArgumentNullException(nameof(PollerContext)); }
+            if (token == null) { throw new ArgumentNullException(nameof(CancellationToken)); }
+
             // Get accounts
             var accounts = await _crudInternal.GetAdvertiserAccountsCachedAsync(token);
 
@@ -110,9 +115,9 @@ namespace Poller.Taboola
         /// <param name="context"></param>
         /// <param name="token"></param>
         /// <returns></returns>
-        public async Task DataSyncbackAsync(PollerContext context, CancellationToken token)
+        public Task DataSyncbackAsync(PollerContext context, CancellationToken token)
         {
-            await DataSyncbackAsync(context, token, null, null, null);
+            return DataSyncbackAsync(context, token, null, null, null);
         }
 
         /// <summary>
@@ -141,16 +146,19 @@ namespace Poller.Taboola
             List<AccountInternal> pointerAccounts, List<CampaignInternal> pointerCampaigns,
             List<AdItemInternal> pointerAdItems)
         {
+            if (context == null) { throw new ArgumentNullException(nameof(PollerContext)); }
+            if (token == null) { throw new ArgumentNullException(nameof(CancellationToken)); }
+
             // Accounts almost never change, only do this once every 30 iterations.
             if ((context.RunCount + 1) % 30 == 0)
             {
-                _logger.LogInformation("Syncback account information");
+                _logger.LogDebug("Syncback account information");
                 var accountsInternal = await _crudExternal.GetAllAccounts(token);
                 await _crudInternal.CommitAccountBulk(accountsInternal, token);
             }
 
             // Get local accounts and extract some campaign data.
-            _logger.LogInformation("Syncback campaigns and ad items");
+            _logger.LogDebug("Syncback campaigns and ad items");
             var accounts = await _crudInternal.GetAdvertiserAccountsCachedAsync(token);
 
             var selectedAccounts = accounts.ToList().Shuffle().Take(2).ToList();
@@ -222,13 +230,8 @@ namespace Poller.Taboola
             }
 
             // Retreive and commit
-            var adItems = null as IEnumerable<AdItemInternal>;
-            try
-            {
-                adItems = await _crudExternal.GetAdItemsFromCampaignAsync(account, campaign.SecondaryId, token);
-                await _crudInternal.CommitAdItemBulk(adItems, campaign.Id, token, true);
-            }
-            catch (Exception e) { throw e; }
+            var adItems = await _crudExternal.GetAdItemsFromCampaignAsync(account, campaign.SecondaryId, token);
+            await _crudInternal.CommitAdItemBulk(adItems, campaign.Id, token, true);
 
             // Add to list if present, for testing purposes
             if (pointerAdItems != null) { pointerAdItems.AddRange(adItems); }
