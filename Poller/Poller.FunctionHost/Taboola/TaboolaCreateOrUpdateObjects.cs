@@ -1,12 +1,11 @@
-using System;
-using System.Threading;
-using System.Threading.Tasks;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Poller.FunctionHost.Taboola.Utility;
 using Poller.Poller;
 using Poller.Taboola;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Poller.FunctionHost.Taboola
 {
@@ -71,17 +70,15 @@ namespace Poller.FunctionHost.Taboola
             {
                 var context = new ContextParser().Parse(queueItem);
 
-                var source = new CancellationTokenSource();
-                await _poller.CreateOrUpdateObjectsAsync(context, source.Token);
-                source.Dispose();
+                using (var source = new CancellationTokenSource())
+                {
+                    await _poller.CreateOrUpdateObjectsAsync(context, source.Token);
+                }
             }
             catch (JsonException e)
             {
-                log.LogError("Could not parse service bus message in function TaboolaCreateOrUpdateObjects.");
-            }
-            catch (Exception e)
-            {
-                log.LogError($"Exception thrown in TaboolaRefreshAdvertisementsData: {e.Message}");
+                log.LogError($"Could not parse service bus message in function {nameof(TaboolaCreateOrUpdateObjects)}.");
+                throw;
             }
         }
 

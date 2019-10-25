@@ -56,18 +56,11 @@ namespace Poller.FunctionHost.Taboola
         public async Task Run([TimerTrigger("*/25 * * * * *")]TimerInfo myTimer, ILogger log)
         {
             // Execute with cancellation token and clean up
-            // TODO Token is useless here, do this differently
-            try
+            // TODO Token is useless here, do this differently --> use in function parameters (yes this is possible)
+            using (var source = new CancellationTokenSource())
             {
-                var source = new CancellationTokenSource();
                 await _poller.RefreshAdvertisementDataAsync(pollerContext, source.Token);
-                source.Dispose();
             }
-            catch (Exception e)
-            {
-                log.LogError($"Exception thrown in TaboolaRefreshAdvertisementsData: {e.Message}");
-            }
-
         }
     }
 }

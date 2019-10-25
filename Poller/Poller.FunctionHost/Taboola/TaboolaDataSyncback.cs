@@ -57,18 +57,10 @@ namespace Poller.FunctionHost.Taboola
         {
             // Execute with cancellation token and clean up
             // TODO Token is useless here, do this differently
-            try
+            using (var source = new CancellationTokenSource())
             {
-                var source = new CancellationTokenSource();
                 await _poller.DataSyncbackAsync(pollerContext, source.Token);
-                source.Dispose();
             }
-            catch (Exception e)
-            {
-                log.LogError($"Exception thrown in TaboolaDataSyncback: {e.Message}");
-            }
-
         }
     }
 }
-    
