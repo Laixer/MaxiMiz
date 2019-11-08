@@ -10,11 +10,14 @@ namespace Maximiz.Repositories.Abstraction
     /// <summary>
     /// Interface base for a repository, only responsible for performing get 
     /// operations.
-    /// TODO Implement cancellation token?
+    /// TODO Revise inheritance with ugly enum.
     /// </summary>
-    /// <typeparam name="TEntityModel">Entity type</typeparam>
-    public interface IRepository<TEntity>
+    /// <typeparam name="TEntity">The type of entity</typeparam>
+    /// <typeparam name="TQuery">The type of query object</typeparam>
+    public interface IRepository<TEntity, TQuery, TColumn>
         where TEntity : Entity
+        where TQuery : QueryBase<TColumn>
+        where TColumn : Enum
     {
 
         /// <summary>
@@ -29,15 +32,22 @@ namespace Maximiz.Repositories.Abstraction
         /// </summary>
         /// <param name="page">The page to retrieve</param>
         /// <returns>The entities</returns>
-        Task<IEnumerable<TEntity>> GetAll(int page);
+        Task<IEnumerable<TEntity>> GetAllAsync(TQuery query, int page = 0);
 
         /// <summary>
-        /// This gets called upon (tactically timed) repository creation. This
-        /// then retrieves all separate implemented queries from the database to
-        /// be able to present their results immedeatly.
+        /// Returns the total amount of items in the data store based on some query.
         /// </summary>
-        /// <returns>Tasks</returns>
-        Task QueryOnLoad();
+        /// <param name="query">The query</param>
+        /// <returns>Total item count</returns>
+        Task<int> GetCount(TQuery query);
+
+        /// <summary>
+        /// Query the data store.
+        /// </summary>
+        /// <param name="query"><see cref="TQuery"/></param>
+        /// <param name="page">The page number</param>
+        /// <returns>List of queried <see cref="TEntity"/>s</returns>
+        Task<IEnumerable<TEntity>> GetQueriedAsync(TQuery query, int page = 0);
 
     }
 }

@@ -1,5 +1,4 @@
 ﻿using Maximiz.Database;
-using Maximiz.Repositories.Abstraction;
 using System.Threading;
 
 namespace Maximiz.Repositories

@@ -1,4 +1,6 @@
-﻿using Maximiz.Model.Entity;
+﻿using Maximiz.Database.Columns;
+using Maximiz.Database.Querying;
+using Maximiz.Model.Entity;
 
 namespace Maximiz.Repositories.Abstraction
 {
@@ -6,11 +8,9 @@ namespace Maximiz.Repositories.Abstraction
     /// <summary>
     /// Interface for a <see cref="CampaignGroupWithStats"/> repository, which is only 
     /// responsible for performing read operations.
-    /// TODO Add methods.
     /// </summary>
-    public interface ICampaignGroupRepository : IRepository<CampaignGroupWithStats>
+    public interface ICampaignGroupRepository : IRepository<CampaignGroupWithStats, QueryCampaignGroupWithStats, ColumnCampaignGroupWithStats>
     {
-
-
+        //
     }
 }

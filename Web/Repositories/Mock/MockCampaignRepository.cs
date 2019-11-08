@@ -1,10 +1,11 @@
-﻿using Maximiz.Model.Entity;
+﻿using Maximiz.Database.Querying;
+using Maximiz.Model.Entity;
 using Maximiz.Repositories.Abstraction;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Maximiz.Repositories
+namespace Maximiz.Repositories.Mock
 {
 
     /// <summary>
@@ -14,16 +15,8 @@ namespace Maximiz.Repositories
     {
 
         public async Task<CampaignWithStats> Get(Guid id) => GetCampaignOne();
-         
-        public async Task<IEnumerable<CampaignWithStats>> GetActive(int page)
-        {
-            var result = new List<CampaignWithStats>();
-            result.Add(GetCampaignOne());
-            result.Add(GetCampaignOne());
-            return result;
-        }
 
-        public async Task<IEnumerable<CampaignWithStats>> GetAll(int page)
+        public async Task<IEnumerable<CampaignWithStats>> GetAllAsync(QueryCampaignWithStats query, int page = 0)
         {
             var result = new List<CampaignWithStats>();
             result.Add(GetCampaignOne());
@@ -35,36 +28,21 @@ namespace Maximiz.Repositories
             return result;
         }
 
-        public async Task<IEnumerable<CampaignWithStats>> GetConcept(int page)
+        public async Task<IEnumerable<CampaignWithStats>> GetActiveAsync(QueryCampaignWithStats query, int page = 0)
+            => new List<CampaignWithStats>
+            {
+                GetCampaignOne(),
+                GetCampaignOne()
+            };
+
+        public async Task<IEnumerable<CampaignWithStats>> GetInactiveAsync(QueryCampaignWithStats query, int page = 0)
         {
             var result = new List<CampaignWithStats>();
             result.Add(GetCampaignTwo());
             return result;
         }
 
-        public async Task<IEnumerable<CampaignWithStats>> GetDeleted(int page)
-        {
-            var result = new List<CampaignWithStats>();
-            result.Add(GetCampaignTwo());
-            return result;
-        }
-
-        public async Task<IEnumerable<CampaignWithStats>> GetHidden(int page)
-        {
-            var result = new List<CampaignWithStats>();
-            result.Add(GetCampaignOne());
-            result.Add(GetCampaignOne());
-            return result;
-        }
-
-        public async Task<IEnumerable<CampaignWithStats>> GetInactive(int page)
-        {
-            var result = new List<CampaignWithStats>();
-            result.Add(GetCampaignTwo());
-            return result;
-        }
-
-        public async Task<IEnumerable<CampaignWithStats>> GetPending(int page)
+        public async Task<IEnumerable<CampaignWithStats>> GetPendingAsync(QueryCampaignWithStats query, int page = 0)
         {
             var result = new List<CampaignWithStats>();
             result.Add(GetCampaignTwo());
@@ -73,7 +51,7 @@ namespace Maximiz.Repositories
             return result;
         }
 
-        public Task QueryOnLoad()
+        public Task<IEnumerable<CampaignWithStats>> GetQueriedAsync(QueryCampaignWithStats query, int page = 0)
         {
             throw new NotImplementedException();
         }
@@ -82,6 +60,7 @@ namespace Maximiz.Repositories
         {
             Id = Guid.NewGuid(),
             Name = "Dummy campaign one",
+            BrandingText = "Some branding text",
             Budget = 54,
             Spent = 1000,
             Clicks = 18548,
@@ -92,12 +71,18 @@ namespace Maximiz.Repositories
             Profit = 337,
             Actions = 1574,
             StartDate = DateTime.Now,
-            EndDate = DateTime.Now
+            EndDate = DateTime.Now,
+            Publisher = Model.Enums.Publisher.Taboola,
+            TargetUrl = "www.oznak.nl",
+            Utm = "base_utm_code",
+            Delivery = Model.Enums.Delivery.Balanced
         };
+
         private CampaignWithStats GetCampaignTwo() => new CampaignWithStats
         {
             Id = Guid.NewGuid(),
             Name = "Dummy campaign two",
+            BrandingText = "Some branding text",
             Budget = 185,
             Spent = 8000,
             Clicks = 183748,
@@ -108,8 +93,15 @@ namespace Maximiz.Repositories
             Profit = 8657,
             Actions = 1574,
             StartDate = DateTime.Now,
-            EndDate = DateTime.Now
+            EndDate = DateTime.Now,
+            Publisher = Model.Enums.Publisher.Taboola,
+            TargetUrl = "www.oznak.nl",
+            Utm = "base_utm_code",
+            Delivery = Model.Enums.Delivery.Strict
         };
+
+        public Task<int> GetCount(QueryCampaignWithStats query)
+            => Task.FromResult(new Random().Next(40, 350));
     }
 
 }
