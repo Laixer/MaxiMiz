@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics;
 using Maximiz.ViewModels;
+using Maximiz.ViewModels.Utility;
 using Microsoft.AspNetCore.Mvc;
-
 
 namespace Maximiz.Controllers
 {
@@ -13,13 +13,12 @@ namespace Maximiz.Controllers
     {
 
         /// <summary>
-        /// Semi-explicitly links the home view to be loaded upon visiting the
-        /// home page.
+        /// Links the home view to be loaded upon visiting the home page.
         /// </summary>
         /// <returns>The corresponding home view</returns>
         public IActionResult Index()
         {
-            return View();
+            return View(new HomeStatisticsViewModel());
         }
 
         /// <summary>
