@@ -1,0 +1,220 @@
+﻿@*
+    Displays an overview of all campaigns in our viewmodel.
+*@
+
+@model CampaignOverviewViewModel
+@{
+    ViewData["Title"] = "Campaigns";
+}
+<head>
+    <link rel="stylesheet" href="~/css/modal-right.css" />
+</head>
+<body>
+    <main>
+
+        <div class="campaign-overview">
+            <div class="header">
+
+                <!-- Title and searchbar -->
+                <nav class="navbar justify-content-between mb-4">
+                    <h1>All Campaigns</h1>
+
+                    <!-- TODO This way of matching parameters is messy -->
+                    <form class="form-inline" id="formSearchCampaigns">
+                        <input name="SearchQuery" class="form-control search" id="searchCampaigns" placeholder="Search" aria-label="Search" value="@Model.SearchQuery">
+                    </form>
+                </nav>
+
+                <!-- Contains the tabs top bar -->
+                <ul class="nav nav-tabs">
+                    <li class="nav-item">
+                        <a class="nav-link active" data-target="#tabAll" data-toggle="tab" id="tabAllCount">All (...)</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-target="#tabActive" data-toggle="tab" id="tabActiveCount">Active (...)</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-target="#tabInactive" data-toggle="tab" id="tabInactiveCount">Inactive (...)</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-target="#tabPending" data-toggle="tab" id="tabPendingCount">Pending (...)</a>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Contains the correct partial view for each tab. -->
+            <div class="content tab-content">
+
+                <!-- All the partial views, rendered upon document load. -->
+                <div class="tab-pane active" id="tabAll">
+                    <div class="table-responsive tab-pane active" id="tabAll">
+                        <table class="table table-striped">
+                            <partial name="_TableHead" model="@Model" />
+                            <tbody id="tabAllTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="tab-pane" id="tabActive">
+                    <div class="table-responsive tab-pane active" id="tabActive">
+                        <table class="table table-striped">
+                            <partial name="_TableHead" model="@Model" />
+                            <tbody id="tabActiveTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="tab-pane" id="tabInactive">
+                    <div class="table-responsive tab-pane active" id="tabInactive">
+                        <table class="table table-striped">
+                            <partial name="_TableHead" model="@Model" />
+                            <tbody id="tabInactiveTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="tab-pane" id="tabPending">
+                    <div class="table-responsive tab-pane active" id="tabPending">
+                        <table class="table table-striped" id="tableCampaigns">
+                            <partial name="_TableHead" model="@Model" />
+                            <tbody id="tabPendingTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Div in which our details partial view will open -->
+            <div class="container sidemodal">
+                <div class="modal right fade modal-right" id="modal-campaign-details" tabindex="-1" role="dialog" aria-labelledby="modalRightLabel" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content" id="modal-details-content">
+                            <!-- Empty to load partial view with jquery -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </main>
+</body>
+
+<!-- TODO For some reason jquery is not loaded. -->
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+<script type="text/javascript">
+
+    // Global variables to ensure consistent sorting and searc query display across operations
+    window.Column = '@Model.Column';
+    window.Order = '@Model.Order';
+
+    // TODO DRY for fetch
+    $(document).ready(function () {
+
+        // Register all custom form submission classes
+        // TODO This is unused at the moment.
+        $(document).off('click', '.submit-form-by-click');
+        $(document).on('click', '.submit-form-by-click', function () {
+            var form = $(this).closest('form').get(0);
+            $(form).submit();
+        });
+
+        // Subscribe search campaign form submit
+        subscribeFormBySubmit('#formSearchCampaigns', function () {
+            loadTablesAsync();
+        });
+
+        // Handles our model opening for the campaign details
+        $(document).off('click', '.click-open-details');
+        $(document).on('click', '.click-open-details', function () {
+            var campaignId = $(this).attr('data-campaign-id');
+            fetch('@Url.Action("ShowCampaign", "CampaignDetails")?' +
+                new URLSearchParams({
+                    id: campaignId
+                }), {
+                method: 'get'
+            }).then((response) => {
+                return response.text();
+            }).then((html) => {
+                $('#modal-details-content').html(html);
+                $('#modal-campaign-details').modal({ show: true });
+            });
+        });
+
+        // Subscribe delete button functionality
+        $(document).off('click', '.click-delete-campaign');
+        $(document).on('click', '.click-delete-campaign', function () {
+            // TODO Confirmation popup
+            fetch('@Url.Action("Delete", "CampaignOverview")?' +
+                new URLSearchParams({
+                    campaignId: $(this).attr('data-campaign-id')
+                }), {
+                method: 'delete'
+            }).then((response) => {
+                return response();
+            }).then(() => {
+                // Reload all tables because deleted entry can exist in multiple tab tables
+                loadTablesAsync();
+            });
+        });
+
+        // Make us load all tables with default values
+        loadTablesAsync();
+    })
+
+    // TODO Ugly parameter passing, maybe this can be done more elegantly?
+    // Handles the async loading
+    function loadTablesAsync() {
+        var query = $('#searchCampaigns')[0].value; // TODO This does not seem bulletproof!
+        var column = window.Column;
+        var order = window.Order;
+
+        loadTableAsync('@CampaignTableType.All', '#tabAllTableBody', '#tabAllCount', 'All', query, column, order);
+        loadTableAsync('@CampaignTableType.Active', '#tabActiveTableBody', '#tabActiveCount', 'Active', query, column, order);
+        loadTableAsync('@CampaignTableType.Inactive', '#tabInactiveTableBody', '#tabInactiveCount', 'Inactive', query, column, order);
+        loadTableAsync('@CampaignTableType.Pending', '#tabPendingTableBody', '#tabPendingCount', 'Pending', query, column, order);
+    }
+
+    // Ajax call for generic table get request
+    function loadTableAsync(tableType, tableBodyId, countId, tableName, query, column, order) {
+        // Set count to ...
+        $(countId).html(tableName + ' (...)');
+
+        // Load view component async through controller ajax call
+        fetch('@Url.Action("GetCampaignTableViewComponent", "CampaignOverview")?'
+            + new URLSearchParams({
+                table: tableType,
+                query: query,
+                column: column,
+                order: order
+            }), {
+            method: 'get'
+        }).then((response) => {
+            return response.text();
+        }).then((html) => {
+            $(tableBodyId).html(html);
+        });
+
+        // Load count component async through controller ajax call
+        fetch('@Url.Action("GetCampaignCountViewComponent", "CampaignOverview")?'
+            + new URLSearchParams({
+                table: tableType,
+                query: query,
+                column: column,
+                order: order
+            }), {
+            method: 'get'
+        }).then((response) => {
+            return response.text();
+        }).then((html) => {
+            $(countId).html(html);
+        });
+    }
+
+    // Subscribes a form using a custom submit event handler.
+    // Remove existing listeners to prevent duplication
+    function subscribeFormBySubmit(formId, callbackFunction) {
+        $(document).off('submit', formId);
+        $(document).on('submit', formId, function (event) {
+            event.preventDefault();
+            callbackFunction(event);
+        });
+    }
+
+</script>
