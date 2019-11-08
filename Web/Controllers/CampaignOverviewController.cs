@@ -1,11 +1,12 @@
+using Maximiz.Controllers.Abstraction;
 using Maximiz.Database.Querying;
-using Maximiz.InputModels;
 using Maximiz.Mapper;
 using Maximiz.Model.Entity;
-using Maximiz.Model.Enums;
 using Maximiz.Repositories.Abstraction;
 using Maximiz.Transactions;
-using Maximiz.ViewModels;
+using Maximiz.ViewModels.CampaignOverview;
+using Maximiz.ViewModels.Columns;
+using Maximiz.ViewModels.Columns.Translation;
 using Maximiz.ViewModels.EntityModels;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -17,7 +18,7 @@ namespace Maximiz.Controllers
     /// <summary>
     /// Controller for requests related to campaigns.
     /// </summary>
-    public sealed class CampaignOverviewController : Controller
+    public sealed class CampaignOverviewController : Controller, ICampaignOverviewController
     {
 
         /// <summary>
@@ -49,173 +50,69 @@ namespace Maximiz.Controllers
         }
 
         /// <summary>
-        /// Index page for the campaign page, redirecting us to the overview.
-        /// GET: /Campaign/
+        /// Loads our campaign page.
         /// </summary>
-        [HttpGet]
-        public async Task<IActionResult> Index()
-        {
-            return await Overview();
-        }
-
-        /// <summary>
-        /// An overview of all campaigns.
-        /// GET: /Campaign/Overview
-        /// </summary>
-        /// <returns></returns>
-        [HttpGet]
-        public async Task<IActionResult> Overview()
-        {
-            var campaigns = await _campaignRepository.GetAll(0);
-            var campaignsConverted = _mapperCampaign.ConvertAll(campaigns);
-
-            // Compose viewmodel and return view
-            return View("Index", new CampaignOverviewViewModel
-            {
-                Campaigns = campaignsConverted
-            });
-        }
-
-        /// <summary>
-        /// Http Get method for a sorted overview of the campaigns. This does
-        /// query our own database.
-        /// 
-        /// TODO Do we need this overload?
-        /// TODO Should we always re-query the database?
-        /// </summary>
-        /// <param name="column">The column to order by</param>
-        /// <param name="order">The order</param>
         /// <returns>The view</returns>
         [HttpGet]
-        public async Task<IActionResult> OverviewSorted(ColumnCampaign column, Order order)
+        public IActionResult Overview()
         {
             return View("Overview", new CampaignOverviewViewModel
             {
-                //Campaigns = await _campaignRepository.GetAll(column, order)
+                Column = ColumnCampaignOverview.Name,
+                Order = Order.Ascending
             });
         }
 
         /// <summary>
-        /// Http post method to search our database based on a user provided
-        /// search query.
+        /// Gets our view component that gets table rows async.
+        /// TODO This translates, is that correct? Responsibility?
         /// </summary>
+        /// <param name="table">The table</param>
         /// <param name="query">The search query</param>
-        /// <returns>View with retrieved campaigns</returns>
+        /// <param name="column">The sorting column</param>
+        /// <param name="order">The sorting order</param>
+        /// <returns>View component call</returns>
         [HttpGet]
-        public async Task<IActionResult> Search(string query)
+        public IActionResult GetCampaignTableViewComponent(CampaignTableType table,
+            string query, ColumnCampaignOverview column, Order order)
         {
-            // TODO Do nothing if we have no query
-            if (string.IsNullOrEmpty(query)) { return RedirectToAction("Overview"); }
-
-            // Create and return view with model
-            var model = new CampaignOverviewViewModel
-            {
-                //Campaigns = await _campaignRepository.Search(query)
-            };
-            return View("Overview", model);
-
-            //return View("OverView", new OverviewCampaignModel { Campaigns = await _campaignRepository.GetAll() });
-        }
-
-        [HttpGet]
-        public async Task<IActionResult> MyAction(int i)
-        {
-            return View();
-        }
-
-        [HttpGet]
-        public async Task<IActionResult> OnPressActive()
-        {
-            return RedirectToAction("Overview");
+            var columnDatabase = ColumnTranslator.Translate(column);
+            var orderDatabase = OrderTranslator.Translate(order);
+            var queryObject = new QueryCampaignWithStats(query, columnDatabase, orderDatabase);
+            return ViewComponent("CampaignTable", new { query = queryObject });
         }
 
 
         /// <summary>
-        /// Displaying the details for a single <see cref="Campaign"/>.
-        /// GET: /Campaign/Details/{Id}
+        /// Gets our view component that gets campaign query count async.
         /// </summary>
+        /// <param name="table">The table</param>
+        /// <param name="query">The search query</param>
+        /// <param name="column">The sorting column</param>
+        /// <param name="order">The sorting order</param>
+        /// <returns>View component call</returns>
         [HttpGet]
-        public async Task<IActionResult> Details(Guid id)
+        public IActionResult GetCampaignCountViewComponent(CampaignTableType table, 
+            string query, ColumnCampaignOverview column, Order order)
         {
-            var c = await _campaignRepository.Get(id);
-            return View(c);
+            var columnDatabase = ColumnTranslator.Translate(column);
+            var orderDatabase = OrderTranslator.Translate(order);
+            var queryObject = new QueryCampaignWithStats(query, columnDatabase, orderDatabase);
+            return ViewComponent("CampaignCount", new { table, query = queryObject });
         }
 
         /// <summary>
-        /// The create page for a new <see cref="Campaign"/>.
-        /// GET: /Campaign/Create
+        /// Deletes a campaign.
         /// </summary>
-        /// <returns>Action result</returns>
-        [HttpGet]
-        public IActionResult Create()
-        {
-            return View();
-        }
-
-        /// <summary>
-        /// Create a new <see cref="CampaignGroup"/> entity and generate its 
-        /// corresponding <see cref="Campaign"/> entities.
-        /// POST: /Campaign/Create
-        /// </summary>
-        /// <param name="input">The input model for a new campaign</param>
-        /// <returns>Action result</returns>
-        [HttpPost]
-        public async Task<IActionResult> Create(CampaignGroupInputModel input)
-        {
-            // TODO: Validate and create model, handle possible error
-            if (!ModelState.IsValid)
-            {
-                return View(input);
-            }
-
-            //CampaignGroup group = input.ToEntityModel();
-
-            throw new NotImplementedException();
-            // await _campaignRepository.CreateGroup(group);
-
-            return RedirectToAction("Overview");
-        }
-
-        // TODO Remove, temporary page for quickly creating a model with a prefilled  form
-        public IActionResult CreateTest(string name)
-        {
-            return View("Create", new CampaignGroupInputModel()
-            {
-                Name = name ?? "Test",
-                Budget = 9001,
-                DailyBudget = 10,
-                Devices = new Device[] { Device.Desktop, Device.Laptop, Device.Mobile, Device.Tablet, Device.Wearable },
-                OperatingSystems = new OS[] { OS.Android, OS.Chromeos, OS.iOS, },
-                //ConnectionsType = new ConnectionType[] { ConnectionType.Wifi },
-                Utm = "utm=test",
-                BrandingText = "Test",
-            });
-        }
-
-
-
-        [HttpPut]
-        public IActionResult Edit(Campaign campaign)
-        {
-            // TODO
-            return NotFound();
-            //_campaignRepository.Update(campaign);
-        }
-
-        [HttpPut]
-        public IActionResult Duplicate(Campaign campaign)
-        {
-            // TODO
-            return NotFound();
-            //_campaignRepository.Create(campaign);
-        }
-
+        /// <param name="campaignId">Internal campaign id</param>
+        /// <returns>View</returns>
         [HttpDelete]
-        public IActionResult Delete(Campaign campaign)
+        public async Task<IActionResult> Delete(Guid campaignId)
         {
-            // TODO
-            return NotFound();
-            //_campaignRepository.Delete(campaign);
+            // Simulate waiting
+            await Task.Delay(new Random().Next(200, 500));
+            return NoContent();
         }
+
     }
 }

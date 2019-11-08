@@ -1,12 +1,17 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using Maximiz.Controllers.Abstraction;
+using Maximiz.Database.Querying;
 using Maximiz.Mapper;
 using Maximiz.Model.Entity;
 using Maximiz.Repositories.Abstraction;
 using Maximiz.Transactions;
-using Maximiz.ViewModels;
+using Maximiz.ViewModels.CampaignDetails;
+using Maximiz.ViewModels.Columns;
+using Maximiz.ViewModels.Columns.Translation;
 using Maximiz.ViewModels.EntityModels;
+using Maximiz.ViewModels.Enums;
 using Microsoft.AspNetCore.Mvc;
+using System;
+using System.Threading.Tasks;
 
 namespace Maximiz.Controllers
 {
@@ -14,17 +19,27 @@ namespace Maximiz.Controllers
     /// <summary>
     /// Controller for showing and editing campaign details.
     /// </summary>
-    internal sealed class CampaignDetailsController : Controller
+    public sealed class CampaignDetailsController : Controller, ICampaignDetailsController
     {
         /// <summary>
-        /// Repository containing our campaigns retrieved from the database.
+        /// Repository containing our campaigns retrieved from the data store.
         /// </summary>
         private readonly ICampaignRepository _campaignRepository;
 
         /// <summary>
+        /// Repository containing our ad groups retrieved from the data store.
+        /// </summary>
+        private readonly IAdGroupRepository _adGroupRepository;
+
+        /// <summary>
         /// Converts our campaigns.
         /// </summary>
-        private readonly IMapper<Campaign, CampaignModel> _mapperCampaign;
+        private readonly IMapper<CampaignWithStats, CampaignModel> _mapperCampaign;
+
+        /// <summary>
+        /// Converts our ad groups.
+        /// </summary>
+        private readonly IMapper<AdGroupWithStats, AdGroupModel> _mapperAdGroup;
 
         /// <summary>
         /// Manages entity transactions for us.
@@ -37,16 +52,16 @@ namespace Maximiz.Controllers
         /// <param name="campaignRepository">The campaign repository</param>
         /// <param name="transactionHandler">The transaction handler</param>
         public CampaignDetailsController(ICampaignRepository campaignRepository,
-            IMapper<Campaign, CampaignModel> mapperCampaign, ITransactionHandler transactionHandler)
+            IAdGroupRepository adGroupRepository,
+            IMapper<CampaignWithStats, CampaignModel> mapperCampaign,
+            IMapper<AdGroupWithStats, AdGroupModel> mapperAdGroup,
+            ITransactionHandler transactionHandler)
         {
             _campaignRepository = campaignRepository;
+            _adGroupRepository = adGroupRepository;
             _mapperCampaign = mapperCampaign;
+            _mapperAdGroup = mapperAdGroup;
             _transactionHandler = transactionHandler;
-        }
-
-        public ActionResult Index()
-        {
-            return View();
         }
 
         /// <summary>
@@ -58,12 +73,115 @@ namespace Maximiz.Controllers
         [HttpGet]
         public async Task<IActionResult> ShowCampaign(Guid id)
         {
-            var campaign = await _campaignRepository.Get(id);
-            var campaignConverted = _mapperCampaign.Convert(campaign);
-            return View("Index", new CampaignDetailsViewModel
+            return PartialView("_Details", new CampaignDetailsViewModel
             {
-                Campaign = campaignConverted
+                Campaign = _mapperCampaign.Convert(await _campaignRepository.Get(id)),
+                Account = new AccountModel() { Name = "This is my account oh yes oh yes", Publisher = Publisher.Taboola } // TODO Account repository
             });
         }
+
+        /// <summary>
+        /// Saves the user submitted form variables.
+        /// </summary>
+        /// <param name="model"><see cref="FormCampaignAccountViewModel"/></param>
+        /// <returns>Action result</returns>
+        [HttpPost]
+        public async Task<IActionResult> PostFormAccount(FormCampaignAccountViewModel model)
+        {
+            // Do the transaction
+            await Task.Delay(new Random().Next(350, 1000));
+            return NoContent();
+        }
+
+        /// <summary>
+        /// Saves the user submitted form variables.
+        /// </summary>
+        /// <param name="model"><see cref="FormCampaignMarketingViewModel"/></param>
+        /// <returns>Action result</returns>
+        [HttpPost]
+        public async Task<IActionResult> PostFormMarketing(FormCampaignMarketingViewModel model)
+        {
+            // Do the transaction
+            await Task.Delay(new Random().Next(350, 1000));
+            return NoContent();
+        }
+
+        /// <summary>
+        /// Saves the user submitted form variables.
+        /// </summary>
+        /// <param name="model"><see cref="FormCampaignMarketingViewModel"/></param>
+        /// <returns>Action result</returns>
+        [HttpPost]
+        public async Task<IActionResult> PostFormPublishers(FormCampaignPublishersViewModel model)
+        {
+            // Do the transaction
+            await Task.Delay(new Random().Next(350, 1000));
+            return NoContent();
+        }
+
+        /// <summary>
+        /// Returns the partial view containing all currently linked ad groups.
+        /// </summary>
+        /// <param name="campaignId">The id of the corresponding campaign</param>
+        /// <returns>Partial view</returns>
+        [HttpGet]
+        public IActionResult GetAdGroupsLinkedViewComponent(Guid campaignId, string query, ColumnAdGroupLinking column, Order order)
+        {
+            // Translate from viewmodel to model
+            var columnTranslated = ColumnTranslator.Translate(column);
+            var orderTranslated = OrderTranslator.Translate(order);
+
+            return ViewComponent("AdGroupTableLinked", new
+            {
+                campaignId,
+                query = new QueryAdGroupWithStats(query, columnTranslated, orderTranslated)
+            });
+        }
+
+        /// <summary>
+        /// Returns the partial view containing all currently linked ad groups.
+        /// </summary>
+        /// <param name="campaignId">The id of the corresponding campaign</param>
+        /// <returns>Partial view</returns>
+        [HttpGet]
+        public IActionResult GetAdGroupsAllViewComponent(Guid campaignId, string query, ColumnAdGroupLinking column, Order order)
+        {
+            // Translate from viewmodel to model
+            var columnTranslated = ColumnTranslator.Translate(column);
+            var orderTranslated = OrderTranslator.Translate(order);
+
+            return ViewComponent("AdGroupTableAll", new
+            {
+                campaignId,
+                query = new QueryAdGroupWithStats(query, columnTranslated, orderTranslated)
+            });
+        }
+
+        /// <summary>
+        /// Links a given ad group to the campaign of the details view.
+        /// </summary>
+        /// <param name="model"><see cref="AdGroupConnectionViewModel"</param>
+        /// <returns>No content actionresult</returns>
+        [HttpPost]
+        public async Task<IActionResult> LinkAdGroup(Guid campaignId, Guid adGroupId)
+        {
+            // await _transactionHandler.HandleTransaction();
+            await Task.Delay(500);
+            return NoContent();
+        }
+
+        /// <summary>
+        /// Unlinks a given ad group to the campaign of the details view.
+        /// </summary>
+        /// <param name="model"><see cref="AdGroupConnectionViewModel"</param>
+        /// <returns>Partial view with unlinked ad groups</returns>
+        [HttpPost]
+        public async Task<IActionResult> UnlinkAdGroup(Guid campaignId, Guid adGroupId)
+        {
+            // await _transactionHandler.HandleTransaction()
+            await Task.Delay(500);
+            return NoContent();
+        }
+
     }
 }
