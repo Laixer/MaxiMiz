@@ -1,4 +1,4 @@
-@*
+﻿@*
     This layout page contains the sidebar navigation menu and a navigation bar,
     and is used as the base template for views.
 *@
@@ -10,6 +10,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - Maximiz</title>
 
+    <!-- Styling setup -->
     <environment include="Development">
         <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.css" />
     </environment>
@@ -18,126 +19,49 @@
               asp-fallback-href="~/lib/bootstrap/dist/css/bootstrap.min.css"
               asp-fallback-test-class="sr-only" asp-fallback-test-property="position" asp-fallback-test-value="absolute"
               crossorigin="anonymous"
-              integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"/>
+              integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" />
     </environment>
-    <link rel="stylesheet" href="~/css/site.css" />
-    <link rel="stylesheet" href="~/css/sidebar.css"/>
+
+    <!-- Custom css -->
+    <link rel="stylesheet" href="~/css/style.css">
+    <link rel="stylesheet" href="~/css/modal_center.css">
+    <link rel="stylesheet" href="~/css/modal_right.css">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css" integrity="sha384-mzrmE5qonljUremFsqc01SB46JvROS7bZs3IO2EmfFsd15uHvIt+Y8vEf7N7fWAU" crossorigin="anonymous">
-    @RenderSection("Styles", required:false)
+
+
+    @RenderSection("Styles", required: false)
 </head>
 <body>
-  <header class="sidebar">
-    <div class="sidebar-wrapper">
-      <ul class="nav flex-column mt-5">
-        <li>
-          <a href="/">
-            <p><i class="fas fa-tachometer-alt"></i> Dashboards</p>
-          </a>
-        </li>
-        <li>
-          <a data-toggle="collapse" href="#collapseCampaigns" aria-expanded="false" class="@(Context.Request.Path.Value.StartsWith("/Campaign") ? "active" : "")">
-            <p><i class="far fa-paper-plane"></i> Campaigns <i class="fas fa-chevron-down"></i></p>
-          </a>
-          <div class="collapse show" id="collapseCampaigns">
-            <div class="dropdown-divider"></div>
-            <ul class="nav">
-                <li class="dropright">
-                  <a class="dropdown-toggle" data-toggle="dropdown" href="#">Recently opened</a>
-                  <ul class="dropdown-menu">
-                    <li><a href="#">1</a></li>
-                    <li><a href="#">2</a></li>
-                    <li><a href="#">3</a></li>
-                    <li><a href="#">4</a></li>
-                    <li><a href="#">5</a></li>
-                  </ul>
-                </li>
-                <li class="active">
-                  <a href="/Campaign" class="@(Context.Request.Path.Value.StartsWith("/Campaign") ? "active-color" : "")">Overview</a>
-                </li>
-                <li>
-                  <a href="#">Ad Performance</a>
-                </li>
-                <li>
-                  <a href="view/campaigns/publisher_performance.html">Publisher Performance</a>
-                </li>
-            </ul>
-          </div>
-        </li>
-        <li>
-          <a href="view/ad_groups.html">
-            <p><i class="fas fa-rocket"></i> Ad Groups</p>
-          </a>
-        </li>
-        <li>
-          <a href="view/rules.html">
-            <p><i class="far fa-file-alt"></i> Rules</p>
-          </a>
-        </li>
-        <li>
-          <a href="view/targeting_lists.html">
-            <p><i class="fas fa-bullseye"></i> Targeting Lists</p>
-          </a>
-        </li>
-      </ul>
+    <partial name="_SideMenu" />
+    <partial name="_NavigationBar" />
+    <div id="divBody">
+        @RenderBody()
     </div>
-  </header>
-  <nav class="navbar navbar-default">
-    <div class="container-fluid">
-      <div class="navbar-minimize">
-          <button class="btn btn-fill btn-icon"><i class="ti-more-alt"></i></button>
-      </div>
-      <div class="collapse navbar-collapse show">
-        <div class="logo float-left">
-          <p>ISA <b class="minimize"></b></p>
-        </div>
-        <ul class="nav navbar-right">
-          <li class="button dropdown"><button data-toggle="dropdown" class="dropdown-toggle btn btn-main btn-blue">Add new <i class="fas fa-chevron-down"></i></button>
-            <ul class="dropdown-menu">
-              <li><a href="view/campaigns/new_campaign.html"> Campaign</a></li>
-              <li><a href="view/ads/new_advertisement.html"> Advertisement</a></li>
-            </ul>
-          </li>
-          <li class="dropdown">
-            <a data-toggle="dropdown" href="#" class="dropdown-toggle">
-              <p>info@webuy.media</p>
-            </a>
-            <ul class="dropdown-menu dropdown-settings">
-              <li><a asp-controller="Settings" asp-action="Account"><i class="fas fa-user-circle"></i> Account</a></li>
-              <li><a asp-controller="Settings" asp-action="Preferences"><i class="fas fa-sliders-h"></i> Preferences</a></li>
-              <li><a asp-controller="Settings" asp-action="Billing"><i class="fas fa-dollar-sign"></i> Billing</a></li>
-              <li><a asp-controller="Settings" asp-action="Integrations"><i class="fas fa-plug"></i> Integrations</a></li>
-              <div class="dropdown-divider"></div>
-              <li><a href="#"><i class="fas fa-sign-out-alt"></i> Sign Out</a></li>
-            </ul>
-          </li>
-          <div class="divider"></div>
-          <li class="settings">
-            <a href="#"><i class="fas fa-cog"></i></a>
-          </li>
-        </ul>
-      </div>
-    </div>
-  </nav>
-  <div>
-  @RenderBody()
-  </div>
     <script>
-
-        document.getElementById("menu-toggle").onclick = function (e) {
-            e.preventDefault();
-            var wrapper = document.getElementById("wrapper");
-            if (wrapper.className == "d-flex toggled") {
-                wrapper.className = "d-flex";
-            }
-            else {
-                wrapper.className = "d-flex toggled";
-            }
-        }
+                                        // TODO This was added in a previous version where our menu openclose was implemented.
+                                        //document.getElementById("menu-toggle").onclick = function (e) {
+                                        //    e.preventDefault();
+                                        //    var wrapper = document.getElementById("wrapper");
+                                        //    if (wrapper.className == "d-flex toggled") {
+                                        //        wrapper.className = "d-flex";
+                                        //    }
+                                        //    else {
+                                        //        wrapper.className = "d-flex toggled";
+                                        //    }
+                                        //}
     </script>
+
+
+    <!-- Script setup -->
+    <!-- In development, just get all from lib -->
     <environment include="Development">
+        <!-- These are our global script imports. -->
         <script src="~/lib/jquery/dist/jquery.js"></script>
         <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.js"></script>
+        <script src="~/lib/jquery-validation/dist/jquery.validate.js"></script>
     </environment>
+
+    <!-- In production, have download as fallback -->
     <environment exclude="Development">
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"
                 asp-fallback-src="~/lib/jquery/dist/jquery.min.js"
@@ -152,8 +76,9 @@
                 integrity="sha384-xrRywqdh3PHs8keKZN+8zzc5TX0GRTLCcmivcbNJWm2rs5C8PRhcEn3czEjhAO9o">
         </script>
     </environment>
-    <script src="~/js/site.js" asp-append-version="true"></script>
 
+    <!-- Render script section for each (non-partial) view after imports -->
     @RenderSection("Scripts", required: false)
+
 </body>
 </html>

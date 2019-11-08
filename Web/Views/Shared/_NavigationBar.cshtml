@@ -1,0 +1,42 @@
+﻿@*
+    Contains the navigation top bar as a partial view.
+*@
+
+<nav class="navbar navbar-default">
+    <div class="container-fluid">
+        <div class="navbar-minimize">
+            <button class="btn btn-fill btn-icon"><i class="ti-more-alt"></i></button>
+        </div>
+        <div class="collapse navbar-collapse show">
+            <div class="logo float-left">
+                <p>ISA <b class="minimize"></b></p>
+            </div>
+            <ul class="nav navbar-right">
+                <li class="button dropdown">
+                    <button data-toggle="dropdown" class="dropdown-toggle btn btn-main btn-blue">Add new<i class="fas fa-chevron-down"></i></button>
+                    <ul class="dropdown-menu">
+                        <li><a asp-controller="NewCampaignGroup" asp-action="@nameof(NewCampaignGroupController.ShowWizard)"> Campaign Group</a></li>
+                        <li><a asp-controller="AdGroupWizard" asp-action="@nameof(AdGroupWizardController.ShowWizard)" > Ad Group</a></li>
+                    </ul>
+                </li>
+                <li class="dropdown">
+                    <a data-toggle="dropdown" href="#" class="dropdown-toggle">
+                        <p>info@webuy.media</p>
+                    </a>
+                    <ul class="dropdown-menu dropdown-settings">
+                        <li><a asp-controller="Settings" asp-action="Account"><i class="fas fa-user-circle"></i> Account</a></li>
+                        <li><a asp-controller="Settings" asp-action="Preferences"><i class="fas fa-sliders-h"></i> Preferences</a></li>
+                        <li><a asp-controller="Settings" asp-action="Billing"><i class="fas fa-dollar-sign"></i> Billing</a></li>
+                        <li><a asp-controller="Settings" asp-action="Integrations"><i class="fas fa-plug"></i> Integrations</a></li>
+                        <div class="dropdown-divider"></div>
+                        <li><a href="#"><i class="fas fa-sign-out-alt"></i> Sign Out</a></li>
+                    </ul>
+                </li>
+                <div class="divider"></div>
+                <li class="settings">
+                    <a href="#"><i class="fas fa-cog"></i></a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
