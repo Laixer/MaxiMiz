@@ -1,0 +1,119 @@
+﻿@*
+    Partial view containing the ad group details for a single campaign.
+*@
+
+@model CampaignDetailsViewModel
+<!-- Ad group tab -->
+<div>
+    <h1>Linked Ad Groups</h1>
+    <div class="section-users">
+
+        <!-- Table containing linked ad groups -->
+        <div id="tableLinked">
+            <div class="table-responsive total-ad-groups">
+                <table class="table table-striped table-hover table-bordered">
+                    <partial name="_AdGroupTableHead" model="@new AdGroupTableHeadViewModel() { TableType = AdGroupLinkingTableType.Linked }"/>
+                    <tbody id="tableAdGroupLinkedBody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Section for all existing ad groups and searching -->
+        <h1 class="my-3">All Ad Groups</h1>
+        <div class="row users-heading px-3">
+
+            <!-- Search bar -->
+            <div class="form-group">
+                <form id="formSearchAllAdGroups" method="post">
+                    <input id="searchAllAdGroups" type="search" class="search form-control mr-sm-2" placeholder="Search Ad Groups" aria-label="Search">
+                </form>
+            </div>
+
+            <!-- Text link for creating a new ad group -->
+            <div class="ml-4 align-self-center">
+                <a asp-controller="AdGroupWizard" asp-action="ShowWizard"><i class="fas fa-plus-circle"> </i>Create a new ad group</a>
+            </div>
+
+            <!-- Total ad group count -->
+            <div class="ml-4 align-self-center">
+                <p class="m-0"> <b id="adGroupTotalCount">...</b> Ad Groups in total</p>
+            </div>
+        </div>
+
+        <!-- Table containing all ad groups -->
+        <div id="tableAll">
+            <div class="table-responsive total-ad-groups">
+                <table class="table table-striped table-hover table-bordered">
+                    <partial name="_AdGroupTableHead" model="@new AdGroupTableHeadViewModel() { TableType = AdGroupLinkingTableType.All }"/>
+                    <tbody id="tableAdGroupAllBody"></tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+
+        // Save global variables
+        window.ColumnAdGroupLinked = '@ColumnAdGroupLinking.Name';
+        window.OrderAdGroupLinked = '@Order.Ascending';
+        window.ColumnAdGroupAll = '@ColumnAdGroupLinking.Name';
+        window.OrderAdGroupAll = '@Order.Ascending';
+
+        // Subscribe search button
+        subscribeFormBySubmit('#formSearchAllAdGroups', function () {
+            loadAdGroupAllAsync();
+        });
+
+        // Trigger initial async view component load when our document is ready
+        loadAdGroupLinkedAsync();
+        loadAdGroupAllAsync();
+    });
+
+    // Loads the linked ad groups table
+    function loadAdGroupLinkedAsync() {
+        var query = null; // TODO Sending null, good idea or not?
+        var column = window.ColumnAdGroupLinked;
+        var order = window.OrderAdGroupLinked;
+        var url = '@Url.Action("GetAdGroupsLinkedViewComponent", "CampaignDetails")';
+        loadAdGroupTableAsync(url, '#tableAdGroupLinkedBody', query, column, order);
+    }
+
+    // Loads the all ad groups table
+    // TODO Should this take control over an element outside of this view? I think not, but I didn't want to build an entire component for this.
+    // TODO If this is the approach, maybe do the same for the campaign table count
+    function loadAdGroupAllAsync() {
+        // Count indicator is updated by the view returned by the all-table view component
+        $('#adGroupTotalCount').html('...');
+
+        var query = $('#searchAllAdGroups')[0].value; // TODO This does not seem bulletproof!
+        var column = window.ColumnAdGroupAll;
+        var order = window.OrderAdGroupAll;
+        var url = '@Url.Action("GetAdGroupsAllViewComponent", "CampaignDetails")';
+        loadAdGroupTableAsync(url, '#tableAdGroupAllBody', query, column, order);
+    }
+
+    // Loads up a table async using ajax
+    // This is pretty similar to the campaign ajax method, but fundamentally different.
+    // We are dealing with ad groups instead of campaigns.
+    function loadAdGroupTableAsync(url, tableBodyId, query, column, order) {
+        // Load view component async through controller ajax call
+        $.ajax({
+            url: url,
+            type: 'get',
+            data: {
+                campaignId: getCampaignId(),
+                query: query,
+                column: column,
+                order: order
+            },
+            success: function (response) {
+                $(tableBodyId).html(response);
+            }
+        });
+    }
+
+</script>

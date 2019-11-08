@@ -1,0 +1,65 @@
+﻿@*
+    Contains our table head for a given ad group table.
+*@
+
+@model AdGroupTableHeadViewModel
+
+<!--Table head -->
+<thead class="thead-darkblue" data-tabletype="@Model.TableType">
+    <tr>
+        <th scope="col">
+            Group name
+            <a class="click-sort-adgroup" data-column="@ColumnAdGroupLinking.Name" data-order="@Order.Ascending">/\</a>
+            <a class="click-sort-adgroup" data-column="@ColumnAdGroupLinking.Name" data-order="@Order.Descending">\/</a>
+        </th>
+        <th scope="col">
+            Created
+            <a class="click-sort-adgroup" data-column="@ColumnAdGroupLinking.CreateDate" data-order="@Order.Ascending">/\</a>
+            <a class="click-sort-adgroup" data-column="@ColumnAdGroupLinking.CreateDate" data-order="@Order.Descending">\/</a>
+        </th>
+        <th scope="col">
+            Ads
+            <a class="click-sort-adgroup" data-column="@ColumnAdGroupLinking.AdCount" data-order="@Order.Ascending">/\</a>
+            <a class="click-sort-adgroup" data-column="@ColumnAdGroupLinking.AdCount" data-order="@Order.Descending">\/</a>
+        </th>
+        <th scope="col">
+            Modified
+            <a class="click-sort-adgroup" data-column="@ColumnAdGroupLinking.UpdateDate" data-order="@Order.Ascending">/\</a>
+            <a class="click-sort-adgroup" data-column="@ColumnAdGroupLinking.UpdateDate" data-order="@Order.Descending">\/</a>
+        </th>
+        <th scope="col"></th>
+    </tr>
+</thead>
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+
+        // Link sorting buttons
+        // Subscribe sorting button functionality
+        // Remove all click handlers because tabs load multiple times
+        $(document).off('click', '.click-sort-adgroup');
+        $(document).on('click', '.click-sort-adgroup', function () {
+            // Query is stored in the search bar, might want to do this differently?
+            var column = $(this).attr('data-column');
+            var order = $(this).attr('data-order');
+
+            // Get the table type stored in the thead html element, because @@Model doesnt work on $this.
+            var type = $(this).closest('thead').attr('data-tabletype')
+
+            // Storing global
+            if (type == '@AdGroupLinkingTableType.All') {
+                window.ColumnAdGroupAll = column;
+                window.OrderAdGroupAll = order;
+                loadAdGroupAllAsync();
+            } else {
+                window.ColumnAdGroupLinked = column;
+                window.OrderAdGroupLinked = order;
+                loadAdGroupLinkedAsync();
+            }
+        });
+
+
+    });
+
+</script>

@@ -1,0 +1,76 @@
+@*
+    Partial view containing the details of a campaign.
+*@
+
+@model CampaignDetailsViewModel
+<!-- View for the details of a campaign -->
+<div class="modal-body">
+    <ul class="nav nav-tabs">
+        <li class="nav-item">
+            <span class="nav-link active" data-target="#tabAccount" data-toggle="tab">Account</span>
+        </li>
+        <li class="nav-item">
+            <span class="nav-link" data-target="#tabMarketing" data-toggle="tab">Marketing</span>
+        </li>
+        <li class="nav-item">
+            <span class="nav-link" data-target="#tabPublishers" data-toggle="tab">Publishers</span>
+        </li>
+        <li class="nav-item">
+            <span class="nav-link" data-target="#tabAdGroups" data-toggle="tab">Ad Groups</span>
+        </li>
+    </ul>
+
+    <!-- Tab contents with partial views for each tab -->
+    <div class="tab-content">
+        <div class="tab-pane active" id="tabAccount">
+            <partial name="_DetailsAccount" model="@Model" />
+        </div>
+        <div class="tab-pane" id="tabMarketing">
+            <partial name="_DetailsMarketing" model="@Model" />
+        </div>
+        <div class="tab-pane" id="tabPublishers">
+            <partial name="_DetailsPublishers" model="@Model" />
+        </div>
+        <div class="tab-pane" id="tabAdGroups">
+            <partial name="_DetailsAdGroups" model="@Model" />
+        </div>
+    </div>
+</div>
+
+<!-- Footer of our modal -->
+<!-- TODO Do we want this? -->
+<div class="modal-footer justify-content-start">
+    <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fas fa-long-arrow-alt-right"></i></button>
+</div>
+
+<script type="text/javascript">
+
+    // Getter for campaign id
+    // Created because passing the id became a race condition
+    // TODO Is this the way to go?
+    function getCampaignId() {
+        return '@Model.Campaign.Id';
+    }
+
+    // Sets up a campaign details tab form
+    function setupCampaignDetailsForm(formId, inputClass, buttonId) {
+        subscribeFormBySubmit(formId, function () {
+            // First serialize because disabled forms cant be serialized
+            var data = $(formId).serialize();
+
+            // Give user feedback that the operation is in progress
+            $(inputClass).attr('disabled', 'disabled');
+            var startHtml = $(buttonId).html();
+            $(buttonId).load('@Url.Action("LoadingIcon", "Utility")');
+
+            $.post($(formId).attr('action'), data, function () {
+                // Reset tab
+                // TODO What happens if this post never finishes? Is that a possible scenario?
+                $(inputClass).removeAttr('disabled');
+                $(buttonId).html(startHtml);
+            });
+        });
+    }
+
+
+</script>
