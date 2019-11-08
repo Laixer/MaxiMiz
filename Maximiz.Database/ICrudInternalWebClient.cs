@@ -22,13 +22,13 @@ namespace Maximiz.Database
 
         Task<AdGroupWithStats> GetAdGroupAsync(Guid guid, CancellationToken token);
 
-        Task<IEnumerable<CampaignWithStats>> GetCampaignsAsync(Query<ColumnCampaignWithStats> query, int page, CancellationToken token);
+        Task<IEnumerable<CampaignWithStats>> GetCampaignsAsync(QueryCampaignWithStats query, int page, CancellationToken token);
 
-        Task<IEnumerable<CampaignGroupWithStats>> GetCampaignGroupsAsync(Query<ColumnCampaignGroupWithStats> query, int page, CancellationToken token);
+        Task<IEnumerable<CampaignGroupWithStats>> GetCampaignGroupsAsync(QueryCampaignGroupWithStats query, int page, CancellationToken token);
 
-        Task<IEnumerable<AdItemWithStats>> GetAdItemsAsync(Query<ColumnAdItemWithStats> query, int page, CancellationToken token);
+        Task<IEnumerable<AdItemWithStats>> GetAdItemsAsync(QueryAdItemWithStats query, int page, CancellationToken token);
 
-        Task<IEnumerable<AdGroupWithStats>> GetAdGroupsAsync(Query<ColumnAdGroupWithStats> query, int page, CancellationToken token);
+        Task<IEnumerable<AdGroupWithStats>> GetAdGroupsAsync(QueryAdGroupWithStats query, int page, CancellationToken token);
 
         Task<CampaignWithStats> CreateCampaignAsync(Campaign campaign, CancellationToken token);
 

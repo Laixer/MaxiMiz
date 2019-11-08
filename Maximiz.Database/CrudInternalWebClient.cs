@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Maximiz.Database.Querying;
@@ -49,12 +48,12 @@ namespace Maximiz.Database
             throw new NotImplementedException();
         }
 
-        public Task<IEnumerable<AdGroupWithStats>> GetAdGroupsAsync(Query<ColumnAdGroupWithStats> query, int page, CancellationToken token)
+        public Task<IEnumerable<AdGroupWithStats>> GetAdGroupsAsync(QueryAdGroupWithStats query, int page, CancellationToken token)
         {
             throw new NotImplementedException();
         }
 
-        public Task<IEnumerable<AdItemWithStats>> GetAdItemsAsync(Query<ColumnAdItemWithStats> query, int page, CancellationToken token)
+        public Task<IEnumerable<AdItemWithStats>> GetAdItemsAsync(QueryAdItemWithStats query, int page, CancellationToken token)
         {
             throw new NotImplementedException();
         }
@@ -69,12 +68,12 @@ namespace Maximiz.Database
             throw new NotImplementedException();
         }
 
-        public Task<IEnumerable<CampaignGroupWithStats>> GetCampaignGroupsAsync(Query<ColumnCampaignGroupWithStats> query, int page, CancellationToken token)
+        public Task<IEnumerable<CampaignGroupWithStats>> GetCampaignGroupsAsync(QueryCampaignGroupWithStats query, int page, CancellationToken token)
         {
             throw new NotImplementedException();
         }
 
-        public Task<IEnumerable<CampaignWithStats>> GetCampaignsAsync(Query<ColumnCampaignWithStats> query, int page, CancellationToken token)
+        public Task<IEnumerable<CampaignWithStats>> GetCampaignsAsync(QueryCampaignWithStats query, int page, CancellationToken token)
         {
             throw new NotImplementedException();
         }
