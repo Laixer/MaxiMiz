@@ -1,11 +1,9 @@
-﻿using Maximiz.Model.Enums;
-using System;
+﻿using Maximiz.Database.Mapper;
+using Maximiz.Model.Enums;
 using System.Collections.Generic;
-using System.Text;
 
-namespace Maximiz.Database.Querying
+namespace Maximiz.Database.QueryBuilding
 {
-
 
     /// <summary>
     /// Composes query string for us based on multiple values of certain enums.
