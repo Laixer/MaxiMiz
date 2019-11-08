@@ -1,0 +1,78 @@
+﻿@*
+    Table rows for our all-adgroup table in the campaign details view.
+*@
+
+@model AdGroupTableAllViewModel
+<!-- Table entry for each item in our collection. -->
+@foreach (var adGroup in Model.AdGroupsAll)
+{
+    <tr class="row-unlink-adgroup">
+        <td>@adGroup.Name</td>
+        <td>@adGroup.CreateDate</td>
+        <td>@adGroup.AdItemCount</td>
+        <td>@adGroup.UpdateDate</td>
+        <td>
+            <!-- Form for posting link or unlink requests -->
+            @if (Model.AdGroupIdsLinked.Contains(adGroup.Id))
+            {
+                <!-- If the adgroup is already linked -->
+                <form method="post" class="formUnlinkAdGroup">
+                    <!-- Post form submission through jquery ajax post request -->
+                    <button type="submit" class="button-adgroup btn btn-primary">Unlink</button>
+
+                    <!-- Hidden input fields to insert data into form model -->
+                    <input type="hidden" name="AdGroupId" value="@adGroup.Id" />
+                </form>
+            }
+            else
+            {
+                <!-- If the adgroup is not already linked -->
+                <form method="post" class="formLinkAdGroup">
+                    <!-- Post form submission through jquery ajax post request -->
+                    <button type="submit" class="button-adgroup btn btn-primary">Link</button>
+
+                    <!-- Hidden input fields to insert data into form model -->
+                    <input type="hidden" name="AdGroupId" value="@adGroup.Id" />
+                </form>
+            }
+        </td>
+    </tr>
+}
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+
+        // Set the count
+        $('#adGroupTotalCount').html('@Model.TotalCount');
+
+        // TODO Duplicate code
+        // Add functionality for linking button
+        subscribeFormBySubmit('.formLinkAdGroup', function (event) {
+            var form = $(event.target);
+            var button = $(form).children().first('.button-adgroup');
+            var adGroupId = $(form).find('input[name="AdGroupId"]').val();
+
+            // Disable button to prevent double clicking
+            $(button).attr('disabled', true);
+
+            // Button text should indicate loading icon as user feedback
+            $(button).load('@Url.Action("LoadingIcon", "Utility")');
+
+            $.ajax({
+                url: '@Url.Action("LinkAdGroup", "CampaignDetails")',
+                type: 'post',
+                data: {
+                    campaignId: getCampaignId(),
+                    adGroupId: adGroupId
+                },
+                success: function () {
+                    loadAdGroupLinkedAsync();
+                    loadAdGroupAllAsync();
+                }
+            });
+        });
+
+    });
+
+</script>

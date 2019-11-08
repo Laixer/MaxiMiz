@@ -1,0 +1,59 @@
+﻿@*
+    View component view for displaying a table of ad groups in our campaign details popup.
+*@
+
+@model AdGroupTableLinkedViewModel
+<!-- Entry for each item in the list -->
+@foreach (var adGroup in Model.AdGroups)
+{
+    <tr>
+        <td>@adGroup.Name</td>
+        <td>@adGroup.CreateDate</td>
+        <td>@adGroup.AdItemCount</td>
+        <td>@adGroup.UpdateDate</td>
+        <td>
+            <form method="post" class="formUnlinkAdGroup">
+                <!-- Post form submission through jquery ajax post request -->
+                <button type="submit" class="button-adgroup btn btn-primary">Unlink</button>
+
+                <!-- Hidden input fields to insert data into form model -->
+                <input type="hidden" name="AdGroupId" value="@adGroup.Id" />
+            </form>
+        </td>
+    </tr>
+}
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+
+        // TODO Duplicate code
+        // Add functionality for linking button
+        subscribeFormBySubmit('.formUnlinkAdGroup', function (event) {
+            var form = $(event.target);
+            var button = $(form).children().first('.button-adgroup');
+            var adGroupId = $(form).find('input[name="AdGroupId"]').val();
+
+            // Disable button to prevent double clicking
+            $(button).attr('disabled', true);
+
+            // Button text should indicate loading icon as user feedback
+            $(button).load('@Url.Action("LoadingIcon", "Utility")');
+
+            $.ajax({
+                url: '@Url.Action("UnlinkAdGroup", "CampaignDetails")',
+                type: 'post',
+                data: {
+                    campaignId: getCampaignId(),
+                    adGroupId: adGroupId
+                },
+                success: function () {
+                    loadAdGroupLinkedAsync();
+                    loadAdGroupAllAsync();
+                }
+            });
+        });
+
+    });
+
+</script>

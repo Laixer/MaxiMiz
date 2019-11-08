@@ -1,0 +1,44 @@
+﻿@*
+    Contains our campaign overview table rows.
+*@
+
+@model CampaignOverviewTableViewModel
+<!-- Creates a row for each entity in our model. -->
+@foreach (CampaignModel campaign in Model.CampaignList)
+{
+
+    <tr>
+        <th scope="row"><input type="checkbox" name="campaigncheck" value="@campaign.Id"></th>
+        <td class="data-campaign">
+            <!-- Opens campaign details modal -->
+            <a class="click-open-details" data-campaign-id="@campaign.Id">
+                <img class="mr-1" src="~/images/taboola_logo.png" alt="taboola_logo">
+                @campaign.Name
+            </a>
+        </td>
+        <td>@Model.CurrencySymbol @campaign.InitialCpc</td>
+        <td>@campaign.Ctr</td>
+        <td>@campaign.Clicks</td>
+        <td>
+            <small> Daily: </small>@Model.CurrencySymbol @campaign.BudgetDaily<br>
+            <small> Monthly: </small>@Model.CurrencySymbol @campaign.Budget
+        </td>
+        <td>@Model.CurrencySymbol @campaign.Spent</td>
+        <td>@Model.CurrencySymbol @campaign.Revenue</td>
+        <td>@campaign.Roi%</td>
+        <td>@Model.CurrencySymbol @campaign.RevenueTaboola</td>
+        <td>@Model.CurrencySymbol @campaign.RevenueAdsense</td>
+        <td>@Model.CurrencySymbol @campaign.Profit</td>
+        <td>
+            <!-- Clickable icon to open the details -->
+            <a class="click-open-details" data-campaign-id="@campaign.Id"><i class="fas fa-edit"></i></a>
+
+            <!-- TODO What does this do? Unimplemented functionality -->
+            @*<a data-toggle="tooltip" title="Hide"><i class="fas fa-eye"></i></a>*@
+
+            <!-- Clickable icon to delete campaign -->
+            <!-- TODO This is actually a delete form -->
+            <a class="click-delete-campaign" data-toggle="tooltip" data-campaign-id="@campaign.Id" title="Delete"><i class="fas fa-trash text-danger ml-1"></i></a>
+        </td>
+    </tr>
+}
