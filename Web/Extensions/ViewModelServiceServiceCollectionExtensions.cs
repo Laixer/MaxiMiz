@@ -1,6 +1,5 @@
-﻿using Maximiz.Mapper;
-using Maximiz.Model.Entity;
-using Maximiz.ViewModels.EntityModels;
+﻿using Maximiz.Services;
+using Maximiz.Services.Abstraction;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
@@ -9,7 +8,7 @@ namespace Microsoft.Extensions.DependencyInjection
     /// External model to internal viewmodel mapper dependency injection.
     /// TODO Make more generic?
     /// </summary>
-    public static class MapperServiceCollectionExtensions
+    public static class ViewModelServiceServiceCollectionExtensions
     {
 
         /// <summary>
@@ -17,12 +16,13 @@ namespace Microsoft.Extensions.DependencyInjection
         /// </summary>
         /// <param name="services"><see cref="IServiceCollection"/></param>
         /// <returns><see cref="IServiceCollection"/></returns>
-        public static IServiceCollection AddMappers(this IServiceCollection services)
+        public static IServiceCollection AdddViewModelServices(this IServiceCollection services)
         {
-            services.AddSingleton<IMapper<CampaignWithStats, CampaignModel>, MapperCampaignWithStats>();
-            services.AddSingleton<IMapper<AdGroupWithStats, AdGroupModel>, MapperAdGroupWithStats>();
-            // TODO Add other mappers too
+            // Add view model services
+            services.AddSingleton<ICurrencyViewModelService, CurrencyViewModelService>();
+            services.AddSingleton<IEnumViewModelService, EnumViewModelService>();
 
+            // Return for chaining
             return services;
         }
 
