@@ -13,13 +13,13 @@ namespace Maximiz.Model.Enums
     {
 
         /// <summary>
-        /// 
+        /// The specified budget holds for the entire campaign.
         /// </summary>
         [EnumMember(Value = "campaign")]
         Campaign,
 
         /// <summary>
-        /// 
+        /// The specified budget holds for each month.
         /// </summary>
         [EnumMember(Value = "monthly")]
         Monthly

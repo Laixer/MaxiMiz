@@ -1,5 +1,4 @@
 ﻿using System;
-using Maximiz.Model.Enums;
 
 namespace Maximiz.Model.Entity
 {
@@ -11,7 +10,10 @@ namespace Maximiz.Model.Entity
     public class AdGroupWithStats : AdGroup
     { 
 
-        // TODO Add properties from view
+        /// <summary>
+        /// Total amount of ad items present in this ad group.
+        /// </summary>
+        public int AdItemCount { get; set; }
 
     }
 }
