@@ -1,6 +1,9 @@
 ﻿using Maximiz.ViewModels.EntityModels;
+using Maximiz.ViewModels.Enums;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
-namespace Maximiz.ViewModels
+namespace Maximiz.ViewModels.CampaignDetails
 {
 
     /// <summary>
@@ -13,6 +16,11 @@ namespace Maximiz.ViewModels
         /// The campaign we are displaying.
         /// </summary>
         public CampaignModel Campaign { get; set; }
+
+        /// <summary>
+        /// The account to which theh campaign belongs.
+        /// </summary>
+        public AccountModel Account { get; set; }
 
     }
 }

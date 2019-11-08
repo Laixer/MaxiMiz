@@ -1,4 +1,4 @@
-﻿using Maximiz.Model.Enums;
+﻿using Maximiz.ViewModels.Enums;
 using System;
 
 namespace Maximiz.ViewModels.EntityModels
@@ -7,7 +7,7 @@ namespace Maximiz.ViewModels.EntityModels
     /// <summary>
     /// Represents a campaign group along with some numeric info.
     /// </summary>
-    public sealed class CampaignGroupModel : EntityModel
+    public sealed class CampaignGroupModel : EntityAuditModel<Guid>
     {
 
         /// <summary>

@@ -1,4 +1,4 @@
-﻿using Maximiz.Model.Enums;
+﻿using Maximiz.ViewModels.Enums;
 using System;
 
 namespace Maximiz.ViewModels.EntityModels
@@ -7,7 +7,7 @@ namespace Maximiz.ViewModels.EntityModels
     /// <summary>
     /// Represents an ad atem along with some numeric data.
     /// </summary>
-    public sealed class AdItemModel : EntityModel
+    public sealed class AdItemModel : EntityAuditModel<Guid>
     {
 
         /// <summary>
@@ -90,13 +90,11 @@ namespace Maximiz.ViewModels.EntityModels
         /// changes have to be pushed to the corresponding external API.
         /// </summary>
         public ApprovalState ApprovalState { get; set; }
-        public string ApprovalStateText { get => ApprovalState.GetEnumMemberName(); }
 
         /// <summary>
         /// Represents our item status.
         /// </summary>
         public AdItemStatus Status { get; set; }
-        public string StatusText { get => Status.GetEnumMemberName(); }
 
         /// <summary>
         /// True if this was modified beyond the properties given from the ad group.

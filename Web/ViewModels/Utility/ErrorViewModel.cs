@@ -1,5 +1,5 @@
 
-namespace Maximiz.ViewModels
+namespace Maximiz.ViewModels.Utility
 {
 
     /// <summary>

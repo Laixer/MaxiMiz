@@ -1,11 +1,12 @@
-﻿
+﻿using System;
+
 namespace Maximiz.ViewModels.EntityModels
 {
 
     /// <summary>
     /// Represents an ad group along with some numeric data.
     /// </summary>
-    public sealed class AdGroupModel : EntityModel
+    public sealed class AdGroupModel : EntityAuditModel<Guid>
     {
 
         /// <summary>
@@ -27,6 +28,11 @@ namespace Maximiz.ViewModels.EntityModels
         /// Array of titles.
         /// </summary>
         public string[] Titles { get; set; }
+
+        /// <summary>
+        /// Total amount of ad items present in this ad group.
+        /// </summary>
+        public int AdItemCount { get; set; }
 
     }
 }

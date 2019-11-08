@@ -1,4 +1,4 @@
-﻿using Maximiz.Model.Enums;
+﻿using Maximiz.ViewModels.Enums;
 using System;
 
 namespace Maximiz.ViewModels.EntityModels
@@ -7,7 +7,7 @@ namespace Maximiz.ViewModels.EntityModels
     /// <summary>
     /// Represents a campaign along with some numeric calculated properties.
     /// </summary>
-    public sealed class CampaignModel : EntityModel
+    public sealed class CampaignModel : EntityAuditModel<Guid>
     {
 
         /// <summary>
@@ -167,6 +167,11 @@ namespace Maximiz.ViewModels.EntityModels
         /// Total actions of all ad items in this campaign.
         /// </summary>
         public int Actions { get; set; }
+
+        /// <summary>
+        /// Total clicks of all ad items in this campaign.
+        /// </summary>
+        public int Clicks { get; set; }
 
     }
 }
