@@ -1,0 +1,38 @@
+﻿@*
+    Campaign group creation wizard section for schedule settings.
+*@
+
+@model CampaignGroupFormAllViewModel
+<!-- Fieldset for our schedule properties -->
+<fieldset id="fieldsetSchedule">
+
+    <!-- TODO Remove this debug -->
+    <label>Dit overleg ik even met Kaan zodra hij er weer is. Input komt door bij de controller!</label>
+    <br />
+
+    <!-- Start date -->
+    <form-group>
+        <label>Campaign start date: </label>
+        <input id="datetimeStartDate" asp-for="StartDate" type="datetime-local" value="@DateTime.Now.ToString("s")"/>
+        <div class="errorHolder"></div>
+    </form-group>    
+    
+    <!-- End date -->
+    <form-group>
+        <label>Campaign end date: </label>
+        <input id="datetimeEndDate" asp-for="EndDate" type="datetime-local" value="@DateTime.Now.ToString("s")"/>
+
+        <!-- Infinite or not -->
+        <input id="checkboxIgnoreEndDate" type="checkbox" name="@nameof(CampaignGroupFormAllViewModel.IgnoreEndDate)" value="true" checked="checked" />
+        <label>None</label>
+
+        <div class="errorHolder"></div>
+    </form-group>
+
+    <!-- Submit and back button -->
+    <div class="form-row">
+        <button class="buttonBack btn text-white btn-main btn-blue mt-5" data-thisindex="4">Back</button>
+        <button id="buttonNextSchedule" class="btn text-white btn-main btn-blue mt-5">Next</button>
+    </div>
+
+</fieldset>

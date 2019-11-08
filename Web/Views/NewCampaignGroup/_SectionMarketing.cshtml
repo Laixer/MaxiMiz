@@ -1,0 +1,89 @@
+﻿@*
+    Campaign group creation wizard section for our marketing settings.
+*@
+
+@model CampaignGroupFormAllViewModel
+<!-- Fieldset for our marketing properties -->
+<fieldset id="fieldsetMarketing">
+
+    <!-- Autopilot -->
+    <form-group class="form-row">
+        <label>Autopilot </label>
+        <input id="checkboxAutopilot" type="checkbox" name="@nameof(CampaignGroupFormAllViewModel.Autopilot)" value="true" checked="true" />
+        <div class="errorHolder"></div>
+    </form-group>
+
+    <!-- Cpc -->
+    <form-group class="form-row">
+        <label>Initial CPC </label>
+        <input id="inputCpc" name="@nameof(CampaignGroupFormAllViewModel.Cpc)" type="number" placeholder="Initial campaign CPC" />
+        <div class="errorHolder"></div>
+    </form-group>
+
+    <!-- Bid strategy -->
+    <form-group class="form-row">
+        <label>Bid strategy</label>
+        @foreach (var bidStrategy in new EnumViewModelService().GetBidStrategyOptions())
+        {
+            <input class="radioBidStrategy" type="radio" name="@nameof(CampaignGroupFormAllViewModel.BidStrategy)" value="@bidStrategy" />
+            <label>@EnumTranslator.TranslateBidStrategy(bidStrategy)</label>
+        }
+        <div class="errorHolder"></div>
+    </form-group>
+
+    <!-- Delivery -->
+    <form-group class="form-row">
+        <label>Content delivery</label>
+        @foreach (var delivery in new EnumViewModelService().GetDeliveryOptions())
+        {
+            <input class="radioDelivery" type="radio" name="@nameof(CampaignGroupFormAllViewModel.Delivery)" value="@delivery" />
+            <label>@EnumTranslator.TranslateDelivery(delivery)</label>
+        }
+        <div class="errorHolder"></div>
+    </form-group>
+
+    <!-- Budget monthly -->
+    <div>
+
+        <!-- Amount -->
+        <form-group class="form-row">
+            <label>Campaign budget </label>
+            <input id="inputBudget" name="@nameof(CampaignGroupFormAllViewModel.Budget)" type="number" placeholder="My campaign budget" />
+
+            <!-- Type -->
+            <select id="selectBudgetModel" name="@nameof(CampaignGroupFormAllViewModel.BudgetModel)">
+                @foreach (var budgetModel in new EnumViewModelService().GetBudgetModelOptions())
+                {
+                    <option value="@budgetModel">@EnumTranslator.TranslateBudgetModel(budgetModel)</option>
+                }
+            </select>
+
+            <div class="errorHolder"></div>
+        </form-group>
+
+    </div>
+
+    <!-- Budget daily -->
+    <div>
+
+        <!-- Amount -->
+        <form-group class="form-row">
+            <label>Daily budget </label>
+            <input id="inputBudgetDaily" name="@nameof(CampaignGroupFormAllViewModel.BudgetDaily)" type="number" placeholder="My daily campaign budget" />
+
+            <!-- Infinite or not -->
+            <input id="inputBudgetDailyInfinite" type="checkbox" name="@nameof(CampaignGroupFormAllViewModel.BudgetDailyInfinite)" value="true" checked="true"/>
+            <label>Ignore</label>
+
+            <div class="errorHolder"></div>
+        </form-group>
+
+    </div>
+
+    <!-- Submit and back button -->
+    <div class="form-row">
+        <button class="buttonBack btn text-white btn-main btn-blue mt-5" data-thisindex="2">Back</button>
+        <button id="buttonNextMarketing" class="btn text-white btn-main btn-blue mt-5">Next</button>
+    </div>
+
+</fieldset>
