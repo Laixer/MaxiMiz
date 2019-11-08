@@ -1,5 +1,6 @@
 ﻿using Maximiz.Model.Entity;
 using Maximiz.ViewModels.EntityModels;
+using System;
 using System.Collections.Generic;
 
 namespace Maximiz.Mapper
@@ -9,12 +10,14 @@ namespace Maximiz.Mapper
     /// Converts an <see cref="Entity"/> to the <see cref="EntityModel"/> that
     /// belongs to it. This exists to separate our internal models and our
     /// viewmodels. These two are NOT the same thing.
+    /// 
+    /// TODO The hard coded usage of the <see cref="Guid"/> in the inheritance requirements makes the generic type parameter of <see cref="EntityModel{TPrimary}"/> completely obsolete.
     /// </summary>
     /// <typeparam name="TEntity">The entity type</typeparam>
     /// <typeparam name="TEntityModel">The entity model type</typeparam>
     public interface IMapper<TEntity, TEntityModel>
-        where TEntity : Entity
-        where TEntityModel : EntityModel
+        where TEntity : Entity<Guid>
+        where TEntityModel : EntityModel<Guid>
     {
 
         /// <summary>
