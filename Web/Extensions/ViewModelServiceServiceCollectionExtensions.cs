@@ -21,6 +21,7 @@ namespace Microsoft.Extensions.DependencyInjection
             // Add view model services
             services.AddSingleton<ICurrencyViewModelService, CurrencyViewModelService>();
             services.AddSingleton<IEnumViewModelService, EnumViewModelService>();
+            services.AddSingleton<ITargetingViewModelService, TargetingViewModelService>();
 
             // Return for chaining
             return services;

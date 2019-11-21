@@ -27,9 +27,12 @@
       <Publish Condition="'%(PackageReference.Version)' == ''">true</Publish>
     </PackageReference>
     <PackageReference Include="Microsoft.AspNetCore.Razor.Design" Version="2.2.0" PrivateAssets="All" />
-    <PackageReference Include="Microsoft.Azure.ServiceBus" Version="4.0.0" />
-    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.2.4" />
-    <PackageReference Include="Npgsql" Version="4.1.1" />
+    <PackageReference Include="Microsoft.Azure.ServiceBus" Version="4.1.1" />
+    <PackageReference Include="Microsoft.Azure.Storage.Blob" Version="11.1.1" />
+    <PackageReference Include="Microsoft.Azure.Storage.Common" Version="11.1.1" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="3.1.0-preview3.19558.8" />
+    <PackageReference Include="Npgsql" Version="4.1.2" />
+    <PackageReference Include="System.Drawing.Common" Version="4.6.1" />
   </ItemGroup>
 
 
@@ -38,6 +41,12 @@
     <ProjectReference Include="..\Maximiz.Database\Maximiz.Database.csproj" />
     <ProjectReference Include="..\Maximiz.Helper\Maximiz.Helper.csproj" />
     <ProjectReference Include="..\Model\Maximiz.Model.csproj" />
+    <ProjectReference Include="..\Poller\Poller\Poller.csproj" />
+  </ItemGroup>
+
+
+  <ItemGroup>
+    <Folder Include="ViewComponents\AdGroupWizard\" />
   </ItemGroup>
 
 </Project>
