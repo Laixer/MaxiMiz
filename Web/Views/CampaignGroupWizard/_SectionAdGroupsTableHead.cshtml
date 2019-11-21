@@ -1,0 +1,32 @@
+﻿@*
+    Contains our table head for a given ad group table.
+*@
+
+<!--Table head -->
+<thead class="thead-darkblue">
+    <tr>
+        <th scope="col">
+            Group name
+            <a class="click-sort-adgroup" data-column="@ColumnCampaignGroupWizardAdGroup.Name" data-order="@Order.Ascending">/\</a>
+            <a class="click-sort-adgroup" data-column="@ColumnCampaignGroupWizardAdGroup.Name" data-order="@Order.Descending">\/</a>
+        </th>
+        <th scope="col">
+            Created
+            <a class="click-sort-adgroup" data-column="@ColumnCampaignGroupWizardAdGroup.CreateDate" data-order="@Order.Ascending">/\</a>
+            <a class="click-sort-adgroup" data-column="@ColumnCampaignGroupWizardAdGroup.CreateDate" data-order="@Order.Descending">\/</a>
+        </th>
+        <th scope="col">
+            Ads
+            <a class="click-sort-adgroup" data-column="@ColumnCampaignGroupWizardAdGroup.AdCount" data-order="@Order.Ascending">/\</a>
+            <a class="click-sort-adgroup" data-column="@ColumnCampaignGroupWizardAdGroup.AdCount" data-order="@Order.Descending">\/</a>
+        </th>
+        <th scope="col">
+            Modified
+            <a class="click-sort-adgroup" data-column="@ColumnCampaignGroupWizardAdGroup.UpdateDate" data-order="@Order.Ascending">/\</a>
+            <a class="click-sort-adgroup" data-column="@ColumnCampaignGroupWizardAdGroup.UpdateDate" data-order="@Order.Descending">\/</a>
+        </th>
+        <th scope="col">
+            <!-- Checkbox column -->
+        </th>
+    </tr>
+</thead>

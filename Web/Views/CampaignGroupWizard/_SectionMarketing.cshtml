@@ -9,7 +9,7 @@
     <!-- Autopilot -->
     <form-group class="form-row">
         <label>Autopilot </label>
-        <input id="checkboxAutopilot" type="checkbox" name="@nameof(CampaignGroupFormAllViewModel.Autopilot)" value="true" checked="true" />
+        <input id="checkboxAutopilot" type="checkbox" name="@nameof(CampaignGroupFormAllViewModel.Autopilot)" value="true" checked="checked" />
         <div class="errorHolder"></div>
     </form-group>
 
@@ -65,22 +65,20 @@
 
     <!-- Budget daily -->
     <div>
-
         <!-- Amount -->
         <form-group class="form-row">
             <label>Daily budget </label>
             <input id="inputBudgetDaily" name="@nameof(CampaignGroupFormAllViewModel.BudgetDaily)" type="number" placeholder="My daily campaign budget" />
 
             <!-- Infinite or not -->
-            <input id="inputBudgetDailyInfinite" type="checkbox" name="@nameof(CampaignGroupFormAllViewModel.BudgetDailyInfinite)" value="true" checked="true"/>
+            <input id="inputBudgetDailyInfinite" type="checkbox" name="@nameof(CampaignGroupFormAllViewModel.BudgetDailyInfinite)" value="true" checked="checked"/>
             <label>Ignore</label>
 
             <div class="errorHolder"></div>
         </form-group>
-
     </div>
 
-    <!-- Submit and back button -->
+    <!-- Submit button -->
     <div class="form-row">
         <button class="buttonBack btn text-white btn-main btn-blue mt-5" data-thisindex="2">Back</button>
         <button id="buttonNextMarketing" class="btn text-white btn-main btn-blue mt-5">Next</button>

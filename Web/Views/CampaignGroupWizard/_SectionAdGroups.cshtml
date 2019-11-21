@@ -1,0 +1,40 @@
+﻿@*
+    Campaign group creation wizard section for account settings.
+*@
+
+@model CampaignGroupFormAllViewModel
+<!-- Fieldset for our schedule properties -->
+<fieldset id="fieldsetSchedule">
+
+    <!-- Search bar -->
+    <!-- This can't be in its own form because the entire wrapper is a form already. -->
+    <div class="form-group">
+        <input id="searchAdGroups" type="search" class="search form-control mr-sm-2" placeholder="Search Ad Groups" aria-label="Search">
+    </div>
+
+    <!-- Table for selecting ad groups -->
+    <div id="tableLinked">
+        <div class="table-responsive total-ad-groups">
+            <table class="table table-striped table-hover table-bordered">
+                <partial name="_SectionAdGroupsTableHead" />
+                <tbody id="tableAdGroupsBody"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- This is where we store our selected ad groups dynamically -->
+    <form-group>
+        <div id="selectedAdGroupIds">
+            <input id="emptyHiddenAdGroup" type='hidden' class='hiddenAdGroupId' name='@nameof(CampaignGroupFormAllViewModel.SelectedAdGroupIds)' />
+        </div>
+        <div class="errorHolder"></div>
+    </form-group>
+
+    <!-- Submit and back button -->
+    <div class="form-row">
+        <button class="buttonBack btn text-white btn-main btn-blue mt-5" data-thisindex="5">Back</button>
+        <button id="buttonNextAdGroups" class="btn text-white btn-main btn-blue mt-5 clickToRefreshOverview">Next</button>
+    </div>
+
+</fieldset>
+

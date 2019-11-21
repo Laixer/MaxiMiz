@@ -10,6 +10,8 @@
         setupAccount();
         setupMarketing();
         setupTargeting();
+        //setupSchedule(); TODO Enable and implement
+        setupAdGroups();
 
     });
 
@@ -190,4 +192,16 @@
         });
     }
 
-</script>s
+    // Ad group tab
+    function setupAdGroups() {
+
+        // Select at least one ad group
+        $('.hiddenAdGroupId').rules('add', {
+            required: true,
+            messages: {
+                required: 'Please select at least one ad group'
+            }
+        });
+    }
+
+</script>

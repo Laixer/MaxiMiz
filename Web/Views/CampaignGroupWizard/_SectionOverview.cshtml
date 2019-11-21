@@ -1,0 +1,72 @@
+﻿@*
+    Campaign group creation wizard section for our overview.
+*@
+
+@model CampaignGroupFormAllViewModel
+<!-- Campaign group wizard overview tab -->
+<div id="divOverview">
+
+    <!-- Displaying the results of our form -->
+    <div>
+        <!-- Account tab -->
+        <div>
+            <h6>Account: </h6>
+            <label>Selected publishers: </label><label id="displayPublishers"></label><br />
+            <label>Selected accounts: </label><label id="displayAccountName"></label><br />
+            <label>Campaign name suffix: </label><label id="displayCampaignNameSuffix"></label><br />
+            <label>Branding text: </label><label id="displayBrandingText"></label><br />
+            <label>Target URL: </label><label id="displayUrl"></label><br />
+            <label>Tracking code: </label><label id="displayUtm"></label><br />
+        </div>
+
+        <br />
+
+        <!-- Marketing tab -->
+        <div>
+            <h6>Marketing:</h6>
+            <label>Auto pilot: </label><label id="displayAutoPilot"></label><br />
+            <label>Initial cpc: </label><label id="displayCpc"></label><br />
+            <label>Bid strategy: </label><label id="displayBidStrategy"></label><br />
+            <label>Content delivery: </label><label id="displayDelivery"></label><br />
+            <label>Campaign budget: </label><label id="displayBudget"></label><br />
+            <label>Campaign daily budget: </label><label id="displayBudgetDaily"></label><br />
+        </div>
+
+        <br />
+
+        <!-- Targeting tab -->
+        <div>
+            <h6>Targeting:</h6>
+            <label>Targeted countries: </label><label id="displayLocations"></label><br />
+            <label>Targeted devices: </label><label id="displayDevices"></label><br />
+            <label>Targeted operating systems: </label><label id="displayOperatingSystems"></label><br />
+        </div>
+
+        <br />
+
+        <!-- Schedule tab -->
+        <div>
+            <h6>Schedule:</h6>
+            <label>Start date: </label><label id="displayStartDate"></label><br />
+            <label>End date: </label><label id="displayEndDate"></label><br />
+        </div>
+
+        <br />
+
+        <!-- Ad group tab -->
+        <div>
+            <h6>Ad groups:</h6>
+            <label>Linked ad groups: </label><label id="displayAdGroups"></label><br />
+        </div>
+
+    </div>
+
+    <!-- Feedback text, submit button and back button -->
+    <br />
+    <label id="divSubmitFeedback" ></label>
+    <div class="form-row">
+        <button class="buttonBack btn text-white btn-main btn-blue mt-5" data-thisindex="6">Back</button>
+        <button id="buttonSubmitWizard" class="btn text-white btn-main btn-blue mt-5">Submit</button>
+    </div>
+
+</div>

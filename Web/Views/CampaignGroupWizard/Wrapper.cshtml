@@ -14,13 +14,13 @@
             <li><button id="selectorTargeting" data-progress="3" data-toggle="tab" data-target="#sectionTargeting" class="btn text-white btn-main btn-blue mt-5">Targeting</button></li>
             <li><button id="selectorSchedule" data-progress="4" data-toggle="tab" data-target="#sectionSchedule" class="btn text-white btn-main btn-blue mt-5">Schedule</button></li>
             <li><button id="selectorAdGroups" data-progress="5" data-toggle="tab" data-target="#sectionAdGroups" class="btn text-white btn-main btn-blue mt-5">Ad Groups</button></li>
-            <li><button id="selectorOverview" data-progress="6" data-toggle="tab" data-target="#sectionOverview" class="btn text-white btn-main btn-blue mt-5">Overview</button></li>
+            <li><button id="selectorOverview" data-progress="6" data-toggle="tab" data-target="#sectionOverview" class="btn text-white btn-main btn-blue mt-5 clickToRefreshOverview">Overview</button></li>
         </ul>
 
         <!-- One giant form with fieldsets for each tab -->
-        <form id="formWizard" asp-controller="NewCampaignGroup" asp-action="SubmitForm" method="post">
+        <form id="formWizard" asp-controller="CampaignGroupWizard" asp-action="SubmitForm" method="post">
+            @{ var formModel = new CampaignGroupFormAllViewModel(); }
             <div class="tab-content">
-                @{ var formModel = new CampaignGroupFormAllViewModel(); }
                 <div class="tab-pane active" id="sectionAccount"><partial name="_SectionAccount" model="formModel" /></div>
                 <div class="tab-pane" id="sectionMarketing"><partial name="_SectionMarketing" model="formModel" /></div>
                 <div class="tab-pane" id="sectionTargeting"><partial name="_SectionTargeting" model="formModel" /></div>
@@ -41,16 +41,22 @@
     <!-- Import partial view with validation rules for each section -->
     <partial name="_ValidationRules" />
 
-    <!-- Scripts for _SectionAccount.cshtml -->
+    <!-- Import ad group functionality -->
+    <partial name="_SectionAdGroupsScripts" />
+
+    <!-- Import overivew functionality -->
+    <partial name="_SectionOverviewScripts" />
+
+    <!-- Scripts for our campaign group wizard wrapper -->
     <script type="text/javascript">
 
         // Indicates our subform progress
-        var progressIndex = 6;
+        var progressIndex = 1;
         var maxProgress = 6;
 
         // Initialize our validator object
         setupValidatorDefaults();
-        var wizardValidator = $('#formWizard').validate();
+        var validatorWizardCampaignGroup = $('#formWizard').validate();
 
         // Explicitly define all elements that have to be validated for each section
         var elementsAccount = [
@@ -82,7 +88,7 @@
             '#checkboxIgnoreEndDate'
         ];
         var elementsAdGroups = [
-            //
+            '.hiddenAdGroupId'
         ];
 
         $(document).ready(function () {
@@ -91,80 +97,23 @@
             updateAllTabs();
 
             // Register all our back buttons
-            $(document).on('click', '.buttonBack', function (e) {
-                e.preventDefault();
-                clickBack($(e.target).attr('data-thisindex'));
-            });
-
-            // Register our post button
-            $(document).on('click', '#buttonSubmitWizard', function (e) {
-                e.preventDefault();
-                submitWizard();
-            });
+            subscribeClickable('.buttonBack', clickBack);
 
             // Register all our next buttons
             setupValidateSection('#buttonNextAccount', elementsAccount, 1);
             setupValidateSection('#buttonNextMarketing', elementsMarketing, 2);
             setupValidateSection('#buttonNextTargeting', elementsTargeting, 3);
             setupValidateSection('#buttonNextSchedule', elementsSchedule, 4);
-            setupValidateSection('#buttonNextAdGroups', elementsSchedule, 5);
+            setupValidateSection('#buttonNextAdGroups', elementsAdGroups, 5);
         });
-
-        // Configures our validator static object
-        // This has to be called before validator creation
-        function setupValidatorDefaults() {
-            $.validator.setDefaults({
-                // Add error styling when invalid highlighted
-                highlight: function (element) {
-                    $(element)
-                        .closest('form-group')
-                        .addClass('has-error');
-                },
-
-                // Remove error styling when unhighlighted
-                unhighlight: function (element) {
-                    $(element)
-                        .closest('form-group')
-                        .removeClass('has-error');
-                },
-
-                // Custom error class (recognized by bootstrap)
-                errorClass: 'error-text',
-
-                // Error placement customized
-                errorPlacement: function (error, element) {
-                    var errorHolder = $(element)
-                        .closest('form-group')
-                        .find('.errorHolder');
-                    if (errorHolder != null) {
-                        $(errorHolder).html(error);
-                    };
-                }
-            });
-        }
 
         // Registers a next-button to process section validation
         function setupValidateSection(buttonId, elements, sectionProgress) {
-            $(document).off('click', buttonId);
-            $(document).on('click', buttonId, function (e) {
-                e.preventDefault();
-                if (validateMultiple(elements)) {
+            subscribeClickable(buttonId, function () {
+                if (validateSet(validatorWizardCampaignGroup, elements)) {
                     clickNext(sectionProgress);
                 }
             });
-        }
-
-        // Validates each element in a given varargs collection
-        // Returns true if all are valid
-        function validateMultiple(elementArray) {
-            var result = true;
-            elementArray.forEach(function (item) {
-                var itemValid = wizardValidator.element(item);
-                if (result == true && itemValid == false) {
-                    result = false;
-                }
-            });
-            return result;
         }
 
         // Function for going to the next page
@@ -181,9 +130,10 @@
         }
 
         // Function for going to the previous page
-        function clickBack(thisTabProgess) {
-            if (thisTabProgess > 1) {
-                $('#selectors li:eq(' + (thisTabProgess - 2) + ') button').tab('show');
+        function clickBack(event) {
+            let thisTabProgress = $(event.target).attr('data-thisindex')
+            if (thisTabProgress > 1) {
+                $('#selectors li:eq(' + (thisTabProgress - 2) + ') button').tab('show');
             }
         }
 
@@ -199,6 +149,7 @@
 
         // Processes the enabling of a single tab based on the progress
         function updateTab(idSelector) {
+
             var requiredIndex = $(idSelector).attr('data-progress');
             if (progressIndex >= requiredIndex) {
                 $(idSelector).removeAttr('disabled');
@@ -207,24 +158,18 @@
             }
         }
 
-        // Submit the form
-        function submitWizard() {
-            // Visual feedback
-            var htmlOriginal = $(button).html();
-            $('#buttonSubmitWizard').attr('disabled', 'disabled');
-            $('#buttonSubmitWizard').load('@Url.Action("LoadingIcon", "Utility")');
-            $('.buttonBack').attr('disabled', 'disabled');
-            // TODO Disable tabs
-
-            // Post the form and handle the response
-            $.post($('#formWizard').get(0).action, $('#formWizard').serialize(), function () {
-                $('#buttonSubmitWizard').html(htmlOriginal);
-                $('#buttonSubmitWizard').removeAttr('disabled');
-                $('.buttonBack').removeAttr('disabled');
-
-                // TODO How are we going to feedback success to the user?
-                // TODO What if we fail?
-            });
+        // Validates entire form, returns true if valid
+        function validateEntireWizard() {
+            // Validate all non-lazy
+            if (validateSet(validatorWizardCampaignGroup, elementsAccount) &
+                validateSet(validatorWizardCampaignGroup, elementsMarketing) &
+                validateSet(validatorWizardCampaignGroup, elementsTargeting) &
+                validateSet(validatorWizardCampaignGroup, elementsSchedule) &
+                validateSet(validatorWizardCampaignGroup, elementsAdGroups)) {
+                return true;
+            } else {
+                return false;
+            }
         }
 
     </script>

@@ -1,0 +1,132 @@
+﻿@*
+    Contains the scripts for the ad group section of the campaign group wizard.
+*@
+
+<!-- TODO Should we place this here? -->
+<script type="text/javascript">
+
+    // TODO This is a workaround
+    let emptyHiddenAdGroupHtml = null;
+
+    $(document).ready(function () {
+
+        // Save global row sorting variables
+        window.ColumnCampaignGroupWizardAdGroup = '@ColumnCampaignGroupWizardAdGroup.Name';
+        window.OrderCampaignGroupWizardAdGroupLinked = '@Order.Ascending';
+
+        // Save empty hidden adgroup entry
+        emptyHiddenAdGroupHtml = $('#emptyHiddenAdGroup').get(0).outerHTML;
+
+        // Subscribe searchbar as non-form
+        subscribeOnUserSubmit('#searchAdGroups', loadAdGroupTableAsync);
+
+        // Subscribe sorting button functionality
+        subscribeClickable('.click-sort-adgroup', function () {
+            // Query is stored in the search bar, might want to do this differently?
+            var column = $(this).attr('data-column');
+            var order = $(this).attr('data-order');
+
+            // Storing global
+            window.ColumnCampaignGroupWizardAdGroup = column;
+            window.OrderCampaignGroupWizardAdGroupLinked = order;
+            loadAdGroupTableAsync();
+        });
+
+        // Subscribe checkbox functionality
+        subscribeCheckbox('.checkboxSelectAdGroup', onUpdateCheckbox);
+
+        // Load table on page ready
+        loadAdGroupTableAsync();
+
+    });
+
+    // TODO Question: rename these functions because we have some similar ones in different views?
+    // Reloads the ad group table
+    function loadAdGroupTableAsync() {
+        var query = $('#searchAdGroups')[0].value; // TODO This does not seem bulletproof!
+        var column = window.ColumnAdGroupAll;
+        var order = window.OrderAdGroupAll;
+        var url = '@Url.Action(nameof(CampaignGroupWizardController.GetAdGroupsViewComponent), "CampaignGroupWizard")';
+
+        doMethodAndProcess(url + '?' + new URLSearchParams({
+            query: query,
+            column: column,
+            order: order
+        }), 'get', function (html) {
+            $('#tableAdGroupsBody').html(html);
+            setAdGroupCheckboxes();
+        });
+    }
+
+    // Sets all checkboxes checked which have already been selected before
+    function setAdGroupCheckboxes() {
+        let selectedIds = getSelectedIds();
+        $.each($('.checkboxSelectAdGroup'), function (index, item) {
+            if (selectedIds.includes($(item).attr('data-adgroup-id'))) {
+                $(item).prop('checked', true);
+            } else {
+                $(item).prop('checked', false);
+            }
+        });
+    }
+
+    // Gets all currently selected hidden ad group ids
+    function getSelectedIds() {
+        let selectedIds = [];
+        $.each($('.hiddenAdGroupId'), function (index, item) {
+            var id = $(item).get(0).value;
+            if (id == null) { console.log('Error while getting guid from ', item); }
+            else { selectedIds.push(id); }
+        });
+        return selectedIds;
+    }
+
+    // Called when we check or uncheck a checkbox
+    function onUpdateCheckbox(event) {
+        var adGroupId = $(event.target).attr('data-adgroup-id');
+        var adGroupName = $(event.target).attr('data-adgroup-name');
+        if ($(event.target).get(0).checked) {
+            addAdGroupId(adGroupId, adGroupName);
+        } else {
+            removeAdGroupId(adGroupId);
+        }
+    }
+
+    // Adds a hidden input entry for a given ad group id
+    function addAdGroupId(adGroupId, adGroupName) {
+        if (getSelectedIds().includes(adGroupId) === false) {
+            // We have to add the name to the input too, for display purposes
+
+            // TODO This can be cleaned up
+            let htmlEntry = "<input type='hidden' class='hiddenAdGroupId notEmpty' name='@nameof(CampaignGroupFormAllViewModel.SelectedAdGroupIds)' value='" + adGroupId + "' ";
+            htmlEntry = htmlEntry.concat("data-adgroup-name='", adGroupName, "' />");
+
+            $('#selectedAdGroupIds').append(htmlEntry);
+        } else {
+            console.log('Not appending ', adGroupId, ' to selected items, already exists');
+        }
+
+        // Remove the empty entry if it exists (we never want to send the empty entry)
+        if ($('#emptyHiddenAdGroup').length) {
+            $('#emptyHiddenAdGroup').remove();
+        }
+
+        // This explicitly removes the error message, because it bugs out
+        // TODO This is a workaround', the validator doesn't seem to understand inputs being removed
+        $('#emptyHiddenAdGroup-error').text('');
+        
+    }
+
+    // Removes a hidden input entry for a given ad group id
+    function removeAdGroupId(adGroupId) {
+        $.each($('.hiddenAdGroupId'), function (index, item) {
+            if ($(item).get(0).value === adGroupId) { $(item).remove(); }
+        });
+
+        // If we have just removed the last item we should add the empty placeholder again
+        if (!$('.hiddenAdGroupId .notEmpty').length) {
+            $('#selectedAdGroupIds').append(emptyHiddenAdGroupHtml);
+        }
+    }
+
+</script>
