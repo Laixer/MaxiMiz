@@ -1,0 +1,51 @@
+﻿@*
+    Settings wrapper, which eventually will contain all our tabs.
+*@
+
+@model SettingsViewModel
+<!-- Settings overview with tabs -->
+<main>
+
+    <!-- Tab navigation -->
+    <nav class="justify-content-between header">
+        <ul class="nav nav-tabs">
+            <li class="nav-item">
+                <span id="navAccount" class="nav-link" data-target="#tabAccount" data-toggle="tab">Account</span>
+            </li>
+            <li class="nav-item">
+                <span id="navIntegrations" class="nav-link" data-target="#tabIntegrations" data-toggle="tab">Integrations</span>
+            </li>
+        </ul>
+    </nav>
+
+    <!-- Tab contents with partial views for each tab -->
+    <div class="tab-content">
+        <div class="tab-pane active" id="tabAccount">
+            <partial name="_PageAccount" />
+        </div>
+        <div class="tab-pane" id="tabIntegrations">
+            <partial name="_PageIntegrations" />
+        </div>
+    </div>
+
+</main>
+
+@section Scripts {
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+
+            // Show the desired tab on page load
+            switch (@Model.SettingsTab != null && '@Model.SettingsTab.ToString()') {
+                case '@SettingsTab.Account':
+                    $('#navAccount').tab('show');
+                    break;
+                case '@SettingsTab.Integrations':
+                    $('#navIntegrations').tab('show');
+                    break;
+            }
+
+        });
+
+    </script>
+}

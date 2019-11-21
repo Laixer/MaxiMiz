@@ -31,8 +31,11 @@
                 </div>
             </div>
         </div>
+
+        <!-- TODO Switch these stat classes around -->
+        <!-- Spend by network -->
         <div class="section-spend_by_account">
-            <h1><span class="circle circle_blue"></span>Spend by Account</h1>
+            <h1><span class="circle circle_blue"></span>Spend by Network</h1>
             <div class="row spend_by_account">
                 <div class="col col-account">
                     <div class="pie"><p class="text-white font-weight-bold m-0">100%</p></div>
@@ -47,8 +50,10 @@
                 </div>
             </div>
         </div>
+
+        <!-- Spend by account -->
         <div class="section-spend_by_network">
-            <h1><span class="circle circle_blue"></span>Spend by Network</h1>
+            <h1><span class="circle circle_blue"></span>Spend by Account</h1>
             <div class="row spend_by_network">
                 <div class="col col-network">
                     <div class="pie">
@@ -80,3 +85,16 @@
         </div>
     </div>
 </main>
+
+@section Scripts {
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+
+            // TODO Is this the right location for this functionality?
+            setMenuHighlight('@MenuItem.Dashboard');
+
+        });
+
+    </script>
+}

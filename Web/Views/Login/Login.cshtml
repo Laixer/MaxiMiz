@@ -1,0 +1,89 @@
+﻿@*
+    Login page.
+*@
+
+@{
+    // Disable regular layout
+    ViewData["RenderSideMenu"] = false;
+    ViewData["RenderNavigationBar"] = false;
+}
+
+@model LoginViewModel
+<body>
+    <main>
+
+        <!-- Actual login functionality -->
+        <form id="formLogin" asp-controller="Login" asp-action="@nameof(LoginController.AttemptLogin)" method="post">
+
+            <!-- Page header (yes this will be expanded) -->
+            <h1>Login</h1>
+
+            <!-- User email -->
+            <form-group class="form-row">
+                <label>Email </label>
+                <input id="inputUserEmail" name="@nameof(LoginViewModel.Email)" type="email" placeholder="username@domain.com" />
+                <div class="errorHolder"></div>
+            </form-group>
+
+            <!-- User password -->
+            <form-group class="form-row">
+                <label>Password </label>
+                <input id="inputUserPassword" name="@nameof(LoginViewModel.Password)" type="password" placeholder="**********" />
+                <div class="errorHolder"></div>
+            </form-group>
+
+            <!-- Submit button -->
+            <div class="form-row">
+                <button id="buttonLogin" class="btn text-white btn-main btn-blue mt-5">Login</button>
+            </div>
+
+            <!-- Forgot password link -->
+            <div class="form-row">
+                <a asp-controller="Home" asp-action="@nameof(HomeController.Index)">Forgot password?</a>
+            </div>
+
+        </form>
+
+    </main>
+</body>
+
+
+
+@section Scripts {
+
+    <!-- Import validation rules -->
+    <partial name="_LoginValidationRules" />
+
+    <script type="text/javascript">
+
+        // Initialize our validator object
+        setupValidatorDefaults();
+        var validatorLogin = $('#formLogin').validate();
+
+        $(document).ready(function () {
+
+            // Do not post form implicitly ever
+            subscribeFormSubmit('#formLogin');
+
+            // Register form submit button
+            subscribeClickable('#buttonLogin', function (event) {
+                event.preventDefault();
+                if (validatorLogin.form()) {
+                    $('#buttonLogin').attr('disabled', 'disabled');
+                    doPostFormAndProcess('#formLogin', function () {
+                        // TODO Will this always work?
+                        window.location.href = '@Url.Action(nameof(HomeController.Index), "Home")';
+
+                        // If we did not succeed
+                        // TODO Implement
+                        $('#buttonLogin').removeAttr('disabled');
+                    });
+                }
+            });
+
+        });
+
+
+
+    </script>
+}
