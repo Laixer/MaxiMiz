@@ -12,6 +12,11 @@ namespace Maximiz.ViewModels.CampaignDetails
     {
 
         /// <summary>
+        /// Internal ID for the corresponding campaign.
+        /// </summary>
+        public Guid CampaignId { get; set; }
+
+        /// <summary>
         /// All ad groups.
         /// </summary>
         public IEnumerable<AdGroupModel> AdGroupsAll { get; set; }

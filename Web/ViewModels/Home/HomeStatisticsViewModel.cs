@@ -1,7 +1,7 @@
 ﻿
 using Maximiz.ViewModels.Utility;
 
-namespace Maximiz.ViewModels
+namespace Maximiz.ViewModels.Dashboard
 {
 
     /// <summary>

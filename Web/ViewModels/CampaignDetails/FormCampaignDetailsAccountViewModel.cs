@@ -1,33 +1,31 @@
-﻿using Maximiz.ViewModels.Enums;
-using System;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace Maximiz.ViewModels.CampaignDetails
 {
 
     /// <summary>
-    /// Viewmodel to contain our modification properties for a given campaign.
+    /// Partial viewmodel that contains the account modifications for a campaign.
     /// </summary>
-    public sealed class FormCampaignAccountViewModel
+    public sealed partial class FormCampaignDetailsViewModel
     {
 
         /// <summary>
-        /// The internal id of the campaign we are modifying.
+        /// Name of this campaign group, human readable. This will be added onto
+        /// all generated names for each campaign.
         /// </summary>
-        public Guid CampaignId { get; set; }
-
-        /// <summary>
-        /// User input campaign name.
-        /// </summary>
-        public string Name { get; set; }
+        [Required]
+        public string CampaignNameSuffix { get; set; }
 
         /// <summary>
         /// User input branding text.
         /// </summary>
+        [Required]
         public string BrandingText { get; set; }
 
         /// <summary>
         /// User input campaign target url.
         /// </summary>
+        [Required]
         public string Url { get; set; }
 
         /// <summary>

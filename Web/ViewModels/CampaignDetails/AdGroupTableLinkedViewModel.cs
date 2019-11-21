@@ -1,4 +1,5 @@
 ﻿using Maximiz.ViewModels.EntityModels;
+using System;
 using System.Collections.Generic;
 
 namespace Maximiz.ViewModels.CampaignDetails
@@ -9,6 +10,11 @@ namespace Maximiz.ViewModels.CampaignDetails
     /// </summary>
     public class AdGroupTableLinkedViewModel
     {
+
+        /// <summary>
+        /// Internal id of the campaign.
+        /// </summary>
+        public Guid CampaignId { get; set; }
 
         /// <summary>
         /// All linked ad groups

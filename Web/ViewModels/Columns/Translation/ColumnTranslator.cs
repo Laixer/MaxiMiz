@@ -72,5 +72,54 @@ namespace Maximiz.ViewModels.Columns.Translation
             throw new InvalidOperationException(nameof(column));
         }
 
+        /// <summary>
+        /// Translates a <see cref="ColumnAdGroupOverview"/> to the corresponding
+        /// <see cref="ColumnAdGroupWithStats"/>.
+        /// </summary>
+        /// <param name="column"><see cref="ColumnAdGroupOverview"/></param>
+        /// <returns><see cref="ColumnAdGroupWithStats"/></returns>
+        public static ColumnAdGroupWithStats Translate(ColumnAdGroupOverview column)
+        {
+            switch (column)
+            {
+                case ColumnAdGroupOverview.Name:
+                    return ColumnAdGroupWithStats.Name;
+                case ColumnAdGroupOverview.CreateDate:
+                    return ColumnAdGroupWithStats.CreateDate;
+                case ColumnAdGroupOverview.UpdateDate:
+                    return ColumnAdGroupWithStats.UpdateDate;
+                case ColumnAdGroupOverview.AdCount:
+                    return ColumnAdGroupWithStats.AdCount;
+            }
+
+            throw new InvalidOperationException(nameof(column));
+        }
+
+        /// <summary>
+        /// Translates a <see cref="ColumnCampaignGroupWizardAdGroup"/> to the corresponding
+        /// <see cref="ColumnAdGroupWithStats"/>.
+        /// </summary>
+        /// <param name="column"><see cref="ColumnCampaignGroupWizardAdGroup"/></param>
+        /// <returns><see cref="ColumnAdGroupWithStats"/></returns>
+        public static ColumnAdGroupWithStats Translate(ColumnCampaignGroupWizardAdGroup column)
+        {
+            switch (column)
+            {
+                case ColumnCampaignGroupWizardAdGroup.Name:
+                    return ColumnAdGroupWithStats.Name;
+                case ColumnCampaignGroupWizardAdGroup.CreateDate:
+                    return ColumnAdGroupWithStats.CreateDate;
+                case ColumnCampaignGroupWizardAdGroup.UpdateDate:
+                    return ColumnAdGroupWithStats.UpdateDate;
+                case ColumnCampaignGroupWizardAdGroup.AdCount:
+                    return ColumnAdGroupWithStats.AdCount;
+                case ColumnCampaignGroupWizardAdGroup.Selected:
+                    // TODO This must NEVER leave the testing environment
+                    throw new NotImplementedException("Can't sort by selected ad group yet");
+            }
+
+            throw new InvalidOperationException(nameof(column));
+        }
+
     }
 }

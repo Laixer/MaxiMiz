@@ -1,5 +1,5 @@
 ﻿
-namespace Maximiz.ViewModels.NewCampaignGroup
+namespace Maximiz.ViewModels.CampaignGroupWizard
 {
 
     /// <summary>

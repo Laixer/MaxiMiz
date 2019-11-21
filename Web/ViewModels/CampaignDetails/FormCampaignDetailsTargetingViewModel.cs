@@ -2,20 +2,20 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
-namespace Maximiz.ViewModels.CampaignGroupWizard
+namespace Maximiz.ViewModels.CampaignDetails
 {
 
     /// <summary>
-    /// View model for the targeting form for our campaign group creation.
+    /// Viewmodel to modify our targeting properties for a given campaign.
     /// </summary>
-    public sealed partial class CampaignGroupFormAllViewModel
+    public sealed partial class FormCampaignDetailsViewModel
     {
 
         /// <summary>
         /// All countries we want to target.
         /// </summary>
         [Required]
-        public IEnumerable<Location> Locations { get; set; }
+        public List<Location> Locations { get; set; }
 
         /// <summary>
         /// All devices we want to target.

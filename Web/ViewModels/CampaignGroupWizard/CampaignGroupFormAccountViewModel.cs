@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
-namespace Maximiz.ViewModels.NewCampaignGroup
+namespace Maximiz.ViewModels.CampaignGroupWizard
 {
 
     /// <summary>

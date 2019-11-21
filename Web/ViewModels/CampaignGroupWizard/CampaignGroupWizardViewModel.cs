@@ -3,13 +3,13 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
-namespace Maximiz.ViewModels.NewCampaignGroup
+namespace Maximiz.ViewModels.CampaignGroupWizard
 {
 
     /// <summary>
     /// Viewmodel for the new campaign wrapper.
     /// </summary>
-    public sealed class NewCampaignGroupViewModel
+    public sealed class CampaignGroupWizardViewModel
     {
 
         /// <summary>

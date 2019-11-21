@@ -1,35 +1,35 @@
 ﻿using Maximiz.ViewModels.Enums;
 using System.ComponentModel.DataAnnotations;
 
-namespace Maximiz.ViewModels.CampaignGroupWizard
+namespace Maximiz.ViewModels.CampaignDetails
 {
 
     /// <summary>
-    /// Viewmodel for the marketing tab in campaign group creation.
+    /// Viewmodel to modify our marketing properties for a given campaign.
     /// </summary>
-    public sealed partial class CampaignGroupFormAllViewModel
+    public sealed partial class FormCampaignDetailsViewModel
     {
 
-        /// <summary>
+        // <summary>
         /// Use the auto pilot functionality or not.
         /// </summary>
         [Required]
         public bool Autopilot { get; set; }
 
         /// <summary>
-        /// Indicates the initial cpc for each item in the campaign group.
+        /// User input cpc.
         /// </summary>
         [Required]
         public decimal Cpc { get; set; }
 
         /// <summary>
-        /// Bid strategy for each item in the campaign group.
+        /// User input bid strategy.
         /// </summary>
         [Required]
         public BidStrategy BidStrategy { get; set; }
 
         /// <summary>
-        /// Delivery for each item in the campaign group.
+        /// User input delivery.
         /// </summary>
         [Required]
         public Delivery Delivery { get; set; }
@@ -37,7 +37,7 @@ namespace Maximiz.ViewModels.CampaignGroupWizard
         /// <summary>
         /// Total budget for the campaign group.
         /// </summary>
-        public decimal Budget { get; set; } 
+        public decimal Budget { get; set; }
 
         /// <summary>
         /// The budget model for each item in the campaign group.

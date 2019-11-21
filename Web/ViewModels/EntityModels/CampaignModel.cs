@@ -1,5 +1,6 @@
 ﻿using Maximiz.ViewModels.Enums;
 using System;
+using System.Collections.Generic;
 
 namespace Maximiz.ViewModels.EntityModels
 {
@@ -44,12 +45,12 @@ namespace Maximiz.ViewModels.EntityModels
         /// <summary>
         /// Region in which campaign is active.
         /// </summary>
-        public int[] LocationInclude { get; set; }
+        public IEnumerable<Location> LocationInclude { get; set; }
 
         /// <summary>
         /// Region in which campaign is not active.
         /// </summary>
-        public int[] LocationExclude { get; set; }
+        public IEnumerable<Location> LocationExclude { get; set; }
 
         /// <summary>
         /// The initial CPC per item.
