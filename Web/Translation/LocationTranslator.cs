@@ -28,8 +28,7 @@ namespace Maximiz.Translation
                 case Location.DE:
                     return "Germany";
                 case Location.FR:
-                    return "Le country du baguette";
-                    // TODO fix this lol
+                    return "France";
             }
 
             throw new InvalidOperationException(nameof(location));

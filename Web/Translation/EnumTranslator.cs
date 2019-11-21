@@ -88,7 +88,7 @@ namespace Maximiz.Translation
             switch (budgetModel)
             {
                 case BudgetModel.Campaign:
-                    return "Campaign";
+                    return "In total";
                 case BudgetModel.Monthly:
                     return "Monthly";
             }

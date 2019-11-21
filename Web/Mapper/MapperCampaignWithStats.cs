@@ -11,6 +11,7 @@ namespace Maximiz.Mapper
     /// <summary>
     /// Mapper between <see cref="CampaignWithStats"/> and <see cref="CampaignModel"/>.
     /// TODO Doc
+    /// TODO Instantiate mapper with configuration! Dont reuse it.
     /// </summary>
     internal sealed class MapperCampaignWithStats 
         : IMapper<CampaignWithStats, CampaignModel>
@@ -41,6 +42,9 @@ namespace Maximiz.Mapper
         public CampaignWithStats Convert(CampaignModel from)
         {
             var result = mapper.Map<CampaignWithStats>(from);
+
+            // TODO Location mapping
+
             return result;
         }
 
@@ -52,6 +56,13 @@ namespace Maximiz.Mapper
         public CampaignModel Convert(CampaignWithStats from)
         {
             var result = mapper.Map<CampaignModel>(from);
+
+            // Explicit location mapping
+            // TODO Is this the way to go?
+            var mapperLocations = new MapperLocations();
+            result.LocationInclude = mapperLocations.MapToLocations(from.LocationInclude);
+            result.LocationExclude = mapperLocations.MapToLocations(from.LocationExclude);
+
             return result;
         }
 

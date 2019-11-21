@@ -1,4 +1,5 @@
-﻿using Maximiz.ViewModels.CampaignOverview;
+﻿using Maximiz.ViewModels.AdGroupOverview;
+using Maximiz.ViewModels.CampaignOverview;
 using System;
 
 namespace Maximiz.Mapper.Enum
@@ -31,6 +32,23 @@ namespace Maximiz.Mapper.Enum
 
             throw new InvalidOperationException(nameof(table));
         }
+
+        /// <summary>
+        /// Converts a <see cref="AdGroupOverviewTableType"/> to its corresponding string value.
+        /// </summary>
+        /// <param name="table"><see cref="AdGroupOverviewTableType"/></param>
+        /// <returns>String value</returns>
+        internal static string TranslateCampaignTableType(AdGroupOverviewTableType table)
+        {
+            switch (table)
+            {
+                case AdGroupOverviewTableType.All:
+                    return "All";
+            }
+
+            throw new InvalidOperationException(nameof(table));
+        }
+
 
     }
 }
