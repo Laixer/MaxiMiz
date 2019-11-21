@@ -1,0 +1,178 @@
+﻿@*
+    Contains the form validation rules for all our campaign details form fields.
+*@
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+
+        // Each sections has a separate function for readability
+        setupAccount();
+        setupMarketing();
+        setupTargeting();
+        //setupSchedule(); Not yet ready
+
+    });
+
+    // Account tab
+    function setupAccount() {
+
+        // Campaign name suffix
+        $('#inputCampaignNameSuffix').rules('add', {
+            required: true,
+            minlength: 8,
+            messages: {
+                required: 'Please specify a campaign name',
+                'minlength': jQuery.validator.format("The minimum name length is {0} characters")
+            }
+        });
+
+        // Branding text
+        $('#inputBrandingText').rules('add', {
+            required: true,
+            messages: {
+                required: 'Please specify a branding text'
+            },
+
+        });
+
+        // URL
+        $('#inputUrl').rules('add', {
+            required: true,
+            messages: {
+                required: 'Please specify a target url'
+            }
+        })
+
+        // Custom UTM code
+        $('#inputBrandingText').rules('add', {
+            // Format?
+        })
+
+    }
+
+    // Marketing tab
+    function setupMarketing() {
+
+        // Auto pilotinputBudget
+        $('#checkboxAutopilot').rules('add', {
+            // None
+        });
+
+        // Cpc
+        $('#inputCpc').rules('add', {
+            required: true,
+            min: 0.01,
+            messages: {
+                required: 'Please enter a valid CPC bid',
+                min: 'Please enter a CPC of at least 0.01'
+            }
+        });
+
+        // Bid strategy
+        $('.radioBidStrategy').rules('add', {
+            required: true,
+            messages: {
+                required: 'Please select a bid strategy'
+            }
+        });
+
+        // Delivery
+        $('.radioDelivery').rules('add', {
+            required: true,
+            messages: {
+                required: 'Please select a delivery'
+            }
+        });
+
+        // Budget
+        $('#inputBudget').rules('add', {
+            required: true,
+            min: 1,
+            messages: {
+                required: 'Please enter a valid campaign budget',
+                min: 'Please enter a campaign budget of at least 1'
+            }
+        });
+
+        // Budget model
+        $('#selectBudgetModel').rules('add', {
+            required: true,
+            messages: {
+                required: 'Please select a budget model'
+            }
+        });
+
+        // Budget daily
+        $('#inputBudgetDaily').rules('add', {
+            required: true,
+            min: 1,
+            messages: {
+                required: 'Please enter a valid daily budget',
+                min: 'Please enter a daily budget of at least 1'
+            }
+        });
+
+        // Budget daily infinite
+        $('#inputBudgetDailyInfinite').rules('add', {
+            // None
+        });
+
+    }
+
+    // Targeting tab
+    function setupTargeting() {
+
+        // Location select
+        $('.checkboxLocation').rules('add', {
+            required: true,
+            messages: {
+                required: 'Please select at least one country'
+            }
+        });
+
+        // Publisher select
+        $('.checkboxDevice').rules('add', {
+            required: true,
+            messages: {
+                required: 'Please select at least one device YES'
+            }
+        });
+
+        // Publisher select
+        $('.checkboxOperatingSystem').rules('add', {
+            required: true,
+            messages: {
+                required: 'Please select at least one operating system'
+            }
+        });
+
+    }
+
+    // Schedule tab
+    function setupSchedule() {
+
+        // Start date
+        $('#datetimeStartDate').rules('add', {
+            required: true,
+            messages: {
+                required: 'Please enter a start date',
+                //min: 'Please select a start date in the future'
+            }
+        });
+
+        // End date
+        $('#datetimeEndDate').rules('add', {
+            greaterThan: '#datetimeStartDate',
+            messages: {
+                greaterThan: 'End date must be after start date'
+            }
+        });
+
+        // Ignore end date
+        $('#checkboxIgnoreEndDate').rules('add', {
+            // None
+        });
+    }
+
+</script>

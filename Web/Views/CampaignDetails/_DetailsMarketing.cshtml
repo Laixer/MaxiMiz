@@ -2,68 +2,95 @@
     Partial view containing the marketing details for a single campaign.
 *@
 
-@inject IEnumViewModelService enumservice
+@inject IEnumViewModelService enumService
 @model CampaignDetailsViewModel
 <!-- Marketing tab -->
-<fieldset>
-    <form id="formMarketing" method="post" asp-controller="CampaignDetails" asp-action="PostFormMarketing">
-        <!-- Hidden input to post form data -->
-        <input type="hidden" name="@nameof(FormCampaignMarketingViewModel.CampaignId)" value="@Model.Campaign.Id" />
+<form id="formTabMarketing">
+    <fieldset>
 
-        <!-- Modify cpc -->
-        <div class="info form-group">
-            <div>
-                <div class="form-row">
-                    <div class="form-group col-md-6">
-                        <label for="@nameof(FormCampaignMarketingViewModel.Cpc)">CPC</label>
-                        <!-- TODO Fix input type to money -->
-                        <input name="@nameof(FormCampaignMarketingViewModel.Cpc)" type="text"
-                               class="input-modifications-marketing form-control" value="@Model.Campaign.InitialCpc">
-                    </div>
-                </div>
-            </div>
-        </div>
+        <!-- Autopilot -->
+        <form-group class="form-row">
+            <h5>This has not yet been implemented</h5>
+            <label>Autopilot </label>
+            <input id="checkboxAutopilot" type="checkbox" name="@nameof(FormCampaignDetailsViewModel.Autopilot)"
+                   value="true" checked="checked" >
+            <div class="errorHolder"></div>
+        </form-group>
 
-        <!-- Modify bid strategy -->
-        <label for="bidStrategy">Bid strategy</label>
-        <div class="ml-0">
-            @{ foreach (var item in enumservice.GetBidStrategyOptions())
-                {
-                    <div class="form-check form-check-inline">
-                        <label class="form-check-label font-weight-normal" for="@nameof(FormCampaignMarketingViewModel.BidStrategy)">@item.ToString()</label>
-                        <input name="@nameof(FormCampaignMarketingViewModel.BidStrategy)" type="radio"
-                               class="input-modifications-marketing form-check-input" value="@item" checked="@(Model.Campaign.BidStrategy == item) " />
-                    </div>
-                }
+        <!-- Cpc -->
+        <form-group class="form-row">
+            <label>CPC </label>
+            <input id="inputCpc" name="@nameof(FormCampaignDetailsViewModel.Cpc)" type="number"
+                   value="@Model.Campaign.InitialCpc" />
+            <div class="errorHolder"></div>
+        </form-group>
+
+        <!-- Bid strategy -->
+        <form-group class="form-row">
+            <label>Bid strategy</label>
+            @foreach (var bidStrategy in enumService.GetBidStrategyOptions())
+            {
+                <input class="radioBidStrategy" type="radio" name="@nameof(FormCampaignDetailsViewModel.BidStrategy)"
+                       value="@bidStrategy" checked="@(Model.Campaign.BidStrategy == bidStrategy)" />
+                <label>@EnumTranslator.TranslateBidStrategy(bidStrategy)</label>
             }
-        </div>
+            <div class="errorHolder"></div>
+        </form-group>
 
-        <!-- Modify delivery -->
-        <label for="delivery">Content delivery</label>
-        <div class="ml-0">
-            @{ foreach (var item in enumservice.GetDeliveryOptions())
-                {
-                    <div class="form-check form-check-inline">
-                        <input name="@nameof(FormCampaignMarketingViewModel.Delivery)" type="radio"
-                               class="input-modifications-marketing form-check-input" value="@item" checked="@(Model.Campaign.Delivery == item) " />
-                        <label class="form-check-label font-weight-normal" for="delivery">@item.ToString()</label>
-                    </div>
-                }
+        <!-- Delivery -->
+        <form-group class="form-row">
+            <label>Bid strategy</label>
+            @foreach (var delivery in enumService.GetDeliveryOptions())
+            {
+                <input class="radioDelivery" type="radio" name="@nameof(FormCampaignDetailsViewModel.Delivery)"
+                       value="@delivery" checked="@(Model.Campaign.Delivery == delivery)" />
+                <label>@EnumTranslator.TranslateDelivery(delivery)</label>
             }
+            <div class="errorHolder"></div>
+        </form-group>
+
+        <!-- Budget monthly -->
+        <div>
+            <!-- Amount -->
+            <form-group class="form-row">
+                <label>Campaign budget </label>
+                <input id="inputBudget" name="@nameof(FormCampaignDetailsViewModel.Budget)" type="number"
+                       value="@Model.Campaign.Budget" />
+
+                <!-- Type -->
+                <select id="selectBudgetModel" name="@nameof(FormCampaignDetailsViewModel.BudgetModel)" >
+                    @foreach (var budgetModel in enumService.GetBudgetModelOptions())
+                    {
+                        <option selected="@(Model.Campaign.BudgetModel == budgetModel)"
+                                value="@budgetModel">
+                            @EnumTranslator.TranslateBudgetModel(budgetModel)
+                        </option>
+                    }
+                </select>
+
+                <div class="errorHolder"></div>
+            </form-group>
         </div>
 
-        <!-- Submit the form -->
-        <div class="button-save">
-            <button type="submit" id="buttonSubmitMarketing" class="input-modifications-marketing btn text-white btn-main btn-blue mt-5 float-right">Save</button>
+        <!-- Budget daily -->
+        <div>
+            <!-- Amount -->
+            <form-group class="form-row">
+                <label>Daily budget </label>
+                <input id="inputBudgetDaily" name="@nameof(FormCampaignDetailsViewModel.BudgetDaily)"
+                       type="number" value="@Model.Campaign.BudgetDaily" />
+
+                <!-- Infinite or not -->
+                <input id="inputBudgetDailyInfinite" type="checkbox" name="@nameof(FormCampaignDetailsViewModel.BudgetDailyInfinite)"
+                       value="true" checked="@(Model.Campaign.BudgetDaily == 0)"  />
+                <label>Ignore</label>
+
+                <div class="errorHolder"></div>
+            </form-group>
         </div>
-    </form>
-</fieldset>
 
+        <!-- Submit button -->
+        <button class="buttonSaveCampaignDetails btn text-white btn-main btn-blue mt-5 float-right">Save</button>
 
-<script type="text/javascript">
-
-    $(document).ready(function () {
-        setupCampaignDetailsForm('#formMarketing', '.input-modifications-marketing', '#buttonSubmitMarketing');
-    });
-
-</script>
+    </fieldset>
+</form>

@@ -1,0 +1,81 @@
+﻿@*
+    Partial view containing the targeting details for a single campaign.
+*@
+
+@inject ITargetingViewModelService targetingService
+@model CampaignDetailsViewModel
+<!-- Targeting tab -->
+<form id="formTabTargeting">
+    <fieldset>
+
+        <!-- Countries -->
+        <form-group>
+            <label>Targeted countries: </label>
+            @foreach (var location in targetingService.GetLocationOptions())
+            {
+                <div class="form-row">
+                    <input class="checkboxLocation customCheckbox"
+                           name="@nameof(FormCampaignDetailsViewModel.Locations)" 
+                           value="@location" type="checkbox" checked="@(Model.Campaign.LocationInclude.Contains(location))" />
+                    <label>@LocationTranslator.TranslateLocation(location)</label>
+                </div>
+            }
+            <div class="errorHolder"></div>
+        </form-group>
+
+        <!-- Devices -->
+        <form-group>
+            <label>Targeted devices: </label>
+            @foreach (var device in targetingService.GetDeviceOptions())
+            {
+                <div class="form-row">
+                    <input class="checkboxDevice" name="@nameof(FormCampaignDetailsViewModel.Devices)" 
+                           value="@device" type="checkbox" checked="@(Model.Campaign.Devices.Contains(device))" />
+                    <label>@LocationTranslator.TranslateDevice(device)</label>
+                </div>
+            }
+            <div class="errorHolder"></div>
+        </form-group>
+
+        <!-- Operating systems -->
+        <form-group>
+            <label>Targeted operating systems: </label>
+            @foreach (var os in targetingService.GetOperatingSystemOptions())
+            {
+                <div class="form-row">
+                    <input class="checkboxOperatingSystem" name="@nameof(FormCampaignDetailsViewModel.OperatingSystems)"
+                           value="@os" type="checkbox" checked="@(Model.Campaign.OperatingSystems.Contains(os))"  />
+                    <label>@LocationTranslator.TranslateOperatingSystem(os)</label>
+                </div>
+            }
+            <div class="errorHolder"></div>
+        </form-group>
+
+        <!-- Publisher blocking -->
+        <!-- TODO Implement -->
+        @*<div class="info form-group">
+                <div>
+                    <div class="form-subgroup">
+                        <h1 class="mb-4">Publishers</h1>
+                        <div class="form-row">
+                            <div class="form-group col-md-6">
+                                <label for="inputBlockPublishers">Block Publishers</label>
+                                <input type="text" disabled="disabled" class="form-control" id="inputBlockPublishers" placeholder="None">
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group col-md-6">
+                                <label for="inputTargetingList">Targeting Lists</label>
+                                <input type="text" disabled="disabled" class="form-control" id="inputTargetingList" placeholder="Choose">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>*@
+
+        <!-- Submit button -->
+        <button type="submit" class="buttonSaveCampaignDetails btn text-white btn-main btn-blue mt-5 float-right">Save</button>
+
+    </fieldset>
+</form>

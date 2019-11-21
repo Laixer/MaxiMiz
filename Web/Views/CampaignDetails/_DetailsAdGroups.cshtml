@@ -12,7 +12,7 @@
         <div id="tableLinked">
             <div class="table-responsive total-ad-groups">
                 <table class="table table-striped table-hover table-bordered">
-                    <partial name="_AdGroupTableHead" model="@new AdGroupTableHeadViewModel() { TableType = AdGroupLinkingTableType.Linked }"/>
+                    <partial name="_AdGroupTableHead" model="@new AdGroupTableHeadViewModel() { TableType = AdGroupLinkingTableType.Linked }" />
                     <tbody id="tableAdGroupLinkedBody"></tbody>
                 </table>
             </div>
@@ -24,7 +24,7 @@
 
             <!-- Search bar -->
             <div class="form-group">
-                <form id="formSearchAllAdGroups" method="post">
+                <form id="formSearchAllAdGroups">
                     <input id="searchAllAdGroups" type="search" class="search form-control mr-sm-2" placeholder="Search Ad Groups" aria-label="Search">
                 </form>
             </div>
@@ -44,7 +44,7 @@
         <div id="tableAll">
             <div class="table-responsive total-ad-groups">
                 <table class="table table-striped table-hover table-bordered">
-                    <partial name="_AdGroupTableHead" model="@new AdGroupTableHeadViewModel() { TableType = AdGroupLinkingTableType.All }"/>
+                    <partial name="_AdGroupTableHead" model="@new AdGroupTableHeadViewModel() { TableType = AdGroupLinkingTableType.All }" />
                     <tbody id="tableAdGroupAllBody"></tbody>
                 </table>
             </div>
@@ -63,10 +63,12 @@
         window.ColumnAdGroupAll = '@ColumnAdGroupLinking.Name';
         window.OrderAdGroupAll = '@Order.Ascending';
 
-        // Subscribe search button
-        subscribeFormBySubmit('#formSearchAllAdGroups', function () {
-            loadAdGroupAllAsync();
-        });
+        // Subscribe our search unit
+        subscribeFormSubmit('#formSearchAllAdGroups', loadAdGroupAllAsync);
+
+        // Add functionality for link operation buttons
+        subscribeFormSubmit('.formUnlinkAdGroup', onClickLinkingButton);
+        subscribeFormSubmit('.formLinkAdGroup', onClickLinkingButton);
 
         // Trigger initial async view component load when our document is ready
         loadAdGroupLinkedAsync();
@@ -75,11 +77,11 @@
 
     // Loads the linked ad groups table
     function loadAdGroupLinkedAsync() {
-        var query = null; // TODO Sending null, good idea or not?
-        var column = window.ColumnAdGroupLinked;
-        var order = window.OrderAdGroupLinked;
-        var url = '@Url.Action("GetAdGroupsLinkedViewComponent", "CampaignDetails")';
-        loadAdGroupTableAsync(url, '#tableAdGroupLinkedBody', query, column, order);
+        let query = null; // TODO Sending null, good idea or not?
+        let column = window.ColumnAdGroupLinked;
+        let order = window.OrderAdGroupLinked;
+        loadAdGroupTablePartAsync('@Url.Action(nameof(CampaignDetailsController.GetAdGroupsLinkedViewComponent), "CampaignDetails")',
+            '#tableAdGroupLinkedBody', query, column, order);
     }
 
     // Loads the all ad groups table
@@ -89,30 +91,43 @@
         // Count indicator is updated by the view returned by the all-table view component
         $('#adGroupTotalCount').html('...');
 
-        var query = $('#searchAllAdGroups')[0].value; // TODO This does not seem bulletproof!
-        var column = window.ColumnAdGroupAll;
-        var order = window.OrderAdGroupAll;
-        var url = '@Url.Action("GetAdGroupsAllViewComponent", "CampaignDetails")';
-        loadAdGroupTableAsync(url, '#tableAdGroupAllBody', query, column, order);
+        let query = $('#searchAllAdGroups')[0].value;
+        let column = window.ColumnAdGroupAll;
+        let order = window.OrderAdGroupAll;
+        loadAdGroupTablePartAsync('@Url.Action(nameof(CampaignDetailsController.GetAdGroupsAllViewComponent), "CampaignDetails")',
+            '#tableAdGroupAllBody', query, column, order);
+        loadAdGroupTablePartAsync('@Url.Action(nameof(CampaignDetailsController.GetAdGroupsAllCountViewComponent), "CampaignDetails")',
+            '#adGroupTotalCount', query, column, order);
     }
 
-    // Loads up a table async using ajax
+    // Loads up a table async using fetch
     // This is pretty similar to the campaign ajax method, but fundamentally different.
     // We are dealing with ad groups instead of campaigns.
-    function loadAdGroupTableAsync(url, tableBodyId, query, column, order) {
-        // Load view component async through controller ajax call
-        $.ajax({
-            url: url,
-            type: 'get',
-            data: {
-                campaignId: getCampaignId(),
-                query: query,
-                column: column,
-                order: order
-            },
-            success: function (response) {
-                $(tableBodyId).html(response);
-            }
+    function loadAdGroupTablePartAsync(url, tableBodyId, query, column, order) {
+        doGetAndReplaceHtml(url + '?' + new URLSearchParams({
+            campaignId: '@Model.Campaign.Id',
+            query: query,
+            column: column,
+            order: order
+        }), tableBodyId);
+    }
+
+    /**
+     * Handles our linking click event. Visual feedback is given, the unlink
+     * request is sent and the tables are both refreshed upon completion.
+     *
+     * @@param event The form submit event
+     */
+    function onClickLinkingButton(event) {
+        let form = $(event.target);
+        let button = $(form).children().first('.buttonLinkingAction');
+        $(button).attr('disabled', true);
+        setLoadingIconTo(button);
+
+        // TODO We are now passing empty arrays, is this the way to go?
+        doPostAndProcess($(form).get(0).action, $(form).serializeFormJSON(), () => {
+            loadAdGroupLinkedAsync();
+            loadAdGroupAllAsync();
         });
     }
 

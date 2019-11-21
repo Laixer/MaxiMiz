@@ -4,11 +4,10 @@
 
 @model CampaignDetailsViewModel
 <!-- Account tab -->
-<fieldset>
-    <form id="formAccount" method="post" asp-controller="CampaignDetails" asp-action="PostFormAccount">
-        <!-- Hidden input to post form data -->
-        <input type="hidden" name="@nameof(FormCampaignAccountViewModel.CampaignId)" value="@Model.Campaign.Id" />
+<form id="formTabAccount">
+    <fieldset>
 
+        <!-- Account informatiton display -->
         <div class="campaign form-group">
             <div class="form-subgroup mb-3">
                 <h1 class="mb-4">Account</h1>
@@ -27,44 +26,61 @@
             <div>
                 <div class="form-subgroup">
                     <div class="form-row">
-                        <div class="form-group col-md-6">
-                            <label for="inputCampaignName">Campaign Name</label>
-                            <input name="@nameof(FormCampaignAccountViewModel.Name)" type="text"
-                                   class="input-modifications-account form-control" id="inputCampaignName" value="@Model.Campaign.Name">
-                        </div>
-                        <div class="form-group col-md-6">
-                            <label for="inputBranding">Branding</label>
-                            <input name="@nameof(FormCampaignAccountViewModel.BrandingText)" type="text"
-                                   class="input-modifications-account form-control" id="inputBranding" value="@Model.Campaign.BrandingText">
-                            <small id="brandingHelp" class="form-text text-muted"><i>Apears below headline</i></small>
-                        </div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group col-md-6">
-                            <label for="inputTrackingCode">Tracking Code</label>
-                            <input disabled type="text" class="form-control" value="@Model.Campaign.Utm">
-                            <input name="@nameof(FormCampaignAccountViewModel.UtmCustom)" type="text"
-                                   class="input-modifications-account form-control" id="inputTrackingCode" placeholder="Put your custom utm tags here">
-                        </div>
-                        <div class="form-group col-md-6">
-                            <label for="inputURL">URL</label>
-                            <input name="@nameof(FormCampaignAccountViewModel.Url)" type="text"
-                                   class="input-modifications-account form-control" id="inputURL" value="@Model.Campaign.TargetUrl">
-                        </div>
+
+                        <!-- Campaign name -->
+                        <form-group>
+                            <div class="form-group col-md-6">
+                                <label for="inputCampaignName">Campaign Name</label>
+                                <input id="inputCampaignNameSuffix" name="@nameof(FormCampaignDetailsViewModel.CampaignNameSuffix)" type="text"
+                                       class="form-control" value="@Model.Campaign.Name" >
+                            </div>
+                            <div class="errorHolder"></div>
+                        </form-group>
+
+                        <!-- Branding Text -->
+                        <form-group>
+                            <div class="form-group col-md-6">
+                                <label for="inputBranding">Branding Text</label>
+                                <input id="inputBrandingText" name="@nameof(FormCampaignDetailsViewModel.BrandingText)" type="text"
+                                       class="form-control" value="@Model.Campaign.BrandingText" >
+                                <small id="brandingHelp" class="form-text text-muted"><i>Apears below headline</i></small>
+                            </div>
+                            <div class="errorHolder"></div>
+                        </form-group>
+
                     </div>
 
-                    <button type="submit" id="buttonSubmitAccount" class="input-modifications-account btn text-white btn-main btn-blue mt-5 float-right">Save</button>
+                    <div class="form-row">
+
+                        <!-- Custom UTM -->
+                        <form-group>
+                            <div class="form-group col-md-6">
+                                <label for="inputTrackingCode">Tracking Code</label>
+                                <input disabled type="text" class="form-control" value="@Model.Campaign.Utm">
+                                <input id="inputUtmCustom" name="@nameof(FormCampaignDetailsViewModel.UtmCustom)" type="text"
+                                       class="form-control" placeholder="Put your custom utm tags here">
+                            </div>
+                            <div class="errorHolder"></div>
+                        </form-group>
+
+                        <!-- Target url -->
+                        <form-group>
+                            <div class="form-group col-md-6">
+                                <label for="inputURL">URL</label>
+                                <input id="inputUrl" name="@nameof(FormCampaignDetailsViewModel.Url)" type="text" 
+                                       class="form-control" value="@Model.Campaign.TargetUrl">
+                            </div>
+                            <div class="errorHolder"></div>
+                        </form-group>
+
+                    </div>
+
+                    <!-- Submit button -->
+                    <button class="buttonSaveCampaignDetails btn text-white btn-main btn-blue mt-5 float-right">Save</button>
+
                 </div>
             </div>
         </div>
-    </form>
 
-</fieldset>
-
-<script type="text/javascript">
-
-    $(document).ready(function () {
-        setupCampaignDetailsForm('#formAccount', '.input-modifications-account', '#buttonSubmitAccount');
-    });
-
-</script>
+    </fieldset>
+</form>
