@@ -8,7 +8,8 @@
 <!-- Each sortable variable has corresponding order buttons. TODO Improve order buttons, clean up -->
 <thead class="thead-darkblue">
     <tr>
-        <th scope="col"><input type="checkbox" name="campaignCheck" id="select-all"></th>
+        <!-- TODO Use this or not? -->
+        @*<th scope="col"><input type="checkbox" name="campaignCheck" id="select-all"></th>*@
         <th scope="col">
             Campaign Name
             <a class="click-sort" data-column="@ColumnCampaignOverview.Name" data-order="@Order.Ascending">/\</a>
@@ -78,17 +79,11 @@
 
     $(document).ready(function () {
 
-        // Subscribe sorting button functionality
-        // Remove all click handlers because tabs load multiple times
-        $(document).off('click', '.click-sort');
-        $(document).on('click', '.click-sort', function () {
-            // Query is stored in the search bar, might want to do this differently?
-            var column = $(this).attr('data-column');
-            var order = $(this).attr('data-order');
-
+        // Sets up our sorting arrow buttons
+        subscribeClickable('.click-sort', function () {
             // Storing global
-            window.Column = column;
-            window.Order = order;
+            window.ColumnCampaignOverview = $(this).attr('data-column');
+            window.OrderCampaignOverview = $(this).attr('data-order');
 
             loadTablesAsync();
         });

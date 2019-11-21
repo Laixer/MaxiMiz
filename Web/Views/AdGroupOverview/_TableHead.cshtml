@@ -1,0 +1,57 @@
+﻿@*
+    Table head for our ad group overview.
+*@
+
+@model AdGroupOverviewViewModel
+<!-- Creates a head cell for each value in our table -->
+<thead class="thead-darkblue">
+    <tr>
+        <th scope="col">
+            Group name
+            <a class="click-sort-adgroup" data-column="@ColumnAdGroupLinking.Name" data-order="@Order.Ascending">/\</a>
+            <a class="click-sort-adgroup" data-column="@ColumnAdGroupLinking.Name" data-order="@Order.Descending">\/</a>
+        </th>
+        <th scope="col">
+            Created
+            <a class="click-sort-adgroup" data-column="@ColumnAdGroupLinking.CreateDate" data-order="@Order.Ascending">/\</a>
+            <a class="click-sort-adgroup" data-column="@ColumnAdGroupLinking.CreateDate" data-order="@Order.Descending">\/</a>
+        </th>
+        <th scope="col">
+            Ads
+            <a class="click-sort-adgroup" data-column="@ColumnAdGroupLinking.AdCount" data-order="@Order.Ascending">/\</a>
+            <a class="click-sort-adgroup" data-column="@ColumnAdGroupLinking.AdCount" data-order="@Order.Descending">\/</a>
+        </th>
+        <th scope="col">
+            Modified
+            <a class="click-sort-adgroup" data-column="@ColumnAdGroupLinking.UpdateDate" data-order="@Order.Ascending">/\</a>
+            <a class="click-sort-adgroup" data-column="@ColumnAdGroupLinking.UpdateDate" data-order="@Order.Descending">\/</a>
+        </th>
+        <th scope="col">
+            <!-- Edit column -->
+        </th>
+    </tr>
+</thead>
+
+<!-- TODO For some reason jquery is not loaded. -->
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+<script type="text/javascript">
+
+    $(document).ready(function () {
+
+        // Subscribe sorting button functionality
+        // Remove all click handlers because tabs load multiple times
+        subscribeClickable('.click-sort-adgroup', function () {
+            // Query is stored in the search bar, might want to do this differently?
+            var column = $(this).attr('data-column');
+            var order = $(this).attr('data-order');
+
+            // Storing global
+            window.AdGroupOverviewColumn = column;
+            window.AdGroupOverviewOrder = order;
+
+            loadAdGroupOverviewTablesAsync();
+        });
+
+    });
+
+</script>
