@@ -1,0 +1,74 @@
+﻿@*
+    Image picker functionality.
+    TODO Obsolete comments?
+*@
+
+<div class="modal-content">
+
+    <!-- Header -->
+    <div class="modal-header">
+        <h1 class="m-0">Upload images</h1>
+        <form class="form-inline my-2 my-lg-0">
+            <div class="form-group has-feedback has-feedback-left">
+                <input type="search" class="form-control image-search" placeholder="Search" />
+                <i class="form-control-feedback fa fa-search"></i>
+            </div>
+            <button type="button" class="btn btn-outline-dark" data-dismiss="modal"><i class="fas fa-times"></i></button>
+        </form>
+    </div>
+
+    <!-- Body -->
+    <div class="modal-body">
+
+        <!-- Navigation bar -->
+        <div class="sidebar">
+            <div class="sidebar-wrapper">
+                <ul class="nav nav-tabs flex-column mt-4">
+                    <li class="active"><span class="active" data-target="#tab1" data-toggle="tab"> <i class="fas fa-image"></i> My Library</span></li>
+                    <li><span data-target="#tab2" data-toggle="tab"> <i class="fas fa-camera"></i> Stock Photos - Free</span></li>
+                    <li><span data-target="#tab3" data-toggle="tab"> <i class="fas fa-pencil-ruler"></i> Icons</span></li>
+                    <li><span data-target="#tab4" data-toggle="tab"> <i class="fas fa-video"></i> GIFS</span></li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="tab-content">
+            <div class="tab-pane active" id="tab1">
+
+                <!-- Partial view for drag & drop functionality -->
+                <partial name="_DropZone.cshtml" />
+
+                <div class="dropdown-divider"></div>
+
+                <div class="my-library">
+                    <p>My Library</p>
+                    <!-- Gets replaced by async calls -->
+                    <div id="divImageList" class="image-section"></div>
+                </div>
+
+            </div>
+
+            <div class="tab-pane" id="tab2">
+                <p>I'm in Section 2.</p>
+            </div>
+
+            <div class="tab-pane" id="tab3">
+                <p>I'm in Section 3.</p>
+            </div>
+
+            <div class="tab-pane" id="tab4">
+                <p>I'm in Section 4.</p>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- For exiting our modal again -->
+    <div class="modal-footer">
+        <button id="buttonAddSelectedImages" type="button" class="btn btn-primary px-5" data-dismiss="modal">Confirm</button>
+    </div>
+</div>
+
+
+

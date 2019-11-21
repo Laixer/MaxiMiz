@@ -1,0 +1,17 @@
+﻿@*
+    Contains a single title entry for our title list.
+*@
+
+@* Set to true if remove button is required *@
+@model bool
+@* Used as delete identifier *@
+@{var id = Guid.NewGuid(); }
+
+<!-- Single title item -->
+<div class="form-row" id="@id">
+    <input type="text" name="@nameof(AdGroupFormViewModel.Titles)" class="form-control titleEntry disableOnSubmitPending" placeholder="My advertisement title" />
+    @if (Model)
+    {
+        <a class="removeTitleEntry" data-target-id="@id">[X]</a>
+    }
+</div>

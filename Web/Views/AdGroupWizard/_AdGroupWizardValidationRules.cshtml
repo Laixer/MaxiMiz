@@ -1,0 +1,38 @@
+﻿@*
+    Contains our validation rules for the ad group wizard.
+*@
+
+<script type="text/javascript">
+
+    $(function () {
+
+        // Ad group name
+        $('#inputAdgroupName').rules('add', {
+            required: true,
+            minlength: 8,
+            messages: {
+                required: 'Please specify a name',
+                'minlength': jQuery.validator.format("The minimum name length is {0} characters")
+            },
+        });
+
+        // Ad group title entry
+        // TODO Remove empty titles? Filter empty titles?
+        $('.titleEntry').rules('add', {
+            required: true,
+            messages: {
+                required: 'Please specify at least one title'
+            },
+        });
+
+        // Selected image uris
+        $('.hiddenImageUri').rules('add', {
+            required: true,
+            messages: {
+                required: 'Please select at least one image'
+            },
+        });
+
+    });
+
+</script>

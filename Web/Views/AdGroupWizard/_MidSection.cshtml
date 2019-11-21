@@ -8,14 +8,23 @@
     <p>Preview</p>
     <div class="preview-section">
         <label id="lblAdGroup"><i class="text-muted">Ad group</i></label>
-        <img src="../../img/phone-ad.png" alt="phone-ad">
+        @*<img src="../../img/phone-ad.png" alt="phone-ad">*@
         <label id="lblDestURL"><i class="text-muted">Destination URL</i></label>
+    </div>
+
+    <!-- TODO Remove debug -->
+    <a id="buttonGenerateRandomAd" class="btn text-white btn-main btn-blue mt-5">Generate random ad</a>
+
+    <!-- Placeholders for our randomly generated ad -->
+    <div>
+        <img id="generatedAdImage" />
+        <label id="generatedAdTitle"></label>
     </div>
 
     <!-- Buttons -->
     <div class="form-row">
         <button id="buttonBack" class="btn text-white btn-main btn-blue mt-5">Back</button>
-        <button id="buttonSave" class="btn text-white btn-main btn-blue mt-5">Save</button>
+        <button id="buttonSubmitWizardAdGroup" class="btn text-white btn-main btn-blue mt-5">Save</button>
     </div>
 
 </div>

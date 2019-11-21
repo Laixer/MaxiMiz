@@ -1,0 +1,17 @@
+﻿@*
+    Partial view containing the dropzone for images.
+*@
+
+@*<div class="image-upload">
+    <img src="~/images/drop-image.png" alt="image-drop">
+    <p>Drag & Drop your images here</p>
+</div>*@
+
+<form asp-controller="ImagePicker" asp-action="@nameof(ImagePickerController.UploadImage)" method="post"
+      id="formDropZone" class="dropzone"
+      enctype="multipart/form-data">
+    <div class="fallback">
+        <input type="file" name="files" multiple />
+        <input type="submit" value="Upload" />
+    </div>
+</form>

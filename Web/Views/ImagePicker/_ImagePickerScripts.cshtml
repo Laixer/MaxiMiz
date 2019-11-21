@@ -1,0 +1,148 @@
+﻿@*
+    Contains the scripts for the image picker.
+*@
+
+<script type="text/javascript">
+
+    // Configure dropzone
+    Dropzone.options.formDropZone = {
+        init: function () {
+            this.on('queuecomplete', function () {
+                loadUploadedImages();
+            });
+        },
+
+        paramName: 'file',
+        maxFilesize: 25,
+        acceptedFiles: 'image/*',
+    };
+
+    $(function () {
+
+        // Subscribe all images to be selectable
+        subscribeClickable('.imageSelectable', onClickImageSelectable);
+
+        // Subscribe add images button
+        subscribeClickable('#buttonAddSelectedImages', onAddSelectedImages);
+
+        // Download images when the page loads
+        loadUploadedImages();
+
+    });
+
+    /**
+     * Refreshes our stored images.
+     */
+    function loadUploadedImages() {
+        doMethodAndProcess('@Url.Action(nameof(ImagePickerController.GetUploadedImages), "ImagePicker")', 'get', function (html) {
+            $('#divImageList').html(html);
+            setAllSelectedImages();
+        });
+    };
+
+    /**
+     * Adds the selected images.
+     * TODO This seems like some kind of circular reference! Maybe do this differently.
+     */
+    function onAddSelectedImages() {
+        refreshSelectedImagesThumbnails();
+        tryGenerateRandomAd();
+    }
+
+    /**
+     * Called when we select or unselect an image.
+     *
+     * @@param event The click event
+     */
+    function onClickImageSelectable(event) {
+        let target = $(event.target).closest('.imageSelectable');
+        let selected = $(target).hasClass('imageSelected');
+        if (selected === false) {
+            selectImage(target);
+        } else {
+            deselectImage(target);
+        }
+    }
+
+    // Adds a hidden input entry for a given ad group id
+    function selectImage(target) {
+        $(target).addClass('imageSelected');
+
+        let imageUri = $(target).attr('data-image-uri');
+
+        let selectedUris = getSelectedUris();
+        if (selectedUris.includes(imageUri) === false) {
+            // Populate the first item if there are none selected yet
+            if (selectedUris.length === 1 && selectedUris[0] === "") {
+                $('.hiddenImageUri').val(imageUri);
+            } else {
+                // TODO This can be cleaned up
+                let htmlEntry = "<input type='hidden' class='hiddenImageUri disableOnSubmitPending' name='@nameof(AdGroupFormViewModel.ImageLinks)' value='" + imageUri + "' />";
+
+                $('#hiddenImageUris').append(htmlEntry);
+            }
+        } else {
+            console.log('Not appending ', imageUri, ' to selected items, already exists');
+        }
+    }
+
+    // Removes a hidden input entry for a given ad group id
+    function deselectImage(target) {
+        $(target).removeClass('imageSelected');
+
+        // Remove if we have more than one selected, else set to empty
+        var imageUri = $(target).attr('data-image-uri');
+        if (getSelectedUris().length > 1) {
+            $.each($('.hiddenImageUri'), function (index, item) {
+                if ($(item).get(0).value === imageUri) {
+                    $(item).remove();
+                }
+            });
+        } else {
+            $('.hiddenImageUri').val('');
+        }
+    }
+
+    // Sets all checkboxes checked which have already been selected before
+    function setAllSelectedImages() {
+        let selectedUris = getSelectedUris();
+        $.each($('.imageSelectable'), function (index, item) {
+            if (selectedUris.includes($(item).attr('data-image-uri'))) {
+                $(item).addClass('imageSelected');
+            } else {
+                $(item).removeClass('imageSelected');
+            }
+        });
+    }
+
+    // Gets all currently selected hidden ad group ids
+    function getSelectedUris() {
+        let selectedUris = [];
+        $.each($('.hiddenImageUri'), function (index, item) {
+            var uri = $(item).get(0).value;
+            if (uri == null) { console.log('Error while getting uri from ', item); }
+            else { selectedUris.push(uri); }
+        });
+        return selectedUris;
+    }
+
+    /**
+     * Refreshes our miniaturized version of the selected images.
+     */
+    function refreshSelectedImagesThumbnails() {
+        let jsonFormSerialized = $('.hiddenImageUri').serializeFormJSON();
+        let jsonFormBody = {
+            '@nameof(ImageUrisViewModel.ImageUris)': jsonFormSerialized['@nameof(AdGroupFormViewModel.ImageLinks)'],
+        };
+        makeArrayIfSingleString(jsonFormBody, '@nameof(ImageUrisViewModel.ImageUris)');
+        doPostAndProcess('@Url.Action(nameof(ImagePickerController.GetSelectedImagesThumbnails), "ImagePicker")', jsonFormBody, function (html) {
+            $('#divSelectedImagesThumbnails').html(html);
+        });
+
+        // TODO This seems to bug out with dynamic content
+        if (getSelectedUris().length > 0) {
+            $('#ImageLinks-error').text('');
+        }
+    }
+
+</script>

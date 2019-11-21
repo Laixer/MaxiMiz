@@ -1,0 +1,45 @@
+﻿@*
+    Contains our sidebar functionality for ad group creation.
+*@
+
+<div id="adsfield">
+
+    <!-- All form functionality exists in the sidebar -->
+    <form id="formWizardAdGroup" asp-controller="AdGroupWizard" asp-action="@nameof(AdGroupWizardController.SubmitForm)" method="post" class="pt-2">
+
+        <!-- Name -->
+        <form-group class="form-group">
+            <label>Ad group name</label><br />
+            <input id="inputAdgroupName" type="text" name="@nameof(AdGroupFormViewModel.Name)" class="form-control disableOnSubmitPending" placeholder="My ad group name" />
+            <div class="errorHolder"></div>
+        </form-group>
+
+        <!-- Titles -->
+        <form-group class="form-group">
+            <label>Titles</label>
+            <div id="divTitleList">
+                <partial name="_TitleEntry" model="false" />
+            </div>
+            <a id="addTitleEntry"> + Add Title </a>
+            <div class="errorHolder"></div>
+        </form-group>
+
+        <!-- Images -->
+        <div class="form-group">
+            <label for="uploadImage">Upload Images</label>
+            <a id="openImages" class="btn text-white btn-main btn-blue mt-5" data-toggle="modal" data-target="#modalCenter">
+                <div id="divSelectedImagesThumbnails" class="image-section">
+                    <!-- Contains our selected images, loaded dynamically -->
+                </div>
+            </a>
+        </div>
+
+        <!-- Hidden input for selected image urls -->
+        <form-group id="hiddenImageUris" class="form-group">
+            <input type='hidden' class='hiddenImageUri disableOnSubmitPending' name='@nameof(AdGroupFormViewModel.ImageLinks)' />
+            <div class="errorHolder"></div>
+        </form-group>
+
+    </form>
+
+</div>
