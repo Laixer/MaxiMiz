@@ -9,7 +9,7 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Maximiz.ViewComponents.CampaignOverview
+namespace Maximiz.ViewComponents.CampaignDetails
 {
 
     /// <summary>
@@ -54,14 +54,13 @@ namespace Maximiz.ViewComponents.CampaignOverview
             // TODO Remove assignment??
             var all = _mapperAdGroups.ConvertAll(await _adGroupRepository.GetAllAsync(query));
             var linkedIds = all.ToList().GetRange(1, 2).Select(x => x.Id); // TODO We need the campaignId here
-            var model = new AdGroupTableAllViewModel
+
+            return View("TableRows", new AdGroupTableAllViewModel
             {
                 AdGroupsAll = all,
                 AdGroupIdsLinked = linkedIds,
                 TotalCount = await _adGroupRepository.GetCount(query)
-            };
-
-            return View("TableRows", model);
+            });
         }
 
     }

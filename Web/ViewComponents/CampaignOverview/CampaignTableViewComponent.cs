@@ -15,7 +15,7 @@ namespace Maximiz.ViewComponents.CampaignOverview
     /// <summary>
     /// View component for loading our campaign tables async.
     /// </summary>
-    public class CampaignTableViewComponent : ViewComponent
+    public sealed class CampaignTableViewComponent : ViewComponent
     {
 
         /// <summary>
@@ -50,10 +50,10 @@ namespace Maximiz.ViewComponents.CampaignOverview
         {
             // Simulate waiting
             await Task.Delay(new Random().Next(25, 100));
-
             return View("TableRows", new CampaignOverviewTableViewModel
             {
-                CampaignList = _mapperCampaign.ConvertAll(await GetCampaignsFromTable(table, query, page))
+                CampaignList = _mapperCampaign.ConvertAll(
+                    await GetCampaignsByTable(table, query, page))
             });
         }
 
@@ -64,7 +64,7 @@ namespace Maximiz.ViewComponents.CampaignOverview
         /// <param name="query"><see cref="QueryCampaignWithStats"/></param>
         /// <param name="page">Page number</param>
         /// <returns>Task that retreives the specified campaigns</returns>
-        private Task<IEnumerable<CampaignWithStats>> GetCampaignsFromTable(CampaignTableType table, QueryCampaignWithStats query, int page)
+        private Task<IEnumerable<CampaignWithStats>> GetCampaignsByTable(CampaignTableType table, QueryCampaignWithStats query, int page)
         {
             switch (table)
             {
