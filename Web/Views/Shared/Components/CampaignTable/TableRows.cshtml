@@ -8,7 +8,8 @@
 {
 
     <tr>
-        <th scope="row"><input type="checkbox" name="campaigncheck" value="@campaign.Id"></th>
+        <!-- Remove this? -->
+        @*<th scope="row"><input type="checkbox" name="campaigncheck" value="@campaign.Id"></th>*@
         <td class="data-campaign">
             <!-- Opens campaign details modal -->
             <a class="click-open-details" data-campaign-id="@campaign.Id">
@@ -33,11 +34,7 @@
             <!-- Clickable icon to open the details -->
             <a class="click-open-details" data-campaign-id="@campaign.Id"><i class="fas fa-edit"></i></a>
 
-            <!-- TODO What does this do? Unimplemented functionality -->
-            @*<a data-toggle="tooltip" title="Hide"><i class="fas fa-eye"></i></a>*@
-
             <!-- Clickable icon to delete campaign -->
-            <!-- TODO This is actually a delete form -->
             <a class="click-delete-campaign" data-toggle="tooltip" data-campaign-id="@campaign.Id" title="Delete"><i class="fas fa-trash text-danger ml-1"></i></a>
         </td>
     </tr>

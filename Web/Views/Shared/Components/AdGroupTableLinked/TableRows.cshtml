@@ -12,48 +12,14 @@
         <td>@adGroup.AdItemCount</td>
         <td>@adGroup.UpdateDate</td>
         <td>
-            <form method="post" class="formUnlinkAdGroup">
+            <form asp-controller="CampaignDetails" asp-action="@nameof(CampaignDetailsController.UnlinkAdGroup)" method="post" class="formUnlinkAdGroup">
                 <!-- Post form submission through jquery ajax post request -->
-                <button type="submit" class="button-adgroup btn btn-primary">Unlink</button>
+                <button type="submit" class="buttonLinkingAction btn btn-primary">Unlink</button>
 
                 <!-- Hidden input fields to insert data into form model -->
-                <input type="hidden" name="AdGroupId" value="@adGroup.Id" />
+                <input type="hidden" name="@nameof(LinkingOperationViewModel.AdGroupId)" value="@adGroup.Id" />
+                <input type="hidden" name="@nameof(LinkingOperationViewModel.CampaignId)" value="@Model.CampaignId" />
             </form>
         </td>
     </tr>
 }
-
-<script type="text/javascript">
-
-    $(document).ready(function () {
-
-        // TODO Duplicate code
-        // Add functionality for linking button
-        subscribeFormBySubmit('.formUnlinkAdGroup', function (event) {
-            var form = $(event.target);
-            var button = $(form).children().first('.button-adgroup');
-            var adGroupId = $(form).find('input[name="AdGroupId"]').val();
-
-            // Disable button to prevent double clicking
-            $(button).attr('disabled', true);
-
-            // Button text should indicate loading icon as user feedback
-            $(button).load('@Url.Action("LoadingIcon", "Utility")');
-
-            $.ajax({
-                url: '@Url.Action("UnlinkAdGroup", "CampaignDetails")',
-                type: 'post',
-                data: {
-                    campaignId: getCampaignId(),
-                    adGroupId: adGroupId
-                },
-                success: function () {
-                    loadAdGroupLinkedAsync();
-                    loadAdGroupAllAsync();
-                }
-            });
-        });
-
-    });
-
-</script>
