@@ -1,0 +1,77 @@
+@*
+    Contains shared razor js functionality for validation.
+*@
+
+<script type="text/javascript">
+
+    // Configures our validator static object
+    // This has to be called before validator creation
+    function setupValidatorDefaults() {
+        $.validator.setDefaults({
+            // Add error styling when invalid highlighted
+            highlight: function (element) {
+                $(element)
+                    .closest('form-group')
+                    .addClass('has-error');
+            },
+
+            // Remove error styling when unhighlighted
+            unhighlight: function (element) {
+                $(element)
+                    .closest('form-group')
+                    .removeClass('has-error');
+            },
+
+            // Custom error class (recognized by bootstrap)
+            errorClass: 'error-text',
+
+            // Error placement customized
+            errorPlacement: function (error, element) {
+                var errorHolder = $(element)
+                    .closest('form-group')
+                    .find('.errorHolder');
+                if (errorHolder != null) {
+                    $(errorHolder).html(error);
+                };
+            },
+
+            // Disable ignoring hidden and non-visible elements
+            ignore: [],
+
+        });
+    };
+
+    // Validates each element in a given array
+    // Returns true if all are valid
+    function validateSet(myValidator, elementArray) {
+        if (myValidator == null) {
+            console.log('validator should not be null');
+            return;
+        }
+        if (elementArray == null) {
+            console.log('no elements to validate');
+            return;
+        }
+
+        try {
+            var result = true;
+            elementArray.forEach(function (item) {
+                if (!$(item).length) {
+                    console.log('Could not find item ', item);
+                } else {
+                    var itemValid = myValidator.element(item);
+                    if (result == true && itemValid == false) {
+                        result = false;
+                    }
+                }
+            });
+        } catch (e) {
+            console.log('Exception in ValidateSet: ', e);
+            throw e;
+        }
+
+        // Return last to ensure all elements have been checked
+        return result;
+    };
+
+</script>

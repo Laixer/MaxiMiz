@@ -1,0 +1,91 @@
+﻿@*
+    Contains some utility functionality.
+*@
+
+<script type="text/javascript">
+
+    /**
+     * Sets the inner html of some item to the loading icon.
+     * TODO This has to be implemented.
+     *
+     * @@param id The id of the element to replace
+     */
+    function setLoadingIconTo(id) {
+        $(id).html('Loading...');
+    }
+
+    /**
+     * Serializes a form to json.
+     */
+    (function ($) {
+        $.fn.serializeFormJSON = function () {
+
+            var o = {};
+            var a = this.serializeArray();
+            $.each(a, function () {
+                if (o[this.name]) {
+                    if (!o[this.name].push) {
+                        o[this.name] = [o[this.name]];
+                    }
+                    o[this.name].push(this.value || '');
+                } else {
+                    o[this.name] = this.value || '';
+                }
+            });
+            return o;
+        };
+    })(jQuery);
+
+
+    /**
+     * TODO This is a beunfix.
+     * Makes a single string item in a json object an array of size one. This
+     * will only happen if the item is an actual string instead of an array.
+     * 
+     * @@param jsonBody The entire json object
+     * @@param key The key of the item to check
+     */
+    function makeArrayIfSingleString(jsonBody, key) {
+        if (key in jsonBody) {
+            if (jsonBody[key].constructor == "string".constructor) {
+                jsonBody[key] = [jsonBody[key]];
+            }
+        } else {
+            console.log('Could not find ', key, ' in ', jsonBody);
+        }
+    }
+
+    /**
+     * Makes a single string an array, does nothing if it already is an array.
+     * This returns and does not overwrite. (TODO Is this correct?)
+     * This returns an empty array if the input is undefined.
+     * 
+     * @@param input The input string or array
+     */
+    function makeArrayIfString(input) {
+        if (input === undefined) { return []; }
+        if (input.constructor == "string".constructor) {
+            return [input];
+        } else {
+            return input;
+        }
+    }
+
+    /**
+     * Sets all elements in an array to enabled or disabled.
+     * 
+     * @@param elementsArray The elements to update
+     * @@param enabled True if enabled, false if disabled
+     */
+    function updateEnabledSet(elementsArray, enabled) {
+        if (elementsArray == null) { console.log('No elements to enable or disable'); }
+        elementsArray.forEach(function (item) {
+            if (enabled) {
+                $(item).removeAttr('disabled');
+            } else {
+                $(item).attr('disabled', 'disabled');
+            }
+        });
+    }
+
+</script>

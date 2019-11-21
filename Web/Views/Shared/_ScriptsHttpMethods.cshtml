@@ -1,0 +1,137 @@
+﻿@*
+    Partial view containing all our javascript http request methods.
+    Currently this implements these calls using fetch().
+*@
+
+<script type="text/javascript">
+
+    /**
+     * Sends some get request to a specified url. The response of the url is processed
+     * as html and passed on as the first argument to the callback function. This
+     * function also replaces some element with the retrieved html.
+     *
+     * @@param urlWithArgs The url to send the request to
+     * @@param replaceId Id of the element that will get the html inside it
+     * @@param callbackSuccess Success callback function, html will be the first argument
+     * @@param argsSuccess Argument array for the success callback
+     * @@param callbackFailure Failure callback function, response will be the first argument
+     * @@param argsFailure Argument array for the failure callback
+     */
+    function doGetAndReplaceHtml(urlWithArgs, replaceId, callbackSuccess, argsSuccess, callbackFailure, argsFailure) {
+        // TODO Args never read
+        try {
+            let modifiedCallbackSuccess = function (html, internalPassedArgs) {
+
+                // TODO Do with html parser maybe?
+                $(replaceId).html(html);
+
+                if (callbackSuccess != null) { callbackSuccess(html, internalPassedArgs); }
+            }
+            doMethodAndProcess(urlWithArgs, 'get', modifiedCallbackSuccess, argsSuccess, callbackFailure, argsFailure);
+        } catch (e) {
+            // TODO This doesn't actually do anything, or log and deal with / throw new error, or just throw,
+            console.log('Exception in doGetAndReplaceHtml', e);
+            throw e;
+        }
+    }
+
+    /**
+     * Sends some http request to a specified url. The response of the url is processed
+     * as html and passed on as the first argument to the callback function.
+     *
+     * @@param urlWithArgs The url to send the request to
+     * @@param method The http method to execute
+     * @@param callbackSuccess Success callback function, html will be the first argument
+     * @@param argsSuccess Argument array for the success callback
+     * @@param callbackFailure Failure callback function, response will be the first argument
+     * @@param argsFailure Argument array for the failure callback
+     */
+    function doMethodAndProcess(urlWithArgs, method, callbackSuccess, argsSuccess, callbackFailure, argsFailure) {
+        try {
+            var promise = fetch(urlWithArgs, {
+                method: method
+            });
+            processPromiseAsText(promise, callbackSuccess, argsSuccess, callbackFailure, argsFailure);
+        } catch (e) {
+            console.log('Exception in doMethodAndProcess:', e);
+            throw e;
+        }
+    };
+
+    /**
+     * Posts some form to it's action url. The response of the url is processed
+     * as html and passed on as the first argument to the callback function.
+     *
+     * @@param formId The id of the form
+     * @@param callbackSuccess Success callback function, html will be the first argument
+     * @@param argsSuccess Argument array for the success callback
+     * @@param callbackFailure Failure callback function, response will be the first argument
+     * @@param argsFailure Argument array for the failure callback
+     */
+    function doPostFormAndProcess(formId, callbackSuccess, argsSuccess, callbackFailure, argsFailure) {
+        try {
+            doPostAndProcess($(formId).get(0).action, $(formId).serializeFormJSON(), callbackSuccess, argsSuccess, callbackFailure, argsFailure);
+        } catch (e) {
+            console.log('Exception in doPostFormAndProcess:', e);
+            throw e;
+        }
+    }
+
+    /**
+     * Posts some content to a specified url. The response of the url is processed
+     * as html and passed on as the first argument to the callback function.
+     *
+     * @@param urlWithArgs The url to send the request to
+     * @@param jsonBody The json body for the post method
+     * @@param callbackSuccess Success callback function, html will be the first argument
+     * @@param argsSuccess Argument array for the success callback
+     * @@param callbackFailure Failure callback function, response will be the first argument
+     * @@param argsFailure Argument array for the failure callback
+     */
+    function doPostAndProcess(urlWithArgs, jsonBody, callbackSuccess, argsSuccess, callbackFailure, argsFailure) {
+
+        // TODO Debug remove
+        console.log('json body = ', jsonBody);
+
+        try {
+            var promise = fetch(urlWithArgs, {
+                method: 'post',
+                headers: {
+                    'Content-Type': 'application/json;charset=UTF-8',
+                },
+                body: JSON.stringify(jsonBody),
+            });
+            processPromiseAsText(promise, callbackSuccess, argsSuccess, callbackFailure, argsFailure);
+        } catch (e) {
+            console.log('Exception in doPostAndProcess:', e);
+            throw e;
+        }
+    };
+
+    /**
+     * Awaits a html response and processes it with the callback function. The
+     * first argument of the callback function will always be the html.
+     *
+     * @@param promise Fetch promise object
+     * @@param callbackSuccess Success callback function, html will be the first argument
+     * @@param argsSuccess Argument array for the success callback
+     * @@param callbackFailure Failure callback function, response will be the first argument
+     * @@param argsFailure Argument array for the failure callback
+     */
+    function processPromiseAsText(promise, callbackSuccess, argsSuccess, callbackFailure, argsFailure) {
+        promise
+            .then((response) => {
+                if (response.ok) {
+                    return response.text();
+                } else {
+                    if (callbackFailure != null) { callbackFailure(response, argsFailure); }
+                }
+            })
+            .then((html) => {
+                if (callbackSuccess != null) { callbackSuccess(html, argsSuccess); }
+            });
+    };
+
+</script>
+
+

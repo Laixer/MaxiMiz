@@ -1,4 +1,2 @@
-﻿// Please see documentation at https://docs.microsoft.com/aspnet/core/client-side/bundling-and-minification
-// for details on configuring this project to bundle and minify static web assets.
-
-// Write your JavaScript code.
+﻿// Represents an object for storing sorting properties and a query for a given table
+// TODO Do this or not? May be a nice cleanup

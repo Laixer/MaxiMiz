@@ -10,7 +10,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - Maximiz</title>
 
-    <!-- Styling setup -->
+    <!-- Styling script import -->
     <environment include="Development">
         <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.css" />
     </environment>
@@ -22,46 +22,42 @@
               integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" />
     </environment>
 
+    <!-- Imported css -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.5.1/min/dropzone.min.css" />
+
     <!-- Custom css -->
     <link rel="stylesheet" href="~/css/style.css">
+    <link rel="stylesheet" href="~/css/site.css">
+    <link rel="stylesheet" href="~/css/sidebar.css">
     <link rel="stylesheet" href="~/css/modal_center.css">
     <link rel="stylesheet" href="~/css/modal_right.css">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css" integrity="sha384-mzrmE5qonljUremFsqc01SB46JvROS7bZs3IO2EmfFsd15uHvIt+Y8vEf7N7fWAU" crossorigin="anonymous">
 
-
     @RenderSection("Styles", required: false)
+
 </head>
 <body>
-    <partial name="_SideMenu" />
-    <partial name="_NavigationBar" />
+    <!-- Menu and topbar are conditional -->
+    @if ((bool)ViewData["RenderSideMenu"])
+    {
+        <partial name="_SideMenu" />
+    }
+    @if ((bool)ViewData["RenderNavigationBar"])
+    {
+        <partial name="_NavigationBar" />
+    }
+
+    <!-- Main rendering section -->
     <div id="divBody">
         @RenderBody()
     </div>
-    <script>
-                                        // TODO This was added in a previous version where our menu openclose was implemented.
-                                        //document.getElementById("menu-toggle").onclick = function (e) {
-                                        //    e.preventDefault();
-                                        //    var wrapper = document.getElementById("wrapper");
-                                        //    if (wrapper.className == "d-flex toggled") {
-                                        //        wrapper.className = "d-flex";
-                                        //    }
-                                        //    else {
-                                        //        wrapper.className = "d-flex toggled";
-                                        //    }
-                                        //}
-    </script>
 
-
-    <!-- Script setup -->
-    <!-- In development, just get all from lib -->
+    <!-- Library imports -->
     <environment include="Development">
-        <!-- These are our global script imports. -->
         <script src="~/lib/jquery/dist/jquery.js"></script>
         <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.js"></script>
         <script src="~/lib/jquery-validation/dist/jquery.validate.js"></script>
     </environment>
-
-    <!-- In production, have download as fallback -->
     <environment exclude="Development">
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"
                 asp-fallback-src="~/lib/jquery/dist/jquery.min.js"
@@ -76,6 +72,18 @@
                 integrity="sha384-xrRywqdh3PHs8keKZN+8zzc5TX0GRTLCcmivcbNJWm2rs5C8PRhcEn3czEjhAO9o">
         </script>
     </environment>
+
+    <!-- Drop zone, used for dragging & dropping images -->
+    <!-- TODO Also offline -->
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.5.1/min/dropzone.min.js"></script>
+
+    <!-- Import custom razor js functions as partial views -->
+    <!-- TODO Only the menu one has to be razor, the rest can be .js -->
+    <partial name="_ScriptsMenu" />
+    <partial name="_ScriptsValidation" />
+    <partial name="_ScriptsSubscribables" />
+    <partial name="_ScriptsHttpMethods" />
+    <partial name="_ScriptsUtility" />
 
     <!-- Render script section for each (non-partial) view after imports -->
     @RenderSection("Scripts", required: false)

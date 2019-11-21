@@ -4,57 +4,19 @@
 
 <header class="sidebar">
     <div class="sidebar-wrapper">
-        <button id="menu-toggle" class="btn">TOGGLE</button>
         <ul class="nav flex-column mt-5">
+            <!-- TODO class="active" op <a/> -->
             <li>
-                <a asp-controller="Home" class="active" asp-action="Index">
-                    <p><i class="fas fa-tachometer-alt"></i> Dashboards</p>
+                <a id="menuItemDashboard" asp-controller="Home" asp-action="Index">
+                    <p><i class="fas fa-tachometer-alt"> </i>Dashboard</p>
                 </a>
             </li>
             <li>
-                <a data-toggle="collapse" href="#collapseCampaigns" aria-expanded="false">
-                    <p><i class="far fa-paper-plane"></i> Campaigns <i class="fas fa-chevron-down"></i></p>
-                </a>
-                <div class="collapse show" id="collapseCampaigns">
-                    <div class="dropdown-divider"></div>
-                    <ul class="nav">
-                        <li class="dropright">
-                            <a class="dropdown-toggle" data-toggle="dropdown" href="#">Recently opened</a>
-                            <ul class="dropdown-menu">
-                                <li><a>1</a></li>
-                                <li><a>2</a></li>
-                                <li><a>3</a></li>
-                                <li><a>4</a></li>
-                                <li><a>5</a></li>
-                            </ul>
-                        </li>
-                        <li class="active">
-                            <a asp-controller="CampaignOverview" asp-action="Overview">Overview</a>
-                        </li>
-                        <li>
-                            <a>Ad Performance</a>
-                        </li>
-                        <li>
-                            <a>Publisher Performance</a>
-                        </li>
-                    </ul>
-                </div>
+                <a id="menuItemCampaignOverview" asp-controller="CampaignOverview" asp-action="Overview"><p><i class="far fa-paper-plane"> </i>Campaigns </p></a>
             </li>
-            @*<li>
-                <a asp-controller="AdGroupOverview" asp-action="Overview">
-                    <p><i class="fas fa-rocket"></i> Ad Groups</p>
-                </a>
-            </li>*@
-            @*<li>
-                <a>
-                    <p><i class="far fa-file-alt"></i> Rules</p>
-                </a>
-            </li>*@
-            @*<li>
-                <a>
-                    <p><i class="fas fa-bullseye"></i> Targeting Lists</p>
-                </a>
-            </li>*@
+            <li>
+                <a id="menuItemAdGroupOverview" asp-controller="AdGroupOverview" asp-action="Overview"><p><i class="fas fa-rocket"> </i>Ad Groups</p></a>
+            </li>
         </ul>
     </div>
 </header>

@@ -1,0 +1,100 @@
+﻿@*
+    Contains generic functionality for forms, buttons and links.    
+*@
+
+<script type="text/javascript">
+
+    // TODO Varargs with or without dots?
+
+    /**
+     * Subscribes a clickable item. This works with dynamically loaded elements.
+     * The default action of the event will be prevented.
+     * Each callback function will always get the click event as its first argument.
+     * All other arguments will be passed on as (expanded) varargs.
+     * 
+     * @@param id The element identifier
+     * @@param callbackFunction The callback function
+     * @@param callbackArgs The callback function args as varargs
+     */
+    function subscribeClickable(id, callbackFunction, ...callbackArgs) {
+        try {
+            $(document).off('click', id);
+            $(document).on('click', id, function (event) {
+                event.preventDefault();
+                if (callbackFunction != null) { callbackFunction(event, callbackArgs); }
+            });
+        } catch (e) {
+            console.log('exception in subscribeClickable: ', e);
+            throw e;
+        }
+    };
+
+    /**
+     * Creates a custom event handler for a checkbox tick event.
+     * This does NOT prevent the default event.
+     * 
+     * @@param id The element identifier
+     * @@param callbackFunction The callback function
+     * @@param callbackArgs The callback function args as varargs
+     */
+    function subscribeCheckbox(id, callbackFunction, ...callbackArgs) {
+        try {
+            $(document).off('change', id);
+            $(document).on('change', id, function (event) {
+                if (callbackFunction != null) { callbackFunction(event, callbackArgs); }
+            });
+        } catch (e) {
+            console.log('exception in subscribeClickable: ', e);
+            throw e;
+        }
+    };
+
+    
+
+    /**
+     * Subscribes a form submit. This works with dynamically loaded elements.
+     * The default action of the event will be prevented.
+     * Each callback function will always get the submit event as its first argument.
+     * All other arguments will be passed on as (expanded) varargs.
+     * 
+     * @@param id The element identifier
+     * @@param callbackFunction The callback function
+     * @@param callbackArgs The callback function args as varargs
+     */
+    function subscribeFormSubmit(id, callbackFunction, ...callbackArgs) {
+        try {
+            $(document).off('submit', id);
+            $(document).on('submit', id, function (event) {
+                event.preventDefault();
+                if (callbackFunction != null) { callbackFunction(event, callbackArgs); }
+            });
+        } catch (e) {
+            console.log('exception in subscribeFormSubmit: ', e);
+            throw e;
+        }
+    };   
+
+    /**
+     * Subscribe an element to do something when we press enter.
+     * TODO Add more clickable checks, such as smartphone enters?
+     * 
+     * @@param id The element identifier
+     * @@param callbackFunction The callback function
+     * @@param callbackArgs The callback function args as varargs
+     */
+    function subscribeOnUserSubmit(id, callbackFunction, ...callbackArgs) {
+        try {
+            $(document).off('keypress', id);
+            $(document).on('keypress', id, function (event) {
+                if (event.which == 13) {
+                    event.preventDefault();
+                    if (callbackFunction != null) { callbackFunction(event, callbackArgs); }
+                }
+            });
+        } catch (e) {
+            console.log('exception in subscribeOnUserSubmit: ', e);
+            throw e;
+        }
+    };   
+
+</script>
