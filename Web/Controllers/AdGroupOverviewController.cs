@@ -3,6 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Maximiz.Controllers.Abstraction;
+using Maximiz.Database.Querying;
+using Maximiz.Mapper;
+using Maximiz.Model.Entity;
+using Maximiz.Transactions;
+using Maximiz.ViewModels.AdGroupOverview;
+using Maximiz.ViewModels.Columns;
+using Maximiz.ViewModels.Columns.Translation;
+using Maximiz.ViewModels.EntityModels;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Maximiz.Controllers
@@ -16,12 +24,89 @@ namespace Maximiz.Controllers
     {
 
         /// <summary>
-        /// Loads our overview.
+        /// Converts our campaigns.
         /// </summary>
-        /// <returns></returns>
+        private readonly IMapper<AdGroupWithStats, AdGroupModel> _mapperAdItems;
+
+        /// <summary>
+        /// Manages entity transactions for us.
+        /// </summary>
+        private readonly ITransactionHandler _transactionHandler;
+
+        /// <summary>
+        /// Constructor for dependency injection.
+        /// </summary>
+        /// <param name="mapperAdItems">Mapper from external to viewmodel</param>
+        /// <param name="transactionHandler"><see cref="ITransactionHandler"/></param>
+        public AdGroupOverviewController(IMapper<AdGroupWithStats, AdGroupModel> mapperAdItems,
+            ITransactionHandler transactionHandler)
+        {
+            _mapperAdItems = mapperAdItems;
+            _transactionHandler = transactionHandler;
+        }
+
+        /// <summary>
+        /// Loads our overview of adgroups.
+        /// </summary>
+        /// <returns><see cref="ViewResult"/></returns>
+        [HttpGet]
         public IActionResult Overview()
         {
-            return View("Overview");
+            return View("Overview", new AdGroupOverviewViewModel
+            {
+                Column = ColumnAdGroupOverview.Name,
+                Order = Order.Ascending
+            });
         }
+
+        /// <summary>
+        /// Gets our view component that gets table rows async.
+        /// </summary>
+        /// <param name="table"><see cref="AdGroupOverviewTableType"/></param>
+        /// <param name="query">Search query string</param>
+        /// <param name="column"><see cref="ColumnAdGroupOverview"/></param>
+        /// <param name="order"><see cref="Order"/></param>
+        /// <returns><see cref="ViewComponentResult"/></returns>
+        [HttpGet]
+        public IActionResult GetAdGroupTableViewComponent(AdGroupOverviewTableType table, 
+            string query, ColumnAdGroupOverview column, Order order)
+        {
+            var columnDatabase = ColumnTranslator.Translate(column);
+            var orderDatabase = OrderTranslator.Translate(order);
+            var queryObject = new QueryAdGroupWithStats(query, columnDatabase, orderDatabase);
+            return ViewComponent("AdGroupOverviewTable", new { table, query = queryObject });
+        }
+
+        /// <summary>
+        /// Gets our view component that gets an ad group query count async.
+        /// </summary>
+        /// <param name="table"><see cref="AdGroupOverviewTableType"/></param>
+        /// <param name="query">The search query string</param>
+        /// <param name="column"><see cref="ColumnAdGroupOverview"/></param>
+        /// <param name="order"><see cref="Order"/></param>
+        /// <returns><see cref="ViewComponentResult"/></returns>
+        [HttpGet]
+        public IActionResult GetAdGroupCountViewComponent(AdGroupOverviewTableType table, 
+            string query, ColumnAdGroupOverview column, Order order)
+        {
+            var columnDatabase = ColumnTranslator.Translate(column);
+            var orderDatabase = OrderTranslator.Translate(order);
+            var queryObject = new QueryAdGroupWithStats(query, columnDatabase, orderDatabase);
+            return ViewComponent("AdGroupOverviewCount", new { table, query = queryObject });
+        }
+
+        /// <summary>
+        /// Deletes an ad group.
+        /// </summary>
+        /// <param name="adGroupId">Internal ad group id</param>
+        /// <returns><see cref="NoContentResult"/></returns>
+        [HttpDelete]
+        public async Task<IActionResult> Delete(Guid adGroupId)
+        {
+            // Simulate waiting
+            await Task.Delay(new Random().Next(200, 500));
+            return NoContent();
+        }
+
     }
 }

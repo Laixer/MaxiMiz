@@ -37,11 +37,18 @@ namespace Maximiz.Controllers
         /// Submits our form.
         /// </summary>
         /// <param name="model"><see cref="AdGroupFormViewModel"</param>
-        /// <returns><see cref="NoContentResult"/></returns>
+        /// <returns><see cref="NoContentResult"/> or <see cref="BadRequestResult"/></returns>
         [HttpPost]
-        public Task<IActionResult> SubmitForm(AdGroupFormViewModel model)
+        public Task<IActionResult> SubmitForm([FromBody] AdGroupFormViewModel model)
         {
-            return Task.FromResult<IActionResult>(NoContent());
+            if (ModelState.IsValid)
+            {
+                return Task.FromResult<IActionResult>(NoContent());
+            }
+            else
+            {
+                return Task.FromResult<IActionResult>(BadRequest());
+            }
         }
 
         [HttpGet]

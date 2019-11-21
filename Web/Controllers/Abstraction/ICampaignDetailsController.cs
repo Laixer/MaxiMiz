@@ -23,26 +23,10 @@ namespace Maximiz.Controllers.Abstraction
         /// <summary>
         /// Saves the user submitted form variables.
         /// </summary>
-        /// <param name="model"><see cref="FormCampaignAccountViewModel"/></param>
+        /// <param name="model"><see cref="FormCampaignDetailsViewModel"/></param>
         /// <returns>Action result</returns>
         [HttpPost]
-        Task<IActionResult> PostFormAccount(FormCampaignAccountViewModel model);
-
-        /// <summary>
-        /// Saves the user submitted form variables.
-        /// </summary>
-        /// <param name="model"><see cref="FormCampaignMarketingViewModel"/></param>
-        /// <returns>Action result</returns>
-        [HttpPost]
-        Task<IActionResult> PostFormMarketing(FormCampaignMarketingViewModel model);
-
-        /// <summary>
-        /// Saves the user submitted form variables.
-        /// </summary>
-        /// <param name="model"><see cref="FormCampaignMarketingViewModel"/></param>
-        /// <returns>Action result</returns>
-        [HttpPost]
-        Task<IActionResult> PostFormPublishers(FormCampaignPublishersViewModel model);
+        Task<IActionResult> PostModificationForm(FormCampaignDetailsViewModel model);
 
         /// <summary>
         /// Returns the partial view containing all currently linked ad groups.
@@ -56,25 +40,33 @@ namespace Maximiz.Controllers.Abstraction
         /// Returns the partial view containing all existing ad groups.
         /// </summary>
         /// <param name="campaignId">The id of the corresponding campaign</param>
-        /// <returns>View</returns>
+        /// <returns><see cref="IActionResult>"/></returns>
         [HttpGet]
         IActionResult GetAdGroupsAllViewComponent(Guid campaignId, string query, ColumnAdGroupLinking column, Order order);
 
         /// <summary>
+        /// Returns the total count view component all existing ad groups.
+        /// </summary>
+        /// <param name="campaignId">The id of the corresponding campaign</param>
+        /// <returns><see cref="IActionResult>"/></returns>
+        [HttpGet]
+        IActionResult GetAdGroupsAllCountViewComponent(Guid campaignId, string query, ColumnAdGroupLinking column, Order order);
+
+        /// <summary>
         /// Links a given ad group to the campaign of the details view.
         /// </summary>
-        /// <param name="model"><see cref="AdGroupConnectionViewModel"</param>
-        /// <returns>No content actionresult</returns>
+        /// <param name="model"><see cref="LinkingOperationViewModel"</param>
+        /// <returns><see cref="IActionResult"/></returns>
         [HttpPost]
-        Task<IActionResult> LinkAdGroup(Guid campaignId, Guid adGroupId);
+        Task<IActionResult> LinkAdGroup(LinkingOperationViewModel model);
 
         /// <summary>
         /// Unlinks a given ad group to the campaign of the details view.
         /// </summary>
-        /// <param name="model"><see cref="AdGroupConnectionViewModel"</param>
-        /// <returns>No content actionresult</returns>
+        /// <param name="model"><see cref="LinkingOperationViewModel"</param>
+        /// <returns><see cref="IActionResult"/></returns>
         [HttpPost]
-        Task<IActionResult> UnlinkAdGroup(Guid campaignId, Guid adGroupId);
+        Task<IActionResult> UnlinkAdGroup(LinkingOperationViewModel model);
 
     }
 }

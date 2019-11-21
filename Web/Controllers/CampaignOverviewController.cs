@@ -22,11 +22,6 @@ namespace Maximiz.Controllers
     {
 
         /// <summary>
-        /// Repository containing our campaigns retrieved from the database.
-        /// </summary>
-        private readonly ICampaignRepository _campaignRepository;
-
-        /// <summary>
         /// Converts our campaigns.
         /// </summary>
         private readonly IMapper<CampaignWithStats, CampaignModel> _mapperCampaign;
@@ -39,12 +34,11 @@ namespace Maximiz.Controllers
         /// <summary>
         /// Constructor for dependency injection.
         /// </summary>
-        /// <param name="campaignRepository">The campaign repository</param>
+        /// <param name="mapperCampaign">Mapper from external to viewmodel</param>
         /// <param name="transactionHandler">The transaction handler</param>
-        public CampaignOverviewController(ICampaignRepository campaignRepository,
-            IMapper<CampaignWithStats, CampaignModel> mapperCampaign, ITransactionHandler transactionHandler)
+        public CampaignOverviewController(IMapper<CampaignWithStats, CampaignModel> mapperCampaign,
+            ITransactionHandler transactionHandler)
         {
-            _campaignRepository = campaignRepository;
             _mapperCampaign = mapperCampaign;
             _transactionHandler = transactionHandler;
         }
@@ -79,7 +73,7 @@ namespace Maximiz.Controllers
             var columnDatabase = ColumnTranslator.Translate(column);
             var orderDatabase = OrderTranslator.Translate(order);
             var queryObject = new QueryCampaignWithStats(query, columnDatabase, orderDatabase);
-            return ViewComponent("CampaignTable", new { query = queryObject });
+            return ViewComponent("CampaignTable", new { table, query = queryObject });
         }
 
 
@@ -92,7 +86,7 @@ namespace Maximiz.Controllers
         /// <param name="order">The sorting order</param>
         /// <returns>View component call</returns>
         [HttpGet]
-        public IActionResult GetCampaignCountViewComponent(CampaignTableType table, 
+        public IActionResult GetCampaignCountViewComponent(CampaignTableType table,
             string query, ColumnCampaignOverview column, Order order)
         {
             var columnDatabase = ColumnTranslator.Translate(column);

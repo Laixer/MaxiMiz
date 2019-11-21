@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using Maximiz.ViewModels;
+using Maximiz.ViewModels.Dashboard;
 using Maximiz.ViewModels.Utility;
 using Microsoft.AspNetCore.Mvc;
 

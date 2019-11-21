@@ -17,7 +17,7 @@ namespace Maximiz.Controllers.Abstraction
         /// <summary>
         /// Loads the entire page as is.
         /// </summary>
-        /// <returns>View</returns>
+        /// <returns><see cref="IActionResult"/></returns>
         [HttpGet]
         IActionResult Overview();
 
@@ -28,7 +28,7 @@ namespace Maximiz.Controllers.Abstraction
         /// <param name="query">The search query</param>
         /// <param name="column">The sorting column</param>
         /// <param name="order">The sorting order</param>
-        /// <returns></returns>
+        /// <returns><see cref="IActionResult"/></returns>
         [HttpGet]
         IActionResult GetCampaignTableViewComponent(CampaignTableType table,
             string query, ColumnCampaignOverview column, Order order);
@@ -40,7 +40,7 @@ namespace Maximiz.Controllers.Abstraction
         /// <param name="query">The search query</param>
         /// <param name="column">The sorting column</param>
         /// <param name="order">The sorting order</param>
-        /// <returns></returns>
+        /// <returns><see cref="IActionResult"/></returns>
         [HttpGet]
         IActionResult GetCampaignCountViewComponent(CampaignTableType table,
             string query, ColumnCampaignOverview column, Order order);
@@ -49,7 +49,7 @@ namespace Maximiz.Controllers.Abstraction
         /// Deletes a campaign.
         /// </summary>
         /// <param name="campaignId">Internal campaign id</param>
-        /// <returns>View</returns>
+        /// <returns><see cref="IActionResult"/></returns>
         [HttpDelete]
         Task<IActionResult> Delete(Guid campaignId);
 

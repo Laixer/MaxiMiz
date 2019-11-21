@@ -1,9 +1,12 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Maximiz.Model.Entity;
 using Maximiz.Controllers.Abstraction;
-using Maximiz.ViewModels.NewCampaignGroup;
+using Maximiz.ViewModels.CampaignGroupWizard;
 using System.Threading.Tasks;
 using System;
+using Maximiz.ViewModels.Columns;
+using Maximiz.ViewModels.Columns.Translation;
+using Maximiz.Database.Querying;
 
 namespace Maximiz.Controllers
 {
@@ -11,7 +14,7 @@ namespace Maximiz.Controllers
     /// <summary>
     /// Controller to manage our <see cref="CampaignGroup"/> creation.
     /// </summary>
-    public class NewCampaignGroupController : Controller, INewCampaignGroupController
+    public class CampaignGroupWizardController : Controller, ICampaignGroupWizardController
     {
 
         /// <summary>
@@ -40,14 +43,32 @@ namespace Maximiz.Controllers
         /// <param name="model"><see cref="CampaignGroupFormAllViewModel"/></param>
         /// <returns>No content</returns>
         [HttpPost]
-        public async Task<IActionResult> SubmitForm(CampaignGroupFormAllViewModel model)
+        public async Task<IActionResult> SubmitForm([FromBody] CampaignGroupFormAllViewModel model)
         {
             await Task.Delay(new Random().Next(250, 1000));
 
             // Check modelstate.valid
             // Do transaction
 
+            // TODO Debug remove
+            return BadRequest();
             return NoContent();
+        }
+
+        /// <summary>
+        /// Gets our view component that retrieves ad groups in list form.
+        /// </summary>
+        /// <param name="query">Search query string</param>
+        /// <param name="column"><see cref="column"/></param>
+        /// <param name="order"></param>
+        /// <returns><see cref="ViewComponent"/></returns>
+        [HttpGet]
+        public IActionResult GetAdGroupsViewComponent(string query, ColumnCampaignGroupWizardAdGroup column, Order order)
+        {
+            var columnDatabase = ColumnTranslator.Translate(column);
+            var orderDatabase = OrderTranslator.Translate(order);
+            var queryObject = new QueryAdGroupWithStats(query, columnDatabase, orderDatabase);
+            return ViewComponent("CampaignGroupWizardAdGroup", new { query = queryObject });
         }
 
     }

@@ -4,12 +4,14 @@ using Maximiz.Mapper;
 using Maximiz.Model.Entity;
 using Maximiz.Repositories.Abstraction;
 using Maximiz.Transactions;
+using Maximiz.ViewModels;
 using Maximiz.ViewModels.CampaignDetails;
 using Maximiz.ViewModels.Columns;
 using Maximiz.ViewModels.Columns.Translation;
 using Maximiz.ViewModels.EntityModels;
 using Maximiz.ViewModels.Enums;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Threading.Tasks;
 
@@ -83,39 +85,18 @@ namespace Maximiz.Controllers
         /// <summary>
         /// Saves the user submitted form variables.
         /// </summary>
-        /// <param name="model"><see cref="FormCampaignAccountViewModel"/></param>
+        /// <param name="model"><see cref="FormCampaignDetailsViewModel"/></param>
         /// <returns>Action result</returns>
         [HttpPost]
-        public async Task<IActionResult> PostFormAccount(FormCampaignAccountViewModel model)
+        public async Task<IActionResult> PostModificationForm([FromBody] FormCampaignDetailsViewModel model)
         {
-            // Do the transaction
-            await Task.Delay(new Random().Next(350, 1000));
-            return NoContent();
-        }
+            if (!ModelState.IsValid)
+            {
+                return BadRequest();
+            }
 
-        /// <summary>
-        /// Saves the user submitted form variables.
-        /// </summary>
-        /// <param name="model"><see cref="FormCampaignMarketingViewModel"/></param>
-        /// <returns>Action result</returns>
-        [HttpPost]
-        public async Task<IActionResult> PostFormMarketing(FormCampaignMarketingViewModel model)
-        {
-            // Do the transaction
-            await Task.Delay(new Random().Next(350, 1000));
-            return NoContent();
-        }
-
-        /// <summary>
-        /// Saves the user submitted form variables.
-        /// </summary>
-        /// <param name="model"><see cref="FormCampaignMarketingViewModel"/></param>
-        /// <returns>Action result</returns>
-        [HttpPost]
-        public async Task<IActionResult> PostFormPublishers(FormCampaignPublishersViewModel model)
-        {
-            // Do the transaction
-            await Task.Delay(new Random().Next(350, 1000));
+            // Simluate the transaction
+            await Task.Delay(new Random().Next(500, 1000));
             return NoContent();
         }
 
@@ -158,12 +139,34 @@ namespace Maximiz.Controllers
         }
 
         /// <summary>
+        /// Gets the count view component.
+        /// </summary>
+        /// <param name="campaignId">Corresponding campaign id</param>
+        /// <param name="query">Query string</param>
+        /// <param name="column"><see cref="ColumnAdGroupLinking"/></param>
+        /// <param name="order"><see cref="Order"/></param>
+        /// <returns><see cref="ViewComponent"/></returns>
+        [HttpGet]
+        public IActionResult GetAdGroupsAllCountViewComponent(Guid campaignId, string query, ColumnAdGroupLinking column, Order order)
+        {
+            // Translate from viewmodel to model
+            var columnTranslated = ColumnTranslator.Translate(column);
+            var orderTranslated = OrderTranslator.Translate(order);
+
+            return ViewComponent("AdGroupTableAllCount", new
+            {
+                campaignId,
+                query = new QueryAdGroupWithStats(query, columnTranslated, orderTranslated)
+            });
+        }
+
+        /// <summary>
         /// Links a given ad group to the campaign of the details view.
         /// </summary>
-        /// <param name="model"><see cref="AdGroupConnectionViewModel"</param>
+        /// <param name="model"><see cref="LinkingOperationViewModel"</param>
         /// <returns>No content actionresult</returns>
         [HttpPost]
-        public async Task<IActionResult> LinkAdGroup(Guid campaignId, Guid adGroupId)
+        public async Task<IActionResult> LinkAdGroup([FromBody] LinkingOperationViewModel model)
         {
             // await _transactionHandler.HandleTransaction();
             await Task.Delay(500);
@@ -173,10 +176,10 @@ namespace Maximiz.Controllers
         /// <summary>
         /// Unlinks a given ad group to the campaign of the details view.
         /// </summary>
-        /// <param name="model"><see cref="AdGroupConnectionViewModel"</param>
+        /// <param name="model"><see cref="LinkingOperationViewModel"</param>
         /// <returns>Partial view with unlinked ad groups</returns>
         [HttpPost]
-        public async Task<IActionResult> UnlinkAdGroup(Guid campaignId, Guid adGroupId)
+        public async Task<IActionResult> UnlinkAdGroup([FromBody] LinkingOperationViewModel model)
         {
             // await _transactionHandler.HandleTransaction()
             await Task.Delay(500);
@@ -184,4 +187,5 @@ namespace Maximiz.Controllers
         }
 
     }
+
 }
