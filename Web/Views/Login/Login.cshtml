@@ -34,7 +34,7 @@
 
             <!-- Submit button -->
             <div class="form-row">
-                <button id="buttonLogin" class="btn text-white btn-main btn-blue mt-5">Login</button>
+                <button type="submit" id="buttonLogin" class="btn text-white btn-main btn-blue mt-5">Login</button>
             </div>
 
             <!-- Forgot password link -->
@@ -62,22 +62,25 @@
 
         $(document).ready(function () {
 
-            // Do not post form implicitly ever
-            subscribeFormSubmit('#formLogin');
-
-            // Register form submit button
-            subscribeClickable('#buttonLogin', function (event) {
-                event.preventDefault();
+            // Post our form explicitly
+            subscribeFormSubmit('#formLogin', function () {
                 if (validatorLogin.form()) {
-                    $('#buttonLogin').attr('disabled', 'disabled');
-                    doPostFormAndProcess('#formLogin', function () {
-                        // TODO Will this always work?
-                        window.location.href = '@Url.Action(nameof(HomeController.Index), "Home")';
 
-                        // If we did not succeed
-                        // TODO Implement
+                    // Visual feedback and double submit disabling
+                    $('#buttonLogin').attr('disabled', 'disabled');
+
+                    let callbackSuccess = function () {
+                        console.log('Login succeeded');
+                        window.location.href = '@Url.Action(nameof(HomeController.Index), "Home")';
+                    }
+                    let callbackFailure = function () {
+                        // TODO Feedback
+                        console.log('Login failed');
                         $('#buttonLogin').removeAttr('disabled');
-                    });
+                    }
+
+                    doPostAndProcess($('#formLogin').get(0).action, $('#formLogin').serializeFormJSON(),
+                        callbackSuccess, [], callbackFailure, []);
                 }
             });
 

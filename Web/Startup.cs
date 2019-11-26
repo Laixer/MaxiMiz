@@ -14,6 +14,11 @@ using Maximiz.Repositories.Mock;
 using Maximiz.Storage.Abstraction;
 using Maximiz.Storage;
 using Microsoft.Extensions.Logging;
+using Microsoft.AspNetCore.Identity;
+using Maximiz.Identity;
+using Laixer.Identity.Dapper.Extensions;
+using Microsoft.AspNetCore.Mvc.Authorization;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Maximiz
 {
@@ -21,7 +26,7 @@ namespace Maximiz
     /// <summary>
     /// Class to setup our configuration and dependency injections.
     /// </summary>
-    public class Startup
+    public sealed class Startup
     {
 
         /// <summary>
@@ -76,7 +81,30 @@ namespace Maximiz
             services.AddSingleton(typeof(ILogger<>), typeof(Logger<>));
 
             // Setup MVC structure
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Latest);
+            services.AddMvc(options =>
+            {
+                var policy = new AuthorizationPolicyBuilder()
+                    .RequireAuthenticatedUser()
+                    .Build();
+                options.Filters.Add(new AuthorizeFilter(policy));
+            })
+            .SetCompatibilityVersion(CompatibilityVersion.Latest);
+
+            // Setup identity
+            services.AddIdentity<AppUser, AppRole>(options =>
+            {
+                options.Password = AppIdentityConstants.PasswordPolicy;
+                options.Lockout = AppIdentityConstants.LockoutOptions;
+                options.User.RequireUniqueEmail = true;
+            })
+            .AddDapperStores(options =>
+            {
+                options.UserTable = "user";
+                options.Schema = "application";
+                options.MatchWithUnderscore = true;
+                options.UseNpgsql<CustomQueryRepository>(Configuration.GetConnectionString("DatabaseInternal"));
+            })
+            .AddDefaultTokenProviders();
         }
 
         /// <summary>
@@ -100,14 +128,17 @@ namespace Maximiz
             app.UseStaticFiles();
             app.UseCookiePolicy();
 
+            // Identity
+            app.UseAuthentication();
+
             // Setup our mvc route default template
             app.UseMvc(routes =>
             {
                 routes.MapRoute(
                     name: "default",
-                    //template: "{controller=Home}/{action=Index}");
-                    template: "{controller=AdGroupWizard}/{action=ShowWizard}");
-                    //template: "{controller=Debug}/{action=Index}");
+                    template: "{controller=Login}/{action=Index}");
+                //template: "{controller=AdGroupWizard}/{action=ShowWizard}");
+                //template: "{controller=Debug}/{action=Index}");
             });
 
         }
