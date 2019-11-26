@@ -1,7 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
-namespace Maximiz.ViewModels.AdgroupWizard
+namespace Maximiz.ViewModels.AdGroupWizard
 {
 
     /// <summary>
@@ -10,6 +11,12 @@ namespace Maximiz.ViewModels.AdgroupWizard
     /// </summary>
     public sealed class AdGroupFormViewModel
     {
+
+        /// <summary>
+        /// The id of the ad group we are modifying. This can be null if it's a new creation.
+        /// TODO Is this a bulletproof strategy?
+        /// </summary>
+        public Guid Id { get; set; }
 
         /// <summary>
         /// Ad group name.

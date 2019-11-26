@@ -7,6 +7,8 @@
     ViewData["RenderSideMenu"] = false;
 }
 
+@model AdGroupWizardViewModel
+
 <!-- Wrapper content -->
 <main>
 
@@ -15,7 +17,7 @@
 
         <!-- Contains all our metadata functionality -->
         <div class="col-md-3">
-            <partial name="_Sidebar" />
+            <partial name="_Sidebar" model="@Model"/>
         </div>
 
         <!-- Contains our previews -->
@@ -63,6 +65,12 @@
             subscribeClickable('.removeTitleEntry', clickDeleteTitleEntry);
             subscribeClickable('#addTitleEntry', clickAddTitleEntry);
 
+            // Attempt to load images and preview ad
+            // This can also be used as an edit page
+            // TODO Do we want this?
+            refreshSelectedImagesThumbnails();
+            tryGenerateRandomAd();
+
         });
 
         // Takes us back to the previous browser page
@@ -98,8 +106,10 @@
         }
 
         // When we add a text entry
-        function clickAddTitleEntry() {
-            doMethodAndProcess('@Url.Action("GetPartialView", "AdGroupWizard")', 'get', function (html) {
+        function clickAddTitleEntry(event) {
+            event.preventDefault();
+            console.log('clicking add title entry');
+            doMethodAndProcess('@Url.Action(nameof(AdGroupWizardController.GetTitleEntryPartialView), "AdGroupWizard")', 'get', function (html) {
                 $('#divTitleList').append(html);
 
                 // TODO Circular reference sort of? Spaghetti?
@@ -111,13 +121,6 @@
         function clickDeleteTitleEntry(event) {
             var id = $(event.target).attr('data-target-id');
             $('#' + id).remove();
-        }
-
-        // Shows the image picker popup modal
-        function showImagePickerModal() {
-            var div = $('#divModalImagePicker');
-            // TODO Implement
-            console.log('Function called to show image picker modal.')
         }
 
     </script>

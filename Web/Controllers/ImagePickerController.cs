@@ -100,7 +100,7 @@ namespace Maximiz.Controllers
             // TODO Maybe fix this in model validation
             if (model.ImageUris != null && (
             model.ImageUris.ToList()[0] == null ||
-            string.IsNullOrEmpty(model.ImageUris.ToList()[0].AbsoluteUri)))
+            string.IsNullOrEmpty(model.ImageUris.ToList()[0].ToString()))) // TODO This was not tostring but absoluteuri
             {
                 return PartialView("_ImageSelectedThumbnails", new ImageListViewModel
                 {

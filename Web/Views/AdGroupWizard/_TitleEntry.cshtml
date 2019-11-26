@@ -3,14 +3,15 @@
 *@
 
 @* Set to true if remove button is required *@
-@model bool
+@model TitleEntryViewModel
+
 @* Used as delete identifier *@
 @{var id = Guid.NewGuid(); }
 
 <!-- Single title item -->
 <div class="form-row" id="@id">
-    <input type="text" name="@nameof(AdGroupFormViewModel.Titles)" class="form-control titleEntry disableOnSubmitPending" placeholder="My advertisement title" />
-    @if (Model)
+    <input type="text" name="@nameof(AdGroupFormViewModel.Titles)" class="form-control titleEntry disableOnSubmitPending" value="@((Model != null && Model.Title != null) ? Model.Title : "")" placeholder="My advertisement title" />
+    @if (Model != null && Model.IsRemovable)
     {
         <a class="removeTitleEntry" data-target-id="@id">[X]</a>
     }
