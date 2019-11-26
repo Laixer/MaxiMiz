@@ -125,10 +125,14 @@
                     return response.text();
                 } else {
                     if (callbackFailure != null) { callbackFailure(response, argsFailure); }
+                    return Promise.reject("Stopping promise because invalid response code");
                 }
             })
             .then((html) => {
                 if (callbackSuccess != null) { callbackSuccess(html, argsSuccess); }
+            })
+            .catch((error) => {
+                // TODO Maybe do something with this?
             });
     };
 
