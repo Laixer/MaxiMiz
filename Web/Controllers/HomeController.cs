@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics;
-using Maximiz.ViewModels;
 using Maximiz.ViewModels.Dashboard;
 using Maximiz.ViewModels.Utility;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Maximiz.Controllers
@@ -26,6 +26,7 @@ namespace Maximiz.Controllers
         /// Returns the privacy view.
         /// </summary>
         /// <returns>The privacy view</returns>
+        [AllowAnonymous]
         public IActionResult Privacy()
         {
             return View();
@@ -36,6 +37,7 @@ namespace Maximiz.Controllers
         /// </summary>
         /// <returns>The error view</returns>
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+        [AllowAnonymous]
         public IActionResult Error()
         {
             return View(new ErrorViewModel
