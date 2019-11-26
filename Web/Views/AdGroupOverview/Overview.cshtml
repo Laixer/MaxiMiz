@@ -72,7 +72,8 @@
             // TODO Implement
             subscribeClickable('.click-open-details', function (event) {
                 var adGroupId = $(event.currentTarget).attr('data-adgroup-id');
-                console.log('Implement go to edit page for ', adGroupId);
+                // TODO Make less strongly typed
+                location.href = '@Url.Action(nameof(AdGroupWizardController.ShowWizardAsEditor), "AdGroupWizard")' + '?adGroupId=' + adGroupId;
             });
 
             // Subscribe delete button functionality
