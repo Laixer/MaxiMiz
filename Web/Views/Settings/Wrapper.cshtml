@@ -35,15 +35,28 @@
 
         $(document).ready(function () {
 
+            // TODO Fix
+            console.log('Fix tab selection upon load');
+
             // Show the desired tab on page load
-            switch (@Model.SettingsTab != null && '@Model.SettingsTab.ToString()') {
-                case '@SettingsTab.Account':
-                    $('#navAccount').tab('show');
-                    break;
-                case '@SettingsTab.Integrations':
-                    $('#navIntegrations').tab('show');
-                    break;
+            if ('@Model' != null && '@Model.SettingsTab' != null) {
+                switch ('@Model.SettingsTab') {
+                    case '@SettingsTab.Account':
+                        $('#navAccount').tab('show');
+                        break;
+                    case '@SettingsTab.Integrations':
+                        $('#navIntegrations').tab('show');
+                        break;
+                }
             }
+
+            // Load our account details dynamically
+            let urlAccount = '@Url.Action(nameof(SettingsController.GetAccountDetailsPartialView), "Settings")';
+            doGetAndReplaceHtml(urlAccount, '#formSettingsAccount');
+
+            // Load our accounts dynamically
+            let urlLinked = '@Url.Action(nameof(SettingsController.GetListedAccountsPartialView), "Settings")';
+            doGetAndReplaceHtml(urlLinked, '#tableLinkedAccountsBody');
 
         });
 

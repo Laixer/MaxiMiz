@@ -2,6 +2,8 @@
     Contains the navigation top bar as a partial view.
 *@
 
+@inject IUserViewModelService userService
+
 <nav class="navbar navbar-default">
     <div class="container-fluid">
         <div class="navbar-minimize">
@@ -23,13 +25,14 @@
                 </li>
                 <li class="dropdown">
                     <a data-toggle="dropdown" href="#" class="dropdown-toggle">
-                        <p>dont@hardcode.this</p>
+                        <!-- TODO Is this correct usage? -->
+                        <p>@await userService.GetEmail()</p>
                     </a>
                     <ul class="dropdown-menu dropdown-settings">
                         <li><a asp-controller="Settings" asp-action="@nameof(SettingsController.ShowSettings)" asp-route-settingsTab="@SettingsTab.Account.GetHashCode()"><i class="fas fa-user-circle"></i> Account</a></li>
                         <li><a asp-controller="Settings" asp-action="@nameof(SettingsController.ShowSettings)" asp-route-settingsTab="@SettingsTab.Integrations.GetHashCode()"><i class="fas fa-plug"></i> Integrations</a></li>
                         <div class="dropdown-divider"></div>
-                        <li><a asp-controller="Login" asp-action="@nameof(LoginController.Index)"><i class="fas fa-sign-out-alt"></i> Sign Out</a></li>
+                        <li><a asp-controller="Login" asp-action="@nameof(LoginController.Logout)"><i class="fas fa-sign-out-alt"></i> Sign Out</a></li>
                     </ul>
                 </li>
                 <div class="divider"></div>
