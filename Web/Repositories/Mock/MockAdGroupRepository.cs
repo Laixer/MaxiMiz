@@ -55,7 +55,11 @@ namespace Maximiz.Repositories.Mock
                 Id = guids[idIndex],
                 Name = "Dummy Ad Group",
                 Description = "A lovely adgroup",
-                ImageLinks = new[] { "link.one", "link.two", "link.three" },
+                ImageLinks = new[] {
+                    @"https://images-na.ssl-images-amazon.com/images/I/C10oJWvuWFS._CR0,0,3840,2880_._SL1000_.jpg",
+                    @"https://i.ytimg.com/vi/qWWkzmZZmvU/maxresdefault.jpg",
+                    @"https://townsquare.media/site/812/files/2017/10/shaquille-o-neal-big-man-diss.jpg?w=980&q=75"
+                },
                 Titles = new[] { "Image one", "Image two", "Image three" },
                 CreateDate = DateTime.Now,
                 UpdateDate = DateTime.Now,

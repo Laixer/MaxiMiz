@@ -1,4 +1,5 @@
-﻿using Maximiz.ViewModels.Enums;
+﻿using Maximiz.ViewModels.EntityModels;
+using Maximiz.ViewModels.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -94,6 +95,38 @@ namespace Maximiz.Translation
             }
 
             throw new InvalidOperationException(nameof(budgetModel));
+        }
+
+        /// <summary>
+        /// Translates an account type string to the corresponding string.
+        /// TODO this seems too strongly typed.
+        /// </summary>
+        /// <remarks>
+        /// This needs the publisher enum because we have to validate that
+        /// our publisher-accounttype combination is valid.
+        /// If it's invalid we just display nothing. TODO Should we?
+        /// </remarks>
+        /// <param name="accountTypeString">The account type string as 
+        /// extracted from the database json details object 
+        /// (TODO TMI for this entity?)</param>
+        /// <param name="publisher"><see cref="Publisher"/></param>
+        /// <returns>Account type as string</returns>
+        public static string TranslateAccountType(Publisher publisher, string accountTypeString)
+        {
+            switch (publisher)
+            {
+                case Publisher.Taboola:
+                    switch (accountTypeString)
+                    {
+                        case "publisher":
+                            return "Publisher";
+                        case "advertiser":
+                            return "Advertiser";
+                    }
+                    return ""; // TODO Should we?
+            }
+
+            throw new InvalidOperationException(nameof(publisher));
         }
 
     }
