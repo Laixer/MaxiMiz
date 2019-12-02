@@ -1,7 +1,4 @@
 ﻿using Maximiz.Model.Entity;
-using Maximiz.Transactions;
-using Maximiz.Transactions.CreateUpdateDelete;
-using Maximiz.Transactions.ServiceBus;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
@@ -18,26 +15,26 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <typeparam name="TTransactionHandler">The transaction handler type</typeparam>
         /// <param name="services">The service collection</param>
         /// <returns>The service collection</returns>
-        public static IServiceCollection AddTransactionHandler
-            <TTransactionHandler>(this IServiceCollection services)
-            where TTransactionHandler : class, ITransactionHandler
-        {
-            // First add creation dependencies
-            services.AddSingleton<ICud<Campaign>, CudCampaign>();
-            services.AddSingleton<ICud<CampaignGroup>, CudCampaignGroup>();
-            services.AddSingleton<ICud<AdItem>, CudAdItem>();
-            services.AddSingleton<ICud<AdGroup>, CudAdGroup>();
-            services.AddSingleton<ICudProcessor, CudProcessor>();
+        //public static IServiceCollection AddTransactionHandler
+        //    <TTransactionHandler>(this IServiceCollection services)
+        //    where TTransactionHandler : class, ITransactionHandler
+        //{
+        //    // First add creation dependencies
+        //    services.AddSingleton<ICud<Campaign>, CudCampaign>();
+        //    services.AddSingleton<ICud<CampaignGroup>, CudCampaignGroup>();
+        //    services.AddSingleton<ICud<AdItem>, CudAdItem>();
+        //    services.AddSingleton<ICud<AdGroup>, CudAdGroup>();
+        //    services.AddSingleton<ICudProcessor, CudProcessor>();
 
-            // Then add sending dependencies
-            services.AddSingleton<ISender<Entity>, Sender>();
+        //    // Then add sending dependencies
+        //    services.AddSingleton<ISender<Entity>, Sender>();
 
-            // Then add the transaction handler
-            services.AddSingleton<ITransactionHandler, TTransactionHandler>();
+        //    // Then add the transaction handler
+        //    services.AddSingleton<ITransactionHandler, TTransactionHandler>();
 
-            // Return services for chaining
-            return services;
-        }
+        //    // Return services for chaining
+        //    return services;
+        //}
 
     }
 }

@@ -18,10 +18,10 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <returns><see cref="IServiceCollection"/></returns>
         public static IServiceCollection AdddViewModelServices(this IServiceCollection services)
         {
-            // Add view model services
-            services.AddSingleton<ICurrencyViewModelService, CurrencyViewModelService>();
-            services.AddSingleton<IEnumViewModelService, EnumViewModelService>();
-            services.AddSingleton<ITargetingViewModelService, TargetingViewModelService>();
+            services.AddTransient<ICurrencyViewModelService, CurrencyViewModelService>();
+            services.AddTransient<IEnumViewModelService, EnumViewModelService>();
+            services.AddTransient<ITargetingViewModelService, TargetingViewModelService>();
+            services.AddTransient<IUserViewModelService, UserViewModelService>();
 
             // Return for chaining
             return services;
