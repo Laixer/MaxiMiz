@@ -30,7 +30,9 @@ namespace Maximiz.Identity
                     password_hash,
                     security_stamp,
                     phone_number,
-                    lockout_end)
+                    lockout_end,
+                    given_name,
+                    last_name)
                 VALUES
                     (@Email,
                     @NormalizedEmail,
@@ -38,7 +40,9 @@ namespace Maximiz.Identity
                     @PasswordHash,
                     @SecurityStamp,
                     @PhoneNumber,
-                    @LockoutEnd)
+                    @LockoutEnd,
+                    @GivenName,
+                    @LastName)
                 RETURNING id";
 
             queryRepository.FindByNameAsync = @"
@@ -61,7 +65,9 @@ namespace Maximiz.Identity
                        two_factor_enabled = @TwoFactorEnabled,
                        lockout_end = @LockoutEnd,
                        lockout_enabled = @LockoutEnabled,
-                       access_failed_count = @AccessFailedCount
+                       access_failed_count = @AccessFailedCount,
+                       given_name = @GivenName,
+                       last_name = @LastName,
                 WHERE  id = @Id";
 
             queryRepository.FindByIdAsync = $@"
