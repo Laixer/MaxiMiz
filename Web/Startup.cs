@@ -9,7 +9,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Maximiz.Database;
 using Laixer.Library.Injection.ServiceBus;
 using Laixer.Library.Injection.Database;
-using Maximiz.Transactions;
 using Maximiz.Repositories.Mock;
 using Maximiz.Storage.Abstraction;
 using Maximiz.Storage;
@@ -19,6 +18,8 @@ using Maximiz.Identity;
 using Laixer.Identity.Dapper.Extensions;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Maximiz.Controllers;
 
 namespace Maximiz
 {
@@ -63,22 +64,20 @@ namespace Maximiz
                 ("ServiceBusSend", "ServiceBusQueueName", Configuration);
 
             // Setup custom made services
-            services.AddTransactionHandler<TransactionHandler>();
+            //services.AddTransactionHandler<TransactionHandler>();
             services.AddCrudInternalWebClient<CrudInternalWebClient>();
             services.AddMappers();
             services.AdddViewModelServices();
             // TODO Might want to revisit this
             services.AddTransient<IStorageManager, StorageManager>();
 
-            // Add required repositories
-            // TODO Make scoped in stead of transient? Because of multiple queries & item preservation
-            services.AddTransient<ICampaignRepository, MockCampaignRepository>();
-            services.AddTransient<IAdGroupRepository, MockAdGroupRepository>();
-            //services.AddTransient<IAdItemRepository, AdItemRepository>();
 
             // Setup logging
             services.AddSingleton<ILoggerFactory, LoggerFactory>();
             services.AddSingleton(typeof(ILogger<>), typeof(Logger<>));
+
+            ConfigureServicesRepositories(services);
+            ConfigureServicesIdentity(services);
 
             // Setup MVC structure
             services.AddMvc(options =>
@@ -89,8 +88,14 @@ namespace Maximiz
                 options.Filters.Add(new AuthorizeFilter(policy));
             })
             .SetCompatibilityVersion(CompatibilityVersion.Latest);
+        }
 
-            // Setup identity
+        /// <summary>
+        /// Configures our Identity Framework.
+        /// </summary>
+        /// <param name="services"><see cref="IServiceCollection"/></param>
+        private void ConfigureServicesIdentity(IServiceCollection services)
+        {
             services.AddIdentity<AppUser, AppRole>(options =>
             {
                 options.Password = AppIdentityConstants.PasswordPolicy;
@@ -105,6 +110,30 @@ namespace Maximiz
                 options.UseNpgsql<CustomQueryRepository>(Configuration.GetConnectionString("DatabaseInternal"));
             })
             .AddDefaultTokenProviders();
+
+            // TODO Does this work?
+            services.Configure<CookieAuthenticationOptions>(options =>
+            {
+                options.LoginPath = new PathString($"/Login/{nameof(LoginController.Index)}");
+                options.AccessDeniedPath = new PathString($"/Login/{nameof(LoginController.Index)}");
+                options.LogoutPath = new PathString($"/Login/{nameof(LoginController.Index)}");
+            });
+
+            // For accessing our user
+            services.AddHttpContextAccessor();
+        }
+
+        /// <summary>
+        /// Configures our repositories.
+        /// </summary>
+        /// <param name="services"><see cref="IServiceCollection"/></param>
+        private void ConfigureServicesRepositories(IServiceCollection services)
+        {
+            // TODO Make scoped in stead of transient? Because of multiple queries & item preservation
+            services.AddTransient<ICampaignRepository, MockCampaignRepository>();
+            services.AddTransient<IAdGroupRepository, MockAdGroupRepository>();
+            services.AddTransient<IAccountRepository, MockAccountRepository>();
+            //services.AddTransient<IAdItemRepository, AdItemRepository>();
         }
 
         /// <summary>
@@ -137,8 +166,8 @@ namespace Maximiz
                 routes.MapRoute(
                     name: "default",
                     template: "{controller=Login}/{action=Index}");
-                //template: "{controller=AdGroupWizard}/{action=ShowWizard}");
-                //template: "{controller=Debug}/{action=Index}");
+                    //template: "{controller=Settings}/{action=ShowSettings}");
+                    //template: "{controller=Debug}/{action=Index}");
             });
 
         }
