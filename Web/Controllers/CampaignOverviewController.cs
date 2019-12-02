@@ -2,8 +2,6 @@ using Maximiz.Controllers.Abstraction;
 using Maximiz.Database.Querying;
 using Maximiz.Mapper;
 using Maximiz.Model.Entity;
-using Maximiz.Repositories.Abstraction;
-using Maximiz.Transactions;
 using Maximiz.ViewModels.CampaignOverview;
 using Maximiz.ViewModels.Columns;
 using Maximiz.ViewModels.Columns.Translation;
@@ -27,20 +25,11 @@ namespace Maximiz.Controllers
         private readonly IMapper<CampaignWithStats, CampaignModel> _mapperCampaign;
 
         /// <summary>
-        /// Manages entity transactions for us.
-        /// </summary>
-        private readonly ITransactionHandler _transactionHandler;
-
-        /// <summary>
         /// Constructor for dependency injection.
         /// </summary>
-        /// <param name="mapperCampaign">Mapper from external to viewmodel</param>
-        /// <param name="transactionHandler">The transaction handler</param>
-        public CampaignOverviewController(IMapper<CampaignWithStats, CampaignModel> mapperCampaign,
-            ITransactionHandler transactionHandler)
+        public CampaignOverviewController(IMapper<CampaignWithStats, CampaignModel> mapperCampaign)
         {
             _mapperCampaign = mapperCampaign;
-            _transactionHandler = transactionHandler;
         }
 
         /// <summary>

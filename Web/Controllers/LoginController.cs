@@ -74,7 +74,7 @@ namespace Maximiz.Controllers
         /// <summary>
         /// Performs user logout.
         /// </summary>
-        /// <returns><see cref="ViewResult"/></returns>
+        /// <returns><see cref="Index"/></returns>
         public async Task<IActionResult> Logout()
         {
             try
@@ -86,7 +86,7 @@ namespace Maximiz.Controllers
             {
                 logger.LogError($"Error while logging out user, message: {e.Message}");
             }
-            return NoContent();
+            return Index();
         }
 
         /// <summary>

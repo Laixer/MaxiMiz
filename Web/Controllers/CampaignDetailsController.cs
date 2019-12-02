@@ -3,15 +3,12 @@ using Maximiz.Database.Querying;
 using Maximiz.Mapper;
 using Maximiz.Model.Entity;
 using Maximiz.Repositories.Abstraction;
-using Maximiz.Transactions;
-using Maximiz.ViewModels;
 using Maximiz.ViewModels.CampaignDetails;
 using Maximiz.ViewModels.Columns;
 using Maximiz.ViewModels.Columns.Translation;
 using Maximiz.ViewModels.EntityModels;
 using Maximiz.ViewModels.Enums;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json.Linq;
 using System;
 using System.Threading.Tasks;
 
@@ -44,26 +41,17 @@ namespace Maximiz.Controllers
         private readonly IMapper<AdGroupWithStats, AdGroupModel> _mapperAdGroup;
 
         /// <summary>
-        /// Manages entity transactions for us.
-        /// </summary>
-        private readonly ITransactionHandler _transactionHandler;
-
-        /// <summary>
         /// Constructor for dependency injection.
         /// </summary>
-        /// <param name="campaignRepository">The campaign repository</param>
-        /// <param name="transactionHandler">The transaction handler</param>
         public CampaignDetailsController(ICampaignRepository campaignRepository,
             IAdGroupRepository adGroupRepository,
             IMapper<CampaignWithStats, CampaignModel> mapperCampaign,
-            IMapper<AdGroupWithStats, AdGroupModel> mapperAdGroup,
-            ITransactionHandler transactionHandler)
+            IMapper<AdGroupWithStats, AdGroupModel> mapperAdGroup)
         {
             _campaignRepository = campaignRepository;
             _adGroupRepository = adGroupRepository;
             _mapperCampaign = mapperCampaign;
             _mapperAdGroup = mapperAdGroup;
-            _transactionHandler = transactionHandler;
         }
 
         /// <summary>

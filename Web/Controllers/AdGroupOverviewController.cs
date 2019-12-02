@@ -1,12 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Maximiz.Controllers.Abstraction;
 using Maximiz.Database.Querying;
 using Maximiz.Mapper;
 using Maximiz.Model.Entity;
-using Maximiz.Transactions;
 using Maximiz.ViewModels.AdGroupOverview;
 using Maximiz.ViewModels.Columns;
 using Maximiz.ViewModels.Columns.Translation;
@@ -28,21 +25,13 @@ namespace Maximiz.Controllers
         /// </summary>
         private readonly IMapper<AdGroupWithStats, AdGroupModel> _mapperAdItems;
 
-        /// <summary>
-        /// Manages entity transactions for us.
-        /// </summary>
-        private readonly ITransactionHandler _transactionHandler;
 
         /// <summary>
         /// Constructor for dependency injection.
         /// </summary>
-        /// <param name="mapperAdItems">Mapper from external to viewmodel</param>
-        /// <param name="transactionHandler"><see cref="ITransactionHandler"/></param>
-        public AdGroupOverviewController(IMapper<AdGroupWithStats, AdGroupModel> mapperAdItems,
-            ITransactionHandler transactionHandler)
+        public AdGroupOverviewController(IMapper<AdGroupWithStats, AdGroupModel> mapperAdItems)
         {
             _mapperAdItems = mapperAdItems;
-            _transactionHandler = transactionHandler;
         }
 
         /// <summary>

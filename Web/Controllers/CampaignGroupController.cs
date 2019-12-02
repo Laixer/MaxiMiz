@@ -1,5 +1,4 @@
-﻿using Maximiz.Transactions;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 
 namespace Maximiz.Controllers
 {
@@ -9,11 +8,6 @@ namespace Maximiz.Controllers
     /// </summary>
     public class CampaignGroupController : Controller
     {
-
-        /// <summary>
-        /// Manages entity transactions for us.
-        /// </summary>
-        private readonly ITransactionHandler _transactionHandler;
 
         /// <summary>
         /// Index view.
