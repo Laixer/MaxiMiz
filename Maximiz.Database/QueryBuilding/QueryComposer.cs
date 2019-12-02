@@ -35,7 +35,7 @@ namespace Maximiz.Database.QueryBuilding
             inactives.Add(CampaignStatus.Terminated);
             inactives.Add(CampaignStatus.Unknown);
 
-            string query = "";
+            string query = ""; // TODO Dangerous!
             for (int i = 0; i < inactives.Count; i++)
             {
                 query += enumTranslator.Translate(inactives[i]);
