@@ -3,17 +3,58 @@
 *@
 
 <div class="adscontent">
+    <p>Preview</p>
+    <div class="preview-section">
+
+        <!-- Our randomly selected image -->
+        <div class="image-container">
+            <img id="generatedAdImage" />
+        </div>
+
+        <!-- Title + adsense text -->
+        <div class="image-description">
+            <div class="form-group">
+                <label id="generatedAdTitle" class="ad-text m-0"></label>
+                <label class="ad-tracking text-muted">Taboola Adsense</label>
+            </div>
+        </div>
+
+        <!-- Submit button for form -->
+        <div class="submit">
+            <button id="buttonSubmitWizardAdGroup" class="btn text-white btn-bluebg mt-5">Submit</button>
+        </div>
+
+
+
+
+
+
+        <!-- Popup message thingy -->
+        <div class="alert alert-success alert-dismissible fade show success-message">
+            <strong>Success!</strong> Advertisement has successfully been submitted.
+            <button type="button" class="close" data-dismiss="alert">&times;</button>
+        </div>
+
+
+
+
+
+    </div>
+</div>
+
+
+
+
+
+
+@*<div class="adscontent">
 
     <!-- Displays a prerendered version of an ad based on a random image -->
     <p>Preview</p>
     <div class="preview-section">
         <label id="lblAdGroup"><i class="text-muted">Ad group</i></label>
-        @*<img src="../../img/phone-ad.png" alt="phone-ad">*@
         <label id="lblDestURL"><i class="text-muted">Destination URL</i></label>
     </div>
-
-    <!-- TODO Remove debug -->
-    <a id="buttonGenerateRandomAd" class="btn text-white btn-main btn-blue mt-5">Generate random ad</a>
 
     <!-- Placeholders for our randomly generated ad -->
     <div>
@@ -28,3 +69,4 @@
     </div>
 
 </div>
+    *@

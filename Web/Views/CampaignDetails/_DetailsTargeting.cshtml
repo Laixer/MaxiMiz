@@ -5,7 +5,108 @@
 @inject ITargetingViewModelService targetingService
 @model CampaignDetailsViewModel
 <!-- Targeting tab -->
-<form id="formTabTargeting">
+<form id="formTabTargeting" action="" class="mt-3">
+    <fieldset id="formAccount">
+        <div class="targeting form-group">
+            <div>
+                <div class="form-subgroup">
+
+                    <div class="section">
+                        <h1 class="mb-4">Targeting</h1>
+                    </div>
+
+                    <div class="form-row">
+                        <!-- Countries -->
+                        <div class="form-group col-md-6 containsErrorHolder">
+                            <div class="mt-3">
+                                <label for="Devices">Countries</label>
+                                <div class="ml-0 space-between">
+                                    @foreach (var location in targetingService.GetLocationOptions())
+                                    {
+                                        var id = Guid.NewGuid(); // Used to link label to input
+                                        <div class="form-check form-check-inline">
+                                            <input class="checkboxDevice form-check-input" type="checkbox" id="@id"
+                                                   name="@nameof(FormCampaignDetailsViewModel.Locations)" value="@location"
+                                                   checked="@(Model.Campaign.LocationInclude.Contains(location))">
+                                            <label class="form-check-label font-weight-normal" for="@id">@LocationTranslator.TranslateLocation(location)</label>
+                                        </div>
+                                    }
+                                </div>
+                                <div class="errorHolder"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <div class="limit form-group mt-5">
+            <div>
+                <div class="form-subgroup">
+                    <div class="form-row">
+                        <!-- Devices -->
+                        <div class="form-group col-md-6 containsErrorHolder">
+                            <div class="mt-3">
+                                <label for="Devices">Devices </label>
+                                <div class="ml-0 space-between">
+                                    @foreach (var device in targetingService.GetDeviceOptions())
+                                    {
+                                        var id = Guid.NewGuid(); // Used to link label to input
+                                        <div class="form-check form-check-inline">
+                                            <input class="checkboxDevice form-check-input" type="checkbox" id="@id"
+                                                   name="@nameof(FormCampaignDetailsViewModel.Devices)" value="@device"
+                                                   checked="@(Model.Campaign.Devices.Contains(device))">
+                                            <label class="form-check-label font-weight-normal" for="@id">@LocationTranslator.TranslateDevice(device)</label>
+                                        </div>
+                                    }
+                                </div>
+                                <div class="errorHolder"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <!-- Operating systems -->
+                        <div class="form-group col-md-6">
+                            <div class="mt-3">
+                                <label for="Devices">Operating systems </label>
+                                <div class="ml-0 space-between">
+                                    @foreach (var os in targetingService.GetOperatingSystemOptions())
+                                    {
+                                        var id = Guid.NewGuid(); // Used to link label to input
+                                        <div class="form-check form-check-inline">
+                                            <input class="checkboxOperatingSystem form-check-input" type="checkbox" id="@id"
+                                                   name="@nameof(FormCampaignDetailsViewModel.OperatingSystems)" value="@os"
+                                                   checked="@(Model.Campaign.OperatingSystems.Contains(os))">
+                                            <label class="form-check-label font-weight-normal" for="@id">@LocationTranslator.TranslateOperatingSystem(os)</label>
+                                        </div>
+                                    }
+                                </div>
+                                <div class="errorHolder"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Save button -->
+                    <button class="buttonSaveCampaignDetails btn text-white btn-bluebg mt-5">Save</button>
+
+                </div>
+            </div>
+        </div>
+    </fieldset>
+</form>
+
+
+
+
+
+
+
+
+
+
+@*<form id="formTabTargeting">
     <fieldset>
 
         <!-- Countries -->
@@ -15,7 +116,7 @@
             {
                 <div class="form-row">
                     <input class="checkboxLocation customCheckbox"
-                           name="@nameof(FormCampaignDetailsViewModel.Locations)" 
+                           name="@nameof(FormCampaignDetailsViewModel.Locations)"
                            value="@location" type="checkbox" checked="@(Model.Campaign.LocationInclude.Contains(location))" />
                     <label>@LocationTranslator.TranslateLocation(location)</label>
                 </div>
@@ -29,7 +130,7 @@
             @foreach (var device in targetingService.GetDeviceOptions())
             {
                 <div class="form-row">
-                    <input class="checkboxDevice" name="@nameof(FormCampaignDetailsViewModel.Devices)" 
+                    <input class="checkboxDevice" name="@nameof(FormCampaignDetailsViewModel.Devices)"
                            value="@device" type="checkbox" checked="@(Model.Campaign.Devices.Contains(device))" />
                     <label>@LocationTranslator.TranslateDevice(device)</label>
                 </div>
@@ -44,7 +145,7 @@
             {
                 <div class="form-row">
                     <input class="checkboxOperatingSystem" name="@nameof(FormCampaignDetailsViewModel.OperatingSystems)"
-                           value="@os" type="checkbox" checked="@(Model.Campaign.OperatingSystems.Contains(os))"  />
+                           value="@os" type="checkbox" checked="@(Model.Campaign.OperatingSystems.Contains(os))" />
                     <label>@LocationTranslator.TranslateOperatingSystem(os)</label>
                 </div>
             }
@@ -53,7 +154,7 @@
 
         <!-- Publisher blocking -->
         <!-- TODO Implement -->
-        @*<div class="info form-group">
+        <div class="info form-group">
                 <div>
                     <div class="form-subgroup">
                         <h1 class="mb-4">Publishers</h1>
@@ -72,10 +173,10 @@
                         </div>
                     </div>
                 </div>
-            </div>*@
+            </div>
 
         <!-- Submit button -->
         <button type="submit" class="buttonSaveCampaignDetails btn text-white btn-main btn-blue mt-5 float-right">Save</button>
 
     </fieldset>
-</form>
+</form>*@

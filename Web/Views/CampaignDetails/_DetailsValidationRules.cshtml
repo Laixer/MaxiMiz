@@ -4,16 +4,6 @@
 
 <script type="text/javascript">
 
-    $(document).ready(function () {
-
-        // Each sections has a separate function for readability
-        setupAccount();
-        setupMarketing();
-        setupTargeting();
-        //setupSchedule(); Not yet ready
-
-    });
-
     // Account tab
     function setupAccount() {
 
@@ -70,12 +60,13 @@
         });
 
         // Bid strategy
-        $('.radioBidStrategy').rules('add', {
-            required: true,
-            messages: {
-                required: 'Please select a bid strategy'
-            }
-        });
+        console.log('Validation rules bid strategy is disabled');
+        //$('.radioBidStrategy').rules('add', {
+        //    required: true,
+        //    messages: {
+        //        required: 'Please select a bid strategy'
+        //    }
+        //});
 
         // Delivery
         $('.radioDelivery').rules('add', {
@@ -152,27 +143,27 @@
     // Schedule tab
     function setupSchedule() {
 
-        // Start date
-        $('#datetimeStartDate').rules('add', {
-            required: true,
-            messages: {
-                required: 'Please enter a start date',
-                //min: 'Please select a start date in the future'
-            }
-        });
+        //// Start date
+        //$('#datetimeStartDate').rules('add', {
+        //    required: true,
+        //    messages: {
+        //        required: 'Please enter a start date',
+        //        //min: 'Please select a start date in the future'
+        //    }
+        //});
 
-        // End date
-        $('#datetimeEndDate').rules('add', {
-            greaterThan: '#datetimeStartDate',
-            messages: {
-                greaterThan: 'End date must be after start date'
-            }
-        });
+        //// End date
+        //$('#datetimeEndDate').rules('add', {
+        //    greaterThan: '#datetimeStartDate',
+        //    messages: {
+        //        greaterThan: 'End date must be after start date'
+        //    }
+        //});
 
-        // Ignore end date
-        $('#checkboxIgnoreEndDate').rules('add', {
-            // None
-        });
+        //// Ignore end date
+        //$('#checkboxIgnoreEndDate').rules('add', {
+        //    // None
+        //});
     }
 
 </script>

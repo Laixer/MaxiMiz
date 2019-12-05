@@ -51,12 +51,11 @@
 
 
 @section Scripts {
-
     <script type="text/javascript">
 
-        // TODO This might not be the right way to do this
-        window.AdGroupOverviewColumn = '@Model.Column';
-        window.AdGroupOverviewOrder = '@Model.Order';
+    // TODO This might not be the right way to do this
+    window.AdGroupOverviewColumn = '@Model.Column';
+    window.AdGroupOverviewOrder = '@Model.Order';
 
         $(document).ready(function () {
 
@@ -87,7 +86,17 @@
                     }), 'delete', loadAdGroupOverviewTablesAsync);
             });
 
+            // Subscribe sorting button functionality
+            subscribeClickable('.clickSortAdGroup', function (event) {
+                window.AdGroupOverviewColumn = $(event.currentTarget).attr('data-column');
+                window.AdGroupOverviewOrder = $(event.currentTarget).attr('data-order');
+
+                highlightSortingIcons('.clickSortAdGroup', window.AdGroupOverviewColumn, window.AdGroupOverviewOrder);
+                loadAdGroupOverviewTablesAsync();
+            });
+
             // Load all the tables upon page load
+            highlightSortingIcons('.clickSortAdGroup', window.AdGroupOverviewColumn, window.AdGroupOverviewOrder);
             loadAdGroupOverviewTablesAsync();
         });
 
@@ -98,7 +107,7 @@
             var order = window.AdGroupOverviewOrder;
 
             loadAdGroupOverviewTableAsync('@AdGroupOverviewTableType.All', '#tabAllTableBody', '#tabAllCount', 'All', query, column, order);
-        }
+        };
 
         // Loads a single table
         // TODO DRY with campaign overview
@@ -108,7 +117,7 @@
 
             // Load view component async through controller fetch call
             doGetAndReplaceHtml('@Url.Action(nameof(AdGroupOverviewController.GetAdGroupTableViewComponent)
-                  , "AdGroupOverview")?'
+                , "AdGroupOverview")?'
                 + new URLSearchParams({
                     table: tableType,
                     query: query,
@@ -118,14 +127,15 @@
 
             // Load count component async through controller fetch call
             doGetAndReplaceHtml('@Url.Action(nameof(AdGroupOverviewController.GetAdGroupCountViewComponent)
-                  , "AdGroupOverview")?'
+                , "AdGroupOverview")?'
                 + new URLSearchParams({
                     table: tableType,
                     query: query,
                     column: column,
                     order: order
                 }), countId);
-        }
+        };
+
 
     </script>
 }

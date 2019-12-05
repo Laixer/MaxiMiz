@@ -12,7 +12,7 @@
         @*<th scope="row"><input type="checkbox" name="campaigncheck" value="@campaign.Id"></th>*@
         <td class="data-campaign">
             <!-- Opens campaign details modal -->
-            <a class="click-open-details" data-campaign-id="@campaign.Id">
+            <a href="" class="click-open-details" data-campaign-id="@campaign.Id">
                 <img class="mr-1" src="~/images/taboola_logo.png" alt="taboola_logo">
                 @campaign.Name
             </a>
@@ -32,10 +32,15 @@
         <td>@Model.CurrencySymbol @campaign.Profit</td>
         <td>
             <!-- Clickable icon to open the details -->
-            <a class="click-open-details" data-campaign-id="@campaign.Id"><i class="fas fa-edit"></i></a>
+            <a href="" class="click-open-details" data-campaign-id="@campaign.Id" title="Edit">
+                <i class="fas fa-edit"></i>
+            </a>
 
             <!-- Clickable icon to delete campaign -->
-            <a class="click-delete-campaign" data-toggle="tooltip" data-campaign-id="@campaign.Id" title="Delete"><i class="fas fa-trash text-danger ml-1"></i></a>
+            <a href="" class="click-delete-campaign" data-toggle="tooltip" data-campaign-id="@campaign.Id" title="Delete">
+                <i class="fas fa-trash text-danger ml-1"></i>
+            </a>
         </td>
+
     </tr>
 }

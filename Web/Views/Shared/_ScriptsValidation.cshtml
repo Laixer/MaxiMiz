@@ -11,24 +11,25 @@
             // Add error styling when invalid highlighted
             highlight: function (element) {
                 $(element)
-                    .closest('form-group')
-                    .addClass('has-error');
+                    //.closest('form-group')
+                    .closest('.form-control')
+                    .addClass('error-label');
             },
 
             // Remove error styling when unhighlighted
             unhighlight: function (element) {
                 $(element)
-                    .closest('form-group')
-                    .removeClass('has-error');
+                    .closest('.form-control')
+                    .removeClass('error-label');
             },
 
             // Custom error class (recognized by bootstrap)
-            errorClass: 'error-text',
+            errorClass: 'is-invalid',
 
             // Error placement customized
             errorPlacement: function (error, element) {
                 var errorHolder = $(element)
-                    .closest('form-group')
+                    .closest('.containsErrorHolder')
                     .find('.errorHolder');
                 if (errorHolder != null) {
                     $(errorHolder).html(error);
@@ -63,6 +64,7 @@
                     if (result == true && itemValid == false) {
                         result = false;
                     }
+                    console.log('Element ', item, ' validated as ', itemValid);
                 }
             });
         } catch (e) {

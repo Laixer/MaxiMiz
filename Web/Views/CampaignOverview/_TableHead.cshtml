@@ -3,91 +3,141 @@
 *@
 
 @model CampaignOverviewViewModel
-
 <!-- Creates a head cell for each value in our table -->
 <!-- Each sortable variable has corresponding order buttons. TODO Improve order buttons, clean up -->
 <thead class="thead-darkblue">
     <tr>
-        <!-- TODO Use this or not? -->
-        @*<th scope="col"><input type="checkbox" name="campaignCheck" id="select-all"></th>*@
         <th scope="col">
             Campaign Name
-            <a class="click-sort" data-column="@ColumnCampaignOverview.Name" data-order="@Order.Ascending">/\</a>
-            <a class="click-sort" data-column="@ColumnCampaignOverview.Name" data-order="@Order.Descending">\/</a>
+            <div class="filter-campaign">
+                <a class="click-sort" data-column="@ColumnCampaignOverview.Name" data-order="@Order.Ascending">
+                    <span class="arrow arrow-up"><i class="fas fa-chevron-up"></i></span>
+                </a>
+                <a class="click-sort" data-column="@ColumnCampaignOverview.Name" data-order="@Order.Descending">
+                    <span class="arrow arrow-down"><i class="fas fa-chevron-down"></i></span>
+                </a>
+            </div>
         </th>
         <th scope="col">
             CPC
-            <a class="click-sort" data-column="@ColumnCampaignOverview.Cpc" data-order="@Order.Ascending">/\</a>
-            <a class="click-sort" data-column="@ColumnCampaignOverview.Cpc" data-order="@Order.Descending">\/</a>
+            <div class="filter-campaign">
+                <a class="click-sort" data-column="@ColumnCampaignOverview.Cpc" data-order="@Order.Ascending">
+                    <span class="arrow arrow-up"><i class="fas fa-chevron-up"></i></span>
+                </a>
+                <a class="click-sort" data-column="@ColumnCampaignOverview.Cpc" data-order="@Order.Descending">
+                    <span class="arrow arrow-down"><i class="fas fa-chevron-down"></i></span>
+                </a>
+            </div>
         </th>
         <th scope="col">
             CTR
-            <a class="click-sort" data-column="@ColumnCampaignOverview.Ctr" data-order="@Order.Ascending">/\</a>
-            <a class="click-sort" data-column="@ColumnCampaignOverview.Ctr" data-order="@Order.Descending">\/</a>
+            <div class="filter-campaign">
+                <a class="click-sort" data-column="@ColumnCampaignOverview.Ctr" data-order="@Order.Ascending">
+                    <span class="arrow arrow-up"><i class="fas fa-chevron-up"></i></span>
+                </a>
+                <a class="click-sort" data-column="@ColumnCampaignOverview.Ctr" data-order="@Order.Descending">
+                    <span class="arrow arrow-down"><i class="fas fa-chevron-down"></i></span>
+                </a>
+            </div>
         </th>
         <th scope="col">
             Clicks
-            <a class="click-sort" data-column="@ColumnCampaignOverview.Clicks" data-order="@Order.Ascending">/\</a>
-            <a class="click-sort" data-column="@ColumnCampaignOverview.Clicks" data-order="@Order.Descending">\/</a>
+            <div class="filter-campaign">
+                <a class="click-sort" data-column="@ColumnCampaignOverview.Clicks" data-order="@Order.Ascending">
+                    <span class="arrow arrow-up"><i class="fas fa-chevron-up"></i></span>
+                </a>
+                <a class="click-sort" data-column="@ColumnCampaignOverview.Clicks" data-order="@Order.Descending">
+                    <span class="arrow arrow-down"><i class="fas fa-chevron-down"></i></span>
+                </a>
+            </div>
         </th>
         <th scope="col">
             Budget
-            <a class="click-sort" data-column="@ColumnCampaignOverview.Budget" data-order="@Order.Ascending">/\</a>
-            <a class="click-sort" data-column="@ColumnCampaignOverview.Budget" data-order="@Order.Descending">\/</a>
+            <div class="filter-campaign">
+                <a class="click-sort" data-column="@ColumnCampaignOverview.Budget" data-order="@Order.Ascending">
+                    <span class="arrow arrow-up"><i class="fas fa-chevron-up"></i></span>
+                </a>
+                <a class="click-sort" data-column="@ColumnCampaignOverview.Budget" data-order="@Order.Descending">
+                    <span class="arrow arrow-down"><i class="fas fa-chevron-down"></i></span>
+                </a>
+            </div>
         </th>
         <th scope="col">
             Spend
-            <a class="click-sort" data-column="@ColumnCampaignOverview.Spend" data-order="@Order.Ascending">/\</a>
-            <a class="click-sort" data-column="@ColumnCampaignOverview.Spend" data-order="@Order.Descending">\/</a>
+            <div class="filter-campaign">
+                <a class="click-sort" data-column="@ColumnCampaignOverview.Spend" data-order="@Order.Ascending">
+                    <span class="arrow arrow-up"><i class="fas fa-chevron-up"></i></span>
+                </a>
+                <a class="click-sort" data-column="@ColumnCampaignOverview.Spend" data-order="@Order.Descending">
+                    <span class="arrow arrow-down"><i class="fas fa-chevron-down"></i></span>
+                </a>
+            </div>
         </th>
         <th scope="col">
             Revenue
-            <a class="click-sort" data-column="@ColumnCampaignOverview.Revenue" data-order="@Order.Ascending">/\</a>
-            <a class="click-sort" data-column="@ColumnCampaignOverview.Revenue" data-order="@Order.Descending">\/</a>
+            <div class="filter-campaign">
+                <a class="click-sort" data-column="@ColumnCampaignOverview.Revenue" data-order="@Order.Ascending">
+                    <span class="arrow arrow-up"><i class="fas fa-chevron-up"></i></span>
+                </a>
+                <a class="click-sort" data-column="@ColumnCampaignOverview.Revenue" data-order="@Order.Descending">
+                    <span class="arrow arrow-down"><i class="fas fa-chevron-down"></i></span>
+                </a>
+            </div>
         </th>
         <th scope="col">
             ROI
-            <a class="click-sort" data-column="@ColumnCampaignOverview.Roi" data-order="@Order.Ascending">/\</a>
-            <a class="click-sort" data-column="@ColumnCampaignOverview.Roi" data-order="@Order.Descending">\/</a>
+            <div class="filter-campaign">
+                <a class="click-sort" data-column="@ColumnCampaignOverview.Roi" data-order="@Order.Ascending">
+                    <span class="arrow arrow-up"><i class="fas fa-chevron-up"></i></span>
+                </a>
+                <a class="click-sort" data-column="@ColumnCampaignOverview.Roi" data-order="@Order.Descending">
+                    <span class="arrow arrow-down"><i class="fas fa-chevron-down"></i></span>
+                </a>
+            </div>
         </th>
         <th scope="col">
             Taboola
-            <a class="click-sort" data-column="@ColumnCampaignOverview.RevenueTaboola" data-order="@Order.Ascending">/\</a>
-            <a class="click-sort" data-column="@ColumnCampaignOverview.RevenueTaboola" data-order="@Order.Descending">\/</a>
+            <div class="filter-campaign">
+                <a class="click-sort" data-column="@ColumnCampaignOverview.RevenueTaboola" data-order="@Order.Ascending">
+                    <span class="arrow arrow-up"><i class="fas fa-chevron-up"></i></span>
+                </a>
+                <a class="click-sort" data-column="@ColumnCampaignOverview.RevenueTaboola" data-order="@Order.Descending">
+                    <span class="arrow arrow-down"><i class="fas fa-chevron-down"></i></span>
+                </a>
+            </div>
         </th>
         <th scope="col">
             Adsense
-            <a class="click-sort" data-column="@ColumnCampaignOverview.RevenueAdsense" data-order="@Order.Ascending">/\</a>
-            <a class="click-sort" data-column="@ColumnCampaignOverview.RevenueAdsense" data-order="@Order.Descending">\/</a>
+            <div class="filter-campaign">
+                <a class="click-sort" data-column="@ColumnCampaignOverview.RevenueAdsense" data-order="@Order.Ascending">
+                    <span class="arrow arrow-up"><i class="fas fa-chevron-up"></i></span>
+                </a>
+                <a class="click-sort" data-column="@ColumnCampaignOverview.RevenueAdsense" data-order="@Order.Descending">
+                    <span class="arrow arrow-down"><i class="fas fa-chevron-down"></i></span>
+                </a>
+            </div>
         </th>
         <th scope="col">
             Profit
-            <a class="click-sort" data-column="@ColumnCampaignOverview.Profit" data-order="@Order.Ascending">/\</a>
-            <a class="click-sort" data-column="@ColumnCampaignOverview.Profit" data-order="@Order.Descending">\/</a>
+            <div class="filter-campaign">
+                <a class="click-sort" data-column="@ColumnCampaignOverview.Profit" data-order="@Order.Ascending">
+                    <span class="arrow arrow-up"><i class="fas fa-chevron-up"></i></span>
+                </a>
+                <a class="click-sort" data-column="@ColumnCampaignOverview.Profit" data-order="@Order.Descending">
+                    <span class="arrow arrow-down"><i class="fas fa-chevron-down"></i></span>
+                </a>
+            </div>
         </th>
         <th scope="col">
             Actions
-            <a class="click-sort" data-column="@ColumnCampaignOverview.Actions" data-order="@Order.Ascending">/\</a>
-            <a class="click-sort" data-column="@ColumnCampaignOverview.Actions" data-order="@Order.Descending">\/</a>
+            <div class="filter-campaign">
+                <a class="click-sort" data-column="@ColumnCampaignOverview.Actions" data-order="@Order.Ascending">
+                    <span class="arrow arrow-up"><i class="fas fa-chevron-up"></i></span>
+                </a>
+                <a class="click-sort" data-column="@ColumnCampaignOverview.Actions" data-order="@Order.Descending">
+                    <span class="arrow arrow-down"><i class="fas fa-chevron-down"></i></span>
+                </a>
+            </div>
         </th>
     </tr>
 </thead>
-
-<!-- TODO For some reason jquery is not loaded. -->
-<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
-<script type="text/javascript">
-
-    $(document).ready(function () {
-
-        // Sets up our sorting arrow buttons
-        subscribeClickable('.click-sort', function () {
-            // Storing global
-            window.ColumnCampaignOverview = $(this).attr('data-column');
-            window.OrderCampaignOverview = $(this).attr('data-order');
-
-            loadTablesAsync();
-        });
-
-    });
-
-</script>

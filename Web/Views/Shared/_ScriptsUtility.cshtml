@@ -41,7 +41,7 @@
      * TODO This is a beunfix.
      * Makes a single string item in a json object an array of size one. This
      * will only happen if the item is an actual string instead of an array.
-     * 
+     *
      * @@param jsonBody The entire json object
      * @@param key The key of the item to check
      */
@@ -59,7 +59,7 @@
      * Makes a single string an array, does nothing if it already is an array.
      * This returns and does not overwrite. (TODO Is this correct?)
      * This returns an empty array if the input is undefined.
-     * 
+     *
      * @@param input The input string or array
      */
     function makeArrayIfString(input) {
@@ -73,7 +73,7 @@
 
     /**
      * Sets all elements in an array to enabled or disabled.
-     * 
+     *
      * @@param elementsArray The elements to update
      * @@param enabled True if enabled, false if disabled
      */
@@ -87,5 +87,34 @@
             }
         });
     }
+
+    /**
+     * Highlights all items in the iconSelector which match the given column and
+     * order. All other items get unhighlighted.
+     *      Based on attr: data-column
+     *      Based on attr: data-order
+     * 
+     * @@param iconSelector jQuery icon selector
+     * @@param column The current selected column
+     * @@param order The current selected order
+     */
+    function highlightSortingIcons(iconSelector, column, order) {
+        console.log('TODO: Change myHighlightClass for sorting icon highlighting');
+        $(iconSelector).each(function (index, item) {
+            if ($(item).attr('data-column') === column &&
+                $(item).attr('data-order') === order) {
+                $(item).addClass('myHighlightClass');
+
+                // TODO Remove
+                $(item).attr('href', '#');
+            } else {
+                $(item).removeClass('myHighlightClass');
+
+                // TODO Remove
+                $(item).removeAttr('href');
+            }
+        });
+    }
+
 
 </script>

@@ -68,7 +68,7 @@
             </div>
             <div class="tab-pane" id="tabPending">
                 <div class="table-responsive tab-pane active" id="tabPending">
-                    <table class="table table-striped" id="tableCampaigns">
+                    <table class="table table-striped">
                         <partial name="_TableHead" model="@Model" />
                         <tbody id="tabPendingTableBody"></tbody>
                     </table>
@@ -78,16 +78,14 @@
 
         <!-- Div in which our details partial view will open -->
         <div class="container sidemodal">
-            <div class="modal right fade modal-right" id="modal-campaign-details" tabindex="-1" role="dialog" aria-labelledby="modalRightLabel" aria-hidden="true">
+            <div class="modal right fade modal-right" id="modalRight" tabindex="-1" role="dialog" aria-labelledby="modalRightLabel" aria-hidden="true">
                 <div class="modal-dialog" role="document">
                     <div class="modal-content" id="modal-details-content">
-                        <!-- Empty to load partial view with jquery -->
+                        <!-- Empty to load partial view dynamically -->
                     </div>
                 </div>
             </div>
         </div>
-
-    </div>
 
 </main>
 
@@ -96,17 +94,15 @@
 @section Scripts  {
 
     <!-- Import campaign details scripts because partial view scripts won't be loaded otherwise -->
-    @*<partial name="~/Views/CampaignDetails/_ScriptDetails.cshtml" />*@
-    <!-- TODO Do we want to implement a solution like this? -->
-    <!-- TODO Do we even want to have javascript at the bottom of the page? Isn't importing cleaner? -->
+    <partial name="~/Views/CampaignDetails/_CampaignDetailsScripts.cshtml" />
 
+    <!-- Script functionality for the campaign overview -->
     <script type="text/javascript">
 
         // Global variables to ensure consistent sorting and searc query display across operations
         window.ColumnCampaignOverview = '@Model.Column';
         window.OrderCampaignOverview = '@Model.Order';
 
-        // TODO DRY for fetch
         $(document).ready(function () {
 
             // TODO Is this the right location for this functionality?
@@ -124,7 +120,7 @@
                     }), 'get', function (html) {
                         // TODO This might take a while, first show then fill?
                         $('#modal-details-content').html(html);
-                        $('#modal-campaign-details').modal({ show: true });
+                        $('#modalRight').modal({ show: true });
                     });
             });
 
@@ -142,10 +138,21 @@
                     });
             });
 
-        });
+            // Sets up our sorting arrow buttons
+            subscribeClickable('.click-sort', function (event) {
+                // Storing global
+                window.ColumnCampaignOverview = $(event.currentTarget).attr('data-column');
+                window.OrderCampaignOverview = $(event.currentTarget).attr('data-order');
+
+                highlightSortingIcons('.click-sort', window.ColumnCampaignOverview, window.OrderCampaignOverview);
+                loadTablesAsync();
+            });
 
             // Make us load all tables with default values
             loadTablesAsync();
+            highlightSortingIcons();
+
+        });
 
         // TODO Ugly parameter passing, maybe this can be done more elegantly?
         // Handles the async loading

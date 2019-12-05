@@ -10,41 +10,51 @@
 
 @model LoginViewModel
 <body>
-    <main>
 
-        <!-- Actual login functionality -->
-        <form id="formLogin" asp-controller="Login" asp-action="@nameof(LoginController.AttemptLogin)" method="post">
+    <div id="login">
+        <div class="login-form">
 
-            <!-- Page header (yes this will be expanded) -->
-            <h1>Login</h1>
+            <!-- Actual login form -->
+            <form id="formLogin" asp-controller="Login" asp-action="@nameof(LoginController.AttemptLogin)" method="post">
+                <h2 class="text-center">Log in</h2>
 
-            <!-- User email -->
-            <form-group class="form-row">
-                <label>Email </label>
-                <input id="inputUserEmail" name="@nameof(LoginViewModel.Email)" type="email" placeholder="username@domain.com" />
-                <div class="errorHolder"></div>
-            </form-group>
+                <!-- Email -->
+                <div class="input-group mb-3 containsErrorHolder">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text" id="inputGroupEmail">📧</span>
+                    </div>
+                    <input id="inputUserEmail" type="email" class="form-control" aria-describedby="inputGroupEmail"
+                           name="@nameof(LoginViewModel.Email)" placeholder="Email" />
+                    <div class="errorHolder"></div>
+                </div>
 
-            <!-- User password -->
-            <form-group class="form-row">
-                <label>Password </label>
-                <input id="inputUserPassword" name="@nameof(LoginViewModel.Password)" type="password" placeholder="**********" />
-                <div class="errorHolder"></div>
-            </form-group>
+                <!-- Password -->
+                <div class="input-group mb-4 containsErrorHolder">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text" id="inputGroupPassword">🔐</span>
+                    </div>
+                    <input id="inputUserPassword" type="password" class="form-control" aria-describedby="inputGroupPassword"
+                           name="@nameof(LoginViewModel.Password)" placeholder="Password" />
+                    <div class="errorHolder"></div>
+                </div>
 
-            <!-- Submit button -->
-            <div class="form-row">
-                <button type="submit" id="buttonLogin" class="btn text-white btn-main btn-blue mt-5">Login</button>
-            </div>
+                <!-- Log in button -->
+                <div class="form-group">
+                    <button id="buttonLogin" type="submit" class="btn btn-primary btn-block">Log in</button>
+                </div>
 
-            <!-- Forgot password link -->
-            @*<div class="form-row">
-                <a asp-controller="Home" asp-action="@nameof(HomeController.Index)">Forgot password?</a>
-            </div>*@
+                <!-- Login feedback text, added dynamically -->
+                <div id="loginFeedbackText"></div>
 
-        </form>
+                <!-- Create account / forgot password -->
+                <div class="clearfix">
+                    <a href="#" class="pull-right">Forgot Password?</a>
+                    <p><a href="#">Create an Account</a></p>
+                </div>
+            </form>
+        </div>
+    </div>
 
-    </main>
 </body>
 
 
@@ -56,14 +66,20 @@
 
     <script type="text/javascript">
 
+        const loginFeedbackTextId = '#loginFeedbackText';
+
         // Initialize our validator object
         setupValidatorDefaults();
         var validatorLogin = $('#formLogin').validate();
 
         $(document).ready(function () {
 
-            // Post our form explicitly
-            subscribeFormSubmit('#formLogin', function () {
+            // Never post our form explicitly
+            subscribeFormSubmit('#formLogin');
+            subscribeClickable('#buttonLogin', function () {
+
+                $(loginFeedbackTextId).text('');
+
                 if (validatorLogin.form()) {
 
                     // Visual feedback and double submit disabling
@@ -72,11 +88,13 @@
                     let callbackSuccess = function () {
                         console.log('Login succeeded');
                         window.location.href = '@Url.Action(nameof(HomeController.Index), "Home")';
+                        $(loginFeedbackTextId).text('Login succeeded, please wait...');
                     }
                     let callbackFailure = function () {
                         // TODO Feedback
                         console.log('Login failed');
                         $('#buttonLogin').removeAttr('disabled');
+                        $(loginFeedbackTextId).text('Login attempt failed');
                     }
 
                     doPostAndProcess($('#formLogin').get(0).action, $('#formLogin').serializeFormJSON(),

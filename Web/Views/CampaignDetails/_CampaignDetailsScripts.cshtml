@@ -1,0 +1,138 @@
+﻿@*
+    Contains all scripts for our campaign details. This exists in its own partial
+    view because all campaign details views are partial. We can not load a scripts
+    section in a partial view, hence this functionality is imported in the
+    campaign overview.
+*@
+
+
+<!-- Script functionality for our campaign details partial views -->
+<!-- Import validation rules -->
+<partial name="~/Views/CampaignDetails/_DetailsValidationRules.cshtml" />
+
+<script type="text/javascript">
+
+    console.log('Executing campaign details scripts now');
+
+    // Initialize our validator object
+    setupValidatorDefaults();
+    let validatorCampaignDetailsAccount = $('#formTabAccount').validate();
+    let validatorCampaignDetailsMarketing = $('#formTabMarketing').validate();
+    let validatorCampaignDetailsTargeting = $('#formTabTargeting').validate();
+    let validatorCampaignDetailsSchedule = $('#formTabSchedule').validate();
+
+    console.log('form account ', $('#formTabAccount'));
+    console.log('validator account: ', validatorCampaignDetailsAccount);
+
+    // Explicitly define all elements that have to be validated for each section
+    // TODO These might be useful to indicate which tab is incorrect upon form validation
+    // The user might not be in the tab where our properties are invalid
+    var elementsAccount = [
+        '#inputCampaignNameSuffix',
+        '#inputBrandingText',
+        '#inputUrl',
+        '#inputUtmCustom'
+    ];
+    var elementsMarketing = [
+        '#checkboxAutopilot',
+        '#inputCpc',
+        //'.radioBidStrategy', TODO Add back in
+        '.radioDelivery',
+        '#inputBudget',
+        '#selectBudgetModel',
+        '#inputBudgetDaily',
+        '#inputBudgetDailyInfinite'
+    ];
+    var elementsTargeting = [
+        '.checkboxLocation',
+        '.checkboxDevice',
+        '.checkboxOperatingSystem'
+    ];
+    var elementsSchedule = [
+        '#datetimeStartDate',
+        '#datetimeEndDate',
+        '#checkboxIgnoreEndDate'
+    ];
+
+    $(document).ready(function () {
+
+        // Do not post our forms by default ever
+        // TODO Maybe do this with a class?
+        subscribeFormSubmit('#formCampaignDetailsModifications');
+        subscribeFormSubmit('#formTabAccount');
+        subscribeFormSubmit('#formTabMarketing');
+        subscribeFormSubmit('#formTabTargeting');
+        subscribeFormSubmit('#formTabSchedule');
+
+        // Register our save buttons
+        subscribeClickable('.buttonSaveCampaignDetails', function () {
+            // Do non-lazy evaluation to enuse all items are checked
+            // These can also be done with validateSet
+            if (validatorCampaignDetailsAccount.form() &
+                validatorCampaignDetailsMarketing.form() &
+                validatorCampaignDetailsTargeting.form() &
+                validatorCampaignDetailsSchedule.form()) {
+                postFormCampaignDetails();
+            }
+        });
+
+    });
+
+    // Setup validation rules
+    $('#formTabAccount').ready(setupAccount);
+    $('#formTabMarketing').ready(setupMarketing);
+    $('#formTabTargeting').ready(setupTargeting);
+    $('#formTabSchedule').ready(setupSchedule);
+
+    // Submit the form
+    function postFormCampaignDetails() {
+        // Visual feedback
+        var htmlOriginal = $('.buttonSaveCampaignDetails').html();
+        $('.buttonSaveCampaignDetails').attr('disabled', 'disabled');
+        setLoadingIconTo('.buttonSaveCampaignDetailsForm');
+
+        // Save original html
+        var originalForm = $('#formCampaignDetailsModifications').html();
+
+        // Append all form pages to single form, to avoid messing with the validation tokens
+        $('#formCampaignDetailsModifications').append($('#formTabAccount fieldset').clone());
+        $('#formCampaignDetailsModifications').append($('#formTabMarketing fieldset').clone());
+        $('#formCampaignDetailsModifications').append($('#formTabTargeting fieldset').clone());
+        $('#formCampaignDetailsModifications').append($('#formTabSchedule fieldset').clone());
+
+        // Serialize before disabling elements
+        var jsonBody = $('#formCampaignDetailsModifications').serializeFormJSON();
+
+        // TODO This is a beunfix
+        // Single items don't get put in an array and are not model bound correctly
+        // This is due to our form to json functionality (it seems)
+        makeArrayIfSingleString(jsonBody, 'Locations');
+        makeArrayIfSingleString(jsonBody, 'Devices');
+        makeArrayIfSingleString(jsonBody, 'OperatingSystems');
+
+        // Restore form and disable elements
+        $('#formCampaignDetailsModifications').html(originalForm);
+        updateEnabledSet(getAllElements(), false);
+
+        // Post the form and handle the response
+        var action = $('#formCampaignDetailsModifications').get(0).action;
+        doPostAndProcess(action, jsonBody, function () {
+            $('.buttonSaveCampaignDetails').html(htmlOriginal);
+            $('.buttonSaveCampaignDetails').removeAttr('disabled');
+            updateEnabledSet(getAllElements(), true);
+
+            // TODO How are we going to feedback success to the user?
+            // TODO What if we fail?
+            // TODO What if there is a timeout?
+        });
+    }
+
+    // Returns all present form elements
+    function getAllElements() {
+        return elementsAccount
+            .concat(elementsMarketing)
+            .concat(elementsTargeting)
+            .concat(elementsSchedule);
+    }
+
+</script>
