@@ -1,4 +1,5 @@
 ﻿using Maximiz.Model.Entity;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Maximiz.Core.Infrastructure.Commiting
@@ -16,22 +17,25 @@ namespace Maximiz.Core.Infrastructure.Commiting
         /// Creates a <see cref="TEntity"/> in our data store and returns it.
         /// </summary>
         /// <param name="entity"><see cref="TEntity"/></param>
+        /// <param name="token"><see cref="CancellationToken"/></param>
         /// <returns><see cref="TEntity"/></returns>
-        Task<TEntity> Create(TEntity entity);
+        Task<TEntity> Create(TEntity entity, CancellationToken token);
 
         /// <summary>
         /// Updates a <see cref="TEntity"/> in our data store and returns it.
         /// </summary>
         /// <param name="entity"><see cref="TEntity"/></param>
+        /// <param name="token"><see cref="CancellationToken"/></param>
         /// <returns><see cref="TEntity"/></returns>
-        Task<TEntity> Update(TEntity entity);
+        Task<TEntity> Update(TEntity entity, CancellationToken token);
 
         /// <summary>
         /// Deletes a <see cref="TEntity"/> in our data store and returns it.
         /// </summary>
         /// <param name="entity"><see cref="TEntity"/></param>
+        /// <param name="token"><see cref="CancellationToken"/></param>
         /// <returns><see cref="TEntity"/></returns>
-        Task<TEntity> Delete(TEntity entity);
+        Task<TEntity> Delete(TEntity entity, CancellationToken token);
 
     }
 }

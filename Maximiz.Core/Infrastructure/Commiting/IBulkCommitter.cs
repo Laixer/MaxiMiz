@@ -1,5 +1,6 @@
 ﻿using Maximiz.Model.Entity;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Maximiz.Core.Infrastructure.Commiting
@@ -17,8 +18,9 @@ namespace Maximiz.Core.Infrastructure.Commiting
         /// Commits a collection of <see cref="TEntity"/>s to our data store.
         /// </summary>
         /// <param name="entities"><see cref="IEnumerable{TEntity}"/></param>
+        /// <param name="token"><see cref="CancellationToken"/></param>
         /// <returns>True if successful, false if not</returns>
-        Task<bool> UpdateBulkAsync(IEnumerable<TEntity> entities);
+        Task<bool> UpdateBulkAsync(IEnumerable<TEntity> entities, CancellationToken token);
 
     }
 }
