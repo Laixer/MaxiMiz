@@ -276,28 +276,28 @@ main h1 {
 }
 
 .col-spend-today {
-  background: url('../img/circleBG-blue.png');
+  background: url('~/images/circleBG-blue.png');
   background-repeat: no-repeat;
   background-size: cover;
   padding: .5rem 1.5rem;
 }
 
 .col-spend-yesterday {
-  background: url('../img/circleBG-pink.png');
+  background: url('~/images/circleBG-pink.png');
   background-repeat: no-repeat;
   background-size: cover;
   padding: .5rem 1.5rem;
 }
 
 .col-spend-this_month {
-  background: url('../img/circleBG-purple.png');
+  background: url('~/images/circleBG-purple.png');
   background-repeat: no-repeat;
   background-size: cover;
   padding: .5rem 1.5rem;
 }
 
 .col-spend-last_month {
-  background: url('../img/circleBG-green.png');
+  background: url('~/images/circleBG-green.png');
   background-repeat: no-repeat;
   background-size: cover;
   padding: .5rem 1.5rem;
@@ -447,7 +447,7 @@ main h1 {
 
 .col-campaign {
   /* background: #fff; */
-  background: #fff url('../img/arrow-right-rounded.png');
+  background: #fff url('~/images/arrow-right-rounded.png');
   background-repeat: no-repeat;
   background-position: 90% center;
   min-width: 30rem;
@@ -465,18 +465,18 @@ main h1 {
 
 /* --- */
 
-.ncg_basic-account {
+.ncg {
   padding: 1rem 2rem;
 }
 
-.ncg_basic-account .header {
+.ncg .header {
   max-width: 75vw;
   margin: auto;
   display: flex;
   align-items: center;
 }
 
-.ncg_basic-account > form {
+.ncg > .form {
   background-color: #fff;
   box-shadow: 0px 0px 21px rgba(0, 0, 0, 0.1);
   border-radius: 10px;
@@ -487,44 +487,68 @@ main h1 {
   overflow: hidden;
 }
 
-.ncg_basic-account form fieldset {
+.ncg form fieldset {
   position: relative;
   left: 0;
   top: 0;
   transition: all .3s ease-in-out;
 }
 
-.ncg_basic-account form .section {
+.ncg form .section {
   display: inline-block;
   min-width: 10vw;
   min-height: auto;
   padding-right: 2rem;
 }
 
-.ncg_basic-account form legend {
+.ncg form legend {
   text-align: center;
   font-size: 30px;
   color: var(--black);
 }
 
-.ncg_basic-account form h2 {
+.ncg form h2 {
   color: var(--black);
   font-size: 24px;
   font-weight: 600;
   text-align: end;
-  display: grid;
-  grid-auto-flow: column;
-  align-items: center;
-  grid-gap: 5px;
 }
 
-.ncg_basic-account form .form-subgroup {
+.ncg form .form-subgroup {
   display: inline-grid;
   min-width: 50vw;
 }
 
-.ncg_basic-account .form-control {
+.form-control {
+  max-width: auto;
+  border: none;
+  border-radius: 0px;
+  border-bottom: 1px solid #AAAAAA;
+  box-shadow: 0px 2px 2px -2px rgba(0,0,0,0.3);
+}
+
+.form-control .error-label {
+  border-bottom: 1px solid rgb(170, 65, 65);
+}
+
+.form-control:active, .form-control:focus {
+  border: none;
+  box-shadow: none;
+  border-bottom: 1px solid var(--primary-color);
+  transition: all .3s linear;
+}
+
+.ncg .form-control, .sidemodal .marketing .form-control {
   width: 22vw;
+}
+
+.ncg .form-steps {
+  min-width: 64%;
+  justify-content: center;
+}
+
+._tooltip {
+  color: var(--primary-color);
 }
 
 .btn-bluebg {
@@ -565,16 +589,16 @@ main h1 {
   opacity: 0;
 }
 
-.ncg_basic-account .content-overview > div {
+.ncg .col > div {
   display: grid;
   grid-auto-flow: column;
-  grid-template-columns: repeat(auto-fit, minmax(450px, 10px));
+  grid-template-columns: repeat(auto-fit, minmax(480px, 10px));
   align-items: center;
   grid-gap: 2rem;
-  margin-left: -20.7rem;
+  margin-left: -23.7rem;
 }
 
-.ncg_basic-account .account-icon {
+.ncg .account-icon {
   width: 4.5rem;
   min-width: 4.5rem; min-height: 4.5rem;
   border-radius: 50%;
@@ -584,17 +608,17 @@ main h1 {
   justify-content: center;
 }
 
-.ncg_basic-account .step-account p {
+.ncg .step-account p {
   text-align: center;
   color: var(--primary-color);
 }
 
-.ncg_basic-account .basic-steps {
+.ncg .basic-steps {
   min-width: 64%;
   justify-content: center;
 }
 
-.ncg_basic-account .marketing-icon {
+.ncg .icon {
   width: 4.5rem;
   min-width: 4.5rem; min-height: 4.5rem;
   border-radius: 50%;
@@ -604,7 +628,7 @@ main h1 {
   justify-content: center;
 }
 
-.ncg_basic-account .step-spacing {
+.ncg .step-spacing {
   width: 5rem;
   align-self: center;
   margin-bottom: 2.5rem;
@@ -615,24 +639,25 @@ main h1 {
   height: 3px;
 }
 
-.ncg_basic-account .section-overview {
+.ncg .section-overview {
   display: flex;
   min-width: 11rem;
   min-height: auto;
   padding-right: 2rem;
 }
 
-.ncg_basic-account .section-overview img {
+.ncg .col img {
   max-width: 1.5rem;
+  margin-top: -4px;
 }
 
-.ncg_basic-account .overview h3 {
+.ncg .overview h3 {
   justify-self: flex-end;
   font-size: 13pt;
   color: #898989;
 }
 
-.ncg_basic-account .overview p {
+.ncg .overview p {
   justify-self: flex-start;
   font-size: 13pt;
 }
@@ -716,6 +741,27 @@ main h1 {
 
 .campaign-overview .table-striped tbody tr:nth-of-type(even) {
   background-color: rgba(255,255,255, 0.35);
+}
+
+.campaign-overview .filter-campaign {
+  display: inline-grid;
+  position: relative;
+  top: -6px;
+  left: 2px;
+}
+
+.campaign-overview .filter-campaign a {
+  height: 9px;
+  font-size: 11px;
+  color: #fff;
+}
+
+.campaign-overview .filter-campaign a:hover {
+  color: var(--primary-color);
+}
+
+.campaign-overview .filter-campaign a.active {
+  color: var(--primary-color);
 }
 
 /* settings-account  */
@@ -853,7 +899,7 @@ main h1 {
 }
 
 .sidemodal .tab-content .form-subgroup {
-	margin-top: 4rem;
+	margin-top: 2rem;
 }
 
 .sidemodal .tab-content .total-ad-groups {
@@ -886,9 +932,37 @@ main h1 {
 }
 
 .adsfield .image-section {
+  padding: 1rem;
   min-height: 30vh;
   border: 2px dashed #b7b7b7;
   border-radius: 2px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(auto, 125px));
+  grid-gap: 1rem;
+}
+
+.adsfield .image-section:hover { 
+  background: #eaf1fc;
+  transition: all .3s ease-in-out;
+}
+
+.adsfield .image-section div {
+  min-width: 8.7rem;
+  min-height: 8.7rem;
+  background-color: #fff;
+  box-shadow: 0px 0px 13px -5px rgba(0, 0, 0, 0.06);
+  border: 2px solid rgb(219, 219, 219);
+  border-radius: 6px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  padding: .8rem .6rem;
+  cursor: pointer;
+}
+
+.adsfield .image-section div img {
+  max-width: 100%;
 }
 
 .navbar-shadow {
@@ -901,14 +975,47 @@ main h1 {
 
 .adscontent .preview-section {
   max-width: 100%;
-  min-height: 70vh;
   display: grid;
   align-content: center;
   justify-items: center;
+  margin-top: 5rem;
+}
+
+.adscontent .preview-section .image-container {
+  display: flex;
+  justify-content: center;
+  min-height: auto;
+  max-width: 40%;
+  background: #fff;
+}
+
+.green-border {
+  border: 2px solid green;
 }
 
 .adscontent .preview-section img {
-  min-width: 50%;
+  max-width: 100%;
+  height: 23rem;
+}
+
+.adscontent .image-description > div {
+  max-width: 24.4rem;
+}
+
+.adscontent .preview-section .ad-text {
+  font-size: 15pt;
+  font-family: serif;
+  font-weight: 400;
+}
+.adscontent .preview-section .ad-tracking {
+  font-size: 12pt;
+  font-family: serif;
+  font-weight: 200;
+}
+
+.adscontent .submit {
+  justify-self: flex-end;
+  margin-right: 3rem;
 }
 
 .adscontent #lblDestURL {
@@ -918,6 +1025,15 @@ main h1 {
   bottom: 24.1rem;
   left: 15.2rem;
   font-size: 11pt;
+}
+
+.success-message {
+  position: fixed;
+  z-index: 999;
+  bottom: 0;
+  width: 55%;
+  margin-top: 1rem;
+  visibility: hidden;
 }
 
 .adsmain input[type="search"] {
@@ -991,4 +1107,140 @@ main h1 {
 .adsmain .image-section div p {
   margin: 0;
   font-size: 8pt;
+}
+
+[type="radio"]:checked,
+[type="radio"]:not(:checked),
+[type="checkbox"]:checked,
+[type="checkbox"]:not(:checked)
+{
+    position: absolute;
+    left: -9999px;
+}
+[type="radio"]:checked + label,
+[type="radio"]:not(:checked) + label,
+[type="checkbox"]:checked + label,
+[type="checkbox"]:not(:checked) + label
+{
+    position: relative;
+    padding-left: 24px;
+    cursor: pointer;
+    line-height: 17px;
+    display: inline-block;
+    color: var(--black);
+}
+[type="radio"]:checked + label:before,
+[type="radio"]:not(:checked) + label:before,
+[type="checkbox"]:checked + label:before,
+[type="checkbox"]:not(:checked) + label:before
+ {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 18px;
+    height: 18px;
+    border: 1px solid rgb(95, 95, 95);
+    border-radius: 100%;
+    background: #fff;
+}
+[type="radio"]:checked + label:after,
+[type="radio"]:not(:checked) + label:after,
+[type="checkbox"]:checked + label:after,
+[type="checkbox"]:not(:checked) + label:after
+{
+    content: '';
+    width: 10px;
+    height: 10px;
+    background: var(--primary-color);
+    position: absolute;
+    top: 4px;
+    left: 4px;
+    border-radius: 100%;
+    -webkit-transition: all 0.2s ease;
+    transition: all 0.2s ease;
+}
+
+[type="checkbox"]:checked + label:before,
+[type="checkbox"]:not(:checked) + label:before,
+[type="checkbox"]:checked + label:after,
+[type="checkbox"]:not(:checked) + label:after
+{
+  border-radius: 0%;
+}
+[type="radio"]:not(:checked) + label:after, 
+[type="checkbox"]:not(:checked) + label:after {
+    opacity: 0;
+    -webkit-transform: scale(0);
+    transform: scale(0);
+}
+[type="radio"]:checked + label:after,
+[type="checkbox"]:checked + label:after {
+    opacity: 1;
+    -webkit-transform: scale(1);
+    transform: scale(1);
+}
+
+#formExtra {
+  width: auto;
+  border: none;
+  background: none;
+  box-shadow: none;
+  margin-left: -2px;
+  margin-top: 5px;
+}
+
+.space-between {
+  display: flex;
+  justify-content: space-between;
+}
+
+#login {
+  height: 100vh;
+  overflow: hidden;
+  background: url(~/img/login-background.jpg);
+  background-position: center bottom;
+  background-repeat: no-repeat;
+  background-size: cover;
+  display: flex;
+  align-items: center;
+}
+
+#login .login-form {
+  width: 440px;
+  margin: 50px auto;
+}
+
+#login .login-form form {
+  height: 380px;
+  margin-bottom: 15px;
+  background: rgba(241, 248, 255, 0.79);
+  box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.3);
+  padding: 30px;
+}
+
+#login .login-form h2 {
+  margin: 0 0 3rem 0;
+  font-family: 'Lato';
+  font-weight: 600;
+}
+
+#login .form-control .btn {
+  min-height: 38px;
+  border-radius: 2px;
+}
+
+#login .btn {        
+  font-size: 15px;
+  font-weight: bold;
+  margin: 0 0 3rem;
+}
+
+#login a {
+  color: #333;
+}
+
+/* Making links have their link color without requiring a href= */
+a:not([href]):not([tabindex]) {
+    color: var(--primary-color);
 }

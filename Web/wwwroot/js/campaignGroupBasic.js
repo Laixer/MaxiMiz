@@ -27,7 +27,7 @@ form1.querySelector('button').addEventListener('click', function (e) {
 
   iconMarketing.style.background = "var(--primary-color)";
   pMarketing.style.color = "var(--primary-color)"
-  iconMarketing.querySelector('img').src = "../../img/marketing-icon-light.svg";
+  iconMarketing.querySelector('img').src = "../../images/marketing-icon-light.svg";
   hr.style.background = "var(--primary-color)";
 
   console.log(iconMarketing);
