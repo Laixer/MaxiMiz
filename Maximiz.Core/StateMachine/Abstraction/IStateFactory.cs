@@ -1,6 +1,4 @@
-﻿using Maximiz.Core.StateMachine.States;
-
-namespace Maximiz.Core.StateMachine.Abstraction
+﻿namespace Maximiz.Core.StateMachine.Abstraction
 {
 
     /// <summary>
@@ -10,16 +8,11 @@ namespace Maximiz.Core.StateMachine.Abstraction
     {
 
         /// <summary>
-        /// Creates a new <see cref="DefaultState"/> state.
+        /// Creates an <see cref="IState"/> of type <typeparamref name="TState"/>.
         /// </summary>
-        /// <returns><see cref="DefaultState"/></returns>
-        DefaultState GetDefaultState();
-
-        /// <summary>
-        /// Creates a new <see cref="MarkedPendingState"/> state.
-        /// </summary>
-        /// <returns><see cref="MarkedPendingState "/></returns>
-        MarkedPendingState GetMarkedPendingState();
+        /// <typeparam name="TState"><see cref="IState"/></typeparam>
+        /// <returns><see cref="IState"/></returns>
+        TState GetState<TState>() where TState : class, IState;
 
     }
 }

@@ -1,5 +1,4 @@
 ﻿using Maximiz.Core.Operations;
-using System;
 using System.Threading.Tasks;
 
 namespace Maximiz.Core.StateMachine.Abstraction
@@ -12,11 +11,11 @@ namespace Maximiz.Core.StateMachine.Abstraction
     {
 
         /// <summary>
-        /// Attempts to launch our state machine for a given <see cref="Operation"/>.
+        /// Attempts to create a new <see cref="Operation"/> based on some <see cref="EntityMap"/>.
         /// </summary>
-        /// <param name="operation"><see cref="Operation"/></param>
-        /// <returns><see cref="Task"/></returns>
-        Task AttemptStartStateMachineAsync(Operation operation);
+        /// <param name="entityMap"><see cref="EntityMap"/></param>
+        /// <returns><see cref="true"/> if successful</returns>
+        Task<bool> AttemptStartStateMachineAsync(EntityMap entityMap);
 
         /// <summary>
         /// Attempts to read the state of an <see cref="Operation"/> and act on it if required.

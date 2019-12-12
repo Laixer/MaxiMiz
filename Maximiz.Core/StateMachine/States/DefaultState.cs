@@ -13,15 +13,11 @@ namespace Maximiz.Core.StateMachine.States
     /// </summary>
     public sealed class DefaultState : IState
     {
-        /// <summary>
-        /// Number of times we may attempt to do our transition.
-        /// </summary>
-        private const int maxTransitionAttempts = 25;
 
-        /// <summary>
-        /// The time we should wait before retrying our transition after failure.
-        /// </summary>
-        private readonly TimeSpan transitionRetryInterval = new TimeSpan(hours: 0, minutes: 0, seconds: 30);
+        public int MaxExecuteAttempts => 25;
+        public int MaxUndoAttempts => 25;
+        public TimeSpan DelayExecuteAttempt => TimeSpan.FromSeconds(90);
+        public TimeSpan DelayExecuteUndo => TimeSpan.FromSeconds(90);
 
         private ILogger logger;
         private IOperationCommitter _operationCommitter;
@@ -46,41 +42,21 @@ namespace Maximiz.Core.StateMachine.States
         {
             if (operation == null) { throw new ArgumentNullException(nameof(operation)); }
 
-            for (int i = 0; i < maxTransitionAttempts; i++)
-            {
-                try
-                {
-                    await _operationCommitter.MarkAllAsPending(operation);
-                    logger.LogTrace($"Successfully made transition for {nameof(DefaultState)}");
-                    return true;
-                }
-                catch (Exception e)
-                {
-                    logger.LogError(e.Message, $"Error in transition attempt {i+1} for state {nameof(DefaultState)}");
-                }
-
-                // Wait if we didn't make it the first time
-                await Task.Delay(transitionRetryInterval);
-            }
-
-            // If we reach this point we have failed doing our transition
-            logger.LogError($"Could not perform transition for {nameof(DefaultState)} after {maxTransitionAttempts} attempts");
-            return false;
+            await _operationCommitter.MarkAllAsPendingAsync(operation);
+            return true;
         }
 
         /// <summary>
-        /// Does nothing, because database transactions are atomic.
+        /// Marks all items back to in operation.
         /// </summary>
-        /// <remarks>
-        /// Just returns <see cref="true"/>.
-        /// </remarks>
         /// <param name="operation"><see cref="Operation"/></param>
-        /// <returns><see cref="true"/></returns>
-        public Task<bool> UndoTransitionAsync(Operation operation)
+        /// <returns><see cref="true"/> if successful</returns>
+        public async Task<bool> UndoTransitionAsync(Operation operation)
         {
             if (operation == null) { throw new ArgumentNullException(nameof(operation)); }
 
-            return Task.FromResult(true);
+            await _operationCommitter.MarkAllAsInOperationAsync(operation);
+            return true;
         }
 
     }

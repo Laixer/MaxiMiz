@@ -13,15 +13,5 @@ namespace Maximiz.Core.StateMachine
         /// </summary>
         public static int MaxFailureCount { get; } = 5;
 
-        /// <summary>
-        /// The maximum amount of times we may stick in the default state.
-        /// </summary>
-        public static int MaxDefaultCount { get; } = 5;
-
-        /// <summary>
-        /// The maximum amount of times we may stick in the initialization state.
-        /// </summary>
-        public static int MaxInitializationCount { get; } = 5;
-
     }
 }
