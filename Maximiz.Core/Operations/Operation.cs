@@ -12,14 +12,14 @@ namespace Maximiz.Core.Operations
     {
 
         /// <summary>
-        /// All entities that are affected by this operation.
+        /// All <see cref="Entity"/> id's that are affected by this operation.
         /// </summary>
-        public IEnumerable<Entity> Entities { get; set; }
+        public IEnumerable<Guid> EntityIds { get; set; } = new List<Guid>();
 
         /// <summary>
         /// Indicates the amount of times we have reached the failure state.
         /// </summary>
-        public int FailureCount { get; set; }
+        public int FailureCount { get; set; } = 0;
 
         /// <summary>
         /// The <see cref="DateTime"/> at which this operation was started.

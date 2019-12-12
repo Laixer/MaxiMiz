@@ -23,7 +23,9 @@ namespace Maximiz.Core.Operations.Execution
         public IEnumerable<CreateOrUpdateObjectsMessage> Extract(Operation operation)
         {
             if (operation == null) { throw new ArgumentNullException(nameof(operation)); }
-            return operation.Entities.Select(x => ExtractSingle(x)).ToList();
+            // TODO Fix
+            //return operation.Entities.Select(x => ExtractSingle(x)).ToList();
+            throw new NotImplementedException();
         }
 
         /// <summary>
