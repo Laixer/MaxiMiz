@@ -1,5 +1,7 @@
 ﻿using Maximiz.Core.Operations;
+using Maximiz.Model.Entity;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Maximiz.Core.Infrastructure.Repositories
@@ -27,6 +29,16 @@ namespace Maximiz.Core.Infrastructure.Repositories
         /// <returns><see cref="true"/> if the <paramref name="lockId"/> matches
         /// the actual lock id in the data store</returns>
         Task<bool> IsOperationLockedByIdAsync(Operation operation, Guid lockId);
+
+        Task<bool> IsOperationFinishedAsync(Operation operation);
+
+        Task<IEnumerable<Entity>> GetEntitiesBeforeModificationAsync(Operation operation);
+
+        Task<IEnumerable<Entity>> GetEntitiesAfterModificationAsync(Operation operation);
+
+        Task<Entity> GetEntityBeforeModificationAsync(Guid id);
+
+        Task<Entity> GetEntityAfterModificationAsync(Guid id);
 
     }
 }
