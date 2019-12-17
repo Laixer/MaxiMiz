@@ -155,6 +155,8 @@ namespace Maximiz.Model.Entity
         /// </summary>
         public string Details { get; set; }
 
+        // TODO Implement active!
+
     }
 
 }
