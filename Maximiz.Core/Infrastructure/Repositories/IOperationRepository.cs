@@ -1,5 +1,6 @@
 ﻿using Maximiz.Core.Operations;
 using Maximiz.Model.Entity;
+using Maximiz.Model.Operations;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;

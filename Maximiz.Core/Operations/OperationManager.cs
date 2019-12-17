@@ -2,6 +2,7 @@
 using Maximiz.Core.Operations.Abstraction;
 using Maximiz.Core.Operations.Execution;
 using Maximiz.Model.Entity;
+using Maximiz.Model.Operations;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -49,7 +50,7 @@ namespace Maximiz.Core.Operations
         /// </summary>
         /// <param name="entitiesModified"><see cref="Entity"/></param>
         /// <returns><see cref="Operation"/></returns>
-        public async Task<Operation> CreateOperationAsync(IEnumerable<Entity> entitiesModified)
+        public async Task<Operation> CreateOperationAsync(IEnumerable<Entity<Guid>> entitiesModified)
         {
             if (entitiesModified == null) { throw new ArgumentNullException(nameof(entitiesModified)); }
 
@@ -72,7 +73,7 @@ namespace Maximiz.Core.Operations
         /// </summary>
         /// <param name="entities"></param>
         /// <returns></returns>
-        private IEnumerable<Guid> ExtractIds(IEnumerable<Entity> entities)
+        private IEnumerable<Guid> ExtractIds(IEnumerable<Entity<Guid>> entities)
         {
             var result = new List<Guid>();
             foreach (var entity in entities)

@@ -1,4 +1,5 @@
 ﻿using Maximiz.Model.Entity;
+using Maximiz.Model.Operations;
 using Maximiz.Model.Protocol;
 using System;
 using System.Collections.Generic;

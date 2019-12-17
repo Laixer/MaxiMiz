@@ -1,4 +1,5 @@
-﻿using Maximiz.Model.Protocol;
+﻿using Maximiz.Model.Operations;
+using Maximiz.Model.Protocol;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
