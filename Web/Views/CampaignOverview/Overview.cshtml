@@ -89,7 +89,10 @@
 
 </main>
 
-
+@section Styles  {
+    <!-- Load the stylesheet for the campaign details modal -->
+    <link rel="stylesheet" href="~/css/modal_right.css">
+}
 
 @section Scripts  {
 
@@ -121,6 +124,9 @@
                         // TODO This might take a while, first show then fill?
                         $('#modal-details-content').html(html);
                         $('#modalRight').modal({ show: true });
+
+                        // We must setup all modal forms, but only after they were loaded
+                        SetupCampaignDetailsModal();
                     });
             });
 
@@ -150,7 +156,7 @@
 
             // Make us load all tables with default values
             loadTablesAsync();
-            highlightSortingIcons();
+            highlightSortingIcons('.click-sort', window.ColumnCampaignOverview, window.OrderCampaignOverview);
 
         });
 
