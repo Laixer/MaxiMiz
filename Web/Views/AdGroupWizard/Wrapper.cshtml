@@ -8,7 +8,6 @@
 }
 
 @model AdGroupWizardViewModel
-
 <!-- Wrapper content -->
 <main class="adsmain">
 
@@ -17,7 +16,7 @@
 
         <!-- Contains all our metadata functionality -->
         <div class="col-md-3">
-            <partial name="_Sidebar" model="@Model"/>
+            <partial name="_Sidebar" model="@Model" />
         </div>
 
         <!-- Contains our previews -->
@@ -39,7 +38,10 @@
 
 </main>
 
-
+@section Styles  {
+    <!-- Load the styles for the image picker popup -->
+    <link rel="stylesheet" href="~/css/modal_center.css">
+}
 
 @section Scripts {
 

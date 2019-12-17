@@ -10,6 +10,8 @@
 
 <main>
     <div class="container-fluid dashboard-content">
+
+        <!-- Overview -->
         <div class="section-overview">
             <h1><span class="circle circle_blue"></span>Overview</h1>
             <div class="row overview">
@@ -42,7 +44,7 @@
                     <div class="pie-listitems">
                         <p>
                             <span class="circle circle_blue mb-0"></span>
-                            <img src="~/images/taboola_logo.png" class="img-sm" alt="taboola_logo"> Taboola <span class="light-text ml-1">
+                            <img src="~/img/taboola_logo.png" class="img-sm" alt="taboola_logo"> Taboola <span class="light-text ml-1">
                                 @Model.CurrencySymbol @Model.SpendTotalTaboola
                             </span>
                         </p>
@@ -87,6 +89,7 @@
 </main>
 
 @section Scripts {
+
     <script type="text/javascript">
 
         $(document).ready(function () {
