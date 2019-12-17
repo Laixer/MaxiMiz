@@ -1,7 +1,9 @@
 ﻿using Maximiz.Controllers.Abstraction;
+using Maximiz.Core.StateMachine.Abstraction;
 using Maximiz.Database.Querying;
 using Maximiz.Mapper;
 using Maximiz.Model.Entity;
+using Maximiz.Operations;
 using Maximiz.Repositories.Abstraction;
 using Maximiz.ViewModels.CampaignDetails;
 using Maximiz.ViewModels.Columns;
@@ -9,6 +11,7 @@ using Maximiz.ViewModels.Columns.Translation;
 using Maximiz.ViewModels.EntityModels;
 using Maximiz.ViewModels.Enums;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Threading.Tasks;
 
@@ -20,25 +23,12 @@ namespace Maximiz.Controllers
     /// </summary>
     public sealed class CampaignDetailsController : Controller, ICampaignDetailsController
     {
-        /// <summary>
-        /// Repository containing our campaigns retrieved from the data store.
-        /// </summary>
+        
         private readonly ICampaignRepository _campaignRepository;
-
-        /// <summary>
-        /// Repository containing our ad groups retrieved from the data store.
-        /// </summary>
         private readonly IAdGroupRepository _adGroupRepository;
-
-        /// <summary>
-        /// Converts our campaigns.
-        /// </summary>
         private readonly IMapper<CampaignWithStats, CampaignModel> _mapperCampaign;
-
-        /// <summary>
-        /// Converts our ad groups.
-        /// </summary>
         private readonly IMapper<AdGroupWithStats, AdGroupModel> _mapperAdGroup;
+        private readonly ILogger logger;
 
         /// <summary>
         /// Constructor for dependency injection.
@@ -46,12 +36,16 @@ namespace Maximiz.Controllers
         public CampaignDetailsController(ICampaignRepository campaignRepository,
             IAdGroupRepository adGroupRepository,
             IMapper<CampaignWithStats, CampaignModel> mapperCampaign,
-            IMapper<AdGroupWithStats, AdGroupModel> mapperAdGroup)
+            IMapper<AdGroupWithStats, AdGroupModel> mapperAdGroup,
+            ILoggerFactory loggerFactory)
         {
-            _campaignRepository = campaignRepository;
-            _adGroupRepository = adGroupRepository;
-            _mapperCampaign = mapperCampaign;
-            _mapperAdGroup = mapperAdGroup;
+            _campaignRepository = campaignRepository ?? throw new ArgumentNullException(nameof(campaignRepository));
+            _adGroupRepository = adGroupRepository ?? throw new ArgumentNullException(nameof(adGroupRepository));
+            _mapperCampaign = mapperCampaign ?? throw new ArgumentNullException(nameof(mapperCampaign));
+            _mapperAdGroup = mapperAdGroup ?? throw new ArgumentNullException(nameof(mapperAdGroup)) ;
+
+            if (loggerFactory == null) { throw new ArgumentNullException(nameof(loggerFactory)); }
+            logger = loggerFactory.CreateLogger(nameof(CampaignDetailsController));
         }
 
         /// <summary>
@@ -74,7 +68,7 @@ namespace Maximiz.Controllers
         /// Saves the user submitted form variables.
         /// </summary>
         /// <param name="model"><see cref="FormCampaignDetailsViewModel"/></param>
-        /// <returns>Action result</returns>
+        /// <returns><see cref="OkResult"/></returns>
         [HttpPost]
         public async Task<IActionResult> PostModificationForm([FromBody] FormCampaignDetailsViewModel model)
         {
@@ -83,9 +77,30 @@ namespace Maximiz.Controllers
                 return BadRequest();
             }
 
-            // Simluate the transaction
-            await Task.Delay(new Random().Next(500, 1000));
-            return NoContent();
+            // Await
+            //try
+            //{
+            //    var entityMap = await _entityExtractor.Extract(model);
+            //    if (await _stateManager.AttemptStartStateMachineAsync(entityMap))
+            //    {
+            //        return Ok();
+            //    }
+            //    else
+            //    {
+            //        // TODO Is this the right way to do this?
+            //        // TODO Implement more specific feedback?
+            //        return BadRequest();
+            //    }
+            //} catch (Exception e)
+            //{
+            //    logger.LogError(e, $"Error while attempting to launch campaign details operation");
+            //    return BadRequest();
+            //}
+
+            // Simulate waiting
+            await Task.Delay(1000);
+
+            return Ok();
         }
 
         /// <summary>

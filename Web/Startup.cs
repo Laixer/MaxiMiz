@@ -20,6 +20,10 @@ using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Maximiz.Controllers;
+using Maximiz.Repositories;
+using Maximiz.Core.StateMachine.Abstraction;
+using Maximiz.Core.StateMachine;
+using Maximiz.Operations;
 
 namespace Maximiz
 {
@@ -85,9 +89,12 @@ namespace Maximiz
                 var policy = new AuthorizationPolicyBuilder()
                     .RequireAuthenticatedUser()
                     .Build();
-                options.Filters.Add(new AuthorizeFilter(policy));
+                // options.Filters.Add(new AuthorizeFilter(policy)); TODO Re-enable!!!
             })
             .SetCompatibilityVersion(CompatibilityVersion.Latest);
+
+            // TODO Remove / replace
+            services.AddTransient<TestRepository>();
         }
 
         /// <summary>
@@ -165,8 +172,8 @@ namespace Maximiz
             {
                 routes.MapRoute(
                     name: "default",
-                    template: "{controller=Login}/{action=Index}");
-                    //template: "{controller=Settings}/{action=ShowSettings}");
+                    //template: "{controller=Login}/{action=Index}");
+                    template: "{controller=CampaignGroupWizard}/{action=ShowWizard}");
                     //template: "{controller=Debug}/{action=Index}");
             });
 

@@ -174,5 +174,20 @@ namespace Maximiz.ViewModels.EntityModels
         /// </summary>
         public int Clicks { get; set; }
 
+        /// <summary>
+        /// Indicates whether or not we are using the autopilot function.
+        /// </summary>
+        public bool AutoPilot { get; set; }
+
+        /// <summary>
+        /// Indicates whether or not this campaign is active.
+        /// </summary>
+        public bool IsActive { get; set; }
+
+        /// <summary>
+        /// Indicates whether or not this campaign has an end date.
+        /// </summary>
+        public bool IgnoreEndDate { get; set; }
+
     }
 }
