@@ -16,6 +16,12 @@ namespace Maximiz.ViewModels.CampaignDetails
         [Required]
         public bool Autopilot { get; set; }
 
+        // <summary>
+        /// Whether or not we want to have this campaign active.
+        /// </summary>
+        [Required]
+        public bool Active { get; set; }
+
         /// <summary>
         /// User input cpc.
         /// </summary>

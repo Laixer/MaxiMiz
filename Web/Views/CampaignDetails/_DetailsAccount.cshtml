@@ -12,13 +12,11 @@
         <div class="campaign form-group">
             <div class="form-subgroup mb-3">
                 <h1 class="mb-4">Account</h1>
-                <label for="campaign">Campaign</label>
-                <div class="ml-0">
-                    <div>@Model.Campaign.Publisher</div>
-                </div>
+                <label for="campaign">Publisher</label>
+                <p>@EnumTranslator.TranslatePublisher(Model.Campaign.Publisher)</p>
                 <div class="form-group my-4">
-                    <label for="campaignAccount">Account</label>
-                    <div>@Model.Account.Name</div>
+                    <label for="campaignAccount">Account name</label>
+                    <p>@Model.Account.Name</p>
                 </div>
             </div>
         </div>

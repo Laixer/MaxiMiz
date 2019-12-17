@@ -4,8 +4,19 @@
 
 <script type="text/javascript">
 
+    /**
+     * Sets up all elements in the campaign details form with their respective
+     * validation rules.
+     */
+    function setupCampaignDetailsValidationRules() {
+        setupCampaignDetailsAccount();
+        setupCampaignDetailsMarketing();
+        setupCampaignDetailsTargeting();
+        setupCampaignDetailsSchedule();
+    }
+
     // Account tab
-    function setupAccount() {
+    function setupCampaignDetailsAccount() {
 
         // Campaign name suffix
         $('#inputCampaignNameSuffix').rules('add', {
@@ -42,10 +53,15 @@
     }
 
     // Marketing tab
-    function setupMarketing() {
+    function setupCampaignDetailsMarketing() {
 
         // Auto pilotinputBudget
         $('#checkboxAutopilot').rules('add', {
+            // None
+        });
+
+        // Active or not
+        $('#checkboxCampaignActive').rules('add', {
             // None
         });
 
@@ -60,13 +76,12 @@
         });
 
         // Bid strategy
-        console.log('Validation rules bid strategy is disabled');
-        //$('.radioBidStrategy').rules('add', {
-        //    required: true,
-        //    messages: {
-        //        required: 'Please select a bid strategy'
-        //    }
-        //});
+        $('#selectBidStrategy').rules('add', {
+            required: true,
+            messages: {
+                required: 'Please select a bid strategy'
+            }
+        });
 
         // Delivery
         $('.radioDelivery').rules('add', {
@@ -105,14 +120,14 @@
         });
 
         // Budget daily infinite
-        $('#inputBudgetDailyInfinite').rules('add', {
+        $('#checkboxBudgetDailyInfinite').rules('add', {
             // None
         });
 
     }
 
     // Targeting tab
-    function setupTargeting() {
+    function setupCampaignDetailsTargeting() {
 
         // Location select
         $('.checkboxLocation').rules('add', {
@@ -126,7 +141,7 @@
         $('.checkboxDevice').rules('add', {
             required: true,
             messages: {
-                required: 'Please select at least one device YES'
+                required: 'Please select at least one device'
             }
         });
 
@@ -141,7 +156,7 @@
     }
 
     // Schedule tab
-    function setupSchedule() {
+    function setupCampaignDetailsSchedule() {
 
         //// Start date
         //$('#datetimeStartDate').rules('add', {
