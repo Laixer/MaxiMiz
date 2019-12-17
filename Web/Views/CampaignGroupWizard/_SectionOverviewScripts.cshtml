@@ -3,22 +3,33 @@
     TODO Do we want this here?
 *@
 
-@inject ICurrencyViewModelService currencyService;
+@inject ICurrencyViewModelService currencyService
 
 <script type="text/javascript">
+
+    // Define some constants
+    const divSubmitFeedback = '#divSubmitFeedback'
+    const buttonSubmitWizard = '#buttonSubmitWizard';
 
     $(document).ready(function () {
 
         // Register our post button
         subscribeClickable('#buttonSubmitWizard', clickSubmit);
 
-        // Subscribe tab enter event
+        // Subscribe event for entering the overview tab
+        $(document).off('click', '.clickToRefreshOverview');
         $(document).on('click', '.clickToRefreshOverview', onEnterOverviewTab);
 
     });
 
     // Gets all values from the form and displays them in the correct format
-    function onEnterOverviewTab() {
+    function onEnterOverviewTab(event) {
+        // If we click a locked icon, don't continue
+        if ($(event.currentTarget).hasClass('selector') &&
+            !$(event.currentTarget).find('.icon').hasClass('iconUnlocked')) {
+            return;
+        }
+
         retrieveAllFormValues();
         if (validateEntireWizard() === true) {
             updateSubmitFeedback(true);
@@ -39,29 +50,36 @@
     // Submit the form
     function submitWizard() {
         // Visual feedback
-        let htmlOriginal = $('#buttonSubmitWizard').html();
-        $('#buttonSubmitWizard').attr('disabled', 'disabled');
-        setLoadingIconTo('#buttonSubmitWizard');
+        let htmlOriginal = $(buttonSubmitWizard).html();
+        $(buttonSubmitWizard).attr('disabled', 'disabled');
+        setLoadingIconTo(buttonSubmitWizard);
         $('.buttonBack').attr('disabled', 'disabled');
-
-        // TODO Disable tabs
+        $('.icon').attr('disabled', 'disabled'); // TODO Check
 
         // Post the form and handle the response
         let callbackSuccess = () => {
-            $('#buttonSubmitWizard').html(htmlOriginal);
-            $('#buttonSubmitWizard').removeAttr('disabled');
+            $(buttonSubmitWizard).html(htmlOriginal);
+            $(buttonSubmitWizard).removeAttr('disabled');
             $('.buttonBack').removeAttr('disabled');
+            $('.icon').removeAttr('disabled'); // TODO Check
+            linkSwitches(); // Don't violate enable checkbox states
 
-            // TODO How are we going to feedback success to the user?
+            window.location.href = '@Url.Action("CampaignOverview", nameof(CampaignOverviewController.Overview))'
+            showConfirmationPopup(true, 'Campaign group was created successfully and is pending external creation')
         };
         let callbackFailure = () => {
-            $('#buttonSubmitWizard').html(htmlOriginal);
-            $('#buttonSubmitWizard').removeAttr('disabled');
+            $(buttonSubmitWizard).html(htmlOriginal);
+            $(buttonSubmitWizard).removeAttr('disabled');
             $('.buttonBack').removeAttr('disabled');
+            $('.icon').removeAttr('disabled'); // TODO Check
+            linkSwitches(); // Don't violate enable checkbox states
 
-            // TODO Do this at one place
-            // TODO What do we tell the user?
-            $('#divSubmitFeedback').text('Something went wrong submitting the campaign group. Please check your fields.');
+            showConfirmationPopup(false, 'Could not create campaign group, please check your settings');
+
+            // TODO DRY
+            $(divSubmitFeedback).text('Something went wrong submitting the campaign group. Please check your fields.');
+            $(divSubmitFeedback).removeClass('text-success');
+            $(divSubmitFeedback).addClass('text-danger');
         };
         doPostFormAndProcess('#formWizard', callbackSuccess, [], callbackFailure, []);
     }
@@ -70,11 +88,15 @@
     // TODO This is beun, but don't implement unwanted features. Will be updated!
     function updateSubmitFeedback(valid) {
         if (valid === true) {
-            $('#buttonSubmitWizard').removeAttr('disabled');
-            $('#divSubmitFeedback').text('Looks good, ready to submit.');
+            $(buttonSubmitWizard).removeAttr('disabled');
+            $(divSubmitFeedback).text('Looks good, ready to submit.');
+            $(divSubmitFeedback).addClass('text-success');
+            $(divSubmitFeedback).removeClass('text-danger');
         } else if (valid === false) {
-            $('#buttonSubmitWizard').attr('disabled', 'disabled');
-            $('#divSubmitFeedback').text('Specified values are invalid, please check your tabs.');
+            $(buttonSubmitWizard).attr('disabled', 'disabled');
+            $(divSubmitFeedback).text('Specified values are invalid, please check your tabs.');
+            $(divSubmitFeedback).removeClass('text-success');
+            $(divSubmitFeedback).addClass('text-danger');
         } else {
             // TODO Question Is it correct to log like this?
             console.log('Invalid parameter specified for "valid", must be a boolean');
@@ -92,11 +114,11 @@
 
         // Marketing tab
         $('#displayAutoPilot').html(extractFromCheckbox('#checkboxAutopilot'));
-        $('#displayCpc').html('@currencyService.GetGlobalCurrencySymbol()' + extractFromLabel('#inputCpc'));
-        $('#displayBidStrategy').html(extractFromCheckableGroup('.radioBidStrategy'));
+        $('#displayCpc').html('@currencyService.GetGlobalCurrencySymbol() ' + extractFromLabel('#inputCpc'));
+        $('#displayBidStrategy').html(extractFromSelect('#selectBidStrategy'));
         $('#displayDelivery').html(extractFromCheckableGroup('.radioDelivery'));
         $('#displayBudget').html(extractBudget('#inputBudget', '#selectBudgetModel'));
-        $('#displayBudgetDaily').html(extractBudgetDaily('#inputBudgetDaily', '#inputBudgetDailyInfinite'));
+        $('#displayBudgetDaily').html(extractBudgetDaily('#inputBudgetDaily', '#checkboxBudgetDailyInfinite'));
 
         // Targeting tab
         $('#displayLocations').html(extractFromCheckableGroup('.checkboxLocation'));
@@ -145,15 +167,15 @@
     function extractBudget(idBudget, idBudgetModel) {
         let budget = extractFromLabel(idBudget);
         let model = extractFromSelect(idBudgetModel);
-        return '@currencyService.GetGlobalCurrencySymbol()' + budget + " " + model;
+        return '@currencyService.GetGlobalCurrencySymbol() ' + budget + " " + model;
     }
 
     // Extracts and formats our daily budget
     function extractBudgetDaily(idBudgetDaily, idBudgetDailyInfinite) {
-        if ($(idBudgetDailyInfinite).get(0).checked) {
+        if (!$(idBudgetDailyInfinite).get(0).checked) {
             return "None";
         } else {
-            return '@currencyService.GetGlobalCurrencySymbol()' + extractFromLabel(idBudgetDaily);
+            return '@currencyService.GetGlobalCurrencySymbol() ' + extractFromLabel(idBudgetDaily);
         }
     }
 
@@ -180,6 +202,7 @@
             if (name === null) { console.log('Error while getting name from ', item); }
             else { names.push(name); }
         });
+        console.log(formatStringArray(names));
         return formatStringArray(names);
     }
 

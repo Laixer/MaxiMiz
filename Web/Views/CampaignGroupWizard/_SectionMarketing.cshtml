@@ -1,87 +1,162 @@
 ﻿@*
     Campaign group creation wizard section for our marketing settings.
 *@
+@inject IEnumViewModelService enumService
 
 @model CampaignGroupFormAllViewModel
 <!-- Fieldset for our marketing properties -->
 <fieldset id="fieldsetMarketing">
+    <!-- Main title -->
+    <legend class="font-weight-bolder mb-4">Marketing</legend>
 
-    <!-- Autopilot -->
-    <form-group class="form-row">
-        <label>Autopilot </label>
-        <input id="checkboxAutopilot" type="checkbox" name="@nameof(CampaignGroupFormAllViewModel.Autopilot)" value="true" checked="checked" />
-        <div class="errorHolder"></div>
-    </form-group>
+    <!-- Title, autopilot, CPC + bid strategy, ad delivery -->
+    <div class="form-group">
 
-    <!-- Cpc -->
-    <form-group class="form-row">
-        <label>Initial CPC </label>
-        <input id="inputCpc" name="@nameof(CampaignGroupFormAllViewModel.Cpc)" type="number" placeholder="Initial campaign CPC" />
-        <div class="errorHolder"></div>
-    </form-group>
+        <!-- Side title -->
+        <div class="section">
+            <h2>Marketing</h2>
+        </div>
 
-    <!-- Bid strategy -->
-    <form-group class="form-row">
-        <label>Bid strategy</label>
-        @foreach (var bidStrategy in new EnumViewModelService().GetBidStrategyOptions())
-        {
-            <input class="radioBidStrategy" type="radio" name="@nameof(CampaignGroupFormAllViewModel.BidStrategy)" value="@bidStrategy" />
-            <label>@EnumTranslator.TranslateBidStrategy(bidStrategy)</label>
-        }
-        <div class="errorHolder"></div>
-    </form-group>
+        <!-- Autopilot -->
+        <div class="form-subgroup">
 
-    <!-- Delivery -->
-    <form-group class="form-row">
-        <label>Content delivery</label>
-        @foreach (var delivery in new EnumViewModelService().GetDeliveryOptions())
-        {
-            <input class="radioDelivery" type="radio" name="@nameof(CampaignGroupFormAllViewModel.Delivery)" value="@delivery" />
-            <label>@EnumTranslator.TranslateDelivery(delivery)</label>
-        }
-        <div class="errorHolder"></div>
-    </form-group>
+            <!-- Autopilot -->
+            <div class="form-row">
+                <div class="form-group col-md-6 containsErrorHolder">
+                    <div class="material-switch pull-right">
+                        <p>Autopilot </p>
+                        <input id="checkboxAutopilot" type="checkbox" class="switchOption"
+                               name="@nameof(CampaignGroupFormAllViewModel.Autopilot)" value="true" checked="">
+                        <label for="checkboxAutopilot" class="label-primary"></label>
+                    </div>
+                    <div class="errorHolder"></div>
+                </div>
+            </div>
 
-    <!-- Budget monthly -->
-    <div>
+            <!-- CPC, bid strategy and ad delivery -->
+            <div class="form-row containsErrorHolder">
+                <!-- CPC -->
+                <div class="form-group col-md-4">
+                    <label for="inputCPC">CPC <i class="fas fa-question-circle _tooltip" data-toggle="tooltip" title="Cost Per Click"></i></label>
+                    <input id="inputCpc" type="number" class="form-control"
+                           name="@nameof(CampaignGroupFormAllViewModel.Cpc)" placeholder="My cpc bid" />
+                    <div class="errorHolder"></div>
+                </div>
+                <!-- Bid strategy -->
+                <div class="form-group col-md-2">
+                    <label for="selectBidStrategy"></label>
+                    <select class="form-control form-extra" id="selectBidStrategy"
+                            name="@nameof(CampaignGroupFormAllViewModel.BidStrategy)">
+                        @foreach (var bidStrategy in enumService.GetBidStrategyOptions())
+                        {
+                            <option value="@bidStrategy">@EnumTranslator.TranslateBidStrategy(bidStrategy)</option>
+                        }
+                    </select>
+                </div>
 
-        <!-- Amount -->
-        <form-group class="form-row">
-            <label>Campaign budget </label>
-            <input id="inputBudget" name="@nameof(CampaignGroupFormAllViewModel.Budget)" type="number" placeholder="My campaign budget" />
+                <!-- Ad delivery -->
+                <div class="form-group col-md-6 containsErrorHolder">
+                    <div class="mt-3">
+                        <label for="adDelivery">Ad Delivery</label>
+                        <div class="ml-0">
+                            @foreach (var delivery in enumService.GetDeliveryOptions())
+                            {
+                                var id = Guid.NewGuid(); // Used to link label and radio button
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input radioDelivery" type="radio" id="@id"
+                                           name="@nameof(CampaignGroupFormAllViewModel.Delivery)" value="@delivery"
+                                           checked="" />
+                                    <label class="form-check-label font-weight-normal" for="@id">
+                                        @EnumTranslator.TranslateDelivery(delivery)
+                                    </label>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
 
-            <!-- Type -->
-            <select id="selectBudgetModel" name="@nameof(CampaignGroupFormAllViewModel.BudgetModel)">
-                @foreach (var budgetModel in new EnumViewModelService().GetBudgetModelOptions())
-                {
-                    <option value="@budgetModel">@EnumTranslator.TranslateBudgetModel(budgetModel)</option>
-                }
-            </select>
-
-            <div class="errorHolder"></div>
-        </form-group>
+            </div>
+        </div>
 
     </div>
 
-    <!-- Budget daily -->
-    <div>
-        <!-- Amount -->
-        <form-group class="form-row">
-            <label>Daily budget </label>
-            <input id="inputBudgetDaily" name="@nameof(CampaignGroupFormAllViewModel.BudgetDaily)" type="number" placeholder="My daily campaign budget" />
+    <!-- Budget title, budget + budget model, daily budget + optional -->
+    <div class="form-group mt-5">
 
-            <!-- Infinite or not -->
-            <input id="inputBudgetDailyInfinite" type="checkbox" name="@nameof(CampaignGroupFormAllViewModel.BudgetDailyInfinite)" value="true" checked="checked"/>
-            <label>Ignore</label>
+        <!-- Section title -->
+        <div class="section">
+            <h2>Budgetting</h2>
+        </div>
 
-            <div class="errorHolder"></div>
-        </form-group>
+        <!-- Budget + budget model, daily budget + optional -->
+        <div class="form-subgroup">
+
+            <!-- Budget + budget model -->
+            <div class="form-row">
+                <!-- Budget -->
+                <div class="form-group col-md-4 containsErrorHolder">
+                    <label for="inputBudget">Budget</label>
+                    <input id="inputBudget" type="number" class="form-control"
+                           name="@nameof(CampaignGroupFormAllViewModel.Budget)" placeholder="My campaign budget" />
+                    <div class="errorHolder"></div>
+                </div>
+                <!-- Budget model -->
+                <div class="form-group col-md-2">
+                    <label for="cpcDropdown"></label>
+                    <select id="selectBudgetModel" class="form-control form-extra" name="@nameof(FormCampaignDetailsViewModel.BudgetModel)">
+                        @foreach (var budgetModel in enumService.GetBudgetModelOptions())
+                        {
+                            <option value="@budgetModel">
+                                @EnumTranslator.TranslateBudgetModel(budgetModel)
+                            </option>
+                        }
+                    </select>
+                </div>
+            </div>
+
+            <!-- Daily budget + optional -->
+            <div class="form-row">
+                <!-- Daily budget -->
+                <div class="form-group col-md-4 containsErrorHolder">
+                    <label for="inputBudgetDaily" class="control-label">Daily budget</label>
+                    <small class="form-text text-muted d-inline"><i>(optional)</i></small>
+                    <input id="inputBudgetDaily" type="number" class="form-control"
+                           name="@nameof(CampaignGroupFormAllViewModel.BudgetDaily)" placeholder="Optional daily budget" />
+                    <div class="errorHolder"></div>
+                </div>
+                <!-- Infinite switch -->
+                <div class="form-group col-md-2">
+                    <div class="material-switch pull-right">
+                        <p>Enable </p>
+                        <input id="checkboxBudgetDailyInfinite" type="checkbox" class="switchOption form-extra"
+                               name="@nameof(CampaignGroupFormAllViewModel.BudgetDailyInfinite)" value="true">
+                        <label for="checkboxBudgetDailyInfinite" class="label-primary"></label>
+                    </div>
+                </div>
+            </div>
+
+        </div>
     </div>
 
-    <!-- Submit button -->
-    <div class="form-row">
-        <button class="buttonBack btn text-white btn-main btn-blue mt-5" data-thisindex="2">Back</button>
-        <button id="buttonNextMarketing" class="btn text-white btn-main btn-blue mt-5">Next</button>
+    <!-- Save button, back button -->
+    <div class="form-group mt-5">
+
+        <!-- Back button -->
+        <div class="button-back">
+            <button class="buttonBack btn text-white btn-main btn-blue mt-5 float-left"
+                    data-targetSection="#sectionAccount">
+                Back
+            </button>
+        </div>
+
+        <!-- Save button -->
+        <div class="button-save">
+            <button id="buttonNextMarketing" class="btn text-white btn-main btn-blue mt-5 float-right"
+                    data-targetSection="#sectionTargeting">
+                Next
+            </button>
+        </div>
+
     </div>
 
 </fieldset>

@@ -10,7 +10,7 @@
         setupAccount();
         setupMarketing();
         setupTargeting();
-        //setupSchedule(); TODO Enable and implement
+        setupSchedule();
         setupAdGroups();
 
     });
@@ -87,7 +87,7 @@
         });
 
         // Bid strategy
-        $('.radioBidStrategy').rules('add', {
+        $('.selectBidStrategy').rules('add', {
             required: true,
             messages: {
                 required: 'Please select a bid strategy'
@@ -122,16 +122,19 @@
 
         // Budget daily
         $('#inputBudgetDaily').rules('add', {
-            required: true,
+            required: function (element) {
+                if ($(element).attr('disabled') === 'disabled') { return false; }
+                return true;
+            },
             min: 1,
             messages: {
-                required: 'Please enter a valid daily budget',
+                required: 'Please enter a daily budget or disable it',
                 min: 'Please enter a daily budget of at least 1'
             }
         });
 
         // Budget daily infinite
-        $('#inputBudgetDailyInfinite').rules('add', {
+        $('#checkboxBudgetDailyInfinite').rules('add', {
             // None
         });
 
@@ -172,17 +175,25 @@
         // Start date
         $('#datetimeStartDate').rules('add', {
             required: true,
+            timeInFuture: true,
             messages: {
                 required: 'Please enter a start date',
-                //min: 'Please select a start date in the future'
+                timeInFuture: 'Please select a start date in the future'
             }
         });
 
         // End date
         $('#datetimeEndDate').rules('add', {
-            greaterThan: '#datetimeStartDate',
+            required: function (element) {
+                if ($(element).attr('disabled') === 'disabled') { return false; }
+                else { return true; }
+            },
+            timeInFuture: true,
+            timeGreaterThanElement: true,
             messages: {
-                greaterThan: 'End date must be after start date'
+                timeGreaterThanElement: 'End date must be after start date',
+                timeInFuture: 'Please select an end date in the future',
+                required: 'Please enter a valid end date or disable it'
             }
         });
 

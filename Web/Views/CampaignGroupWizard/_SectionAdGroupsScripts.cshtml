@@ -12,7 +12,7 @@
 
         // Save global row sorting variables
         window.ColumnCampaignGroupWizardAdGroup = '@ColumnCampaignGroupWizardAdGroup.Name';
-        window.OrderCampaignGroupWizardAdGroupLinked = '@Order.Ascending';
+        window.OrderCampaignGroupWizardAdGroup = '@Order.Ascending';
 
         // Save empty hidden adgroup entry
         emptyHiddenAdGroupHtml = $('#emptyHiddenAdGroup').get(0).outerHTML;
@@ -21,14 +21,10 @@
         subscribeOnUserSubmit('#searchAdGroups', loadAdGroupTableAsync);
 
         // Subscribe sorting button functionality
-        subscribeClickable('.click-sort-adgroup', function () {
-            // Query is stored in the search bar, might want to do this differently?
-            var column = $(this).attr('data-column');
-            var order = $(this).attr('data-order');
-
-            // Storing global
-            window.ColumnCampaignGroupWizardAdGroup = column;
-            window.OrderCampaignGroupWizardAdGroupLinked = order;
+        subscribeClickable('.click-sort-adgroup', function (event) {
+            // Storing global, query is stored in the search bar
+            window.ColumnCampaignGroupWizardAdGroup = $(event.currentTarget).attr('data-column');
+            window.OrderCampaignGroupWizardAdGroup = $(event.currentTarget).attr('data-order');
             loadAdGroupTableAsync();
         });
 
@@ -43,6 +39,9 @@
     // TODO Question: rename these functions because we have some similar ones in different views?
     // Reloads the ad group table
     function loadAdGroupTableAsync() {
+        // Always first highlight the sorting icons
+        highlightSortingIcons('.click-sort-adgroup', window.ColumnCampaignGroupWizardAdGroup, window.OrderCampaignGroupWizardAdGroup);
+
         var query = $('#searchAdGroups')[0].value; // TODO This does not seem bulletproof!
         var column = window.ColumnAdGroupAll;
         var order = window.OrderAdGroupAll;
@@ -54,7 +53,7 @@
             order: order
         }), 'get', function (html) {
             $('#tableAdGroupsBody').html(html);
-            setAdGroupCheckboxes();
+                setAdGroupCheckboxes();
         });
     }
 
@@ -114,7 +113,7 @@
         // This explicitly removes the error message, because it bugs out
         // TODO This is a workaround', the validator doesn't seem to understand inputs being removed
         $('#emptyHiddenAdGroup-error').text('');
-        
+
     }
 
     // Removes a hidden input entry for a given ad group id

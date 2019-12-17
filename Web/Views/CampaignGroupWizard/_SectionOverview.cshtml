@@ -4,69 +4,198 @@
 
 @model CampaignGroupFormAllViewModel
 <!-- Campaign group wizard overview tab -->
-<div id="divOverview">
+<fieldset id="divOverview">
+    <!-- Main title -->
+    <legend class="font-weight-bolder mb-4">Overview</legend>
 
-    <!-- Displaying the results of our form -->
-    <div>
-        <!-- Account tab -->
-        <div>
-            <h6>Account: </h6>
-            <label>Selected publishers: </label><label id="displayPublishers"></label><br />
-            <label>Selected accounts: </label><label id="displayAccountName"></label><br />
-            <label>Campaign name suffix: </label><label id="displayCampaignNameSuffix"></label><br />
-            <label>Branding text: </label><label id="displayBrandingText"></label><br />
-            <label>Target URL: </label><label id="displayUrl"></label><br />
-            <label>Tracking code: </label><label id="displayUtm"></label><br />
+    <!-- Contains all overview properties -->
+    <div class="overview form-group">
+
+        <!-- Account and targeting -->
+        <div class="container">
+            <div class="row">
+
+                <!-- Account section -->
+                <div class="col col-account">
+                    <div>
+                        <h2><img src="~/img/profile-icon-black.svg" alt="profile-icon"> Account</h2>
+                    </div>
+
+                    <!-- Publishers -->
+                    <div class="row">
+                        <h3 class="m-0">Publisher</h3>
+                        <p id="displayPublishers" class="m-0"></p>
+                    </div>
+
+                    <!-- Account name -->
+                    <div class="row">
+                        <h3 class="m-0">Account</h3>
+                        <p id="displayAccountName" class="m-0"></p>
+                    </div>
+
+                    <!-- Campaign name suffic -->
+                    <div class="row">
+                        <h3 class="m-0">Campaign Name Suffix</h3>
+                        <p id="displayCampaignNameSuffix" class="m-0"></p>
+                    </div>
+
+                    <!-- Branding text -->
+                    <div class="row">
+                        <h3 class="m-0">Branding Text</h3>
+                        <p id="displayBrandingText" class="m-0"></p>
+                    </div>
+
+                    <!-- Tracking code -->
+                    <div class="row">
+                        <h3 class="m-0">Tracking Code</h3>
+                        <p id="displayUtm" class="m-0"></p>
+                    </div>
+
+                    <!-- Url -->
+                    <div class="row">
+                        <h3 class="m-0">Target url</h3>
+                        <p id="displayUrl" class="m-0"></p>
+                    </div>
+                </div>
+
+                <!-- Targeting section -->
+                <div class="col col-targeting">
+                    <div>
+                        <h2><img src="~/img/target-icon.svg" alt="targeting-icon"> Targeting</h2>
+                    </div>
+
+                    <!-- Locations -->
+                    <div class="row">
+                        <h3 class="m-0">Locations</h3>
+                        <p id="displayLocations" class="m-0"></p>
+                    </div>
+
+                    <!-- Devices -->
+                    <div class="row">
+                        <h3 class="m-0">Devices</h3>
+                        <p id="displayDevices" class="m-0"></p>
+                    </div>
+
+                    <!-- Operating systems -->
+                    <div class="row">
+                        <h3 class="m-0">Operating Systems</h3>
+                        <p id="displayOperatingSystems" class="m-0"></p>
+                    </div>
+                </div>
+            </div>
         </div>
 
-        <br />
+        <!-- Marketing and schedule -->
+        <div class="container mt-5">
+            <div class="row">
 
-        <!-- Marketing tab -->
-        <div>
-            <h6>Marketing:</h6>
-            <label>Auto pilot: </label><label id="displayAutoPilot"></label><br />
-            <label>Initial cpc: </label><label id="displayCpc"></label><br />
-            <label>Bid strategy: </label><label id="displayBidStrategy"></label><br />
-            <label>Content delivery: </label><label id="displayDelivery"></label><br />
-            <label>Campaign budget: </label><label id="displayBudget"></label><br />
-            <label>Campaign daily budget: </label><label id="displayBudgetDaily"></label><br />
+                <!-- Marketing section -->
+                <div class="col col-marketing">
+                    <div>
+                        <h2><img src="~/img/marketing-icon-dark.svg" alt="marketing-icon"> Marketing</h2>
+                    </div>
+
+                    <!--  -->
+                    <div class="row">
+                        <h3 class="m-0">Autopilot</h3>
+                        <p id="displayAutoPilot" class="m-0"></p>
+                    </div>
+
+                    <!-- Cpc -->
+                    <div class="row">
+                        <h3 class="m-0">Cpc</h3>
+                        <p id="displayCpc" class="m-0"></p>
+                    </div>
+
+                    <!-- Bid Strategy -->
+                    <div class="row">
+                        <h3 class="m-0">Bid Strategy</h3>
+                        <p id="displayBidStrategy" class="m-0"></p>
+                    </div>
+
+                    <!-- Delivery -->
+                    <div class="row">
+                        <h3 class="m-0">Ad Delivery</h3>
+                        <p id="displayDelivery" class="m-0"></p>
+                    </div>
+
+                    <!-- Budget -->
+                    <div class="row">
+                        <h3 class="m-0">Budget</h3>
+                        <p id="displayBudget" class="m-0"></p>
+                    </div>
+
+                    <!-- Budget daily -->
+                    <div class="row">
+                        <h3 class="m-0">Daily Budget</h3>
+                        <p id="displayBudgetDaily" class="m-0"></p>
+                    </div>
+
+                </div>
+
+                <!-- Schedule section -->
+                <div class="col col-schedule">
+                    <div>
+                        <h2><img src="~/img/calendar-icon.svg" alt="calendar-icon"> Schedule</h2>
+                    </div>
+
+                    <!-- Start date -->
+                    <div class="row">
+                        <h3 class="m-0">Start date</h3>
+                        <p id="displayStartDate" class="m-0"></p>
+                    </div>
+
+                    <!-- End date -->
+                    <div class="row">
+                        <h3 class="m-0">End date</h3>
+                        <p id="displayEndDate" class="m-0"></p>
+                    </div>
+                </div>
+            </div>
         </div>
 
-        <br />
+        <!-- Ad Groups -->
+        <div class="container mt-5">
+            <div class="row">
+                <div class="col col-adgroups">
+                    <div>
+                        <h2><img src="~/img/adgroups-icon.svg" alt="adgroups-icon"> Ad Groups</h2>
+                    </div>
 
-        <!-- Targeting tab -->
-        <div>
-            <h6>Targeting:</h6>
-            <label>Targeted countries: </label><label id="displayLocations"></label><br />
-            <label>Targeted devices: </label><label id="displayDevices"></label><br />
-            <label>Targeted operating systems: </label><label id="displayOperatingSystems"></label><br />
+                    <!-- Ad groups -->
+                    <div class="row">
+                        <h3 class="m-0">Linked Ad Groups</h3>
+                        <p id="displayAdGroups" class="m-0"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Feedback text -->
+    <div class="form-group mt-5">
+        <label id="divSubmitFeedback"></label>
+    </div>
+
+    <!-- Save button, back button -->
+    <div class="form-group mt-1">
+
+        <!-- Back button -->
+        <div class="button-back">
+            <button class="buttonBack btn text-white btn-main btn-blue mt-5 float-left"
+                    data-targetSection="#sectionAdGroups">
+                Back
+            </button>
         </div>
 
-        <br />
-
-        <!-- Schedule tab -->
-        <div>
-            <h6>Schedule:</h6>
-            <label>Start date: </label><label id="displayStartDate"></label><br />
-            <label>End date: </label><label id="displayEndDate"></label><br />
-        </div>
-
-        <br />
-
-        <!-- Ad group tab -->
-        <div>
-            <h6>Ad groups:</h6>
-            <label>Linked ad groups: </label><label id="displayAdGroups"></label><br />
+        <!-- Save button -->
+        <div class="button-save">
+            <button id="buttonSubmitWizard" class="btn text-white btn-main btn-blue mt-5 float-right">
+                Submit
+            </button>
         </div>
 
     </div>
 
-    <!-- Feedback text, submit button and back button -->
-    <br />
-    <label id="divSubmitFeedback" ></label>
-    <div class="form-row">
-        <button class="buttonBack btn text-white btn-main btn-blue mt-5" data-thisindex="6">Back</button>
-        <button id="buttonSubmitWizard" class="btn text-white btn-main btn-blue mt-5">Submit</button>
-    </div>
-
-</div>
+</fieldset>

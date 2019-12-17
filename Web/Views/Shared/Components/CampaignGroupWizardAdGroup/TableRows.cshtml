@@ -3,7 +3,6 @@
 *@
 
 @model CampaignGroupWizardAdGroupViewModel
-
 <!-- Table row for each item in our collection. -->
 @foreach (var adGroup in Model.AdGroupList)
 {
@@ -13,7 +12,13 @@
         <td>@adGroup.AdItemCount</td>
         <td>@adGroup.UpdateDate</td>
         <td>
-            <input type="checkbox" class="checkboxSelectAdGroup" data-adgroup-id="@adGroup.Id" data-adgroup-name="@adGroup.Name"/>
+            @*<div class="form-check form-check-inline">
+                    <input class="checkboxSelectAdGroup form-check-input" type="checkbox"
+                           data-adgroup-id="@adGroup.Id" data-adgroup-name="@adGroup.Name"/>
+                    <label class="form-check-label font-weight-normal"></label>
+                </div>*@
+            <input class="checkboxSelectAdGroup switchOption" type="checkbox"
+                   data-adgroup-id="@adGroup.Id" data-adgroup-name="@adGroup.Name" />
         </td>
     </tr>
 }

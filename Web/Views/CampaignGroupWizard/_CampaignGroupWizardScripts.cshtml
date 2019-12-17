@@ -1,0 +1,208 @@
+﻿@*
+    Contains a partial view with all script functionality for the campaign group wizard.
+*@
+
+<!-- Scripts for our campaign group wizard wrapper -->
+<script type="text/javascript">
+
+    // Indicates our subform progress
+    let progressIndex = 1;
+    let maxProgress = 6;
+
+    // Initialize our validator object
+    setupValidatorDefaults();
+    let validatorWizardCampaignGroup = $('#formWizard').validate();
+
+    // Explicitly define all elements that have to be validated for each section
+    const elementsAccount = [
+        '.checkboxPublisher',
+        '#selectAccountTaboola',
+        '#inputCampaignNameSuffix',
+        '#inputBrandingText',
+        '#inputUrl',
+        '#inputUtmCustom'
+    ];
+    const elementsMarketing = [
+        '#checkboxAutopilot',
+        '#inputCpc',
+        '#selectBidStrategy',
+        '.radioDelivery',
+        '#inputBudget',
+        '#selectBudgetModel',
+        '#inputBudgetDaily',
+        '#checkboxBudgetDailyInfinite'
+    ];
+    const elementsTargeting = [
+        '.checkboxLocation',
+        '.checkboxDevice',
+        '.checkboxOperatingSystem'
+    ];
+    const elementsSchedule = [
+        '#datetimeStartDate',
+        '#datetimeEndDate',
+        '#checkboxIgnoreEndDate'
+    ];
+    const elementsAdGroups = [
+        '.hiddenAdGroupId'
+    ];
+
+    /**
+     * Happens one at document load, used to setup functionality.
+     */
+    $(document).ready(function () {
+
+        // Setup our initial progress
+        updateAllTabs();
+
+        // Register all our tab clickables
+        subscribeClickable('.selector', clickSelector);
+
+        // Register all our back buttons
+        subscribeClickable('.buttonBack', clickBack);
+
+        // Register all our next buttons
+        setupClickNext('#buttonNextAccount', elementsAccount, 1);
+        setupClickNext('#buttonNextMarketing', elementsMarketing, 2);
+        setupClickNext('#buttonNextTargeting', elementsTargeting, 3);
+        setupClickNext('#buttonNextSchedule', elementsSchedule, 4);
+        setupClickNext('#buttonNextAdGroups', elementsAdGroups, 5);
+
+        // Link switches to their respective form controls
+        linkSwitches();
+    });
+
+    // Registers a next-button to process section validation
+    // Also contains click-next functionality
+    function setupClickNext(buttonId, elements, sectionProgress) {
+        subscribeClickable(buttonId, function (event) {
+            // Only continue if all items on this page are valid
+            if (validateSet(validatorWizardCampaignGroup, elements)) {
+                if (sectionProgress == progressIndex && sectionProgress < maxProgress) {
+                    progressIndex += 1;
+                    updateAllTabs();
+                }
+                showTabFromClickEvent(event);
+            }
+        });
+    }
+
+    /**
+     * Should be fired when we click one of the selector icons.
+     *
+     * @@param event The click event
+     */
+    function clickSelector(event) {
+        event.preventDefault();
+
+        let clicked = event.currentTarget;
+        let clickedProgress = $(clicked).attr('data-progress');
+        let targetTab = $(clicked).attr('data-targetSection');
+
+        //  Update selection and tab visibility when we can
+        if (progressIndex >= clickedProgress) {
+            $('.selector').each((index, item) => {
+                $(item).removeClass('selectorActive');
+            });
+            $(clicked).addClass('selectorActive');
+
+            showTabFromClickEvent(event);
+        }
+    }
+
+    /**
+     * Function for going to the previous page.
+     *
+     * @@param event The click event
+     */
+    function clickBack(event) {
+        showTabFromClickEvent(event);
+    }
+
+    /**
+     * Triggers tab showing based on a click event. The clicked object should
+     * have a data-target attribute.
+     * TODO This seems suboptimal.
+     *
+     * @@param event The click event
+     */
+    function showTabFromClickEvent(event) {
+        let target = $(event.currentTarget).attr('data-targetSection');
+
+        // Hide all tabs
+        $('#divTabs').find('.tab-pane').each((index, item) => {
+            $(item).hide();
+            $(item).removeClass('active');
+        });
+
+        // Show target tab
+        $(target).show();
+        $(target).addClass('active');
+
+        // Unhighlight all selectors, highlight correct one
+        $('.selector').each((index, item) => {
+            if ($(item).attr('data-targetSection') == target) {
+                $(item).addClass('selectorActive');
+            } else {
+                $(item).removeClass('selectorActive');
+            }
+        })
+    }
+
+    // Call this when the progress is updated
+    function updateAllTabs() {
+        updateTab('#selectorAccount');
+        updateTab('#selectorMarketing');
+        updateTab('#selectorTargeting');
+        updateTab('#selectorSchedule');
+        updateTab('#selectorAdGroups');
+        updateTab('#selectorOverview');
+    }
+
+    /**
+     * Processes the enabling of a single tab based on the global progress.
+     *
+     * @@param idSelector The selector for the tab we want to update
+     */
+    function updateTab(idSelector) {
+        // Update enabling
+        let selectorIndex = $(idSelector).attr('data-progress');
+        if (progressIndex >= selectorIndex) {
+            $(idSelector).removeAttr('disabled');
+        } else {
+            $(idSelector).attr('disabled', 'disabled');
+        }
+
+        // Update styling
+        let icon = $(idSelector).find('.selectorIconBackground');
+        if (progressIndex >= selectorIndex) {
+            $(icon).addClass('iconUnlocked');
+        } else {
+            $(icon).removeClass('iconUnlocked');
+        }
+    }
+
+    /*
+     * Link switches to their respective form controls
+     */ 
+    function linkSwitches() {
+        linkSwitchToFormControlEnable('#checkboxBudgetDailyInfinite', '#inputBudgetDaily', false);
+        linkSwitchToFormControlEnable('#checkboxIgnoreEndDate', '#datetimeEndDate', true);
+    }
+
+    /**
+     * Validates entire form, returns true if valid.
+     */
+    function validateEntireWizard() {
+        // Validate all non-lazy
+        if (validateSet(validatorWizardCampaignGroup, elementsAccount) &
+            validateSet(validatorWizardCampaignGroup, elementsMarketing) &
+            validateSet(validatorWizardCampaignGroup, elementsTargeting) &
+            validateSet(validatorWizardCampaignGroup, elementsSchedule) &
+            validateSet(validatorWizardCampaignGroup, elementsAdGroups)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+</script>
