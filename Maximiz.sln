@@ -42,7 +42,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Maximiz.Infrastructure", "M
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "contrib", "contrib", "{8DA72271-A1FC-4346-BEA9-7C3BE95565F4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Laixer.AppSettingsValidation", "Laixer.AppSettingsValidation\Laixer.AppSettingsValidation.csproj", "{4AF348EB-9533-4095-B29B-FFB79D777371}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Laixer.AppSettingsValidation", "Laixer.AppSettingsValidation\Laixer.AppSettingsValidation.csproj", "{4AF348EB-9533-4095-B29B-FFB79D777371}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Test", "Test", "{7721E103-F14C-4BD8-A4A0-D12E6A8DE0A9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
