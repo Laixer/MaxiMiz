@@ -1,5 +1,6 @@
 ﻿using Maximiz.Core.Operations;
 using Maximiz.Core.StateMachine.Abstraction;
+using Maximiz.Model.Operations;
 using System;
 using System.Threading.Tasks;
 

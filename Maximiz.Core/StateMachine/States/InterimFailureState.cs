@@ -4,6 +4,7 @@ using Maximiz.Core.Infrastructure.Repositories;
 using Maximiz.Core.Operations;
 using Maximiz.Core.Operations.Execution;
 using Maximiz.Core.StateMachine.Abstraction;
+using Maximiz.Model.Operations;
 using Maximiz.Model.Protocol;
 using Microsoft.Extensions.Logging;
 using System;

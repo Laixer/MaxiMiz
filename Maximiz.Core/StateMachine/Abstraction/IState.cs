@@ -1,4 +1,5 @@
 ﻿using Maximiz.Core.Operations;
+using Maximiz.Model.Operations;
 using System;
 using System.Threading.Tasks;
 

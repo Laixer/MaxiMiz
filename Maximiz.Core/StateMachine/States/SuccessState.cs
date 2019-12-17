@@ -1,6 +1,7 @@
 ﻿using Maximiz.Core.Infrastructure.Commiting;
 using Maximiz.Core.Operations;
 using Maximiz.Core.StateMachine.Abstraction;
+using Maximiz.Model.Operations;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Threading.Tasks;
