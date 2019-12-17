@@ -28,8 +28,6 @@
 
     <!-- Custom css -->
     <link rel="stylesheet" href="~/css/style.css">
-    <link rel="stylesheet" href="~/css/modal_center.css">
-    <link rel="stylesheet" href="~/css/modal_right.css">
 
     @RenderSection("Styles", required: false)
 
@@ -49,6 +47,9 @@
     <div id="divBody">
         @RenderBody()
     </div>
+
+    <!-- Confirmation popup unit -->
+    <partial name="_ConfirmationPopup" />
 
     <!-- Library imports -->
     <environment include="Development">
@@ -82,6 +83,13 @@
     <partial name="_ScriptsSubscribables" />
     <partial name="_ScriptsHttpMethods" />
     <partial name="_ScriptsUtility" />
+    <partial name="_ScriptsConfirmationPopup" />
+
+    <!-- Enable strict mode for all js functionality -->
+    <script type="text/javascript">
+        console.log('Using javascript strict mode throughout entire application');
+        'use strict';
+    </script>
 
     <!-- Render script section for each (non-partial) view after imports -->
     @RenderSection("Scripts", required: false)

@@ -1,0 +1,31 @@
+﻿@*
+    Partial view containing confirmation popup functionality for global access.
+*@
+
+<!-- Javascript functionality for confirmation popup -->
+<script type="text/javascript">
+
+    /**
+     * Call this to trigger our confirmation popup message. The timeout is
+     * three and a half seconds before it disappears again.
+     *
+     * @@param success Bool indicating success
+     * @@param message String message to display
+     */
+    function showConfirmationPopup(success, message) {
+        if (success == undefined) { throw new Error("success should not be null"); }
+        if (typeof success !== 'boolean') { throw new Error("success should be a boolean"); }
+        if (message == undefined) { throw new Error("message should not be null"); }
+        if (typeof message !== 'string') { throw new Error("message should not a string"); }
+
+        try {
+            $('#textSuccess').text(success ? 'Success!' : 'Request failed');
+            $('#textMessage').text(message);
+            $('#confirmationPopup').css('visibility', 'visible');
+            setTimeout(() => { $('#confirmationPopup').css('visibility', ''); }, 3500);
+        } catch (exception) {
+            console.log('Error while showing confirmation popup: ', exception);
+        }
+    }
+
+</script>

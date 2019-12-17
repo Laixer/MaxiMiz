@@ -93,27 +93,48 @@
      * order. All other items get unhighlighted.
      *      Based on attr: data-column
      *      Based on attr: data-order
-     * 
+     *
      * @@param iconSelector jQuery icon selector
      * @@param column The current selected column
      * @@param order The current selected order
      */
     function highlightSortingIcons(iconSelector, column, order) {
-        console.log('TODO: Change myHighlightClass for sorting icon highlighting');
         $(iconSelector).each(function (index, item) {
             if ($(item).attr('data-column') === column &&
                 $(item).attr('data-order') === order) {
-                $(item).addClass('myHighlightClass');
-
-                // TODO Remove
-                $(item).attr('href', '#');
+                $(item).addClass('active');
             } else {
-                $(item).removeClass('myHighlightClass');
-
-                // TODO Remove
-                $(item).removeAttr('href');
+                $(item).removeClass('active');
             }
         });
+    }
+
+    /**
+     * This links a switch to a form control. If the switch is enabled then the
+     * form control will either be enabled or disabled. This will also trigger
+     * once when setup to ensure consistency.
+     *
+     * @@param idSwitch The id of the switch
+     * @@param idFormControl The id of the form control
+     * @@param switchDisablesFormControl If set to true the switch disables the
+     * form control, if set to false this behaviour will invert.
+     */
+    function linkSwitchToFormControlEnable(idSwitch, idFormControl, switchDisablesFormControl) {
+        let onClickFunction = function () {
+            let checked = $(idSwitch).get(0).checked;
+            // XOR
+            if ((checked || switchDisablesFormControl) && !(checked && switchDisablesFormControl)) {
+                $(idFormControl).removeAttr('disabled');
+            } else {
+                $(idFormControl).attr('disabled', 'disabled');
+            }
+        };
+
+        $(document).off('click', idSwitch);
+        $(document).on('click', idSwitch, onClickFunction);
+
+        // Call once to ensure consistency
+        onClickFunction();
     }
 
 

@@ -11,20 +11,21 @@
             // Add error styling when invalid highlighted
             highlight: function (element) {
                 $(element)
-                    //.closest('form-group')
                     .closest('.form-control')
-                    .addClass('error-label');
+                    .removeClass('is-valid')
+                    .addClass('is-invalid');
             },
 
             // Remove error styling when unhighlighted
             unhighlight: function (element) {
                 $(element)
                     .closest('.form-control')
-                    .removeClass('error-label');
+                    .removeClass('is-invalid')
+                    .addClass('is-valid');
             },
 
             // Custom error class (recognized by bootstrap)
-            errorClass: 'is-invalid',
+            errorClass: 'invalid-feedback',
 
             // Error placement customized
             errorPlacement: function (error, element) {
@@ -39,6 +40,26 @@
             // Disable ignoring hidden and non-visible elements
             ignore: [],
 
+        });
+
+        // Add validation method for time in future
+        $.validator.addMethod("timeInFuture", function (value, element) {
+            if ($(element).attr('disabled') === 'disabled') { return true; }
+            return (new Date(value).getTime() > Date.now());
+        }, "Please select a date in the future");
+
+        // Add a validation method for being greater than some other time element
+        $.validator.addMethod('timeGreaterThanElement', function (value, element) {
+            if ($(element).attr('disabled') === 'disabled') { return true; }
+
+            let compareId = $(element).attr('data-greaterThanElementId');
+            // Throw if the element doesn't exist for easy debugging
+            if ($(element).length == 0) { throw Error("Can't find element ", compareId, ' for datetime comparison'); }
+
+            // Compare
+            let compareTime = new Date($(compareId).val()).getTime();
+            let thisTime = new Date(value).getTime();
+            return thisTime > compareTime;
         });
     };
 
@@ -64,7 +85,6 @@
                     if (result == true && itemValid == false) {
                         result = false;
                     }
-                    console.log('Element ', item, ' validated as ', itemValid);
                 }
             });
         } catch (e) {
@@ -75,5 +95,12 @@
         // Return last to ensure all elements have been checked
         return result;
     };
+
+    /**
+     * Sets up the ignoreBootstrapValidation class.
+     */
+    $(document).ready(() => {
+        console.log('Implement .ignoreBootstrapValidation');
+    });
 
 </script>
