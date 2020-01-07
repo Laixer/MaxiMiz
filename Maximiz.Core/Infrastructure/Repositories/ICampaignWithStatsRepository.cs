@@ -1,4 +1,7 @@
-﻿using Maximiz.Model.Entity;
+﻿using Maximiz.Core.Querying;
+using Maximiz.Model.Entity;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Maximiz.Core.Infrastructure.Repositories
 {
@@ -9,7 +12,11 @@ namespace Maximiz.Core.Infrastructure.Repositories
     public interface ICampaignWithStatsRepository : IRepository<CampaignWithStats>
     {
 
-        //
+        Task<IEnumerable<CampaignWithStats>> GetActiveAsync(QueryBase<CampaignWithStats> query);
+
+        Task<IEnumerable<CampaignWithStats>> GetPendingAsync(QueryBase<CampaignWithStats> query);
+
+        Task<IEnumerable<CampaignWithStats>> GetInactiveAsync(QueryBase<CampaignWithStats> query);
 
     }
 }

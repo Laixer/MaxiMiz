@@ -22,5 +22,12 @@ namespace Maximiz.Core.Infrastructure.Repositories
         /// <returns><see cref="IEnumerable{TEntity}"/></returns>
         Task<IEnumerable<TEntity>> GetAllAsync(QueryBase<TEntity> query);
 
+        /// <summary>
+        /// Gets the total number of existing items as result of a <paramref name="query"/>.
+        /// </summary>
+        /// <param name="query"><see cref="QueryBase{TEntity}"/></param>
+        /// <returns>The total count</returns>
+        Task<int> GetCountAsync(QueryBase<TEntity> query);
+
     }
 }

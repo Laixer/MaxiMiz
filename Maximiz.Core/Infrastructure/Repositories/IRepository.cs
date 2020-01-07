@@ -24,7 +24,8 @@ namespace Maximiz.Core.Infrastructure.Repositories
         /// Get a list of <see cref="TEntity"/>s from our data store.
         /// </summary>
         /// <returns><see cref="IEnumerable{TEntity}"/></returns>
-        Task<IEnumerable<TEntity>> GetAllAsync();
+        /// <param name="page">Paging option</param>
+        Task<IEnumerable<TEntity>> GetAllAsync(int page = 0);
 
     }
 
