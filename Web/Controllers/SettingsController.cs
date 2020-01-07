@@ -1,12 +1,11 @@
-﻿using Maximiz.Identity;
+﻿using Maximiz.Core.Infrastructure.Repositories;
+using Maximiz.Identity;
 using Maximiz.Mapper;
 using Maximiz.Model.Entity;
-using Maximiz.Repositories.Abstraction;
 using Maximiz.ViewModels.EntityModels;
 using Maximiz.ViewModels.Settings;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using System;
 using System.Threading.Tasks;
 
 namespace Maximiz.Controllers
@@ -51,7 +50,7 @@ namespace Maximiz.Controllers
         public async Task<IActionResult> GetListedAccountsPartialView()
             => PartialView("_LinkedAccountsTableBody", new LinkedAccountsTableViewModel
             {
-                LinkedAccounts = _mapperAccount.ConvertAll(await _accountRepository.GetAll())
+                LinkedAccounts = _mapperAccount.ConvertAll(await _accountRepository.GetAllAsync())
             });
 
         /// <summary>

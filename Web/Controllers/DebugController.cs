@@ -1,13 +1,9 @@
-﻿using Maximiz.Repositories;
-using Maximiz.Storage;
-using Maximiz.Storage.Abstraction;
-using Maximiz.ViewModels.CampaignOverview;
+﻿using Maximiz.Storage.Abstraction;
+using Maximiz.ViewModels.AdGroupOverview;
 using Maximiz.ViewModels.Debug;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Maximiz.Controllers
@@ -20,21 +16,13 @@ namespace Maximiz.Controllers
     {
 
         private readonly IStorageManager _storageManager;
-        private readonly TestRepository _testRepository;
 
         /// <summary>
         /// Constructor for dependency injection.
         /// </summary>
-        public DebugController(IStorageManager storageManager, TestRepository testRepository)
+        public DebugController(IStorageManager storageManager)
         {
             _storageManager = storageManager ?? throw new ArgumentNullException(nameof(storageManager));
-            _testRepository = testRepository ?? throw new ArgumentNullException(nameof(testRepository));
-        }
-
-        [HttpPost]
-        public async Task DoThing()
-        {
-            await _testRepository.DoThingInScope();
         }
 
         /// <summary>

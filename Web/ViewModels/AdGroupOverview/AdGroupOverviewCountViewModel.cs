@@ -1,5 +1,5 @@
 ﻿
-namespace Maximiz.ViewModels.CampaignOverview
+namespace Maximiz.ViewModels.AdGroupOverview
 {
 
     /// <summary>

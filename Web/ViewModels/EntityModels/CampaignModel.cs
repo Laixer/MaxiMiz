@@ -17,6 +17,11 @@ namespace Maximiz.ViewModels.EntityModels
         public string Name { get; set; }
 
         /// <summary>
+        /// The id of the account this belongs to.
+        /// </summary>
+        public Guid AccountGuid { get; set; }
+
+        /// <summary>
         /// Reference to the publisher.
         /// </summary>
         public Publisher Publisher { get; set; }

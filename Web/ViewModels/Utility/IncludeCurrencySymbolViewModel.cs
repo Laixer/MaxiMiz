@@ -14,7 +14,7 @@ namespace Maximiz.ViewModels.Utility
         /// Currency symbol.
         /// TODO Redesign!
         /// </summary>
-        public string CurrencySymbol { get; set; } = new CurrencyViewModelService().GetGlobalCurrencySymbol();
+        public string CurrencySymbol { get => new CurrencyViewModelService().GetGlobalCurrencySymbol(); }
 
     }
 }

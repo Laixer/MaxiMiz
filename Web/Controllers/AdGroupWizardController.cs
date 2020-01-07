@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Maximiz.Controllers.Abstraction;
+using Maximiz.Core.Infrastructure.Repositories;
 using Maximiz.Mapper;
 using Maximiz.Model.Entity;
-using Maximiz.Repositories.Abstraction;
 using Maximiz.ViewModels.AdGroupWizard;
 using Maximiz.ViewModels.EntityModels;
 using Microsoft.AspNetCore.Mvc;
@@ -17,13 +17,13 @@ namespace Maximiz.Controllers
     public class AdGroupWizardController : Controller, IAdGroupWizardController
     {
 
-        private IAdGroupRepository _adGroupRepository;
-        private IMapper<AdGroupWithStats, AdGroupModel> _mapper;
+        private readonly IAdGroupWithStatsRepository _adGroupRepository;
+        private readonly IMapper<AdGroupWithStats, AdGroupModel> _mapper;
 
         /// <summary>
         /// Constructor for dependency injection.
         /// </summary>
-        public AdGroupWizardController(IAdGroupRepository adGroupRepository,
+        public AdGroupWizardController(IAdGroupWithStatsRepository adGroupRepository,
             IMapper<AdGroupWithStats, AdGroupModel> mapper)
         {
             _adGroupRepository = adGroupRepository;
@@ -48,7 +48,7 @@ namespace Maximiz.Controllers
         public async Task<IActionResult> ShowWizardAsEditor(Guid adGroupId)
             => View("Wrapper", new AdGroupWizardViewModel
             {
-                AdGroup = _mapper.Convert(await _adGroupRepository.Get(adGroupId))
+                AdGroup = _mapper.Convert(await _adGroupRepository.GetAsync(adGroupId))
             });
 
         /// <summary>

@@ -1,12 +1,13 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Maximiz.Model.Entity;
-using Maximiz.Controllers.Abstraction;
 using Maximiz.ViewModels.CampaignGroupWizard;
 using System.Threading.Tasks;
 using System;
 using Maximiz.ViewModels.Columns;
-using Maximiz.ViewModels.Columns.Translation;
-using Maximiz.Database.Querying;
+using Maximiz.Core.Infrastructure.Repositories;
+using Maximiz.Mapper;
+using Maximiz.ViewModels.EntityModels;
+using Maximiz.QueryTranslation;
 
 namespace Maximiz.Controllers
 {
@@ -14,61 +15,64 @@ namespace Maximiz.Controllers
     /// <summary>
     /// Controller to manage our <see cref="CampaignGroup"/> creation.
     /// </summary>
-    public class CampaignGroupWizardController : Controller, ICampaignGroupWizardController
+    public class CampaignGroupWizardController : Controller
     {
 
+        private readonly IAdGroupWithStatsRepository _adGroupRepository;
+        private readonly IMapper<AdGroupWithStats, AdGroupModel> _mapperAdGroup;
+        private readonly IQueryTranslator _queryTranslator;
+
         /// <summary>
-        /// Returns the main wrapper view for this controller.
+        /// Constructor for dependency injection.
         /// </summary>
-        /// <returns>View</returns>
-        [HttpGet]
-        public IActionResult Index()
+        public CampaignGroupWizardController(IAdGroupWithStatsRepository adGroupRepository,
+            IMapper<AdGroupWithStats, AdGroupModel> mapperAdGroup,
+            IQueryTranslator queryTranslator)
         {
-            return View("Wrapper");
+            _adGroupRepository = adGroupRepository ?? throw new ArgumentNullException(nameof(adGroupRepository));
+            _mapperAdGroup = mapperAdGroup ?? throw new ArgumentNullException(nameof(mapperAdGroup));
+            _queryTranslator = queryTranslator ?? throw new ArgumentNullException(nameof(queryTranslator));
         }
 
         /// <summary>
-        /// Allows us to choose between the different routes.
+        /// Shows the campaign wizard.
         /// </summary>
-        /// <returns>View</returns>
+        /// <returns><see cref="ViewResult"/></returns>
         [HttpGet]
         public IActionResult ShowWizard()
-        {
-            return View("Wrapper");
-        }
+            => View("Wrapper");
 
         /// <summary>
         /// Submits the creation form, attempts to do the transactions and returns.
         /// </summary>
         /// <param name="model"><see cref="CampaignGroupFormAllViewModel"/></param>
-        /// <returns>No content</returns>
+        /// <returns><see cref="OkResult"/> or <see cref="BadRequestResult"/></returns>
         [HttpPost]
         public async Task<IActionResult> SubmitForm([FromBody] CampaignGroupFormAllViewModel model)
         {
             await Task.Delay(new Random().Next(250, 1000));
 
-            // Check modelstate.valid
-            // Do transaction
-
-            // TODO Debug remove
-            return BadRequest();
-            return NoContent();
+            // TODO Implement
+            return Ok();
         }
 
         /// <summary>
-        /// Gets our view component that retrieves ad groups in list form.
+        /// Get a partial view containing all ad groups based on some query.
         /// </summary>
-        /// <param name="query">Search query string</param>
-        /// <param name="column"><see cref="column"/></param>
-        /// <param name="order"></param>
-        /// <returns><see cref="ViewComponent"/></returns>
-        [HttpGet]
-        public IActionResult GetAdGroupsViewComponent(string query, ColumnCampaignGroupWizardAdGroup column, Order order)
+        /// <param name="column"><see cref="ColumnCampaignGroupWizardAdGroup"/></param>
+        /// <param name="order"><see cref="Order"/></param>
+        /// <param name="searchString">Search string</param>
+        /// <param name="page">Page number</param>
+        /// <returns><see cref="PartialViewResult"/></returns>
+        public async Task<IActionResult> GetAdGroupsAsync(ColumnCampaignGroupWizardAdGroup column,
+            Order order, string searchString = null, int page = 0)
         {
-            var columnDatabase = ColumnTranslator.Translate(column);
-            var orderDatabase = OrderTranslator.Translate(order);
-            var queryObject = new QueryAdGroupWithStats(query, columnDatabase, orderDatabase);
-            return ViewComponent("CampaignGroupWizardAdGroup", new { query = queryObject });
+            if (page < 0) { throw new ArgumentOutOfRangeException(nameof(page)); }
+
+            var query = _queryTranslator.Translate(column, order, searchString, page);
+            return PartialView("_SectionAdGroupsTableRows", new CampaignGroupWizardAdGroupViewModel {
+                AdGroupList = _mapperAdGroup.ConvertAll(await _adGroupRepository.GetAllAsync(query))
+            });
         }
 
     }
