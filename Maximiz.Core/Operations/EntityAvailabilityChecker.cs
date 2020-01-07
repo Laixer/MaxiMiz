@@ -20,7 +20,7 @@ namespace Maximiz.Core.Operations
         /// </summary>
         /// <param name="entities"><see cref="Entity"/></param>
         /// <returns><see cref="true"/> if successful</returns>
-        internal async Task<bool> AreEntitiesAvailable(IEnumerable<Entity> entities)
+        internal Task<bool> AreEntitiesAvailable(IEnumerable<Entity> entities)
         {
             if (entities == null) { throw new ArgumentNullException(nameof(entities)); }
 

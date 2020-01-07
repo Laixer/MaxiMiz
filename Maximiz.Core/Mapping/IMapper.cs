@@ -1,7 +1,7 @@
 ﻿using Maximiz.Model.Entity;
 using System.Collections.Generic;
 
-namespace Maximiz.Core.Mapping
+namespace unusedMaximiz.Core.Mapping
 {
 
     /// <summary>

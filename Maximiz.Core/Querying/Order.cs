@@ -8,6 +8,6 @@ namespace Maximiz.Core.Querying
     public enum Order
     {
         Ascending,
-        Desecending
+        Descending
     }
 }

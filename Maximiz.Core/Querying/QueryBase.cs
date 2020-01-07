@@ -9,7 +9,7 @@ namespace Maximiz.Core.Querying
     /// Query base for a search query in our data store.
     /// </summary>
     /// <typeparam name="TEntity"><see cref="Entity"/></typeparam>
-    public abstract class QueryBase<TEntity>
+    public class QueryBase<TEntity>
         where TEntity : Entity
     {
 
@@ -21,6 +21,9 @@ namespace Maximiz.Core.Querying
         /// <summary>
         /// The items per page to display.
         /// </summary>
+        /// <remarks>
+        /// 50 by default
+        /// </remarks>
         public int PageItemCount { get; set; } = 50;
 
         /// <summary>
@@ -35,8 +38,9 @@ namespace Maximiz.Core.Querying
 
         /// <summary>
         /// Property of our <see cref="TEntity"/> based on which we sort.
+        /// Usage: set to '<see cref="x => x.PropertyName"/>'.
         /// </summary>
-        public Expression<Func<TEntity>> SortableProperty { get; set; }
+        public Expression<Func<TEntity, object>> SortableProperty { get; set; }
 
     }
 }
