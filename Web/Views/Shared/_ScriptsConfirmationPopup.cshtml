@@ -16,7 +16,7 @@
         if (success == undefined) { throw new Error("success should not be null"); }
         if (typeof success !== 'boolean') { throw new Error("success should be a boolean"); }
         if (message == undefined) { throw new Error("message should not be null"); }
-        if (typeof message !== 'string') { throw new Error("message should not a string"); }
+        if (typeof message !== 'string') { throw new Error("message should be a string"); }
 
         try {
             $('#textSuccess').text(success ? 'Success!' : 'Request failed');

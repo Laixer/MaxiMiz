@@ -45,7 +45,7 @@
         var query = $('#searchAdGroups')[0].value; // TODO This does not seem bulletproof!
         var column = window.ColumnAdGroupAll;
         var order = window.OrderAdGroupAll;
-        var url = '@Url.Action(nameof(CampaignGroupWizardController.GetAdGroupsViewComponent), "CampaignGroupWizard")';
+        var url = '@Url.Action(nameof(CampaignGroupWizardController.GetAdGroupsAsync), "CampaignGroupWizard")';
 
         doMethodAndProcess(url + '?' + new URLSearchParams({
             query: query,

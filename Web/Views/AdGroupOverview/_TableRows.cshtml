@@ -1,0 +1,36 @@
+﻿@*
+    Displays table rows for a collection of ad groups.
+*@
+
+@model AdGroupOverviewTableViewModel
+<!-- Table entry for each item in our collection. -->
+@foreach (var adGroup in Model.AdGroupList)
+{
+    <tr class="row-unlink-adgroup">
+        <td>
+            <a href="" class="click-open-details" data-adgroup-id="@adGroup.Id">@adGroup.Name</a>
+        </td>
+        <td>@adGroup.CreateDate</td>
+        <td>@adGroup.AdItemCount</td>
+        <td>@adGroup.UpdateDate</td>
+        <td>
+            <!-- Clickable icon to open the details -->
+            <a href="" class="click-open-details" data-adgroup-id="@adGroup.Id"><i class="fas fa-edit"></i></a>
+
+            <!-- Clickable icon to delete campaign -->
+            <a href="" class="click-delete-adgroup" data-toggle="tooltip" data-adgroup-id="@adGroup.Id" title="Delete"><i class="fas fa-trash text-danger ml-1"></i></a>
+        </td>
+    </tr>
+}
+
+
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+
+        // TODO Implement
+
+    });
+
+</script>

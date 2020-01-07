@@ -80,7 +80,7 @@
         let query = null; // TODO Sending null, good idea or not?
         let column = window.ColumnAdGroupLinked;
         let order = window.OrderAdGroupLinked;
-        loadAdGroupTablePartAsync('@Url.Action(nameof(CampaignDetailsController.GetAdGroupsLinkedViewComponent), "CampaignDetails")',
+        loadAdGroupTablePartAsync('@Url.Action(nameof(CampaignDetailsController.GetAdGroupsLinkedAsync), "CampaignDetails")',
             '#tableAdGroupLinkedBody', query, column, order);
     }
 
@@ -94,9 +94,9 @@
         let query = $('#searchAllAdGroups')[0].value;
         let column = window.ColumnAdGroupAll;
         let order = window.OrderAdGroupAll;
-        loadAdGroupTablePartAsync('@Url.Action(nameof(CampaignDetailsController.GetAdGroupsAllViewComponent), "CampaignDetails")',
+        loadAdGroupTablePartAsync('@Url.Action(nameof(CampaignDetailsController.GetAdGroupsAllAsync), "CampaignDetails")',
             '#tableAdGroupAllBody', query, column, order);
-        loadAdGroupTablePartAsync('@Url.Action(nameof(CampaignDetailsController.GetAdGroupsAllCountViewComponent), "CampaignDetails")',
+        loadAdGroupTablePartAsync('@Url.Action(nameof(CampaignDetailsController.GetAdGroupsAllCountAsync), "CampaignDetails")',
             '#adGroupTotalCount', query, column, order);
     }
 

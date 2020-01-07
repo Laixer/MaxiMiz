@@ -102,35 +102,35 @@
 
         // Loads all existing tables
         function loadAdGroupOverviewTablesAsync() {
-            var query = $('#searchAdGroups')[0].value;
+            var searchString = $('#searchAdGroups')[0].value;
             var column = window.AdGroupOverviewColumn;
             var order = window.AdGroupOverviewOrder;
 
-            loadAdGroupOverviewTableAsync('@AdGroupOverviewTableType.All', '#tabAllTableBody', '#tabAllCount', 'All', query, column, order);
+            loadAdGroupOverviewTableAsync('@AdGroupOverviewTableType.All', '#tabAllTableBody', '#tabAllCount', 'All', searchString, column, order);
         };
 
         // Loads a single table
         // TODO DRY with campaign overview
-        function loadAdGroupOverviewTableAsync(tableType, tableBodyId, countId, tableName, query, column, order) {
+        function loadAdGroupOverviewTableAsync(tableType, tableBodyId, countId, tableName, searchString, column, order) {
             // Set count to ...
             $(countId).html(tableName + ' (...)');
 
             // Load view component async through controller fetch call
-            doGetAndReplaceHtml('@Url.Action(nameof(AdGroupOverviewController.GetAdGroupTableViewComponent)
+            doGetAndReplaceHtml('@Url.Action(nameof(AdGroupOverviewController.GetAdGroupTableAsync)
                 , "AdGroupOverview")?'
                 + new URLSearchParams({
                     table: tableType,
-                    query: query,
+                    searchString: searchString,
                     column: column,
                     order: order
                 }), tableBodyId);
 
             // Load count component async through controller fetch call
-            doGetAndReplaceHtml('@Url.Action(nameof(AdGroupOverviewController.GetAdGroupCountViewComponent)
+            doGetAndReplaceHtml('@Url.Action(nameof(AdGroupOverviewController.GetAdGroupCountAsync)
                 , "AdGroupOverview")?'
                 + new URLSearchParams({
                     table: tableType,
-                    query: query,
+                    searchString: searchString,
                     column: column,
                     order: order
                 }), countId);
