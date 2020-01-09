@@ -42,5 +42,10 @@ namespace Maximiz.Infrastructure.Querying
 
             throw new InvalidOperationException(nameof(TEntity));
         }
+
+        /// <summary>
+        /// Gets the table name for the campaign group vs ad group linking table.
+        /// </summary>
+        internal static string CampaignGroupAdGroupLinkingTableName => "campaign_group_ad_group";
     }
 }

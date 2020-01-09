@@ -7,25 +7,34 @@ namespace Maximiz.Infrastructure.Querying
 
     /// <summary>
     /// Contains our functionality to extract SQL queries.
+    /// TODO This can be cleaned up, even though it works.
     /// </summary>
     internal static partial class QueryExtractor
     {
 
         /// <summary>
-        /// Creates an SQL query based on some <paramref name="queryBase"/>.
+        /// Creates an SQL query based on some <paramref name="query"/>.
         /// </summary>
         /// <typeparam name="TEntity"><see cref="Entity"/></typeparam>
-        /// <param name="queryBase"><see cref="QueryBase{TEntity}"/></param>
+        /// <param name="query"><see cref="QueryBase{TEntity}"/></param>
         /// <returns>SQL query</returns>
-        internal static string ExtractSql<TEntity>(QueryBase<TEntity> queryBase)
+        internal static string ExtractSql<TEntity>(QueryBase<TEntity> query, bool forCount = false)
             where TEntity : Entity
         {
-            if (queryBase == null) { throw new ArgumentNullException(nameof(queryBase)); }
+            // TODO Throw if null? How to handle?
 
-            return $"SELECT * FROM {GetTableName<TEntity>()} " +
-                $"{ExtractWhere(queryBase)} " +
-                $"{ExtractSorting(queryBase)} " +
-                $"{ExtractPaging(queryBase)};";
+            var result = $"SELECT {(forCount ? "COUNT(*)" : "*")} FROM {GetTableName<TEntity>()}";
+            result += (query == null) ? "" : $" {ExtractWhere(query, forCount)}";
+
+            if (!forCount)
+            {
+                result += (query == null) ? "" : $" {ExtractSorting(query)}";
+                result += (query == null) ? ExtractPaging() : $" {ExtractPaging(query)}";
+            }
+
+            result += ";";
+
+            return result;
         }
 
         /// <summary>
@@ -36,46 +45,31 @@ namespace Maximiz.Infrastructure.Querying
         /// <param name="page">Page number</param>
         /// <param name="pageItemCount">Items per page</param>
         /// <returns>SQL query</returns>
-        internal static string ExtractSql<TEntity>(int page = 0, int pageItemCount = 50)
+        internal static string ExtractSql<TEntity>(int page = 0, int pageItemCount = 50, bool forCount = false)
             where TEntity : Entity
         {
             if (page < 0) { throw new ArgumentOutOfRangeException(nameof(page)); }
             if (pageItemCount < 1) { throw new ArgumentOutOfRangeException(nameof(pageItemCount)); }
 
-            return $"SELECT * FROM {GetTableName<TEntity>()} " +
-                $"{ExtractPaging(page, pageItemCount)};";
+            var result = $"SELECT {(forCount ? "COUNT(*)" : "*")} FROM {GetTableName<TEntity>()}";
+
+            if (!forCount)
+            {
+                result += $"{ExtractPaging(page, pageItemCount)}";
+            }
+
+            result += ";";
+
+            return result;
         }
 
-        /// <summary>
-        /// Creates an SQL query based on some <paramref name="queryBase"/> to 
-        /// get the total item count.
-        /// </summary>
-        /// 
-        /// TODO DRY??
-        /// 
-        /// <typeparam name="TEntity"><see cref="Entity"/></typeparam>
-        /// <param name="queryBase"><see cref="QueryBase{TEntity}"/></param>
-        /// <returns>SQL query for the total item count</returns>
-        internal static string ExtractSqlForCount<TEntity>(QueryBase<TEntity> queryBase)
+        internal static string ExtractSqlForSingle<TEntity>(PropertyEquality<TEntity> propertyEquality)
             where TEntity : Entity
         {
-            if (queryBase == null) { throw new ArgumentNullException(nameof(queryBase)); }
+            if (propertyEquality == null) { throw new ArgumentNullException(nameof(propertyEquality)); }
 
-            return $"SELECT COUNT(*) FROM {GetTableName<TEntity>()} " +
-                $"{ExtractWhere(queryBase)} ;";
+            return $"SELECT * FROM {GetTableName<TEntity>()} WHERE {ExtractProperty(propertyEquality)} LIMIT 1;";
         }
-
-        /// <summary>
-        /// Creates an SQL query based on some to get the total item count.
-        /// </summary>
-        /// 
-        /// TODO DRY??
-        /// 
-        /// <typeparam name="TEntity"><see cref="Entity"/></typeparam>
-        /// <returns>SQL query for the total item count</returns>
-        internal static string ExtractSqlForCount<TEntity>()
-            where TEntity : Entity
-            => $"SELECT COUNT(*) FROM {GetTableName<TEntity>()} ;";
 
     }
 }

@@ -17,7 +17,7 @@ namespace Maximiz.Infrastructure.Querying
         /// <typeparam name="TEntity"><see cref="Entity"/></typeparam>
         /// <param name="query"><see cref="QueryBase{TEntity}"/></param>
         /// <returns>Sorting SQL clause</returns>
-        internal static string ExtractSorting<TEntity>(QueryBase<TEntity> query)
+        private static string ExtractSorting<TEntity>(QueryBase<TEntity> query)
             where TEntity : Entity
         {
             if (query == null) { return ""; } // TODO Should we do this?

@@ -18,7 +18,7 @@ namespace Maximiz.Infrastructure.Querying
         /// <typeparam name="TEntity"><see cref="Entity"/></typeparam>
         /// <param name="query"><see cref="QueryBase{TEntity}"/></param>
         /// <returns>Paging SQL clause</returns>
-        internal static string ExtractPaging<TEntity>(QueryBase<TEntity> query)
+        private static string ExtractPaging<TEntity>(QueryBase<TEntity> query)
             where TEntity : Entity
         {
             if (query == null) { return ExtractPaging(0, 50); }
@@ -32,7 +32,7 @@ namespace Maximiz.Infrastructure.Querying
         /// <param name="page">Page number</param>
         /// <param name="pageItemCount">Items per page</param>
         /// <returns>Paging SQL clause</returns>
-        internal static string ExtractPaging(int page, int pageItemCount)
+        private static string ExtractPaging(int page = 0, int pageItemCount = 50)
         {
             if (page < 0) { throw new ArgumentOutOfRangeException(nameof(page)); }
             if (pageItemCount < 1) { throw new ArgumentOutOfRangeException(nameof(pageItemCount)); }
