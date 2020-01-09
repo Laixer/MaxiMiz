@@ -42,5 +42,10 @@ namespace Maximiz.Core.Querying
         /// </summary>
         public Expression<Func<TEntity, object>> SortableProperty { get; set; }
 
+        /// <summary>
+        /// Contains a single <see cref="PropertyEquality{TEntity}"/>.
+        /// </summary>
+        public PropertyEquality<TEntity> PropertyEquality { get; set; }
+
     }
 }
