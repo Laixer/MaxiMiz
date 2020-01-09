@@ -22,8 +22,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Data", "Data", "{AC48AC44-8
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Maximiz.Model", "Model\Maximiz.Model.csproj", "{D0C09AB3-45B2-4CED-8FA2-64274D0F4F00}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Laixer.Library", "Laixer.Library\Laixer.Library.csproj", "{E74D0C30-DBC6-44A1-9CE7-AA8EE027E4CE}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Maximiz.Helper", "Maximiz.Helper\Maximiz.Helper.csproj", "{1D86D62B-9823-4F39-8B31-3553980518EC}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Poller.FunctionHost", "Poller\Poller.FunctionHost\Poller.FunctionHost.csproj", "{8A6A52D4-C0DC-4237-A389-7D4606ABA3AB}"
@@ -45,6 +43,8 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Laixer.AppSettingsValidation", "Laixer.AppSettingsValidation\Laixer.AppSettingsValidation.csproj", "{4AF348EB-9533-4095-B29B-FFB79D777371}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Test", "Test", "{7721E103-F14C-4BD8-A4A0-D12E6A8DE0A9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Maximiz.Test", "Maximiz.Test\Maximiz.Test.csproj", "{E378DD83-1F15-4FAD-820A-A87FC51444C1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -80,10 +80,6 @@ Global
 		{D0C09AB3-45B2-4CED-8FA2-64274D0F4F00}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D0C09AB3-45B2-4CED-8FA2-64274D0F4F00}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D0C09AB3-45B2-4CED-8FA2-64274D0F4F00}.Release|Any CPU.Build.0 = Release|Any CPU
-		{E74D0C30-DBC6-44A1-9CE7-AA8EE027E4CE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E74D0C30-DBC6-44A1-9CE7-AA8EE027E4CE}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E74D0C30-DBC6-44A1-9CE7-AA8EE027E4CE}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{E74D0C30-DBC6-44A1-9CE7-AA8EE027E4CE}.Release|Any CPU.Build.0 = Release|Any CPU
 		{1D86D62B-9823-4F39-8B31-3553980518EC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{1D86D62B-9823-4F39-8B31-3553980518EC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1D86D62B-9823-4F39-8B31-3553980518EC}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -108,6 +104,10 @@ Global
 		{4AF348EB-9533-4095-B29B-FFB79D777371}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4AF348EB-9533-4095-B29B-FFB79D777371}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4AF348EB-9533-4095-B29B-FFB79D777371}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E378DD83-1F15-4FAD-820A-A87FC51444C1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E378DD83-1F15-4FAD-820A-A87FC51444C1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E378DD83-1F15-4FAD-820A-A87FC51444C1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E378DD83-1F15-4FAD-820A-A87FC51444C1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -126,6 +126,7 @@ Global
 		{56C2D2A0-FF98-45C7-99C3-DE1D3C04ADCB} = {0B2A564E-F5FE-48CB-9166-4C93B1E8E43A}
 		{7B1E801A-D04A-437C-B935-C6B7FAB7B6FD} = {270EFE75-CC08-47CE-8510-FC8A07076E68}
 		{4AF348EB-9533-4095-B29B-FFB79D777371} = {8DA72271-A1FC-4346-BEA9-7C3BE95565F4}
+		{E378DD83-1F15-4FAD-820A-A87FC51444C1} = {7721E103-F14C-4BD8-A4A0-D12E6A8DE0A9}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {4EEF981B-C003-46FF-9520-3309BC45C57C}

@@ -1,5 +1,7 @@
 ﻿using Laixer.AppSettingsValidation.Exceptions;
+using Maximiz.Model.Enums;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 using Npgsql;
 using System;
 using System.Data;
@@ -16,17 +18,38 @@ namespace Maximiz.Infrastructure.Database
         private readonly string connectionString;
 
         /// <summary>
-        /// Constructor for dependency injection.
+        /// Setup enum mapping once.
         /// </summary>
-        public NpgsqlDatabaseProvider(NpgsqlDatabaseProviderOptions options,
+        static NpgsqlDatabaseProvider()
+        {
+            NpgsqlConnection.GlobalTypeMapper.MapEnum<AdItemStatus>("ad_item_status");
+            NpgsqlConnection.GlobalTypeMapper.MapEnum<ApprovalState>("approval_state");
+            NpgsqlConnection.GlobalTypeMapper.MapEnum<BidStrategy>("bid_strategy");
+            NpgsqlConnection.GlobalTypeMapper.MapEnum<BudgetModel>("budget_model");
+            NpgsqlConnection.GlobalTypeMapper.MapEnum<CampaignStatus>("campaign_status");
+            NpgsqlConnection.GlobalTypeMapper.MapEnum<ConnectionType>("connection");
+            NpgsqlConnection.GlobalTypeMapper.MapEnum<Delivery>("delivery");
+            NpgsqlConnection.GlobalTypeMapper.MapEnum<Device>("device");
+            NpgsqlConnection.GlobalTypeMapper.MapEnum<Location>("location");
+            NpgsqlConnection.GlobalTypeMapper.MapEnum<OS>("operating_system");
+            NpgsqlConnection.GlobalTypeMapper.MapEnum<Publisher>("publisher");
+
+            Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
+        }
+
+        /// <summary>
+        /// Constructor for dependency injection.
+        /// TODO Clean up a bit
+        /// </summary>
+        public NpgsqlDatabaseProvider(IOptions<NpgsqlDatabaseProviderOptions> options,
             IConfiguration configuration)
         {
             if (configuration == null) { throw new ArgumentNullException(nameof(configuration)); }
-            if (options == null) { throw new ArgumentNullException(nameof(options)); }
-            if (string.IsNullOrEmpty(options.ConnectionStringName)) { throw new ConfigurationException(nameof(options.ConnectionStringName)); }
+            if (options.Value == null) { throw new ArgumentNullException(nameof(options.Value)); }
+            if (string.IsNullOrEmpty(options.Value.ConnectionStringName)) { throw new ConfigurationException(nameof(options.Value.ConnectionStringName)); }
 
-            connectionString = configuration.GetConnectionString(options.ConnectionStringName);
-            if (string.IsNullOrEmpty(connectionString)) { throw new ConfigurationException($"IConfiguration does not contains connection string with name {options.ConnectionStringName}"); }
+            connectionString = configuration.GetConnectionString(options.Value.ConnectionStringName);
+            if (string.IsNullOrEmpty(connectionString)) { throw new ConfigurationException($"IConfiguration does not contains connection string with name {options.Value.ConnectionStringName}"); }
         }
 
         /// <summary>
