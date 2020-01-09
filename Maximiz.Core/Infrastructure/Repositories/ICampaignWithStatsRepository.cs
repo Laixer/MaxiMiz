@@ -18,5 +18,11 @@ namespace Maximiz.Core.Infrastructure.Repositories
 
         Task<IEnumerable<CampaignWithStats>> GetInactiveAsync(QueryBase<CampaignWithStats> query);
 
+        Task<int> GetCountActiveAsync(QueryBase<CampaignWithStats> query);
+
+        Task<int> GetCountInactiveAsync(QueryBase<CampaignWithStats> query);
+
+        Task<int> GetCountPendingAsync(QueryBase<CampaignWithStats> query);
+
     }
 }
