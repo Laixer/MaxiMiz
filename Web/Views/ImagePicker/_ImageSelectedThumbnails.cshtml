@@ -4,13 +4,11 @@
 
 @model ImageListViewModel
 
-<div>
-    @foreach (var uri in Model.ImageUris)
-    {
-        <div class="img-section section1" data-image-uri="@uri.AbsoluteUri">
-            <img src="@uri.AbsoluteUri" alt="@uri.AbsoluteUri"
-                 style="width: 100px; height: 100px" />
-            @*<p>@uri.OriginalString</p>*@
-        </div>
-    }
-</div>
+@foreach (var uri in Model.ImageUris)
+{
+    <div class="img-section uploaded-image section1" data-image-uri="@uri.AbsoluteUri">
+        <img src="@uri.AbsoluteUri" alt="@uri.AbsoluteUri"
+             style="width: 100px; height: 100px" />
+        @*<p>@uri.OriginalString</p>*@
+    </div>
+}

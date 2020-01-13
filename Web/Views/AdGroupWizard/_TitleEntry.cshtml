@@ -1,5 +1,6 @@
 ﻿@*
     Contains a single title entry for our title list.
+    TODO The conditional styling fix is kind of beun
 *@
 
 @* Set to true if remove button is required *@
@@ -9,10 +10,11 @@
 @{var id = Guid.NewGuid(); }
 
 <!-- Single title item -->
-<div class="form-row" id="@id">
-    <input type="text" name="@nameof(AdGroupFormViewModel.Titles)" class="form-control titleEntry disableOnSubmitPending" value="@((Model != null && Model.Title != null) ? Model.Title : "")" placeholder="My advertisement title" />
+<div class="form-row @((Model != null && Model.IsRemovable) ? "form-titles" : "")" id="@id">
+    <input type="text" name="@nameof(AdGroupFormViewModel.Titles)" class="form-control titleEntry disableOnSubmitPending my-2" 
+           value="@((Model != null && Model.Title != null) ? Model.Title : "")" placeholder="My advertisement title" />
     @if (Model != null && Model.IsRemovable)
     {
-        <a class="removeTitleEntry" data-target-id="@id">[X]</a>
+        <button class="btn btn-primary removeTitleEntry" data-target-id="@id"><i class="fas fa-times"></i></button>
     }
 </div>
