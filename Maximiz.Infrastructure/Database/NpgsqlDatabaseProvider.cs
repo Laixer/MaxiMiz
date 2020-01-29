@@ -1,8 +1,10 @@
 ﻿using Laixer.AppSettingsValidation.Exceptions;
 using Maximiz.Model.Enums;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Npgsql;
+using Npgsql.Logging;
 using System;
 using System.Data;
 
@@ -14,7 +16,7 @@ namespace Maximiz.Infrastructure.Database
     /// </summary>
     public sealed class NpgsqlDatabaseProvider : IDatabaseProvider
     {
-
+        private static bool setLogger = false;
         private readonly string connectionString;
 
         /// <summary>
@@ -32,6 +34,7 @@ namespace Maximiz.Infrastructure.Database
             NpgsqlConnection.GlobalTypeMapper.MapEnum<Device>("device");
             NpgsqlConnection.GlobalTypeMapper.MapEnum<Location>("location");
             NpgsqlConnection.GlobalTypeMapper.MapEnum<OS>("operating_system");
+            NpgsqlConnection.GlobalTypeMapper.MapEnum<OperationItemStatus>("operation_item_status");
             NpgsqlConnection.GlobalTypeMapper.MapEnum<Publisher>("publisher");
 
             Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
@@ -42,22 +45,29 @@ namespace Maximiz.Infrastructure.Database
         /// TODO Clean up a bit
         /// </summary>
         public NpgsqlDatabaseProvider(IOptions<NpgsqlDatabaseProviderOptions> options,
-            IConfiguration configuration)
+            IConfiguration configuration, ILoggerFactory loggerFactory)
         {
+            // TODO Logging for now
+            if (!setLogger)
+            {
+                NpgsqlLogManager.Provider = new NpgsqlLoggingProvider(loggerFactory);
+                setLogger = true;
+            }
+
             if (configuration == null) { throw new ArgumentNullException(nameof(configuration)); }
             if (options.Value == null) { throw new ArgumentNullException(nameof(options.Value)); }
             if (string.IsNullOrEmpty(options.Value.ConnectionStringName)) { throw new ConfigurationException(nameof(options.Value.ConnectionStringName)); }
 
             connectionString = configuration.GetConnectionString(options.Value.ConnectionStringName);
             if (string.IsNullOrEmpty(connectionString)) { throw new ConfigurationException($"IConfiguration does not contains connection string with name {options.Value.ConnectionStringName}"); }
+
         }
 
         /// <summary>
         /// Gets a connection scope.
         /// </summary>
         /// <returns><see cref=""/></returns>
-        public IDbConnection GetConnectionScope()
-            => new NpgsqlConnection(connectionString);
+        public IDbConnection GetConnectionScope() => new NpgsqlConnection(connectionString);
 
     }
 }
