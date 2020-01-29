@@ -46,6 +46,12 @@ namespace Maximiz.Infrastructure.Querying
         /// <summary>
         /// Gets the table name for the campaign group vs ad group linking table.
         /// </summary>
-        internal static string CampaignGroupAdGroupLinkingTableName => "campaign_group_ad_group";
+        internal static string CampaignGroupAdGroupLinkingTableName => $"{SqlDomain}.campaign_group_ad_group";
+
+        /// <summary>
+        /// Gets the table name for the campaign vs ad group linking table.
+        /// </summary>
+        internal static string CampaignAdGroupLinkingTableName => $"{SqlDomain}.campaign_ad_group";
+
     }
 }

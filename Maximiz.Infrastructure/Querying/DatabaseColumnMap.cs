@@ -36,7 +36,7 @@ namespace Maximiz.Infrastructure.Querying
             MapAccount.Add(PropertyUtility.GetName<Account>((x) => x.SecondaryId), "secondary_id");
 
             // Campaign
-            MapCampaign.Add(PropertyUtility.GetName<Campaign>((x) => x.AccountGuid), "branding_text");
+            MapCampaign.Add(PropertyUtility.GetName<Campaign>((x) => x.AccountGuid), "account_guid");
             MapCampaign.Add(PropertyUtility.GetName<Campaign>((x) => x.ApprovalState), "approval_state");
             MapCampaign.Add(PropertyUtility.GetName<Campaign>((x) => x.BidStrategy), "bid_strategy");
             MapCampaign.Add(PropertyUtility.GetName<Campaign>((x) => x.BrandingText), "branding_text");
@@ -59,6 +59,8 @@ namespace Maximiz.Infrastructure.Querying
             MapCampaign.Add(PropertyUtility.GetName<Campaign>((x) => x.Name), "name");
             MapCampaign.Add(PropertyUtility.GetName<Campaign>((x) => x.Note), "note");
             MapCampaign.Add(PropertyUtility.GetName<Campaign>((x) => x.OperatingSystems), "operating_systems");
+            MapCampaign.Add(PropertyUtility.GetName<Campaign>((x) => x.OperationId), "operation_id");
+            MapCampaign.Add(PropertyUtility.GetName<Campaign>((x) => x.OperationItemStatus), "operation_item_status");
             MapCampaign.Add(PropertyUtility.GetName<Campaign>((x) => x.Publisher), "publisher");
             MapCampaign.Add(PropertyUtility.GetName<Campaign>((x) => x.SecondaryId), "secondary_id");
             MapCampaign.Add(PropertyUtility.GetName<Campaign>((x) => x.Spent), "spent");
@@ -80,22 +82,32 @@ namespace Maximiz.Infrastructure.Querying
             MapCampaignWithStats.Add(PropertyUtility.GetName<CampaignWithStats>((x) => x.Roi), "roi");
 
             // Campaign group
+            MapCampaignGroup.Add(PropertyUtility.GetName<CampaignGroup>((x) => x.AccountId), "account_id");
             MapCampaignGroup.Add(PropertyUtility.GetName<CampaignGroup>((x) => x.ApprovalState), "approval_state");
+            MapCampaignGroup.Add(PropertyUtility.GetName<CampaignGroup>((x) => x.BidStrategy), "bid_strategy");
             MapCampaignGroup.Add(PropertyUtility.GetName<CampaignGroup>((x) => x.BrandingText), "branding_text");
             MapCampaignGroup.Add(PropertyUtility.GetName<CampaignGroup>((x) => x.Budget), "budget");
             MapCampaignGroup.Add(PropertyUtility.GetName<CampaignGroup>((x) => x.BudgetDaily), "budget_daily");
+            MapCampaignGroup.Add(PropertyUtility.GetName<CampaignGroup>((x) => x.BudgetModel), "budget_model");
             MapCampaignGroup.Add(PropertyUtility.GetName<CampaignGroup>((x) => x.CreateDate), "create_date");
+            MapCampaignGroup.Add(PropertyUtility.GetName<CampaignGroup>((x) => x.ConnectionTypes), "connection_types");
             MapCampaignGroup.Add(PropertyUtility.GetName<CampaignGroup>((x) => x.DeleteDate), "delete_date");
             MapCampaignGroup.Add(PropertyUtility.GetName<CampaignGroup>((x) => x.Delivery), "delivery");
+            MapCampaignGroup.Add(PropertyUtility.GetName<CampaignGroup>((x) => x.Devices), "devices");
             MapCampaignGroup.Add(PropertyUtility.GetName<CampaignGroup>((x) => x.EndDate), "end_date");
             MapCampaignGroup.Add(PropertyUtility.GetName<CampaignGroup>((x) => x.Id), "id");
             MapCampaignGroup.Add(PropertyUtility.GetName<CampaignGroup>((x) => x.InitialCpc), "initial_cpc");
+            MapCampaignGroup.Add(PropertyUtility.GetName<CampaignGroup>((x) => x.Language), "language");
             MapCampaignGroup.Add(PropertyUtility.GetName<CampaignGroup>((x) => x.LocationExclude), "location_exclude");
             MapCampaignGroup.Add(PropertyUtility.GetName<CampaignGroup>((x) => x.LocationInclude), "location_include");
             MapCampaignGroup.Add(PropertyUtility.GetName<CampaignGroup>((x) => x.Name), "name");
+            MapCampaignGroup.Add(PropertyUtility.GetName<CampaignGroup>((x) => x.OperatingSystems), "operating_systems");
+            MapCampaignGroup.Add(PropertyUtility.GetName<CampaignGroup>((x) => x.OperationId), "operation_id");
+            MapCampaignGroup.Add(PropertyUtility.GetName<CampaignGroup>((x) => x.OperationItemStatus), "operation_item_status");
             MapCampaignGroup.Add(PropertyUtility.GetName<CampaignGroup>((x) => x.Publisher), "publisher");
             MapCampaignGroup.Add(PropertyUtility.GetName<CampaignGroup>((x) => x.Spent), "spent");
             MapCampaignGroup.Add(PropertyUtility.GetName<CampaignGroup>((x) => x.StartDate), "start_date");
+            MapCampaignGroup.Add(PropertyUtility.GetName<CampaignGroup>((x) => x.TargetUrl), "target_url");
             MapCampaignGroup.Add(PropertyUtility.GetName<CampaignGroup>((x) => x.UpdateDate), "update_date");
 
             // Campaign group with stats
@@ -109,6 +121,8 @@ namespace Maximiz.Infrastructure.Querying
             MapAdGroup.Add(PropertyUtility.GetName<AdGroup>((x) => x.Id), "id");
             MapAdGroup.Add(PropertyUtility.GetName<AdGroup>((x) => x.ImageLinks), "image_links");
             MapAdGroup.Add(PropertyUtility.GetName<AdGroup>((x) => x.Name), "name");
+            MapAdGroup.Add(PropertyUtility.GetName<AdGroup>((x) => x.OperationId), "operation_id");
+            MapAdGroup.Add(PropertyUtility.GetName<AdGroup>((x) => x.OperationItemStatus), "operation_item_status");
             MapAdGroup.Add(PropertyUtility.GetName<AdGroup>((x) => x.Titles), "titles");
             MapAdGroup.Add(PropertyUtility.GetName<AdGroup>((x) => x.UpdateDate), "update_date");
 
@@ -133,6 +147,8 @@ namespace Maximiz.Infrastructure.Querying
             MapAdItem.Add(PropertyUtility.GetName<AdItem>((x) => x.ImageUrl), "image_url");
             MapAdItem.Add(PropertyUtility.GetName<AdItem>((x) => x.Impressions), "impressions");
             MapAdItem.Add(PropertyUtility.GetName<AdItem>((x) => x.ModifiedBeyondAdGroup), "modified_beyond_ad_group");
+            MapAdItem.Add(PropertyUtility.GetName<AdItem>((x) => x.OperationId), "operation_id");
+            MapAdItem.Add(PropertyUtility.GetName<AdItem>((x) => x.OperationItemStatus), "operation_item_status");
             MapAdItem.Add(PropertyUtility.GetName<AdItem>((x) => x.SecondaryId), "secondary_id");
             MapAdItem.Add(PropertyUtility.GetName<AdItem>((x) => x.Spent), "spent");
             MapAdItem.Add(PropertyUtility.GetName<AdItem>((x) => x.Status), "status");

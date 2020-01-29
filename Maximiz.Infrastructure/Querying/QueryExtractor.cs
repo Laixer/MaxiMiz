@@ -55,7 +55,7 @@ namespace Maximiz.Infrastructure.Querying
 
             if (!forCount)
             {
-                result += $"{ExtractPaging(page, pageItemCount)}";
+                result += $" {ExtractPaging(page, pageItemCount)}";
             }
 
             result += ";";
