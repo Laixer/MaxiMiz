@@ -19,12 +19,14 @@ namespace Maximiz.Model.Entity
         /// Reference to the publisher.
         /// </summary>
         public Publisher Publisher { get; set; }
+        public string PublisherText { get => Publisher.GetEnumMemberName(); }
 
         /// <summary>
         /// Indicates the status of any changes made in our own database. These
         /// changes have to be pushed to the corresponding external API.
         /// </summary>
         public ApprovalState ApprovalState { get; set; }
+        public string ApprovalStateText { get => ApprovalState.GetEnumMemberName(); }
 
         /// <summary>
         /// Delivery mode of this ad.
@@ -76,6 +78,33 @@ namespace Maximiz.Model.Entity
         /// Campaign end date.
         /// </summary>
         public DateTime? EndDate { get; set; }
+
+        /// <summary>
+        /// The <see cref="Account"/> to which this campaign group belongs.
+        /// </summary>
+        public Guid AccountId { get; set; }
+
+        public Device[] Devices { get; set; }
+
+        public OS[] OperatingSystems { get; set; }
+
+        public BidStrategy BidStrategy { get; set; }
+        public string BidStrategyText { get => BidStrategy.GetEnumMemberName(); }
+
+        public string Language { get; set; }
+
+        public string TargetUrl { get; set; }
+
+        public OperationItemStatus OperationItemStatus { get; set; }
+        public string OperationItemStatusText { get => OperationItemStatus.GetEnumMemberName(); }
+
+        public Guid OperationId { get; set; }
+
+        public BudgetModel BudgetModel { get; set; }
+        public string BudgetModelText { get => BudgetModel.GetEnumMemberName(); }
+
+        public ConnectionType[] ConnectionTypes { get; set; }
+
 
     }
 

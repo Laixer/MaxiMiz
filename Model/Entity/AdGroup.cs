@@ -29,5 +29,11 @@ namespace Maximiz.Model.Entity
         /// </summary>
         public string[] Titles { get; set; }
 
+        public OperationItemStatus OperationItemStatus { get; set; }
+        public string OperationItemStatusText { get => OperationItemStatus.GetEnumMemberName(); }
+
+        public Guid OperationId { get; set; }
+
+
     }
 }

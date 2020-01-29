@@ -110,5 +110,11 @@ namespace Maximiz.Model.Entity
         /// we do have to store.
         /// </summary>
         public string Details { get; set; }
+
+        public OperationItemStatus OperationItemStatus { get; set; }
+        public string OperationItemStatusText { get => OperationItemStatus.GetEnumMemberName(); }
+
+        public Guid OperationId { get; set; }
+
     }
 }
