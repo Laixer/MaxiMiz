@@ -29,15 +29,11 @@ namespace Maximiz.Infrastructure.Repositories
         /// Gets all <see cref="AdGroupWithStats"/> that are linked with our
         /// specified <see cref="Campaign"/>.
         /// </summary>
-        /// <param name="campaignId"></param>
-        /// <param name="query"></param>
+        /// <param name="campaignId">The <see cref="Campaign"/> id</param>
         /// <returns></returns>
-        public Task<IEnumerable<AdGroupWithStats>> GetLinkedWithCampaignAsync(Guid campaignId, QueryBase<AdGroupWithStats> query)
+        public Task<IEnumerable<AdGroupWithStats>> GetLinkedWithCampaignAsync(Guid campaignId)
         {
             if (campaignId == null || Guid.Empty == campaignId) { throw new ArgumentNullException(nameof(campaignId)); }
-
-            // TODO This should never happen!!!! REMOVE THIS DEBUG
-            campaignId = new Guid("ca456d7e-ec2a-425b-b01e-dda04939ef7e");
 
             // TODO Maybe move complex queries somewhere else? Kind of hard coded, but also specific.
             var sql = $"SELECT a.*" +
@@ -45,7 +41,7 @@ namespace Maximiz.Infrastructure.Repositories
                 $" JOIN {QueryExtractor.CampaignGroupAdGroupLinkingTableName} link" +
                 $" ON a.id = link.ad_group_guid" +
                 $" JOIN {QueryExtractor.GetTableName<Campaign>()} c" +
-                $" ON c.campaign_group_guid = link.campaign_group_id" +
+                $" ON c.campaign_group_guid = link.campaign_group_guid" +
                 $" WHERE c.id = '{campaignId}';";
             return RepositorySharedFunctions.QueryAsync<AdGroupWithStats>(_databaseProvider, sql);
         }

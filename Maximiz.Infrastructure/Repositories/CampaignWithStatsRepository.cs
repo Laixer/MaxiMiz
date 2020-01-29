@@ -41,8 +41,6 @@ namespace Maximiz.Infrastructure.Repositories
                 CampaignStatus.Expired,
                 CampaignStatus.Frozen,
                 CampaignStatus.Paused,
-                CampaignStatus.PendingApproval,
-                CampaignStatus.PendingStartDate,
                 CampaignStatus.Rejected,
                 CampaignStatus.Terminated },
                 query);
@@ -97,8 +95,6 @@ namespace Maximiz.Infrastructure.Repositories
                 CampaignStatus.Expired,
                 CampaignStatus.Frozen,
                 CampaignStatus.Paused,
-                CampaignStatus.PendingApproval,
-                CampaignStatus.PendingStartDate,
                 CampaignStatus.Rejected,
                 CampaignStatus.Terminated },
                 query);
