@@ -1,4 +1,7 @@
 ﻿using Maximiz.Model.Entity;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Maximiz.Core.Infrastructure.Repositories
 {
@@ -9,7 +12,9 @@ namespace Maximiz.Core.Infrastructure.Repositories
     public interface IAdItemRepository : IRepository<AdItem>, IRepositoryExternalIdQueryable<AdItem>
     {
 
-        //
+        Task<IEnumerable<AdItem>> GetAllFromAdGroupAndCampaignAsync(Guid adGroupId, Guid campaignId);
+
+        Task<IEnumerable<AdItem>> GetAllFromCampaignAsync(Guid campaignId);
 
     }
 }

@@ -19,7 +19,7 @@ namespace Maximiz.Core.Infrastructure.Commiting
         /// <param name="entity"><see cref="TEntity"/></param>
         /// <param name="token"><see cref="CancellationToken"/></param>
         /// <returns><see cref="TEntity"/></returns>
-        Task<TEntity> Create(TEntity entity, CancellationToken token);
+        Task<TEntity> CreateAsync(TEntity entity, CancellationToken token);
 
         /// <summary>
         /// Updates a <see cref="TEntity"/> in our data store and returns it.

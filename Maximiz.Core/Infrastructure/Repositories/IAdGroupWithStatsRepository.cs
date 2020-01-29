@@ -13,7 +13,7 @@ namespace Maximiz.Core.Infrastructure.Repositories
     public interface IAdGroupWithStatsRepository : IRepository<AdGroupWithStats>
     {
 
-        Task<IEnumerable<AdGroupWithStats>> GetLinkedWithCampaignAsync(Guid campaignId, QueryBase<AdGroupWithStats> query);
+        Task<IEnumerable<AdGroupWithStats>> GetLinkedWithCampaignAsync(Guid campaignId);
 
     }
 }

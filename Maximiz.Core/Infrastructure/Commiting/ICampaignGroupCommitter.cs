@@ -1,4 +1,7 @@
 ﻿using Maximiz.Model.Entity;
+using System.Data;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Maximiz.Core.Infrastructure.Commiting
 {
@@ -9,7 +12,7 @@ namespace Maximiz.Core.Infrastructure.Commiting
     public interface ICampaignGroupCommitter : ICommitter<CampaignGroup>
     {
 
-        //
+        Task<CampaignGroup> CreateAsyncFromConnection(IDbConnection connection, CampaignGroup campaignGroup, CancellationToken token);
 
     }
 }
