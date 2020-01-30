@@ -16,7 +16,7 @@ namespace Maximiz.Core.Querying
         /// <summary>
         /// The page number to display.
         /// </summary>
-        public int Page { get; set; } = 0;
+        public int Page { get; set; } = 1;
 
         /// <summary>
         /// The items per page to display.

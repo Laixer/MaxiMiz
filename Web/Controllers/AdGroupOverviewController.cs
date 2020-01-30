@@ -61,10 +61,10 @@ namespace Maximiz.Controllers
         /// <returns><see cref="PartialViewResult"/></returns>
         [HttpGet]
         public async Task<IActionResult> GetAdGroupTableAsync(AdGroupOverviewTableType table,
-            ColumnAdGroupOverview column, Order order, string searchString = null, int page = 0)
+            ColumnAdGroupOverview column, Order order, string searchString = null, int page = 1)
         {
             // Only edge care required
-            if (page < 0) { throw new ArgumentOutOfRangeException(nameof(page)); }
+            if (page < 1) { throw new ArgumentOutOfRangeException(nameof(page)); }
 
             var query = _queryTranslator.Translate(column, order, searchString, page);
             return PartialView("_TableRows", new AdGroupOverviewTableViewModel
@@ -88,10 +88,10 @@ namespace Maximiz.Controllers
         /// <returns><see cref="PartialViewResult"/></returns>
         [HttpGet]
         public async Task<IActionResult> GetAdGroupCountAsync(AdGroupOverviewTableType table,
-            ColumnAdGroupOverview column, Order order, string searchString = null, int page = 0)
+            ColumnAdGroupOverview column, Order order, string searchString = null, int page = 1)
         {
             // Only edge care required
-            if (page < 0) { throw new ArgumentOutOfRangeException(nameof(page)); }
+            if (page < 1) { throw new ArgumentOutOfRangeException(nameof(page)); }
 
             var query = _queryTranslator.Translate(column, order, searchString, page);
             return PartialView("_TableRows", new AdGroupOverviewCountViewModel

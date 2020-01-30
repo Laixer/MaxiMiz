@@ -25,7 +25,7 @@ namespace Maximiz.Core.Infrastructure.Repositories
         /// </summary>
         /// <returns><see cref="IEnumerable{TEntity}"/></returns>
         /// <param name="page">Paging option</param>
-        Task<IEnumerable<TEntity>> GetAllAsync(int page = 0);
+        Task<IEnumerable<TEntity>> GetAllAsync(int page = 1);
 
     }
 

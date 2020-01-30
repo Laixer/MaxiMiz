@@ -45,7 +45,7 @@ namespace Maximiz.Infrastructure.Querying
         /// <param name="page">Page number</param>
         /// <param name="pageItemCount">Items per page</param>
         /// <returns>SQL query</returns>
-        internal static string ExtractSql<TEntity>(int page = 0, int pageItemCount = 50, bool forCount = false)
+        internal static string ExtractSql<TEntity>(int page = 1, int pageItemCount = 50, bool forCount = false)
             where TEntity : Entity
         {
             if (page < 0) { throw new ArgumentOutOfRangeException(nameof(page)); }

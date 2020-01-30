@@ -59,9 +59,9 @@ namespace Maximiz.Controllers
         /// <returns>View component call</returns>
         [HttpGet]
         public async Task<IActionResult> GetCampaignTableViewComponent(CampaignTableType table,
-            ColumnCampaignOverview column, Order order, string searchString = null, int page = 0)
+            ColumnCampaignOverview column, Order order, string searchString = null, int page = 1)
         {
-            if (page < 0) { throw new ArgumentOutOfRangeException(nameof(page)); }
+            if (page < 1) { throw new ArgumentOutOfRangeException(nameof(page)); }
 
             var query = _queryTranslator.Translate(column, order, searchString, page);
             return PartialView("_TableRows", new CampaignOverviewTableViewModel
@@ -80,9 +80,9 @@ namespace Maximiz.Controllers
         /// <returns>View component call</returns>
         [HttpGet]
         public async Task<IActionResult> GetCampaignCountViewComponent(CampaignTableType table,
-            ColumnCampaignOverview column, Order order, string searchString = null, int page = 0)
+            ColumnCampaignOverview column, Order order, string searchString = null, int page = 1)
         {
-            if (page < 0) { throw new ArgumentOutOfRangeException(nameof(page)); }
+            if (page < 1) { throw new ArgumentOutOfRangeException(nameof(page)); }
 
             var query = _queryTranslator.Translate(column, order, searchString, page);
             return PartialView("_TableCount", new CampaignCountViewModel

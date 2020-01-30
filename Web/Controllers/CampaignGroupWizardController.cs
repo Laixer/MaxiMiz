@@ -65,9 +65,9 @@ namespace Maximiz.Controllers
         /// <param name="page">Page number</param>
         /// <returns><see cref="PartialViewResult"/></returns>
         public async Task<IActionResult> GetAdGroupsAsync(ColumnCampaignGroupWizardAdGroup column,
-            Order order, string searchString = null, int page = 0)
+            Order order, string searchString = null, int page = 1)
         {
-            if (page < 0) { throw new ArgumentOutOfRangeException(nameof(page)); }
+            if (page < 1) { throw new ArgumentOutOfRangeException(nameof(page)); }
 
             var query = _queryTranslator.Translate(column, order, searchString, page);
             return PartialView("_SectionAdGroupsTableRows", new CampaignGroupWizardAdGroupViewModel {

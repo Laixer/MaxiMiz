@@ -39,7 +39,7 @@ namespace Maximiz.Infrastructure.Repositories
         /// </summary>
         /// <param name="page">Page number</param>
         /// <returns><see cref="IEnumerable{TEntity}"/></returns>
-        public async Task<IEnumerable<TEntity>> GetAllAsync(int page = 0)
+        public async Task<IEnumerable<TEntity>> GetAllAsync(int page = 1)
         {
             if (page < 0) { throw new ArgumentOutOfRangeException(nameof(page)); }
 

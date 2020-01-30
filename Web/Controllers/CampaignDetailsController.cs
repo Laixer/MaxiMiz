@@ -129,10 +129,10 @@ namespace Maximiz.Controllers
         /// <returns><see cref="PartialViewResult"/></returns>
         [HttpGet]
         public async Task<IActionResult> GetAdGroupsLinkedAsync(Guid campaignId, ColumnAdGroupLinking column,
-            Order order, string searchString = null, int page = 0)
+            Order order, string searchString = null, int page = 1)
         {
             if (campaignId == null || campaignId == Guid.Empty) { throw new ArgumentNullException(nameof(campaignId)); }
-            if (page < 0) { throw new ArgumentOutOfRangeException(nameof(page)); }
+            if (page < 1) { throw new ArgumentOutOfRangeException(nameof(page)); }
 
             var query = _queryTranslator.Translate(column, order, searchString, page);
             return PartialView("_AdGroupTableRowsLinked", new AdGroupTableLinkedViewModel
@@ -152,10 +152,10 @@ namespace Maximiz.Controllers
         /// <returns><see cref="PartialViewResult"/></returns>
         [HttpGet]
         public async Task<IActionResult> GetAdGroupsAllAsync(Guid campaignId, ColumnAdGroupLinking column,
-            Order order, string searchString = null, int page = 0)
+            Order order, string searchString = null, int page = 1)
         {
             if (campaignId == null || campaignId == Guid.Empty) { throw new ArgumentNullException(nameof(campaignId)); }
-            if (page < 0) { throw new ArgumentOutOfRangeException(nameof(page)); }
+            if (page < 1) { throw new ArgumentOutOfRangeException(nameof(page)); }
 
             var query = _queryTranslator.Translate(column, order, searchString, page);
             return PartialView("_AdGroupTableRowsAll", new AdGroupTableLinkedViewModel
@@ -176,10 +176,10 @@ namespace Maximiz.Controllers
         /// <returns><see cref="PartialViewResult"/></returns>
         [HttpGet]
         public async Task<IActionResult> GetAdGroupsAllCountAsync(Guid campaignId, ColumnAdGroupLinking column,
-            Order order, string searchString = null, int page = 0)
+            Order order, string searchString = null, int page = 1)
         {
             if (campaignId == null || campaignId == Guid.Empty) { throw new ArgumentNullException(nameof(campaignId)); }
-            if (page < 0) { throw new ArgumentOutOfRangeException(nameof(page)); }
+            if (page < 1) { throw new ArgumentOutOfRangeException(nameof(page)); }
 
             var query = _queryTranslator.Translate(column, order, searchString, page);
             return PartialView("_AdGroupTableCountAll", new AdGroupTableAllCountViewModel
