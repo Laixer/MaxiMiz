@@ -70,7 +70,7 @@ namespace Maximiz.Core.StateMachine
             {
                 try
                 {
-                    await _operationCommitter.Create(operation, source.Token); // Only affects operation table
+                    await _operationCommitter.CreateAsync(operation, source.Token); // Only affects operation table
                     await _operationCommitter.MarkAllAsInOperationAsync(operation); // Only affects entity tables
                     await _operationHistoryCreator.CreateHistoryAsync(operation); // Only affects history tables
 
