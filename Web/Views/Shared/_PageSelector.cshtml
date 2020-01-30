@@ -1,0 +1,38 @@
+﻿@*
+    Contains our page selection.
+*@
+
+@model PageSelectorViewModel;
+
+<!-- Page nav -->
+<nav aria-label="Page navigation example">
+    <ul id="@Model.Identifier" class="pagination justify-content-center pt-3">
+
+        <!-- Go to previous page -->
+        <li class="page-item">
+            <a class="page-link pagePrevious" href="" aria-label="Previous">
+                <span aria-hidden="true">&laquo;</span>
+                <span class="sr-only">Previous</span>
+            </a>
+        </li>
+
+        <!-- Clickable pagination items get added here dynamically, based on <ul> and <li> -->
+
+        <!-- Go to next page -->
+        <li class="page-item">
+            <a class="page-link pageNext" href="" aria-label="Next">
+                <span aria-hidden="true">&raquo;</span>
+                <span class="sr-only">Next</span>
+            </a>
+        </li>
+
+        <!-- Page selector form -->
+        @*<div class="form-group input-group-sm">
+            <label class="ml-3">Go to page </label>
+            <a>
+                <input size="2" type="number" placeholder="" class="mx-2 w-25" />
+                <button class="btn btn-primary btn-xs">Go</button>
+            </a>
+        </div>*@
+    </ul>
+</nav>

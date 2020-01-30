@@ -4,6 +4,6 @@
 
 @model CampaignCountViewModel
 
-<div>
+<div class="tableCount" data-total-items="@Model.CampaignCount" data-items-per-page="@Model.ItemsPerPage">
     @Model.TableName (@Model.CampaignCount)
 </div>
