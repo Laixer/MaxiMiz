@@ -1086,12 +1086,12 @@ main h1 {
     background: #fff;
 }
 
-.imageSelected {
 .adscontent .preview-section .image-description {
     max-width: 20rem;
     margin-top: .3rem;
 }
 
+.imageSelected {
     border: 2px solid green;
 }
 
