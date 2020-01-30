@@ -16,7 +16,7 @@ namespace Microsoft.Extensions.DependencyInjection
         /// </summary>
         /// <param name="services"><see cref="IServiceCollection"/></param>
         /// <returns><see cref="IServiceCollection"/></returns>
-        public static IServiceCollection AdddViewModelServices(this IServiceCollection services)
+        public static IServiceCollection AddViewModelServices(this IServiceCollection services)
         {
             services.AddTransient<ICurrencyViewModelService, CurrencyViewModelService>();
             services.AddTransient<IEnumViewModelService, EnumViewModelService>();

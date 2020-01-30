@@ -1,5 +1,4 @@
 using Maximiz.ServiceBus;
-using Maximiz.Repositories.Abstraction;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -9,7 +8,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Maximiz.Database;
 using Laixer.Library.Injection.ServiceBus;
 using Laixer.Library.Injection.Database;
-using Maximiz.Repositories.Mock;
 using Maximiz.Storage.Abstraction;
 using Maximiz.Storage;
 using Microsoft.Extensions.Logging;
@@ -20,10 +18,10 @@ using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Maximiz.Controllers;
-using Maximiz.Repositories;
+using Maximiz.QueryTranslation;
+using Maximiz.Operations;
 using Maximiz.Core.StateMachine.Abstraction;
 using Maximiz.Core.StateMachine;
-using Maximiz.Operations;
 
 namespace Maximiz
 {
@@ -71,19 +69,27 @@ namespace Maximiz
             //services.AddTransactionHandler<TransactionHandler>();
             services.AddCrudInternalWebClient<CrudInternalWebClient>();
             services.AddMappers();
-            services.AdddViewModelServices();
+            services.AddViewModelServices();
+            services.AddCommitters();
+            services.AddSingleton<IEntityMapExtractor, EntityMapExtractor>();
+
             // TODO Might want to revisit this
             services.AddTransient<IStorageManager, StorageManager>();
 
-
             // Setup logging
             services.AddSingleton<ILoggerFactory, LoggerFactory>();
-            services.AddSingleton(typeof(ILogger<>), typeof(Logger<>));
 
-            ConfigureServicesRepositories(services);
+            // Setup query translation
+            services.AddTransient<IQueryTranslator, QueryTranslator>();
+
+            // Setup infrastructure
+            services.AddDatabaseProvider("DatabaseInternal");
+            services.AddRepositories();
+
+            // Setup Identity
             ConfigureServicesIdentity(services);
 
-            // Setup MVC structure
+            // Setup MVC structure and add identity to MVC
             services.AddMvc(options =>
             {
                 var policy = new AuthorizationPolicyBuilder()
@@ -92,9 +98,6 @@ namespace Maximiz
                 // options.Filters.Add(new AuthorizeFilter(policy)); TODO Re-enable!!!
             })
             .SetCompatibilityVersion(CompatibilityVersion.Latest);
-
-            // TODO Remove / replace
-            services.AddTransient<TestRepository>();
         }
 
         /// <summary>
@@ -131,19 +134,6 @@ namespace Maximiz
         }
 
         /// <summary>
-        /// Configures our repositories.
-        /// </summary>
-        /// <param name="services"><see cref="IServiceCollection"/></param>
-        private void ConfigureServicesRepositories(IServiceCollection services)
-        {
-            // TODO Make scoped in stead of transient? Because of multiple queries & item preservation
-            services.AddTransient<ICampaignRepository, MockCampaignRepository>();
-            services.AddTransient<IAdGroupRepository, MockAdGroupRepository>();
-            services.AddTransient<IAccountRepository, MockAccountRepository>();
-            //services.AddTransient<IAdItemRepository, AdItemRepository>();
-        }
-
-        /// <summary>
         /// Sets up our http request pipeline.
         /// </summary>
         /// <param name="app">The application builder</param>
@@ -173,8 +163,8 @@ namespace Maximiz
                 routes.MapRoute(
                     name: "default",
                     //template: "{controller=Login}/{action=Index}");
-                    template: "{controller=CampaignGroupWizard}/{action=ShowWizard}");
-                    //template: "{controller=Debug}/{action=Index}");
+                    //template: "{controller=CampaignGroupWizard}/{action=ShowWizard}");
+                    template: "{controller=Debug}/{action=Index}");
             });
 
         }

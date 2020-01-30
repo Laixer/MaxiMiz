@@ -22,6 +22,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IMapper<CampaignWithStats, CampaignModel>, MapperCampaignWithStats>();
             services.AddSingleton<IMapper<AdGroupWithStats, AdGroupModel>, MapperAdGroupWithStats>();
             services.AddSingleton<IMapper<Account, AccountModel>, MapperAccount>();
+            services.AddSingleton<IMapper<AccountWithStats, AccountModel>, MapperAccountWithStats>();
             // TODO Add other mappers too
 
             return services;
