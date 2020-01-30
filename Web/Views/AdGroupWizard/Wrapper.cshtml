@@ -11,20 +11,11 @@
 <!-- Wrapper content -->
 <main class="adsmain">
 
-    <!-- TODO Row placement thingy -->
-    <div class="row">
+    <!-- Contains all our metadata functionality -->
+    <partial name="_Sidebar" model="@Model" />
 
-        <!-- Contains all our metadata functionality -->
-        <div class="col-md-3">
-            <partial name="_Sidebar" model="@Model" />
-        </div>
-
-        <!-- Contains our previews -->
-        <div class="col-md-3">
-            <partial name="_MidSection" />
-        </div>
-
-    </div>
+    <!-- Contains our previews -->
+    <partial name="_MidSection" />
 
     <!-- Image picker modal -->
     <div class="container centermodal">
