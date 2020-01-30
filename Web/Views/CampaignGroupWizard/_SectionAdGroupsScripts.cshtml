@@ -113,7 +113,6 @@
         // This explicitly removes the error message, because it bugs out
         // TODO This is a workaround', the validator doesn't seem to understand inputs being removed
         $('#emptyHiddenAdGroup-error').text('');
-
     }
 
     // Removes a hidden input entry for a given ad group id
@@ -123,7 +122,7 @@
         });
 
         // If we have just removed the last item we should add the empty placeholder again
-        if (!$('.hiddenAdGroupId .notEmpty').length) {
+        if ($('#selectedAdGroupIds .notEmpty').length == 0) {
             $('#selectedAdGroupIds').append(emptyHiddenAdGroupHtml);
         }
     }

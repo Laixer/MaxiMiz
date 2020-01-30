@@ -6,6 +6,7 @@
 <!-- Table row for each item in our collection. -->
 @foreach (var adGroup in Model.AdGroupList)
 {
+    var id = Guid.NewGuid();
     <tr class="row-unlink-adgroup">
         <td>@adGroup.Name</td>
         <td>@adGroup.CreateDate</td>
@@ -17,8 +18,13 @@
                            data-adgroup-id="@adGroup.Id" data-adgroup-name="@adGroup.Name"/>
                     <label class="form-check-label font-weight-normal"></label>
                 </div>*@
-            <input class="checkboxSelectAdGroup switchOption" type="checkbox"
-                   data-adgroup-id="@adGroup.Id" data-adgroup-name="@adGroup.Name" />
+            @*<input class="checkboxSelectAdGroup switchOption" type="checkbox"
+                   data-adgroup-id="@adGroup.Id" data-adgroup-name="@adGroup.Name" />*@
+            <div class="form-check form-check-inline">
+                <input class="checkboxSelectAdGroup form-check-input" type="checkbox" id="@id"
+                       data-adgroup-id="@adGroup.Id" data-adgroup-name="@adGroup.Name">
+                <label class="checkbox-no-label form-check-label" for="@id"></label>
+            </div>
         </td>
     </tr>
 }
