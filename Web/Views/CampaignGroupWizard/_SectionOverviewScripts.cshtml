@@ -56,6 +56,17 @@
         $('.buttonBack').attr('disabled', 'disabled');
         $('.icon').attr('disabled', 'disabled'); // TODO Check
 
+        // We must make non-array items array
+        // TODO This is a workaround
+        let jsonBody = $('#formWizard').serializeFormJSON();
+        makeArrayIfSingleString(jsonBody, 'Publishers');
+        makeArrayIfSingleString(jsonBody, 'Locations');
+        makeArrayIfSingleString(jsonBody, 'Devices');
+        makeArrayIfSingleString(jsonBody, 'OperatingSystems');
+        makeArrayIfSingleString(jsonBody, 'SelectedAdGroupIds');
+
+        let action = $('#formWizard').get(0).action;
+
         // Post the form and handle the response
         let callbackSuccess = () => {
             $(buttonSubmitWizard).html(htmlOriginal);
@@ -81,7 +92,8 @@
             $(divSubmitFeedback).removeClass('text-success');
             $(divSubmitFeedback).addClass('text-danger');
         };
-        doPostFormAndProcess('#formWizard', callbackSuccess, [], callbackFailure, []);
+
+        doPostAndProcess(action, jsonBody, callbackSuccess, [], callbackFailure, []);
     }
 
     // Sets our feedback div text and submit button state according to the current form validity.

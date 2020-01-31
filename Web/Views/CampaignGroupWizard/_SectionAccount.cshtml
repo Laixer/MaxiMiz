@@ -2,7 +2,8 @@
     Campaign group creation wizard section for account settings.
 *@
 
-@model CampaignGroupFormAllViewModel
+@model WizardCollectionsViewModel
+
 <!-- Fieldset for our account properties -->
 <fieldset id="fieldsetAccount">
     <!-- Main title -->
@@ -39,7 +40,7 @@
                 <label for="selectAccountTaboola">Account</label>
                 <select id="selectAccountTaboola" class="form-control"
                         name="@nameof(CampaignGroupFormAllViewModel.AccountTaboolaId)">
-                    @foreach (var account in await new AccountViewModelService().GetAdvertiserAccounts())
+                    @foreach (var account in Model.AccountsTaboolaPublisher)
                     {
                         <option value="@account.Id">@account.Name</option>
                     }

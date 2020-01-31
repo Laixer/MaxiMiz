@@ -2,6 +2,8 @@
     Contains all partial views and sections for the creation of a new campaign group.
 *@
 
+@model WizardCollectionsViewModel
+
 <main>
     <div class="ncg ncg_advanced-account container-fluid">
         <div class="header row">
@@ -81,17 +83,21 @@
 
         <div class="form">
             <!-- One giant form with fieldsets for each tab -->
-            <form id="formWizard" asp-controller="CampaignGroupWizard" asp-action="SubmitForm" method="post">
+            <form id="formWizard" asp-controller="CampaignGroupWizard" asp-action="@nameof(CampaignGroupWizardController.PostForm)" method="post">
                 @{ var formModel = new CampaignGroupFormAllViewModel(); }
                 <div id="divTabs" class="tab-content">
-                    <div class="tab-pane active" id="sectionAccount"><partial name="_SectionAccount" model="formModel" /></div>
-                    <div class="tab-pane" id="sectionMarketing"><partial name="_SectionMarketing" model="formModel" /></div>
-                    <div class="tab-pane" id="sectionTargeting"><partial name="_SectionTargeting" model="formModel" /></div>
-                    <div class="tab-pane" id="sectionSchedule"><partial name="_SectionSchedule" model="formModel" /></div>
-                    <div class="tab-pane" id="sectionAdGroups"><partial name="_SectionAdGroups" model="formModel" /></div>
-                    <div class="tab-pane" id="sectionOverview"><partial name="_SectionOverview" model="formModel" /></div>
+                    <div class="tab-pane active" id="sectionAccount"><partial name="_SectionAccount" model="Model" /></div>
+                    <div class="tab-pane" id="sectionMarketing"><partial name="_SectionMarketing" /></div>
+                    <div class="tab-pane" id="sectionTargeting"><partial name="_SectionTargeting" /></div>
+                    <div class="tab-pane" id="sectionSchedule"><partial name="_SectionSchedule" /></div>
+                    <div class="tab-pane" id="sectionAdGroups"><partial name="_SectionAdGroups" /></div>
+                    <div class="tab-pane" id="sectionOverview"><partial name="_SectionOverview" /></div>
                 </div>
             </form>
+
+            <!-- Debug form, see if this works -->
+            @*<form id="formWizardSubmit" asp-controller="CampaignGroupWizard" asp-action="@nameof(CampaignGroupWizardController.PostForm)" method="post">*@
+            @*</form>*@
         </div>
     </div>
 </main>

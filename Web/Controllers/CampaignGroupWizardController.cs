@@ -8,6 +8,10 @@ using Maximiz.Core.Infrastructure.Repositories;
 using Maximiz.Mapper;
 using Maximiz.ViewModels.EntityModels;
 using Maximiz.QueryTranslation;
+using Maximiz.Operations;
+using Microsoft.Extensions.Logging;
+using Maximiz.Core.StateMachine.Abstraction;
+using System.Threading;
 
 namespace Maximiz.Controllers
 {
@@ -15,23 +19,37 @@ namespace Maximiz.Controllers
     /// <summary>
     /// Controller to manage our <see cref="CampaignGroup"/> creation.
     /// </summary>
-    public class CampaignGroupWizardController : Controller
+    public sealed class CampaignGroupWizardController : Controller
     {
 
         private readonly IAdGroupWithStatsRepository _adGroupRepository;
+        private readonly IAccountRepository _accountRepository;
         private readonly IMapper<AdGroupWithStats, AdGroupModel> _mapperAdGroup;
+        private readonly IMapper<Account, AccountModel> _mapperAccount;
+
         private readonly IQueryTranslator _queryTranslator;
+        private readonly ILogger logger;
+        private readonly IStateMachineManager _stateMachineManager;
 
         /// <summary>
         /// Constructor for dependency injection.
         /// </summary>
         public CampaignGroupWizardController(IAdGroupWithStatsRepository adGroupRepository,
+            IAccountRepository accountRepository,
             IMapper<AdGroupWithStats, AdGroupModel> mapperAdGroup,
-            IQueryTranslator queryTranslator)
+            IMapper<Account, AccountModel> mapperAccount,
+            IQueryTranslator queryTranslator,
+            ILoggerFactory loggerFactory,
+            IStateMachineManager stateMachineManager)
         {
             _adGroupRepository = adGroupRepository ?? throw new ArgumentNullException(nameof(adGroupRepository));
+            _accountRepository = accountRepository ?? throw new ArgumentNullException(nameof(accountRepository));
             _mapperAdGroup = mapperAdGroup ?? throw new ArgumentNullException(nameof(mapperAdGroup));
+            _mapperAccount = mapperAccount ?? throw new ArgumentNullException(nameof(mapperAccount));
             _queryTranslator = queryTranslator ?? throw new ArgumentNullException(nameof(queryTranslator));
+            if (loggerFactory == null) { throw new ArgumentNullException(nameof(loggerFactory)); }
+            logger = loggerFactory.CreateLogger(nameof(CampaignGroupWizardController));
+            _stateMachineManager = stateMachineManager ?? throw new ArgumentNullException(nameof(stateMachineManager));
         }
 
         /// <summary>
@@ -39,8 +57,13 @@ namespace Maximiz.Controllers
         /// </summary>
         /// <returns><see cref="ViewResult"/></returns>
         [HttpGet]
-        public IActionResult ShowWizard()
-            => View("Wrapper");
+        public async Task<IActionResult> ShowWizard()
+        {
+            return View("Wrapper", new WizardCollectionsViewModel
+            {
+                AccountsTaboolaPublisher = _mapperAccount.ConvertAll(await _accountRepository.GetAllAsync())
+            });
+        }
 
         /// <summary>
         /// Submits the creation form, attempts to do the transactions and returns.
@@ -48,12 +71,26 @@ namespace Maximiz.Controllers
         /// <param name="model"><see cref="CampaignGroupFormAllViewModel"/></param>
         /// <returns><see cref="OkResult"/> or <see cref="BadRequestResult"/></returns>
         [HttpPost]
-        public async Task<IActionResult> SubmitForm([FromBody] CampaignGroupFormAllViewModel model)
+        public async Task<IActionResult> PostForm([FromBody] CampaignGroupFormAllViewModel model)
         {
-            await Task.Delay(new Random().Next(250, 1000));
+            if (model == null) { throw new ArgumentNullException(nameof(model)); }
+            //if (token == null) { throw new ArgumentNullException(nameof(token)); } 
+            if (!ModelState.IsValid) { return BadRequest("Model state is not valid"); }
 
-            // TODO Implement
-            return Ok();
+            try
+            {
+                using (var source = new CancellationTokenSource())
+                {
+                    var operation = FormOperationExtractor.Extract(model);
+                    await _stateMachineManager.AttemptStartStateMachineAsync(operation, source.Token);
+                    return Ok();
+                }
+            }
+            catch (Exception e)
+            {
+                logger.LogError("Couldn't start state machine for campaign group creation wizard", e);
+                return BadRequest();
+            }
         }
 
         /// <summary>
@@ -70,7 +107,8 @@ namespace Maximiz.Controllers
             if (page < 1) { throw new ArgumentOutOfRangeException(nameof(page)); }
 
             var query = _queryTranslator.Translate(column, order, searchString, page);
-            return PartialView("_SectionAdGroupsTableRows", new CampaignGroupWizardAdGroupViewModel {
+            return PartialView("_SectionAdGroupsTableRows", new CampaignGroupWizardAdGroupViewModel
+            {
                 AdGroupList = _mapperAdGroup.ConvertAll(await _adGroupRepository.GetAllAsync(query))
             });
         }
