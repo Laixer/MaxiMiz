@@ -14,7 +14,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Laixer.Library\Laixer.Library.csproj" />
     <ProjectReference Include="..\..\Maximiz.Helper\Maximiz.Helper.csproj" />
     <ProjectReference Include="..\Poller\Poller.csproj" />
   </ItemGroup>
