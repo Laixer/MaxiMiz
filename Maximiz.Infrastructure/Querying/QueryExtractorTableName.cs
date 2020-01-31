@@ -31,6 +31,7 @@ namespace Maximiz.Infrastructure.Querying
         {
             var type = typeof(TEntity);
             if (type == typeof(Account)) { return "account"; }
+            if (type == typeof(AccountWithStats)) { return "account"; } // TODO!
             if (type == typeof(CampaignWithStats)) { return "campaign_with_stats"; }
             if (type == typeof(Campaign)) { return "campaign"; }
             if (type == typeof(CampaignGroupWithStats)) { return "campaign_group_with_stats"; }

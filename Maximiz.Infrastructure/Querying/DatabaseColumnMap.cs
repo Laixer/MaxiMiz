@@ -13,6 +13,7 @@ namespace Maximiz.Infrastructure.Querying
     {
 
         private static readonly Dictionary<string, string> MapAccount = new Dictionary<string, string>();
+        private static readonly Dictionary<string, string> MapAccountWithStats = new Dictionary<string, string>();
         private static readonly Dictionary<string, string> MapCampaign = new Dictionary<string, string>();
         private static readonly Dictionary<string, string> MapCampaignWithStats = new Dictionary<string, string>();
         private static readonly Dictionary<string, string> MapCampaignGroup = new Dictionary<string, string>();
@@ -34,6 +35,9 @@ namespace Maximiz.Infrastructure.Querying
             MapAccount.Add(PropertyUtility.GetName<Account>((x) => x.Name), "name");
             MapAccount.Add(PropertyUtility.GetName<Account>((x) => x.Publisher), "publisher");
             MapAccount.Add(PropertyUtility.GetName<Account>((x) => x.SecondaryId), "secondary_id");
+
+            // Account with stats
+            MapAccountWithStats.AddAll(MapAccount);
 
             // Campaign
             MapCampaign.Add(PropertyUtility.GetName<Campaign>((x) => x.AccountGuid), "account_guid");
@@ -173,6 +177,7 @@ namespace Maximiz.Infrastructure.Querying
         {
             var type = typeof(TEntity);
             if (type == typeof(Account)) { return FromMap(sortableProperty, MapAccount); }
+            if (type == typeof(AccountWithStats)) { return FromMap(sortableProperty, MapAccountWithStats); }
             if (type == typeof(CampaignWithStats)) { return FromMap(sortableProperty, MapCampaignWithStats); }
             if (type == typeof(Campaign)) { return FromMap(sortableProperty, MapCampaign); }
             if (type == typeof(CampaignGroupWithStats)) { return FromMap(sortableProperty, MapCampaignGroupWithStats); }
@@ -182,10 +187,11 @@ namespace Maximiz.Infrastructure.Querying
             if (type == typeof(AdGroupWithStats)) { return FromMap(sortableProperty, MapAdGroupWithStats); }
             if (type == typeof(AdGroup)) { return FromMap(sortableProperty, MapAdGroup); }
 
-            throw new InvalidOperationException(nameof(TEntity));
+            throw new InvalidOperationException($"Could not find database column map for entity {nameof(TEntity)}");
         }
 
         internal static string Account(Expression<Func<Account, object>> sortableProperty) => FromMap(sortableProperty, MapAccount);
+        internal static string AccountWithStats(Expression<Func<Account, object>> sortableProperty) => FromMap(sortableProperty, MapAccountWithStats);
         internal static string Campaign(Expression<Func<Campaign, object>> sortableProperty) => FromMap(sortableProperty, MapCampaign);
         internal static string CampaignWithStats(Expression<Func<CampaignWithStats, object>> sortableProperty) => FromMap(sortableProperty, MapCampaignWithStats);
         internal static string CampaignGroup(Expression<Func<CampaignGroup, object>> sortableProperty) => FromMap(sortableProperty, MapCampaignGroup);
