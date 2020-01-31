@@ -52,6 +52,7 @@ namespace Maximiz.Infrastructure.Committing
         public async Task StartOperationOrThrowAsync(MyOperation operation, CancellationToken token)
         {
             if (operation == null) { throw new ArgumentNullException(nameof(operation)); }
+            if (operation.Id == null || operation.Id == Guid.Empty) { throw new ArgumentNullException(nameof(operation.Id)); }
             if (token == null) { throw new ArgumentNullException(nameof(token)); }
 
             using (var connection = _databaseProvider.GetConnectionScope())

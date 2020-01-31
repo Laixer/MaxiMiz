@@ -45,24 +45,14 @@ namespace Maximiz.Infrastructure.Committing
             if (operation.Id == null || operation.Id == Guid.Empty) { throw new ArgumentNullException(nameof(operation.Id)); }
             if (token == null) { throw new ArgumentNullException(nameof(token)); }
 
-            //using (var connection = _databaseProvider.GetConnectionScope())
+            try
             {
-                try
-                {
-                    await connection.QueryAsync(GetClaimSql(operation), token);
-                    //await connection.QueryAsync("SELECT * FROM public.campaign WHERE operation_item_status IS NOT NULL;");
-                    //var parameters = new DynamicParameters();
-                    //parameters.Add("@p_campaign_group_id", operation.TopEntity.Id);
-                    //parameters.Add("@p_operation_id", operation.Id);
-                    //parameters.Add("@p_ad_groups_from_operation", operation.AdGroupCampaignGroupLinksAdd.Select(y => y.AdGroupId).ToList());
-                    //await connection.QueryAsync("claim_campaign_group", parameters, commandType: CommandType.StoredProcedure);
-                    //await connection.QueryAsync("claim_debug", new { }, commandType: CommandType.StoredProcedure);
-                }
-                catch (Exception e)
-                {
-                    logger.LogError(e, $"Error while trying to claim entity with id = {operation.TopEntity.Id}");
-                    throw new EntityInOperationException($"Unable to claim entity with id = {operation.TopEntity.Id}");
-                }
+                await connection.QueryAsync(GetClaimSql(operation), token);
+            }
+            catch (Exception e)
+            {
+                logger.LogError(e, $"Error while trying to claim entity with id = {operation.TopEntity.Id}");
+                throw new EntityInOperationException($"Unable to claim entity with id = {operation.TopEntity.Id}");
             }
         }
 
