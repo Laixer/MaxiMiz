@@ -106,6 +106,8 @@ namespace Maximiz.Model.Entity
         public ConnectionType[] ConnectionTypes { get; set; }
 
 
+        public string Utm { get; set; }
+
     }
 
 }

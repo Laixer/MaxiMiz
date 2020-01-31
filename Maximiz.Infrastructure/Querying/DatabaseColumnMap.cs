@@ -109,6 +109,7 @@ namespace Maximiz.Infrastructure.Querying
             MapCampaignGroup.Add(PropertyUtility.GetName<CampaignGroup>((x) => x.StartDate), "start_date");
             MapCampaignGroup.Add(PropertyUtility.GetName<CampaignGroup>((x) => x.TargetUrl), "target_url");
             MapCampaignGroup.Add(PropertyUtility.GetName<CampaignGroup>((x) => x.UpdateDate), "update_date");
+            MapCampaignGroup.Add(PropertyUtility.GetName<CampaignGroup>((x) => x.Utm), "utm");
 
             // Campaign group with stats
             MapCampaignGroupWithStats.AddAll(MapCampaignGroup);

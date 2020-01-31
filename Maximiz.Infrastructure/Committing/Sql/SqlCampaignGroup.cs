@@ -40,7 +40,8 @@ namespace Maximiz.Infrastructure.Committing.Sql
             $" {CampaignGroup(x => x.Publisher)}," +
             $" {CampaignGroup(x => x.Spent)}," +
             $" {CampaignGroup(x => x.StartDate)}," +
-            $" {CampaignGroup(x => x.TargetUrl)}" +
+            $" {CampaignGroup(x => x.TargetUrl)}," +
+            $" {CampaignGroup(x => x.Utm)}" +
             $") VALUES (" +
             $" @{GetName<CampaignGroup>(x => x.AccountId)}," +
             $" CAST (@{GetName<CampaignGroup>(x => x.ApprovalStateText)} AS approval_state)," +
@@ -64,7 +65,8 @@ namespace Maximiz.Infrastructure.Committing.Sql
             $" CAST (@{GetName<CampaignGroup>(x => x.PublisherText)} AS publisher)," +
             $" @{GetName<CampaignGroup>(x => x.Spent)}," +
             $" @{GetName<CampaignGroup>(x => x.StartDate)}," +
-            $" @{GetName<CampaignGroup>(x => x.TargetUrl)}" +
+            $" @{GetName<CampaignGroup>(x => x.TargetUrl)}," +
+            $" @{GetName<CampaignGroup>(x => x.Utm)}" +
             $") RETURNING {CampaignGroup(x => x.Id)};";
 
         /// <summary>
