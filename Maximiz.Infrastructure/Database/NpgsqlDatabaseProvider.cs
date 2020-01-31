@@ -16,7 +16,7 @@ namespace Maximiz.Infrastructure.Database
     /// </summary>
     public sealed class NpgsqlDatabaseProvider : IDatabaseProvider
     {
-        private static bool setLogger = false;
+        //private static bool setLogger = false;
         private readonly string connectionString;
 
         /// <summary>
@@ -47,12 +47,12 @@ namespace Maximiz.Infrastructure.Database
         public NpgsqlDatabaseProvider(IOptions<NpgsqlDatabaseProviderOptions> options,
             IConfiguration configuration, ILoggerFactory loggerFactory)
         {
-            // TODO Logging for now
-            if (!setLogger)
-            {
-                NpgsqlLogManager.Provider = new NpgsqlLoggingProvider(loggerFactory);
-                setLogger = true;
-            }
+            //// TODO Logging for now
+            //if (!setLogger)
+            //{
+            //    NpgsqlLogManager.Provider = new NpgsqlLoggingProvider(loggerFactory);
+            //    setLogger = true;
+            //}
 
             if (configuration == null) { throw new ArgumentNullException(nameof(configuration)); }
             if (options.Value == null) { throw new ArgumentNullException(nameof(options.Value)); }
