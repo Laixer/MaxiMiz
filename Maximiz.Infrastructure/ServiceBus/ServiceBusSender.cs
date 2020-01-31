@@ -4,7 +4,6 @@ using Maximiz.Model.Protocol;
 using Microsoft.Azure.ServiceBus;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -28,15 +27,15 @@ namespace Maximiz.Infrastructure.ServiceBus
         /// <summary>
         /// Constructor for dependency injection.
         /// </summary>
-        public ServiceBusSender(IOptions<ServiceBusSenderOptions> options, 
+        public ServiceBusSender(ServiceBusSenderOptions options, 
             IConfiguration configuration, ILoggerFactory loggerFactory)
         {
             if (configuration == null) { throw new ConfigurationException(nameof(configuration)); }
-            if (options.Value == null) { throw new ArgumentNullException(nameof(options.Value)); }
 
-            if (string.IsNullOrEmpty(options.Value.ConnectionStringName)) { throw new ConfigurationException(nameof(options.Value.ConnectionStringName)); }
-            if (string.IsNullOrEmpty(options.Value.QueueName)) { throw new ConfigurationException(nameof(options.Value.QueueName)); }
-            _options = options.Value;
+            if (options == null) { throw new ArgumentNullException(nameof(options)); }
+            if (string.IsNullOrEmpty(options.ConnectionStringName)) { throw new ConfigurationException(nameof(options.ConnectionStringName)); }
+            if (string.IsNullOrEmpty(options.QueueName)) { throw new ConfigurationException(nameof(options.QueueName)); }
+            _options = options;
 
             connectionString = configuration.GetConnectionString(_options.ConnectionStringName);
             if (string.IsNullOrEmpty(connectionString)) { throw new ConfigurationException($"IConfiguration does not contains connection string with name {_options.ConnectionStringName}"); }

@@ -100,7 +100,7 @@ namespace Maximiz
                 var policy = new AuthorizationPolicyBuilder()
                     .RequireAuthenticatedUser()
                     .Build();
-                //options.Filters.Add(new AuthorizeFilter(policy));
+                // options.Filters.Add(new AuthorizeFilter(policy)); TODO Re-enable!!!
             })
             .SetCompatibilityVersion(CompatibilityVersion.Latest);
         }
@@ -168,8 +168,8 @@ namespace Maximiz
                 routes.MapRoute(
                     name: "default",
                     //template: "{controller=Login}/{action=Index}");
-                    template: "{controller=CampaignGroupWizard}/{action=ShowWizard}");
-                    //template: "{controller=Debug}/{action=Index}");
+                    //template: "{controller=CampaignGroupWizard}/{action=ShowWizard}");
+                    template: "{controller=Debug}/{action=Index}");
             });
 
         }
