@@ -1,23 +1,21 @@
-﻿using Maximiz.Model.Entity;
+﻿using AutoMapper;
+using Maximiz.Model.Entity;
+using Maximiz.Model.Enums;
 using Maximiz.ViewModels.EntityModels;
+using Microsoft.Extensions.Logging;
+using Newtonsoft.Json.Linq;
+using Poller.Helper;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using AutoMapper;
-using System;
-using Maximiz.Model.Enums;
-using Microsoft.Extensions.Logging;
-using Poller.Helper;
-using Maximiz.Mapper.AccountTypeDeserialization;
-using Newtonsoft.Json.Linq;
 
 namespace Maximiz.Mapper
 {
 
     /// <summary>
-    /// Mapper between <see cref="Account"/> and <see cref="AccountModel"/>.
-    /// TODO Doc
+    /// Mapper between <see cref="AccountWithStats"/> and <see cref="AccountModel"/>.
     /// </summary>
-    internal sealed class MapperAccount : IMapper<Account, AccountModel>
+    internal sealed class MapperAccountWithStats : IMapper<AccountWithStats, AccountModel>
     {
 
         /// <summary>
@@ -34,11 +32,11 @@ namespace Maximiz.Mapper
         /// <summary>
         /// Called once to set up mapping configuration.
         /// </summary>
-        static MapperAccount()
+        static MapperAccountWithStats()
         {
             var config = new MapperConfiguration(
                 cfg => cfg
-                .CreateMap<Account, AccountModel>()
+                .CreateMap<AccountWithStats, AccountModel>()
                 .ReverseMap());
             mapper = new AutoMapper.Mapper(config);
         }
@@ -46,38 +44,38 @@ namespace Maximiz.Mapper
         /// <summary>
         /// Constructor for dependency injection.
         /// </summary>
-        public MapperAccount(ILoggerFactory loggerFactory)
+        public MapperAccountWithStats(ILoggerFactory loggerFactory)
         {
             logger = loggerFactory.CreateLogger(nameof(MapperAccount));
         }
 
         /// <summary>
-        /// Maps from <see cref="AccountModel"/> to <see cref="Account"/>.
+        /// Maps from <see cref="AccountModel"/> to <see cref="AccountWithStats"/>.
         /// </summary>
         /// <param name="from"><see cref="AccountModel"/></param>
-        /// <returns><see cref="Account"/></returns>
-        public Account Convert(AccountModel from)
+        /// <returns><see cref="AccountWithStats"/></returns>
+        public AccountWithStats Convert(AccountModel from)
         {
-            var result = mapper.Map<Account>(from);
+            var result = mapper.Map<AccountWithStats>(from);
             return result;
         }
 
         /// <summary>
-        /// Maps from <see cref="Account"/> to <see cref="AccountModel"/>.
+        /// Maps from <see cref="AccountWithStats"/> to <see cref="AccountModel"/>.
         /// </summary>
-        /// <param name="from"><see cref="Account"/></param>
+        /// <param name="from"><see cref="AccountWithStats"/></param>
         /// <returns><see cref="AccountModel"/></returns>
-        public AccountModel Convert(Account from)
+        public AccountModel Convert(AccountWithStats from)
         {
             var result = mapper.Map<AccountModel>(from);
             result.AccountTypeString = MapAccountType(from);
             return result;
         }
 
-        public IEnumerable<Account> ConvertAll(IEnumerable<AccountModel> from)
+        public IEnumerable<AccountWithStats> ConvertAll(IEnumerable<AccountModel> from)
             => from.ToList().Select(x => Convert(x));
 
-        public IEnumerable<AccountModel> ConvertAll(IEnumerable<Account> from)
+        public IEnumerable<AccountModel> ConvertAll(IEnumerable<AccountWithStats> from)
             => from.ToList().Select(x => Convert(x));
 
         /// <summary>
@@ -86,7 +84,7 @@ namespace Maximiz.Mapper
         /// see https://github.com/Laixer/MaxiMiz/issues/58/>.
         /// </summary>
         /// <returns>The account type as a string</returns>
-        private string MapAccountType(Account account)
+        private string MapAccountType(AccountWithStats account)
         {
             switch (account.Publisher)
             {
@@ -104,12 +102,12 @@ namespace Maximiz.Mapper
                     {
                         logger.LogError($"Could not extract Taboola account type from details: {account.Details}. Message: {e.Message}");
                     }
-                    //throw new InvalidOperationException(nameof(Account.Details)); // TODO Is this correct?
-                    break;
+                    throw new InvalidOperationException(nameof(AccountWithStats.Details)); // TODO Is this correct?
             }
 
-            return "Unknown account type";
-            //throw new InvalidOperationException(nameof(Account.Publisher));
+            // TODO How to handle?
+            //throw new InvalidOperationException(nameof(AccountWithStats.Publisher));
+            return "Unknown type";
         }
 
     }

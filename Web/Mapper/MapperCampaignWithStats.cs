@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using AutoMapper;
+using Maximiz.Core.Utility;
 
 namespace Maximiz.Mapper
 {
@@ -42,7 +43,6 @@ namespace Maximiz.Mapper
         public CampaignWithStats Convert(CampaignModel from)
         {
             var result = mapper.Map<CampaignWithStats>(from);
-
             // TODO Location mapping
 
             return result;
@@ -59,9 +59,8 @@ namespace Maximiz.Mapper
 
             // Explicit location mapping
             // TODO Is this the way to go?
-            var mapperLocations = new MapperLocations();
-            result.LocationInclude = mapperLocations.MapToLocations(from.LocationInclude);
-            result.LocationExclude = mapperLocations.MapToLocations(from.LocationExclude);
+            result.LocationInclude = from.LocationInclude.Select(x => MapperEnum.Map(MapperLocationIntegers.Map(x)));
+            result.LocationExclude = from.LocationExclude.Select(x => MapperEnum.Map(MapperLocationIntegers.Map(x)));
 
             return result;
         }
