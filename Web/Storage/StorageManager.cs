@@ -1,5 +1,4 @@
 ﻿using Microsoft.Azure.Storage.Blob;
-using Laixer.Library.Configuration.Exceptions;
 using Maximiz.Storage.Abstraction;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
@@ -9,6 +8,7 @@ using System.Threading.Tasks;
 using Microsoft.Azure.Storage.Auth;
 using Microsoft.Azure.Storage;
 using Microsoft.Extensions.Logging;
+using Laixer.AppSettingsValidation.Exceptions;
 
 namespace Maximiz.Storage
 {
@@ -88,7 +88,7 @@ namespace Maximiz.Storage
                 return true;
             } catch (Exception e)
             {
-                logger.LogError("Exception in Storage Manager: ", e);
+                logger.LogError(e, "Could not upload file");
                 return false;
             }
         }

@@ -1,13 +1,9 @@
-using Maximiz.ServiceBus;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Maximiz.Database;
-using Laixer.Library.Injection.ServiceBus;
-using Laixer.Library.Injection.Database;
 using Maximiz.Storage.Abstraction;
 using Maximiz.Storage;
 using Microsoft.Extensions.Logging;
@@ -22,6 +18,8 @@ using Maximiz.QueryTranslation;
 using Maximiz.Operations;
 using Maximiz.Core.StateMachine.Abstraction;
 using Maximiz.Core.StateMachine;
+using Maximiz.Core.Infrastructure.EventQueue;
+using Maximiz.Infrastructure.ServiceBus;
 
 namespace Maximiz
 {
@@ -61,17 +59,15 @@ namespace Maximiz
             });
 
             // Setup used azure services
-            services.AddDatabaseProvider<DatabaseProvider, DatabaseProviderOptions>("DatabaseInternal");
-            services.AddServiceBusSender<ServiceBusSender, ServiceBusProvider, ServiceBusProviderOptions>
-                ("ServiceBusSend", "ServiceBusQueueName", Configuration);
+            //services.AddDatabaseProvider<DatabaseProvider, DatabaseProviderOptions>("DatabaseInternal");
+            //services.AddServiceBusSender<ServiceBusSender, ServiceBusProvider, ServiceBusProviderOptions>
+            //    ("ServiceBusSend", "ServiceBusQueueName", Configuration);
 
             // Setup custom made services
             //services.AddTransactionHandler<TransactionHandler>();
-            services.AddCrudInternalWebClient<CrudInternalWebClient>();
             services.AddMappers();
             services.AddViewModelServices();
             services.AddCommitters();
-            services.AddSingleton<IEntityMapExtractor, EntityMapExtractor>();
 
             // TODO Might want to revisit this
             services.AddTransient<IStorageManager, StorageManager>();
@@ -85,6 +81,15 @@ namespace Maximiz
             // Setup infrastructure
             services.AddDatabaseProvider("DatabaseInternal");
             services.AddRepositories();
+            services.AddTransient<IEventQueueSender, ServiceBusSender>();
+            services.Configure<ServiceBusSenderOptions>(options =>
+            {
+                options.ConnectionStringName = "ServiceBusSend";
+                options.QueueName = "ServiceBusQueueName";
+            });
+
+            // Setup State Machine Functionality
+            services.AddTransient<IStateMachineManager, StateMachineManager>();
 
             // Setup Identity
             ConfigureServicesIdentity(services);
