@@ -19,12 +19,12 @@ namespace Maximiz.ViewModels.CampaignDetails
         /// <summary>
         /// All ad groups.
         /// </summary>
-        public IEnumerable<AdGroupModel> AdGroupsAll { get; set; }
+        public IEnumerable<AdGroupModel> AdGroupsAll { get; set; } = new List<AdGroupModel>();
 
         /// <summary>
         /// All ad groups which are linked to the campaign.
         /// </summary>
-        public IEnumerable<Guid> AdGroupIdsLinked { get; set; }
+        public IEnumerable<Guid> AdGroupIdsLinked { get; set; } = new List<Guid>();
 
         /// <summary>
         /// The total amount of all ad groups based on some query.

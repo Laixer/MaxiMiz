@@ -18,5 +18,10 @@ namespace Maximiz.ViewModels.CampaignOverview
         /// </summary>
         public int CampaignCount { get; set; }
 
+        /// <summary>
+        /// Indicates the total amount of items for each page.
+        /// </summary>
+        public int ItemsPerPage { get; set; }
+
     }
 }
