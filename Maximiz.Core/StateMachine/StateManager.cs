@@ -276,6 +276,10 @@ namespace Maximiz.Core.StateMachine
             return;
         }
 
+        public Task AttemptStartStateMachineAsync(MyOperation operation)
+        {
+            throw new NotImplementedException();
+        }
     }
 
 }
