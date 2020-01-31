@@ -24,7 +24,7 @@ namespace Maximiz.Model.Enums
         Android,
 
         [EnumMember(Value = "ios")]
-        iOS,
+        IOS, // TODO This was changed to bypass dapper transaltion iOS to i_os
 
         [EnumMember(Value = "unix")]
         Unix,

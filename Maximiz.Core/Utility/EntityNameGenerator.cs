@@ -77,7 +77,7 @@ namespace Maximiz.Core.Utility
                     return "OSX";
                 case OS.Android:
                     return "AND";
-                case OS.iOS:
+                case OS.IOS:
                     return "IOS";
                 case OS.Unix:
                     return "UNI";
