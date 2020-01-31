@@ -45,21 +45,11 @@ namespace Maximiz.Controllers
         /// <param name="adGroupId">The internal guid of the ad group</param>
         /// <returns><see cref="ViewResult"/></returns>
         [HttpGet]
-        public async Task<IActionResult> ShowWizardAsEditor(Guid adGroupId)
+        public async Task<IActionResult> ShowWizardAsEditor(Guid adGroupId) 
             => View("Wrapper", new AdGroupWizardViewModel
             {
                 AdGroup = _mapper.Convert(await _adGroupRepository.GetAsync(adGroupId))
             });
-
-        /// <summary>
-        /// TODO Remove
-        /// </summary>
-        /// <returns>Debug view</returns>
-        [HttpGet]
-        public IActionResult Debug()
-        {
-            return View("Debug");
-        }
 
         /// <summary>
         /// Submits our form.
@@ -73,8 +63,7 @@ namespace Maximiz.Controllers
             {
                 // Simulate waiting
                 await Task.Delay(new Random().Next(200, 1000));
-
-                return NoContent();
+                throw new NotImplementedException();
             }
             else
             {

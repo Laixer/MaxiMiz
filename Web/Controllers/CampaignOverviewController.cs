@@ -3,6 +3,7 @@ using Maximiz.Core.Querying;
 using Maximiz.Mapper;
 using Maximiz.Model.Entity;
 using Maximiz.QueryTranslation;
+using Maximiz.Translation;
 using Maximiz.ViewModels.CampaignOverview;
 using Maximiz.ViewModels.Columns;
 using Maximiz.ViewModels.EntityModels;
@@ -87,8 +88,16 @@ namespace Maximiz.Controllers
             var query = _queryTranslator.Translate(column, order, searchString, page);
             return PartialView("_TableCount", new CampaignCountViewModel
             {
-                CampaignCount = await _campaignRepository.GetCountAsync(query)
-            }); ;
+                TableName = EnumTranslator.TranslateCampaignTableType(table),
+                CampaignCount = await GetCountByTable(table, query),
+                ItemsPerPage = query.PageItemCount
+            });
+        }
+
+        public Task<IActionResult> GetCampaignPageSelectorViewComponent(CampaignTableType table,
+            ColumnCampaignOverview column, Order order, string searchString = null, int page = 1)
+        {
+            throw new NotImplementedException();
         }
 
         /// <summary>
@@ -125,6 +134,23 @@ namespace Maximiz.Controllers
                     return _campaignRepository.GetInactiveAsync(query);
                 case CampaignTableType.Pending:
                     return _campaignRepository.GetPendingAsync(query);
+            }
+
+            throw new InvalidOperationException(nameof(table));
+        }
+
+        private Task<int> GetCountByTable(CampaignTableType table, QueryBase<CampaignWithStats> query)
+        {
+            switch (table)
+            {
+                case CampaignTableType.All:
+                    return _campaignRepository.GetCountAsync(query);
+                case CampaignTableType.Active:
+                    return _campaignRepository.GetCountActiveAsync(query);
+                case CampaignTableType.Inactive:
+                    return _campaignRepository.GetCountInactiveAsync(query);
+                case CampaignTableType.Pending:
+                    return _campaignRepository.GetCountPendingAsync(query);
             }
 
             throw new InvalidOperationException(nameof(table));

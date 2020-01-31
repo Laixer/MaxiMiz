@@ -60,6 +60,19 @@ namespace Maximiz.Controllers
         public async Task<IActionResult> GetAccountDetailsPartialView()
         {
             var user = await _userManager.GetUserAsync(User);
+
+            // This should never occur, but during debug mode we encounter this.
+            // TODO Keep this or not?
+            if (user == null)
+            {
+                return PartialView("_PageAccountPopulated", new SettingsAccountViewModel
+                {
+                    FirstName = "NO",
+                    LastName = "USER",
+                    Email = "SELECTED",
+                });
+            }
+
             return PartialView("_PageAccountPopulated", new SettingsAccountViewModel
             {
                 FirstName = user.GivenName,

@@ -2,6 +2,7 @@
 using Maximiz.Mapper;
 using Maximiz.Model.Entity;
 using Maximiz.QueryTranslation;
+using Maximiz.Translation;
 using Maximiz.ViewModels.AdGroupOverview;
 using Maximiz.ViewModels.Columns;
 using Maximiz.ViewModels.EntityModels;
@@ -94,9 +95,10 @@ namespace Maximiz.Controllers
             if (page < 1) { throw new ArgumentOutOfRangeException(nameof(page)); }
 
             var query = _queryTranslator.Translate(column, order, searchString, page);
-            return PartialView("_TableRows", new AdGroupOverviewCountViewModel
+            return PartialView("_TableCount", new AdGroupOverviewCountViewModel
             {
-                AdGroupCount = await _adGroupWithStatsRepository.GetCountAsync(query)
+                AdGroupCount = await _adGroupWithStatsRepository.GetCountAsync(query),
+                TableName = EnumTranslator.TranslateAdGroupTableType(table)
             });
         }
 

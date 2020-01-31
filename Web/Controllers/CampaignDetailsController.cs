@@ -1,6 +1,8 @@
 ﻿using Maximiz.Core.Infrastructure.Repositories;
+using Maximiz.Core.StateMachine.Abstraction;
 using Maximiz.Mapper;
 using Maximiz.Model.Entity;
+using Maximiz.Operations;
 using Maximiz.QueryTranslation;
 using Maximiz.ViewModels.CampaignDetails;
 using Maximiz.ViewModels.Columns;
@@ -69,8 +71,16 @@ namespace Maximiz.Controllers
             var campaign = _mapperCampaign.Convert(await _campaignRepository.GetAsync(id));
 
             // Then get account
-            if (campaign.AccountGuid == null || campaign.AccountGuid == Guid.Empty) { throw new ArgumentNullException(nameof(campaign.AccountGuid)); }
-            var account = _mapperAccount.Convert(await _accountRepository.GetAsync(campaign.AccountGuid));
+            var account = null as AccountModel; // TODO Unsafe, this should be fixed. How to handle non-existing account???
+            if (campaign.AccountGuid == null || campaign.AccountGuid == Guid.Empty)
+            {
+                //throw new ArgumentNullException(nameof(campaign.AccountGuid)); }
+                account = new AccountModel { Name = "Could not find account" }; // TODO This should never happen, thus this is the temp fix.
+            }
+            else
+            {
+                account = _mapperAccount.Convert(await _accountRepository.GetAsync(campaign.AccountGuid));
+            }
 
             return PartialView("_Details", new CampaignDetailsViewModel
             {
@@ -87,33 +97,6 @@ namespace Maximiz.Controllers
         [HttpPost]
         public async Task<IActionResult> PostModificationForm([FromBody] FormCampaignDetailsViewModel model)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest();
-            }
-
-            //try
-            //{
-            //    var entityMap = await _entityExtractor.Extract(model);
-            //    if (await _stateManager.AttemptStartStateMachineAsync(entityMap))
-            //    {
-            //        return Ok();
-            //    }
-            //    else
-            //    {
-            //        // TODO Is this the right way to do this?
-            //        // TODO Implement more specific feedback?
-            //        return BadRequest();
-            //    }
-            //} catch (Exception e)
-            //{
-            //    logger.LogError(e, $"Error while attempting to launch campaign details operation");
-            //    return BadRequest();
-            //}
-
-            // Simulate waiting
-            await Task.Delay(1000);
-
             return Ok();
         }
 
@@ -137,7 +120,7 @@ namespace Maximiz.Controllers
             var query = _queryTranslator.Translate(column, order, searchString, page);
             return PartialView("_AdGroupTableRowsLinked", new AdGroupTableLinkedViewModel
             {
-                AdGroups = _mapperAdGroup.ConvertAll(await _adGroupRepository.GetLinkedWithCampaignAsync(campaignId, query))
+                AdGroups = _mapperAdGroup.ConvertAll(await _adGroupRepository.GetLinkedWithCampaignAsync(campaignId)) // TODO Query?
             });
         }
 
@@ -158,9 +141,10 @@ namespace Maximiz.Controllers
             if (page < 1) { throw new ArgumentOutOfRangeException(nameof(page)); }
 
             var query = _queryTranslator.Translate(column, order, searchString, page);
-            return PartialView("_AdGroupTableRowsAll", new AdGroupTableLinkedViewModel
+            return PartialView("_AdGroupTableRowsAll", new AdGroupTableAllViewModel
             {
-                AdGroups = _mapperAdGroup.ConvertAll(await _adGroupRepository.GetAllAsync(query))
+                AdGroupsAll = _mapperAdGroup.ConvertAll(await _adGroupRepository.GetAllAsync(query))
+                // TODO Linked ids? How did I want to do this?
             });
         }
 
@@ -181,7 +165,7 @@ namespace Maximiz.Controllers
             if (campaignId == null || campaignId == Guid.Empty) { throw new ArgumentNullException(nameof(campaignId)); }
             if (page < 1) { throw new ArgumentOutOfRangeException(nameof(page)); }
 
-            var query = _queryTranslator.Translate(column, order, searchString, page);
+            var query = _queryTranslator.Translate(column, order, searchString, page);  
             return PartialView("_AdGroupTableCountAll", new AdGroupTableAllCountViewModel
             {
                 TotalCount = await _adGroupRepository.GetCountAsync(query)
