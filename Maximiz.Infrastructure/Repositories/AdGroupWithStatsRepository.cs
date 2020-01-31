@@ -39,9 +39,9 @@ namespace Maximiz.Infrastructure.Repositories
             var sql = $"SELECT a.*" +
                 $" FROM {QueryExtractor.GetTableName<AdGroupWithStats>()} a" +
                 $" JOIN {QueryExtractor.CampaignGroupAdGroupLinkingTableName} link" +
-                $" ON a.id = link.ad_group_guid" +
+                $" ON a.id = link.ad_group_id" +
                 $" JOIN {QueryExtractor.GetTableName<Campaign>()} c" +
-                $" ON c.campaign_group_guid = link.campaign_group_guid" +
+                $" ON c.campaign_group_guid = link.campaign_group_id" +
                 $" WHERE c.id = '{campaignId}';";
             return RepositorySharedFunctions.QueryAsync<AdGroupWithStats>(_databaseProvider, sql);
         }
