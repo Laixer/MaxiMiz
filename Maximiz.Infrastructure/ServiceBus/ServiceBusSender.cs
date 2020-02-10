@@ -1,13 +1,16 @@
 ﻿using Laixer.AppSettingsValidation.Exceptions;
 using Maximiz.Core.Infrastructure.EventQueue;
+using Maximiz.Core.Utility;
 using Maximiz.Model.Protocol;
 using Microsoft.Azure.ServiceBus;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Maximiz.Infrastructure.ServiceBus
@@ -20,41 +23,47 @@ namespace Maximiz.Infrastructure.ServiceBus
     public sealed class ServiceBusSender : IEventQueueSender
     {
 
-        private readonly ServiceBusSenderOptions _options;
         private readonly string connectionString;
+        private readonly string queueName;
         private readonly ILogger logger;
 
         /// <summary>
         /// Constructor for dependency injection.
         /// </summary>
-        public ServiceBusSender(ServiceBusSenderOptions options, 
+        public ServiceBusSender(IOptions<ServiceBusSenderOptions> options,
             IConfiguration configuration, ILoggerFactory loggerFactory)
         {
             if (configuration == null) { throw new ConfigurationException(nameof(configuration)); }
 
-            if (options == null) { throw new ArgumentNullException(nameof(options)); }
-            if (string.IsNullOrEmpty(options.ConnectionStringName)) { throw new ConfigurationException(nameof(options.ConnectionStringName)); }
-            if (string.IsNullOrEmpty(options.QueueName)) { throw new ConfigurationException(nameof(options.QueueName)); }
-            _options = options;
+            if (options.Value == null) { throw new ArgumentNullException(nameof(options)); }
+            if (string.IsNullOrEmpty(options.Value.ConnectionStringName)) { throw new ArgumentNullException(nameof(options.Value.ConnectionStringName)); }
+            if (string.IsNullOrEmpty(options.Value.QueueName)) { throw new ArgumentNullException(nameof(options.Value.QueueName)); }
 
-            connectionString = configuration.GetConnectionString(_options.ConnectionStringName);
-            if (string.IsNullOrEmpty(connectionString)) { throw new ConfigurationException($"IConfiguration does not contains connection string with name {_options.ConnectionStringName}"); }
+            var section = configuration.GetSection(options.Value.QueueName);
+            if (section == null || string.IsNullOrEmpty(section.Value)) { throw new ConfigurationException($"Configuration does not contain the service bus queue name: {options.Value.QueueName}"); }
+            queueName = section.Value;
+
+            connectionString = configuration.GetConnectionString(options.Value.ConnectionStringName);
+            if (string.IsNullOrEmpty(connectionString)) { throw new ConfigurationException($"Configuration does not contains connection string with name {options.Value.ConnectionStringName}"); }
 
             if (loggerFactory == null) { throw new ArgumentNullException(nameof(loggerFactory)); }
             logger = loggerFactory.CreateLogger(nameof(ServiceBusSender));
         }
 
         /// <summary>
-        /// Sends a <see cref="CreateOrUpdateObjectsMessage"/> to an azure service bus.
+        /// Sends a <see cref="OperationMessage"/> to an azure service bus.
         /// </summary>
         /// <remarks>
-        /// On error this will catch the exception, log it and return false.
+        /// This will throw an <see cref="InvalidOperationException"/> if we 
+        /// fail somewhere down the line.
         /// </remarks>
-        /// <param name="message"><see cref="CreateOrUpdateObjectsMessage"/></param>
-        /// <returns>True if successful, false if not</returns>
-        public async Task<bool> SendMessageAsync(CreateOrUpdateObjectsMessage message)
+        /// <param name="message"><see cref="OperationMessage"/></param>
+        /// <param name="token"><see cref="CancellationToken"/></param>
+        /// <returns><see cref="Task"/></returns>
+        public async Task SendMessageAsync(OperationMessage message, CancellationToken token)
         {
-            if (message == null) { throw new ArgumentNullException(nameof(message)); }
+            MessageValidator.Validate(message);
+            if (token == null) { throw new ArgumentNullException(nameof(token)); }
 
             try
             {
@@ -67,38 +76,27 @@ namespace Maximiz.Infrastructure.ServiceBus
                     await client.SendAsync(toSend);
                     logger.LogTrace("Sent message to service bus successfully");
                 }
-                return true;
             }
             catch (Exception e)
             {
                 logger.LogError(e, "Error while sending object to service bus");
-                return false;
+                throw new InvalidOperationException("Could not send message to service bus", e);
             }
         }
 
         /// <summary>
-        /// Sends all messages in a collection of <see cref="CreateOrUpdateObjectsMessage"/>s.
+        /// Sends all messages in a collection of <see cref="OperationMessage"/>s.
         /// </summary>
-        /// <remarks>
-        /// This will not stop when one of the messages can't be sent.
-        /// </remarks>
-        /// <param name="messages"><see cref="IEnumerable{CreateOrUpdateObjectsMessage}"/></param>
-        /// <returns>True if successful, false if not</returns>
-        public async Task<bool> SendMessagesAsync(IEnumerable<CreateOrUpdateObjectsMessage> messages)
+        /// <param name="messages"><see cref="IEnumerable{OperationMessage}"/></param>
+        /// <param name="token"><see cref="CancellationToken"/></param>
+        /// <returns><see cref="Task"/></returns>
+        public Task SendMessagesAsync(IEnumerable<OperationMessage> messages, CancellationToken token)
         {
-            if (messages == null) { throw new ArgumentNullException(nameof(messages)); }
+            if (token == null) { throw new ArgumentNullException(nameof(token)); }
 
             // TODO Smart parallelization
-            var result = true;
-            foreach (var message in messages)
-            {
-                if (await SendMessageAsync(message) == false)
-                {
-                    result = false;
-                }
-            }
-
-            return result;
+            // TODO ATOM
+            throw new NotImplementedException();
         }
 
         /// <summary>
@@ -107,7 +105,7 @@ namespace Maximiz.Infrastructure.ServiceBus
         /// </summary>
         /// <returns><see cref="QueueClient"/></returns>
         private QueueClient GetQueueClient()
-            => new QueueClient(connectionString, _options.QueueName);
+            => new QueueClient(connectionString, queueName);
 
     }
 }

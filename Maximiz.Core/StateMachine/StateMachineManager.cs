@@ -1,6 +1,7 @@
 ﻿using Maximiz.Core.Infrastructure.Commiting;
 using Maximiz.Core.Infrastructure.EventQueue;
 using Maximiz.Core.StateMachine.Abstraction;
+using Maximiz.Core.Utility;
 using Maximiz.Model.Operations;
 using Microsoft.Extensions.Logging;
 using System;
@@ -46,11 +47,11 @@ namespace Maximiz.Core.StateMachine
             if (token == null) { throw new ArgumentNullException(nameof(token)); }
             if (token.IsCancellationRequested) { throw new OperationCanceledException(); }
 
+            // TODO Shouldn't this be a transaction?
             try
             {
                 await _operationItemCommitter.StartOperationOrThrowAsync(operation, token);
-                throw new NotImplementedException();
-                await _eventQueueSender.SendMessageAsync(null);
+                await _eventQueueSender.SendMessageAsync(MessageExtractor.Extract(operation), token);
             }
             catch (Exception e)
             {

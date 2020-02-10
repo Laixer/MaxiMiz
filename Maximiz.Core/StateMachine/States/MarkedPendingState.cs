@@ -68,16 +68,17 @@ namespace Maximiz.Core.StateMachine.States
                 // Run this first time only, throws if it fails
                 if (messages == null) { await SetupTransition(operation); }
 
-                // Send all messages that are left
-                var failedMessages = new List<CreateOrUpdateObjectsMessage>();
-                foreach (var message in messages)
-                {
-                    if (!await _eventQueueSender.SendMessageAsync(message))
-                    {
-                        failedMessages.Add(message);
-                    }
-                }
-                messages = failedMessages;
+                throw new NotImplementedException();
+                //// Send all messages that are left
+                //var failedMessages = new List<CreateOrUpdateObjectsMessage>();
+                //foreach (var message in messages)
+                //{
+                //    if (!await _eventQueueSender.SendMessageAsync(message))
+                //    {
+                //        failedMessages.Add(message);
+                //    }
+                //}
+                //messages = failedMessages;
 
                 // If no messages are left we are done
                 return messages.Count == 0;

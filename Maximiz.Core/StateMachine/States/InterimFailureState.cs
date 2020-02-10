@@ -77,13 +77,14 @@ namespace Maximiz.Core.StateMachine.States
 
                 // Send all messages that have not yet been sent
                 var failedMessages = new List<CreateOrUpdateObjectsMessage>();
-                foreach (var message in messages)
-                {
-                    if (!await _eventQueueSender.SendMessageAsync(message))
-                    {
-                        failedMessages.Add(message);
-                    }
-                }
+                throw new NotImplementedException();
+                //foreach (var message in messages)
+                //{
+                //    if (!await _eventQueueSender.SendMessageAsync(message))
+                //    {
+                //        failedMessages.Add(message);
+                //    }
+                //}
                 messages = failedMessages;
 
                 // If no messages are left we are done

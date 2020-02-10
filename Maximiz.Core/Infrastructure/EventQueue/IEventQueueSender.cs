@@ -1,5 +1,6 @@
 ﻿using Maximiz.Model.Protocol;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Maximiz.Core.Infrastructure.EventQueue
@@ -12,18 +13,20 @@ namespace Maximiz.Core.Infrastructure.EventQueue
     {
 
         /// <summary>
-        /// Sends a <see cref="CreateOrUpdateObjectsMessage"/> to the event queue.
+        /// Sends a <see cref="OperationMessage"/> to the event queue.
         /// </summary>
-        /// <param name="message"><see cref="CreateOrUpdateObjectsMessage"/></param>
-        /// <returns>True if successful, false if not</returns>
-        Task<bool> SendMessageAsync(CreateOrUpdateObjectsMessage message);
+        /// <param name="message"><see cref="OperationMessage"/></param>
+        /// <param name="token"><see cref="CancellationToken"/></param>
+        /// <returns><see cref="Task"/></returns>
+        Task SendMessageAsync(OperationMessage message, CancellationToken token);
 
         /// <summary>
-        /// Sends a collection of <see cref="CreateOrUpdateObjectsMessage"/> objects to the event queue.
+        /// Sends a collection of <see cref="OperationMessage"/> objects to the event queue.
         /// </summary>
-        /// <param name="messages"><see cref="IEnumerable{CreateOrUpdateObjectsMessage}"/></param>
-        /// <returns>True if successful, false if not</returns>
-        Task<bool> SendMessagesAsync(IEnumerable<CreateOrUpdateObjectsMessage> messages);
+        /// <param name="messages"><see cref="IEnumerable{OperationMessage}"/></param>
+        /// <param name="token"><see cref="CancellationToken"/></param>
+        /// <returns><see cref="Task"/></returns>
+        Task SendMessagesAsync(IEnumerable<OperationMessage> messages, CancellationToken token);
 
     }
 

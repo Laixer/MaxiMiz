@@ -1,12 +1,15 @@
 ﻿using Dapper;
 using Maximiz.Core.Infrastructure.Commiting;
+using Maximiz.Core.Infrastructure.EventQueue;
 using Maximiz.Core.Infrastructure.Repositories;
+using Maximiz.Core.StateMachine.Abstraction;
 using Maximiz.Core.Utility;
 using Maximiz.Infrastructure.Database;
 using Maximiz.Model;
 using Maximiz.Model.Entity;
 using Maximiz.Model.Enums;
 using Maximiz.Model.Operations;
+using Maximiz.Model.Protocol;
 using Maximiz.Storage.Abstraction;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -28,6 +31,8 @@ namespace Maximiz.Controllers
         private readonly ICampaignRepository _campaignRepository;
         private readonly ICampaignWithStatsRepository _campaignWithStatsRepository;
         private readonly IOperationItemCommitter _operationItemCommitter;
+        private readonly IStateMachineManager _stateMachineManager;
+        private readonly IEventQueueSender _eventQueueSender;
 
         /// <summary>
         /// Constructor for dependency injection.
@@ -36,13 +41,17 @@ namespace Maximiz.Controllers
             IDatabaseProvider databaseProvider,
             ICampaignRepository campaignRepository,
             ICampaignWithStatsRepository campaignWithStatsRepository,
-            IOperationItemCommitter operationItemCommitter)
+            IOperationItemCommitter operationItemCommitter,
+            IStateMachineManager stateMachineManager,
+            IEventQueueSender eventQueueSender)
         {
             _storageManager = storageManager ?? throw new ArgumentNullException(nameof(storageManager));
             _databaseProvider = databaseProvider ?? throw new ArgumentNullException(nameof(databaseProvider));
             _campaignRepository = campaignRepository ?? throw new ArgumentNullException(nameof(campaignRepository));
             _campaignWithStatsRepository = campaignWithStatsRepository ?? throw new ArgumentNullException(nameof(campaignWithStatsRepository));
             _operationItemCommitter = operationItemCommitter ?? throw new ArgumentNullException(nameof(operationItemCommitter));
+            _stateMachineManager = stateMachineManager ?? throw new ArgumentNullException(nameof(stateMachineManager));
+            _eventQueueSender = eventQueueSender ?? throw new ArgumentNullException(nameof(eventQueueSender));
         }
 
         /// <summary>
@@ -56,13 +65,11 @@ namespace Maximiz.Controllers
 
         public async Task<IActionResult> TestStateMachine()
         {
-            //await CleanUpAsync(); // Sets all items to up_to_date so we can claim them again
-
-            var operation = CreateOperation();
-
             using (var source = new CancellationTokenSource())
             {
-                await _operationItemCommitter.StartOperationOrThrowAsync(operation, source.Token);
+                var entity = new CampaignGroup { Id = new Guid("23369f01-850c-4fbe-93f2-3e6431377957") };
+                var message = new OperationMessage(entity, CrudAction.Create, new Guid("74708cb8-178d-4ed4-85f8-ceb22d8e2e4e"));
+                await _eventQueueSender.SendMessageAsync(message, source.Token);
             }
 
             return View("Index");
