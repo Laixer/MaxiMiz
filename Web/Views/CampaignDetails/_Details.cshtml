@@ -29,7 +29,7 @@
     <!-- This is required because we need some other forms in these tabs, and can't have forms in forms -->
     <form id="formCampaignDetailsModifications" asp-controller="CampaignDetails" asp-action="@nameof(CampaignDetailsController.PostModificationForm)" method="post">
         <!-- Hidden input to post form data -->
-        <input type="hidden" name="@nameof(FormCampaignDetailsViewModel.CampaignId)" value="@Model.Campaign.Id" />
+        <input id="inputHiddenCampaignId" type="hidden" name="@nameof(FormCampaignDetailsViewModel.CampaignId)" value="@Model.Campaign.Id" />
     </form>
 
     <!-- Tab contents with partial views for each tab -->

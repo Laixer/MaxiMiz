@@ -42,6 +42,7 @@
     const datetimeStartDate = '#datetimeStartDate';
     const datetimeEndDate = '#datetimeEndDate';
     const checkboxIgnoreEndDate = '#checkboxIgnoreEndDate';
+    const inputAdGroupIds = '.hiddenAdGroupId';
 
     // Explicitly define all elements that have to be validated for each section
     // TODO These might be useful to indicate which tab is incorrect upon form validation
@@ -73,6 +74,9 @@
         datetimeEndDate,
         checkboxIgnoreEndDate
     ];
+    const elementsAdgroups = [
+        inputAdGroupIds
+    ];
 
     /**
      * This function should be called when the campaign details modal has finished loading.
@@ -85,32 +89,39 @@
             let validatorCampaignDetailsMarketing = $(formTabMarketing).validate();
             let validatorCampaignDetailsTargeting = $(formTabTargeting).validate();
             let validatorCampaignDetailsSchedule = $(formTabSchedule).validate();
+            let validatorCampaignDetailsAdGroups = $(formTabAdGroups).validate();
 
             // Setup validation rules
             setupCampaignDetailsValidationRules();
 
             // Do not post our forms by default ever
-            // TODO Maybe do this with a class?
+            // TODO Maybe do this with a class? 
+            // TODO What is the function of these lines again?
             subscribeFormSubmit(formAllTabs);
             subscribeFormSubmit(formTabAccount);
             subscribeFormSubmit(formTabMarketing);
             subscribeFormSubmit(formTabTargeting);
             subscribeFormSubmit(formTabSchedule);
+            subscribeFormSubmit(formTabAdGroups);
 
             // Register our save buttons
             subscribeClickable(buttonSaveCampaignDetails, function () {
-                // Do non-lazy evaluation to enuse all items are checked
+                // Do non-lazy evaluation to ensure all items are checked
                 // These can also be done with validateSet
                 if (validatorCampaignDetailsAccount.form() &
                     validatorCampaignDetailsMarketing.form() &
                     validatorCampaignDetailsTargeting.form() &
-                    validatorCampaignDetailsSchedule.form()) {
+                    validatorCampaignDetailsSchedule.form() &
+                    validatorCampaignDetailsAdGroups.form()) {
                     postFormCampaignDetails();
                 }
             });
 
             // Link switches to their respective form controls
             linkSwitches();
+
+            // Setup our ad groups section
+            setupCampaignDetailsAdGroupTab();
 
         } catch (exception) {
             console.log('Error while setting up campaign details modal functionality, ', e);
@@ -138,6 +149,7 @@
         $(formAllTabs).append($('#formTabMarketing fieldset').clone());
         $(formAllTabs).append($('#formTabTargeting fieldset').clone());
         $(formAllTabs).append($('#formTabSchedule fieldset').clone());
+        $(formAllTabs).append($('#formTabAdGroups fieldset').clone());
 
         // Serialize before disabling elements
         var jsonBody = $(formAllTabs).serializeFormJSON();
@@ -148,6 +160,7 @@
         makeArrayIfSingleString(jsonBody, 'Locations');
         makeArrayIfSingleString(jsonBody, 'Devices');
         makeArrayIfSingleString(jsonBody, 'OperatingSystems');
+        makeArrayIfSingleString(jsonBody, 'LinkedAdGroups');
 
         // Restore form and disable elements
         $(formAllTabs).html(originalForm);
@@ -173,7 +186,8 @@
         return elementsAccount
             .concat(elementsMarketing)
             .concat(elementsTargeting)
-            .concat(elementsSchedule);
+            .concat(elementsSchedule)
+            .concat(elementsAdgroups);
     }
 
 </script>

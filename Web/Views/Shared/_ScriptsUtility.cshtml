@@ -137,5 +137,18 @@
         onClickFunction();
     }
 
+    /**
+     * Sets a checkbox to checked or unchecked.
+     * 
+     * @@param selectorId The checkbox id
+     * @@param checked Boolean indicating checkbox checked status
+     */
+    function setCheckBox(selectorId, checked) {
+        if (checked === true || checked === false) {
+            $(selectorId).prop('checked', checked);
+        } else {
+            throw new DOMException("Checked must be a boolean");
+        }
+    }
 
 </script>

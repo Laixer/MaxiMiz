@@ -116,6 +116,7 @@
 
     <!-- Import campaign details scripts because partial view scripts won't be loaded otherwise -->
     <partial name="~/Views/CampaignDetails/_CampaignDetailsScripts.cshtml" />
+    <partial name="~/Views/CampaignDetails/_CampaignDetailsAdGroupsScripts.cshtml" />
 
     <!-- Script functionality for the campaign overview -->
     <script type="text/javascript">
@@ -153,6 +154,7 @@
                         $('#modalRight').modal({ show: true });
 
                         // We must setup all modal forms, but only after they were loaded
+                        console.log('Setting up modal forms from Overview.cshtml');
                         SetupCampaignDetailsModal();
                     });
             });
@@ -363,7 +365,7 @@
 
         /**
          * Saves the retreived total page count for a specified table.
-         * 
+         *
          * @@param tabletype The table type
          * @@param pageCount The retreived total page count
          */
@@ -391,12 +393,12 @@
 
         /**
          * Gets the stored total page count for a specified table.
-         * 
+         *
          * @@param tabletype The table type
          */
         function getTotalPageCountFromTableType(tableType) {
             if (tableType == null) { throw new DOMException("Table type can't be null"); }
-            
+
             switch (tableType) {
                 case ('@CampaignTableType.All.ToString()'):
                     return window.PageCampaignOverviewAllTotalPages;
