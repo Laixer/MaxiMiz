@@ -36,7 +36,7 @@ namespace Maximiz.Infrastructure.Committing
             switch (operation.TopEntity)
             {
                 case Campaign _:
-                    throw new NotImplementedException();
+                    return PrepareCampaignAsync(connection, operation, token);
                 case CampaignGroup _:
                     return PrepareCampaignGroupAsync(connection, operation, token);
                 case AdItem _:
@@ -93,6 +93,30 @@ namespace Maximiz.Infrastructure.Committing
                 // Delete A
                 throw new NotImplementedException("Campaign Group Delete operation not yet implemented");
             }
+        }
+
+        /// <summary>
+        /// Prepares an <see cref="MyOperation"/> where the top entity is of
+        /// type <see cref="Campaign"/>.
+        /// </summary>
+        /// <param name="operation"><see cref="MyOperation"/></param>
+        /// <param name="token"><see cref="CancellationToken"/></param>
+        /// <returns><see cref="Task"/></returns>
+        private async Task PrepareCampaignAsync(IDbConnection connection, MyOperation operation, CancellationToken token)
+        {
+            if (operation == null) { throw new ArgumentNullException(nameof(token)); }
+            if (token == null) { throw new ArgumentNullException(nameof(token)); }
+            var topEntity = (operation.TopEntity as Campaign) ?? throw new InvalidOperationException("Top entity must be a campaign");
+
+            // Create the top campaign group if required
+            if (operation.CrudAction == CrudAction.Create)
+            {
+                topEntity.OperationItemStatus = OperationItemStatus.PendingCreate;
+                topEntity.OperationId = operation.Id;
+                //await _campaignCommitter.CreateAsyncFromConnection(connection, topEntity, token);
+            }
+
+            throw new NotImplementedException();
         }
 
         /* TODO DRY */

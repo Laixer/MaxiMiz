@@ -38,11 +38,9 @@ namespace Maximiz.Infrastructure.Repositories
             // TODO Maybe move complex queries somewhere else? Kind of hard coded, but also specific.
             var sql = $"SELECT a.*" +
                 $" FROM {QueryExtractor.GetTableName<AdGroupWithStats>()} a" +
-                $" JOIN {QueryExtractor.CampaignGroupAdGroupLinkingTableName} link" +
+                $" JOIN {QueryExtractor.CampaignAdGroupLinkingTableName} link" +
                 $" ON a.id = link.ad_group_id" +
-                $" JOIN {QueryExtractor.GetTableName<Campaign>()} c" +
-                $" ON c.campaign_group_guid = link.campaign_group_id" +
-                $" WHERE c.id = '{campaignId}';";
+                $" WHERE link.campaign_id = '{campaignId}';";
             return RepositorySharedFunctions.QueryAsync<AdGroupWithStats>(_databaseProvider, sql);
         }
     }

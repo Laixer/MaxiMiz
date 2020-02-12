@@ -74,13 +74,13 @@ namespace Maximiz.Infrastructure.ServiceBus
                     formatter.Serialize(stream, message);
                     var toSend = new Message(stream.ToArray());
                     await client.SendAsync(toSend);
-                    logger.LogTrace("Sent message to service bus successfully");
+                    logger.LogTrace($"Message was sent to service bus successfully for operation {message.OperationId}");
                 }
             }
             catch (Exception e)
             {
-                logger.LogError(e, "Error while sending object to service bus");
-                throw new InvalidOperationException("Could not send message to service bus", e);
+                logger.LogError(e, $"Error while sending object to service bus for operation {message.OperationId}");
+                throw new InvalidOperationException($"Could not send message to service bus for operation {message.OperationId} ", e);
             }
         }
 
