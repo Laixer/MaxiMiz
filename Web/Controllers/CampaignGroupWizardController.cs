@@ -29,7 +29,9 @@ namespace Maximiz.Controllers
 
         private readonly IQueryTranslator _queryTranslator;
         private readonly ILogger logger;
+
         private readonly IStateMachineManager _stateMachineManager;
+        private readonly FormOperationExtractor _formOperationExtractor;
 
         /// <summary>
         /// Constructor for dependency injection.
@@ -40,7 +42,8 @@ namespace Maximiz.Controllers
             IMapper<Account, AccountModel> mapperAccount,
             IQueryTranslator queryTranslator,
             ILoggerFactory loggerFactory,
-            IStateMachineManager stateMachineManager)
+            IStateMachineManager stateMachineManager,
+            FormOperationExtractor formOperationExtractor)
         {
             _adGroupRepository = adGroupRepository ?? throw new ArgumentNullException(nameof(adGroupRepository));
             _accountRepository = accountRepository ?? throw new ArgumentNullException(nameof(accountRepository));
@@ -50,6 +53,7 @@ namespace Maximiz.Controllers
             if (loggerFactory == null) { throw new ArgumentNullException(nameof(loggerFactory)); }
             logger = loggerFactory.CreateLogger(nameof(CampaignGroupWizardController));
             _stateMachineManager = stateMachineManager ?? throw new ArgumentNullException(nameof(stateMachineManager));
+            _formOperationExtractor = formOperationExtractor ?? throw new ArgumentNullException(nameof(formOperationExtractor));
         }
 
         /// <summary>
@@ -74,20 +78,20 @@ namespace Maximiz.Controllers
         public async Task<IActionResult> PostForm([FromBody] CampaignGroupFormAllViewModel model)
         {
             if (model == null) { throw new ArgumentNullException(nameof(model)); }
-            //if (token == null) { throw new ArgumentNullException(nameof(token)); } 
             if (!ModelState.IsValid) { return BadRequest("Model state is not valid"); }
 
             try
             {
                 using (var source = new CancellationTokenSource())
                 {
-                    var operation = FormOperationExtractor.Extract(model);
+                    var operation = await _formOperationExtractor.ExtractAsync(model);
                     await _stateMachineManager.AttemptStartStateMachineAsync(operation, source.Token);
                     return Ok();
                 }
             }
             catch (Exception e)
             {
+                // TODO Maybe more clear error message display for the user?
                 logger.LogError("Couldn't start state machine for campaign group creation wizard", e);
                 return BadRequest();
             }

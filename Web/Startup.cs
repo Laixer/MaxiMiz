@@ -69,6 +69,7 @@ namespace Maximiz
             services.AddViewModelServices();
             services.AddCommitters();
 
+            // Add storage
             // TODO Might want to revisit this
             services.AddTransient<IStorageManager, StorageManager>();
 
@@ -90,6 +91,7 @@ namespace Maximiz
 
             // Setup State Machine Functionality
             services.AddTransient<IStateMachineManager, StateMachineManager>();
+            services.AddTransient<FormOperationExtractor>(); // TODO Interface? 
 
             // Setup Identity
             ConfigureServicesIdentity(services);

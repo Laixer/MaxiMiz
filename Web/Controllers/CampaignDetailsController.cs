@@ -10,6 +10,9 @@ using Maximiz.ViewModels.EntityModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Maximiz.Controllers
@@ -31,6 +34,9 @@ namespace Maximiz.Controllers
         private readonly IQueryTranslator _queryTranslator;
         private readonly ILogger logger;
 
+        private readonly IStateMachineManager _stateMachineManager;
+        private readonly FormOperationExtractor _formOperationExtractor;
+
         /// <summary>
         /// Constructor for dependency injection.
         /// </summary>
@@ -41,7 +47,9 @@ namespace Maximiz.Controllers
             IMapper<AdGroupWithStats, AdGroupModel> mapperAdGroup,
             IMapper<AccountWithStats, AccountModel> mapperAccount,
             IQueryTranslator queryTranslator,
-            ILoggerFactory loggerFactory)
+            ILoggerFactory loggerFactory,
+            IStateMachineManager stateMachineManager,
+            FormOperationExtractor formOperationExtractor)
         {
             _campaignRepository = campaignRepository ?? throw new ArgumentNullException(nameof(campaignRepository));
             _adGroupRepository = adGroupRepository ?? throw new ArgumentNullException(nameof(adGroupRepository));
@@ -55,6 +63,9 @@ namespace Maximiz.Controllers
 
             if (loggerFactory == null) { throw new ArgumentNullException(nameof(loggerFactory)); }
             logger = loggerFactory.CreateLogger(nameof(CampaignDetailsController));
+
+            _stateMachineManager = stateMachineManager ?? throw new ArgumentNullException(nameof(stateMachineManager));
+            _formOperationExtractor = formOperationExtractor ?? throw new ArgumentNullException(nameof(formOperationExtractor));
         }
 
         /// <summary>
@@ -66,7 +77,7 @@ namespace Maximiz.Controllers
         [HttpGet]
         public async Task<IActionResult> ShowCampaign(Guid id)
         {
-            // First get campaign
+            // First get campaign (we need the values for the other assignments)
             if (id == null || id == Guid.Empty) { throw new ArgumentNullException(nameof(id)); }
             var campaign = _mapperCampaign.Convert(await _campaignRepository.GetAsync(id));
 
@@ -82,10 +93,17 @@ namespace Maximiz.Controllers
                 account = _mapperAccount.Convert(await _accountRepository.GetAsync(campaign.AccountGuid));
             }
 
+            // Ad group ids that are linked
+            // TODO This is a workaround because link didn't work for some unknown reason
+            var adGroups = await _adGroupRepository.GetLinkedWithCampaignAsync(campaign.Id);
+            var adGroupIds = new List<Guid>();
+            foreach (var adGroup in adGroups) { adGroupIds.Add(adGroup.Id); }
+
             return PartialView("_Details", new CampaignDetailsViewModel
             {
                 Campaign = campaign,
-                Account = account
+                Account = account,
+                LinkedAdGroupIds = adGroupIds
             });
         }
 
@@ -97,7 +115,24 @@ namespace Maximiz.Controllers
         [HttpPost]
         public async Task<IActionResult> PostModificationForm([FromBody] FormCampaignDetailsViewModel model)
         {
-            return Ok();
+            if (model == null) { return BadRequest("Model can't be null"); }
+            if (!ModelState.IsValid) { return BadRequest("Model state is invalid"); }
+
+            try
+            {
+                using (var source = new CancellationTokenSource())
+                {
+                    var operation = await _formOperationExtractor.ExtractAsync(model);
+                    await _stateMachineManager.AttemptStartStateMachineAsync(operation, source.Token);
+                    return Ok();
+                }
+            }
+            catch (Exception e)
+            {
+                // TODO Maybe more clear error message display for the user?
+                logger.LogError("Couldn't start state machine for campaign group creation wizard", e);
+                return BadRequest();
+            }
         }
 
         /// <summary>
@@ -120,7 +155,7 @@ namespace Maximiz.Controllers
             var query = _queryTranslator.Translate(column, order, searchString, page);
             return PartialView("_AdGroupTableRowsLinked", new AdGroupTableLinkedViewModel
             {
-                AdGroups = _mapperAdGroup.ConvertAll(await _adGroupRepository.GetLinkedWithCampaignAsync(campaignId)) // TODO Query?
+                AdGroups = _mapperAdGroup.ConvertAll(await _adGroupRepository.GetLinkedWithCampaignAsync(campaignId)) // TODO Query
             });
         }
 
@@ -144,7 +179,6 @@ namespace Maximiz.Controllers
             return PartialView("_AdGroupTableRowsAll", new AdGroupTableAllViewModel
             {
                 AdGroupsAll = _mapperAdGroup.ConvertAll(await _adGroupRepository.GetAllAsync(query))
-                // TODO Linked ids? How did I want to do this?
             });
         }
 
@@ -165,33 +199,11 @@ namespace Maximiz.Controllers
             if (campaignId == null || campaignId == Guid.Empty) { throw new ArgumentNullException(nameof(campaignId)); }
             if (page < 1) { throw new ArgumentOutOfRangeException(nameof(page)); }
 
-            var query = _queryTranslator.Translate(column, order, searchString, page);  
+            var query = _queryTranslator.Translate(column, order, searchString, page);
             return PartialView("_AdGroupTableCountAll", new AdGroupTableAllCountViewModel
             {
                 TotalCount = await _adGroupRepository.GetCountAsync(query)
             });
-        }
-
-        /// <summary>
-        /// Links a given ad group to the campaign of the details view.
-        /// </summary>
-        /// <param name="model"><see cref="LinkingOperationViewModel"</param>
-        /// <returns>No content actionresult</returns>
-        [HttpPost]
-        public Task<IActionResult> LinkAdGroup([FromBody] LinkingOperationViewModel model)
-        {
-            throw new NotImplementedException();
-        }
-
-        /// <summary>
-        /// Unlinks a given ad group to the campaign of the details view.
-        /// </summary>
-        /// <param name="model"><see cref="LinkingOperationViewModel"</param>
-        /// <returns>Partial view with unlinked ad groups</returns>
-        [HttpPost]
-        public Task<IActionResult> UnlinkAdGroup([FromBody] LinkingOperationViewModel model)
-        {
-            throw new NotImplementedException();
         }
 
     }
