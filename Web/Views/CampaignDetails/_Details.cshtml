@@ -1,0 +1,59 @@
+@*
+    Partial view containing the details of a campaign.
+*@
+
+@model CampaignDetailsViewModel
+<!-- View for the details of a campaign -->
+<div id="modalBodyCampaignDetails" class="modal-body">
+    <!-- Navigation tab items -->
+    <ul class="nav nav-tabs">
+        <li class="nav-item">
+            <span class="nav-link active" data-target="#tabAccount" data-toggle="tab">Account</span>
+        </li>
+        <li class="nav-item">
+            <span class="nav-link" data-target="#tabMarketing" data-toggle="tab">Marketing</span>
+        </li>
+        <li class="nav-item">
+            <span class="nav-link" data-target="#tabTargeting" data-toggle="tab">Targeting</span>
+        </li>
+        <li class="nav-item">
+            <span class="nav-link" data-target="#tabSchedule" data-toggle="tab">Schedule</span>
+        </li>
+        <li class="nav-item">
+            <span class="nav-link" data-target="#tabAdGroups" data-toggle="tab">Ad Groups</span>
+        </li>
+    </ul>
+
+    <!-- Modifications exist in their own form -->
+    <!-- Each input field explicitly points to this form -->
+    <!-- This is required because we need some other forms in these tabs, and can't have forms in forms -->
+    <form id="formCampaignDetailsModifications" asp-controller="CampaignDetails" asp-action="@nameof(CampaignDetailsController.PostModificationForm)" method="post">
+        <!-- Hidden input to post form data -->
+        <input id="inputHiddenCampaignId" type="hidden" name="@nameof(FormCampaignDetailsViewModel.CampaignId)" value="@Model.Campaign.Id" />
+    </form>
+
+    <!-- Tab contents with partial views for each tab -->
+    <div class="tab-content">
+        <div class="tab-pane active" id="tabAccount">
+            <partial name="_DetailsAccount" model="@Model" />
+        </div>
+        <div class="tab-pane" id="tabMarketing">
+            <partial name="_DetailsMarketing" model="@Model" />
+        </div>
+        <div class="tab-pane" id="tabTargeting">
+            <partial name="_DetailsTargeting" model="@Model" />
+        </div>
+        <div class="tab-pane" id="tabSchedule">
+            <partial name="_DetailsSchedule" model="@Model" />
+        </div>
+        <div class="tab-pane" id="tabAdGroups">
+            <partial name="_DetailsAdGroups" model="@Model" />
+        </div>
+    </div>
+
+</div>
+
+<!-- Footer of our modal -->
+<div class="modal-footer justify-content-start">
+    <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fas fa-long-arrow-alt-right"></i></button>
+</div>

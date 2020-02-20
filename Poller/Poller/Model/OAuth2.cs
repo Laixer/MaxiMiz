@@ -1,5 +1,8 @@
 ﻿namespace Poller.Model
 {
+    /// <summary>
+    /// Contains our client credentials and tokens.
+    /// </summary>
     public class OAuth2
     {
         /// <summary>
@@ -26,5 +29,10 @@
         /// Grant type.
         /// </summary>
         public string GrantType { get; set; }
+
+        /// <summary>
+        /// Refresh token.
+        /// </summary>
+        public string RefreshToken { get; set; }
     }
 }

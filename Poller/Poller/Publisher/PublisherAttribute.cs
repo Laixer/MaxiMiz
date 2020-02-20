@@ -13,6 +13,10 @@ namespace Poller.Publisher
         /// </summary>
         public string Name { get; set; }
 
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        /// <param name="name">Publisher name</param>
         public PublisherAttribute(string name)
         {
             Name = name;

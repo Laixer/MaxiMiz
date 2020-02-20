@@ -1,0 +1,182 @@
+﻿@*
+    Campaign group creation wizard section for targeting settings.
+*@
+@inject ITargetingViewModelService targetingService
+
+<!-- Fieldset for our targeting properties -->
+<fieldset id="fieldsetTargeting">
+    <!-- Main title -->
+    <legend class="font-weight-bolder mb-4">Targeting</legend>
+
+    <!-- Side title, location -->
+    <div class="form-group">
+
+        <!-- Side title -->
+        <div class="section">
+            <h2>Geo's</h2>
+        </div>
+
+        <!-- Location -->
+        <div class="form-subgroup">
+            <div class="form-row">
+                <div class="form-group col-md-9 containsErrorHolder">
+                    <div class="mt-3">
+                        <label for="Devices">Countries</label>
+                        <div class="ml-0 space-between">
+                            @foreach (var location in targetingService.GetLocationOptions())
+                            {
+                                var id = Guid.NewGuid(); // Used to link label to input
+                                <div class="form-check form-check-inline">
+                                    <input class="checkboxLocation form-check-input" type="checkbox" id="@id"
+                                           name="@nameof(CampaignGroupFormAllViewModel.Locations)" value="@location" />
+                                    <label class="form-check-label font-weight-normal" for="@id">@LocationTranslator.TranslateLocation(location)</label>
+                                </div>
+                            }
+                        </div>
+                        <div class="errorHolder"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Side title, devices, operating systems -->
+    <div class="form-group mt-5">
+
+        <!-- Side title -->
+        <div class="section">
+            <h2>Devices</h2>
+        </div>
+
+        <!-- Devices, operating systems -->
+        <div class="form-subgroup">
+
+            <!-- Devices -->
+            <div class="form-row">
+                <div class="form-group col-md-9 containsErrorHolder">
+                    <div class="mt-3">
+                        <label for="Devices">Devices </label>
+                        <div class="ml-0 space-between">
+                            @foreach (var device in targetingService.GetDeviceOptions())
+                            {
+                                var id = Guid.NewGuid(); // Used to link label to input
+                                <div class="form-check form-check-inline">
+                                    <input class="checkboxDevice form-check-input" type="checkbox" id="@id"
+                                           name="@nameof(FormCampaignDetailsViewModel.Devices)" value="@device" />
+                                    <label class="form-check-label font-weight-normal" for="@id">@LocationTranslator.TranslateDevice(device)</label>
+                                </div>
+                            }
+                        </div>
+                        <div class="errorHolder"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Operating systems -->
+            <div class="form-row">
+                <div class="form-group col-md-9 containsErrorHolder">
+                    <div class="mt-3">
+                        <label for="Devices">Operating systems </label>
+                        <div class="ml-0 space-between">
+                            @foreach (var os in targetingService.GetOperatingSystemOptions())
+                            {
+                                var id = Guid.NewGuid(); // Used to link label to input
+                                <div class="form-check form-check-inline">
+                                    <input class="checkboxOperatingSystem form-check-input" type="checkbox" id="@id"
+                                           name="@nameof(FormCampaignDetailsViewModel.OperatingSystems)" value="@os" />
+                                    <label class="form-check-label font-weight-normal" for="@id">@LocationTranslator.TranslateOperatingSystem(os)</label>
+                                </div>
+                            }
+                        </div>
+                        <div class="errorHolder"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Save button, back button -->
+    <div class="form-group mt-5">
+
+        <!-- Back button -->
+        <div class="button-back">
+            <button class="buttonBack btn text-white btn-main btn-blue mt-5 float-left"
+                    data-targetSection="#sectionMarketing">
+                Back
+            </button>
+        </div>
+
+        <!-- Save button -->
+        <div class="button-save">
+            <button id="buttonNextTargeting" class="btn text-white btn-main btn-blue mt-5 float-right"
+                    data-targetSection="#sectionSchedule">
+                Next
+            </button>
+        </div>
+
+    </div>
+
+</fieldset>
+
+
+
+
+
+
+
+
+
+
+
+
+@*
+    <fieldset id="fieldsetTargeting">
+
+        <!-- Countries -->
+        <form-group>
+            <label>Targeted countries: </label>
+            @foreach (var location in new TargetingViewModelService().GetLocationOptions())
+            {
+                <div class="form-row">
+                    <input class="checkboxLocation" name="@nameof(CampaignGroupFormAllViewModel.Locations)" value="@location" type="checkbox" />
+                    <label>@LocationTranslator.TranslateLocation(location)</label>
+                </div>
+            }
+            <div class="errorHolder"></div>
+        </form-group>
+
+        <!-- Devices -->
+        <form-group>
+            <label>Targeted devices: </label>
+            @foreach (var device in new TargetingViewModelService().GetDeviceOptions())
+            {
+                <div class="form-row">
+                    <input class="checkboxDevice" name="@nameof(CampaignGroupFormAllViewModel.Devices)" value="@device" type="checkbox" />
+                    <label>@LocationTranslator.TranslateDevice(device)</label>
+                </div>
+            }
+            <div class="errorHolder"></div>
+        </form-group>
+
+        <!-- Operating systems -->
+        <form-group>
+            <label>Targeted operating systems: </label>
+            @foreach (var os in new TargetingViewModelService().GetOperatingSystemOptions())
+            {
+                <div class="form-row">
+                    <input class="checkboxOperatingSystem" name="@nameof(CampaignGroupFormAllViewModel.OperatingSystems)" value="@os" type="checkbox" />
+                    <label>@LocationTranslator.TranslateOperatingSystem(os)</label>
+                </div>
+            }
+            <div class="errorHolder"></div>
+        </form-group>
+
+        <!-- Submit and back button -->
+        <div class="form-row">
+            <button class="buttonBack btn text-white btn-main btn-blue mt-5" data-targetIndex="2">Back</button>
+            <button id="buttonNextTargeting" class="btn text-white btn-main btn-blue mt-5" data-targetIndex="4">Next</button>
+        </div>
+
+    </fieldset>
+*@

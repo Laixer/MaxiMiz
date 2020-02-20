@@ -1,0 +1,87 @@
+﻿@*
+    Partial view containing scheduling options for a single campaign.
+*@
+
+@model CampaignDetailsViewModel
+<!-- Schedule tab -->
+<form id="formTabSchedule">
+    <fieldset id="formSchedule">
+        <div class="targeting form-group">
+            <div>
+
+                <!-- Title -->
+                <div class="section">
+                    <h1 class="mb-4">Scheduling</h1>
+                </div>
+
+                <!-- Startdate, enddate + none -->
+                <div class="form-subgroup">
+                    <div class="form-row mt-5 containsErrorHolder">
+                        <!-- Start date -->
+                        <div class="form-group col-md-6">
+                            <label for="datetimeStartDate">Start date</label>
+                            <label>Campaign start date: </label>
+                            <input id="datetimeStartDate" class="form-control"
+                                   name="@nameof(FormCampaignDetailsViewModel.StartDate)"
+                                   type="datetime-local" value="@((Model.Campaign.StartDate ?? DateTime.Now).ToString("yyyy-MM-dd HH:mm:ss").Replace(' ','T'))" />
+                            <div class="errorHolder"></div>
+                        </div>
+
+                        <!-- End date -->
+                        <div class="form-group col-md-4 containsErrorHolder">
+                            <label for="datetimeEndDate">End date</label>
+                            <input id="datetimeEndDate" class="form-control"
+                                   name="@nameof(FormCampaignDetailsViewModel.EndDate)"
+                                   type="datetime-local" value="@((Model.Campaign.EndDate ?? DateTime.Now).ToString("yyyy-MM-dd HH:mm:ss").Replace(' ','T'))" />
+                            <div class="errorHolder"></div>
+                        </div>
+                        <!-- None -->
+                        <div class="form-group col-md-2">
+                            <div class="material-switch pull-right">
+                                <p>None </p>
+                                <input id="checkboxIgnoreEndDate" type="checkbox" class="switchOption form-extra"
+                                       name="@nameof(FormCampaignDetailsViewModel.IgnoreEndDate)" value="true" checked="@((Model.Campaign.IgnoreEndDate) ? "checked" : "")">
+                                <label for="checkboxIgnoreEndDate" class="label-primary"></label>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Save button -->
+        <div class="button-save">
+            <button class="buttonSaveCampaignDetails btn text-white btn-main btn-blue mt-5 float-right">Save</button>
+        </div>
+
+    </fieldset>
+</form>
+
+
+@*
+    <!-- Start date -->
+    <form-group>
+        <label>Campaign start date: </label>
+        <input id="datetimeStartDate" name="@nameof(FormCampaignDetailsViewModel.StartDate)"
+               type="datetime-local" value="@((Model.Campaign.StartDate ?? DateTime.Now).ToString("yyyy-MM-dd HH:mm:ss").Replace(' ','T'))" />
+    </form-group>
+
+    <!-- End date -->
+    <form-group>
+        <label>Campaign end date: </label>
+        <input id="datetimeEndDate" name="@nameof(FormCampaignDetailsViewModel.EndDate)"
+               type="datetime-local" value="@((Model.Campaign.EndDate ?? DateTime.Now).ToString("yyyy-MM-dd HH:mm:ss").Replace(' ','T'))" />
+
+        <!-- Infinite or not -->
+        <input id="checkboxIgnoreEndDate" type="checkbox" name="@nameof(FormCampaignDetailsViewModel.IgnoreEndDate)"
+               value="true" checked="@(Model.Campaign.EndDate == null)" />
+        <label>None</label>
+
+        <div class="errorHolder"></div>
+    </form-group>
+
+    <!-- Submit button -->
+    <button class="buttonSaveCampaignDetails btn text-white btn-main btn-blue mt-5 float-right">Save</button>
+
+*@

@@ -1,0 +1,106 @@
+@*
+    Contains shared razor js functionality for validation.
+*@
+
+<script type="text/javascript">
+
+    // Configures our validator static object
+    // This has to be called before validator creation
+    function setupValidatorDefaults() {
+        $.validator.setDefaults({
+            // Add error styling when invalid highlighted
+            highlight: function (element) {
+                $(element)
+                    .closest('.form-control')
+                    .removeClass('is-valid')
+                    .addClass('is-invalid');
+            },
+
+            // Remove error styling when unhighlighted
+            unhighlight: function (element) {
+                $(element)
+                    .closest('.form-control')
+                    .removeClass('is-invalid')
+                    .addClass('is-valid');
+            },
+
+            // Custom error class (recognized by bootstrap)
+            errorClass: 'invalid-feedback',
+
+            // Error placement customized
+            errorPlacement: function (error, element) {
+                var errorHolder = $(element)
+                    .closest('.containsErrorHolder')
+                    .find('.errorHolder');
+                if (errorHolder != null) {
+                    $(errorHolder).html(error);
+                };
+            },
+
+            // Disable ignoring hidden and non-visible elements
+            ignore: [],
+
+        });
+
+        // Add validation method for time in future
+        $.validator.addMethod("timeInFuture", function (value, element) {
+            if ($(element).attr('disabled') === 'disabled') { return true; }
+            return (new Date(value).getTime() > Date.now());
+        }, "Please select a date in the future");
+
+        // Add a validation method for being greater than some other time element
+        $.validator.addMethod('timeGreaterThanElement', function (value, element) {
+            if ($(element).attr('disabled') === 'disabled') { return true; }
+
+            let compareId = $(element).attr('data-greaterThanElementId');
+            // Throw if the element doesn't exist for easy debugging
+            if ($(element).length == 0) { throw Error("Can't find element ", compareId, ' for datetime comparison'); }
+
+            // Compare
+            let compareTime = new Date($(compareId).val()).getTime();
+            let thisTime = new Date(value).getTime();
+            return thisTime > compareTime;
+        });
+    };
+
+    // Validates each element in a given array
+    // Returns true if all are valid
+    function validateSet(myValidator, elementArray) {
+        if (myValidator == null) {
+            console.log('validator should not be null');
+            return;
+        }
+        if (elementArray == null) {
+            console.log('no elements to validate');
+            return;
+        }
+
+        try {
+            var result = true;
+            elementArray.forEach(function (item) {
+                if (!$(item).length) {
+                    console.log('Could not find item ', item);
+                } else {
+                    var itemValid = myValidator.element(item);
+                    if (result == true && itemValid == false) {
+                        result = false;
+                    }
+                }
+            });
+        } catch (e) {
+            console.log('Exception in ValidateSet: ', e);
+            throw e;
+        }
+
+        // Return last to ensure all elements have been checked
+        return result;
+    };
+
+    /**
+     * Sets up the ignoreBootstrapValidation class.
+     */
+    $(document).ready(() => {
+        console.log('Implement .ignoreBootstrapValidation');
+    });
+
+</script>

@@ -1,0 +1,45 @@
+﻿@*
+    Contains the navigation top bar as a partial view.
+*@
+
+@inject IUserViewModelService userService
+
+<nav class="navbar navbar-default">
+    <div class="container-fluid">
+        <div class="navbar-minimize">
+            <button class="btn btn-fill btn-icon"><i class="ti-more-alt"></i></button>
+        </div>
+        <div class="collapse navbar-collapse show">
+            <div class="logo float-left">
+                <a asp-controller="Home" asp-action="Index">
+                    <p>ISA<b class="minimize"></b></p>
+                </a>
+            </div>
+            <ul class="nav navbar-right">
+                <li class="button dropdown">
+                    <button data-toggle="dropdown" class="dropdown-toggle btn btn-main btn-blue">Add new<i class="fas fa-chevron-down"></i></button>
+                    <ul class="dropdown-menu">
+                        <li><a asp-controller="CampaignGroupWizard" asp-action="@nameof(CampaignGroupWizardController.ShowWizard)"> Campaign Group</a></li>
+                        <li><a asp-controller="AdGroupWizard" asp-action="@nameof(AdGroupWizardController.ShowWizard)"> Ad Group</a></li>
+                    </ul>
+                </li>
+                <li class="dropdown">
+                    <a data-toggle="dropdown" href="#" class="dropdown-toggle">
+                        <!-- TODO Is this correct usage? -->
+                        <p>@await userService.GetEmail()</p>
+                    </a>
+                    <ul class="dropdown-menu dropdown-settings">
+                        <li><a asp-controller="Settings" asp-action="@nameof(SettingsController.ShowSettings)" asp-route-settingsTab="@SettingsTab.Account.GetHashCode()"><i class="fas fa-user-circle"></i> Account</a></li>
+                        <li><a asp-controller="Settings" asp-action="@nameof(SettingsController.ShowSettings)" asp-route-settingsTab="@SettingsTab.Integrations.GetHashCode()"><i class="fas fa-plug"></i> Integrations</a></li>
+                        <div class="dropdown-divider"></div>
+                        <li><a asp-controller="Login" asp-action="@nameof(LoginController.Logout)"><i class="fas fa-sign-out-alt"></i> Sign Out</a></li>
+                    </ul>
+                </li>
+                <div class="divider"></div>
+                <li class="settings">
+                    <a asp-controller="Settings" asp-action="@nameof(SettingsController.ShowSettings)" asp-route-settingsTab="@SettingsTab.Account.GetHashCode()"><i class="fas fa-cog"></i></a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>

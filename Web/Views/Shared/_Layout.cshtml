@@ -1,0 +1,99 @@
+﻿@*
+    This layout page contains the sidebar navigation menu and a navigation bar,
+    and is used as the base template for views.
+*@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Maximiz</title>
+
+    <!-- Styling script import -->
+    <environment include="Development">
+        <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.css" />
+    </environment>
+    <environment exclude="Development">
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+              asp-fallback-href="~/lib/bootstrap/dist/css/bootstrap.min.css"
+              asp-fallback-test-class="sr-only" asp-fallback-test-property="position" asp-fallback-test-value="absolute"
+              crossorigin="anonymous"
+              integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" />
+    </environment>
+
+    <!-- Imported css -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.5.1/min/dropzone.min.css" />
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css" integrity="sha384-mzrmE5qonljUremFsqc01SB46JvROS7bZs3IO2EmfFsd15uHvIt+Y8vEf7N7fWAU" crossorigin="anonymous">
+
+    <!-- Custom css -->
+    <link rel="stylesheet" href="~/css/style.css">
+
+    @RenderSection("Styles", required: false)
+
+</head>
+<body>
+    <!-- Menu and topbar are conditional -->
+    @if ((bool)ViewData["RenderSideMenu"])
+    {
+        <partial name="_SideMenu" />
+    }
+    @if ((bool)ViewData["RenderNavigationBar"])
+    {
+        <partial name="_NavigationBar" />
+    }
+
+    <!-- Main rendering section -->
+    <div id="divBody">
+        @RenderBody()
+    </div>
+
+    <!-- Confirmation popup unit -->
+    <partial name="_ConfirmationPopup" />
+
+    <!-- Library imports -->
+    <environment include="Development">
+        <script src="~/lib/jquery/dist/jquery.js"></script>
+        <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.js"></script>
+        <script src="~/lib/jquery-validation/dist/jquery.validate.js"></script>
+    </environment>
+    <environment exclude="Development">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"
+                asp-fallback-src="~/lib/jquery/dist/jquery.min.js"
+                asp-fallback-test="window.jQuery"
+                crossorigin="anonymous"
+                integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=">
+        </script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.bundle.min.js"
+                asp-fallback-src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"
+                asp-fallback-test="window.jQuery && window.jQuery.fn && window.jQuery.fn.modal"
+                crossorigin="anonymous"
+                integrity="sha384-xrRywqdh3PHs8keKZN+8zzc5TX0GRTLCcmivcbNJWm2rs5C8PRhcEn3czEjhAO9o">
+        </script>
+    </environment>
+
+    <!-- Drop zone, used for dragging & dropping images -->
+    <!-- TODO Also offline -->
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.5.1/min/dropzone.min.js"></script>
+
+    <!-- Import custom razor js functions as partial views -->
+    <!-- TODO Only the menu one has to be razor, the rest can be .js -->
+    <partial name="_ScriptsMenu" />
+    <partial name="_ScriptsValidation" />
+    <partial name="_ScriptsSubscribables" />
+    <partial name="_ScriptsHttpMethods" />
+    <partial name="_ScriptsUtility" />
+    <partial name="_ScriptsConfirmationPopup" />
+    <partial name="_ScriptsPageSelector" />
+
+    <!-- Enable strict mode for all js functionality -->
+    <script type="text/javascript">
+        console.log('Using javascript strict mode throughout entire application');
+        'use strict';
+    </script>
+
+    <!-- Render script section for each (non-partial) view after imports -->
+    @RenderSection("Scripts", required: false)
+
+</body>
+</html>

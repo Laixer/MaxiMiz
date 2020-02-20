@@ -3,152 +3,103 @@ using System.Linq;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Diagnostics;
-using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Poller.Publisher;
+using Poller.Scheduler.Activator;
 
 namespace Poller.Host
 {
+    /// <summary>
+    /// Run the remote services.
+    /// </summary>
     internal class RemoteApplicationService : IHostedService, IDisposable
     {
-        private readonly RemoteApplicationServiceOptions _options;
-        private readonly CancellationTokenSource _cancellationTokenSource;
-        private readonly object executionLock = new object();
-        private ICollection<IRemotePublisher> _remotePublishers;
-        private System.Timers.Timer _timer;
+        private readonly CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
+        private readonly ICollection<ActivatorBase> _activatorBases = new List<ActivatorBase>();
 
         protected ILogger Logger { get; }
-        protected IServiceProvider Services { get; }
+        protected IServiceProvider ServiceProvider { get; }
         protected CancellationToken CancellationToken { get => _cancellationTokenSource.Token; }
 
         /// <summary>
         /// Create new instance.
         /// </summary>
         /// <param name="services">Service provider.</param>
-        public RemoteApplicationService(ILogger<RemoteApplicationService> logger, IServiceProvider services, IOptions<RemoteApplicationServiceOptions> options)
+        public RemoteApplicationService(ILogger<RemoteApplicationService> logger, IServiceProvider services)
         {
             Logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            Services = services ?? throw new ArgumentNullException(nameof(services));
-
-            _options = options.Value ?? throw new ArgumentNullException(nameof(options));
-            _timer = new System.Timers.Timer(_options.StartupDelay * 1000);
-            _cancellationTokenSource = new CancellationTokenSource();
-
-            CancellationToken.Register(() =>
-            {
-                _timer.Stop();
-            });
+            ServiceProvider = services ?? throw new ArgumentNullException(nameof(services));
         }
 
         /// <summary>
-        /// Start service.
+        /// Start service and schedule all operations to run.
         /// </summary>
-        /// <param name="cancellationToken">Cancellation token.</param>
-        public Task StartAsync(CancellationToken cancellationToken)
+        /// <remarks>This method will catch *all* exceptions.</remarks>
+        /// <param name="token">Cancellation token.</param>
+        public Task StartAsync(CancellationToken token)
         {
-            if (cancellationToken.IsCancellationRequested) { return Task.CompletedTask; }
+            if (token.IsCancellationRequested) { return Task.CompletedTask; }
 
-            _remotePublishers = Services.GetService<IEnumerable<IRemotePublisher>>().ToArray();
-            if (_remotePublishers.Count() > 0)
-            {
-                _timer.Elapsed += (s, e) => RunAllPublishers(CancellationToken);
-                _timer.Start();
-            }
+            Logger.LogInformation("Services starting");
+
+            InitializeActivators(token);
 
             return Task.CompletedTask;
         }
 
         /// <summary>
-        /// Run all publishers.
+        /// Initialize all activators.
         /// </summary>
-        /// <remarks>
-        /// Only one session will run at all time. All following threads will skip
-        /// execution if the lock is hold.
-        /// </remarks>
-        /// <param name="cancellationToken">Cancellation token.</param>
-        private void RunAllPublishers(CancellationToken cancellationToken = default)
+        /// <param name="token">Cancellation Token.</param>
+        private void InitializeActivators(CancellationToken token)
         {
-            if (cancellationToken.IsCancellationRequested) { return; }
-
-            if (Monitor.TryEnter(executionLock))
+            try
             {
-                try
+                foreach (var remotePublishers in ServiceProvider.GetService<IEnumerable<IRemotePublisher>>().ToArray())
                 {
-                    Logger.LogInformation("Running publishers");
-
-                    int index = 0;
-                    var taskCollection = new Task[_remotePublishers.Count()];
-                    foreach (var remotePublishers in _remotePublishers)
+                    foreach (var activator in remotePublishers.GetActivators(token).AsParallel())
                     {
-                        taskCollection[index++] = ExecutePublisher(remotePublishers, cancellationToken);
+                        activator.Initialize(CancellationToken);
+                        _activatorBases.Add(activator);
                     }
-
-                    Task.WhenAll(taskCollection).Wait(cancellationToken);
                 }
-                catch (OperationCanceledException) { }
-                finally
-                {
-                    _timer.Interval = _options.PublisherRefreshInterval * 60 * 1000;
-                    Monitor.Exit(executionLock);
-                }
+            }
+            catch (Exception e)
+            {
+                Logger.LogCritical(e.Message);
+                // TODO: Request shutdown
             }
         }
 
         /// <summary>
-        /// Run each publisher.
+        /// Terminate all activators.
         /// </summary>
-        /// <param name="publisher">Executing publisher.</param>
-        /// <param name="cancellationToken">Cancellation token.</param>
-        /// <returns></returns>
-        private async Task ExecutePublisher(IRemotePublisher publisher, CancellationToken cancellationToken)
+        /// <param name="token">Cancellation Token.</param>
+        private void TerminateActivators(CancellationToken token)
         {
-            if (cancellationToken.IsCancellationRequested) { return; }
-
-            await Task.Yield();
-
-            var watch = new Stopwatch();
-
             try
             {
-                Logger.LogDebug($"Start {publisher.GetType().FullName} at {DateTime.Now}");
-
-                watch.Start();
-
-                // Link the cancellation tokens into one new cancellation token
-                var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
-                cts.CancelAfter(TimeSpan.FromMinutes(_options.PublisherOperationTimeout));
-
-                var cancelToken = cts.Token;
-                cancelToken.Register(() =>
+                foreach (var activator in _activatorBases.AsParallel())
                 {
-                    Logger.LogWarning("Operation timeout, task killed");
-                });
-
-                await Task.Run(async () => await publisher.GetTopCampaignReportAsync().ConfigureAwait(false), cancelToken);
+                    activator.Dispose();
+                }
             }
-            catch (Exception e) when (e as OperationCanceledException == null)
+            catch (Exception e)
             {
-                Logger.LogError(e.Message);
-                Logger.LogTrace(e.StackTrace);
-            }
-            finally
-            {
-                watch.Stop();
-
-                Logger.LogDebug($"Finished {publisher.GetType().FullName} in {watch.Elapsed}");
+                Logger.LogCritical(e.Message);
+                // TODO: Request shutdown
             }
         }
 
         /// <summary>
         /// Stop service by cancelling all tokens.
         /// </summary>
-        /// <param name="cancellationToken">Cancellation token.</param>
-        public Task StopAsync(CancellationToken cancellationToken)
+        /// <param name="token">Cancellation token.</param>
+        public Task StopAsync(CancellationToken token)
         {
-            if (cancellationToken.IsCancellationRequested) { return Task.CompletedTask; }
+            if (token.IsCancellationRequested) { return Task.CompletedTask; }
 
             Logger.LogInformation("Services stopping");
 
@@ -160,7 +111,8 @@ namespace Poller.Host
         public void Dispose()
         {
             _cancellationTokenSource?.Dispose();
-            _timer?.Dispose();
+
+            TerminateActivators(default);
         }
     }
 }

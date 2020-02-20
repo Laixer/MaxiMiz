@@ -1,0 +1,141 @@
+﻿@*
+    Overview of ad groups.
+*@
+
+@model AdGroupOverviewViewModel
+@{
+    ViewData["Title"] = "Ad Groups";
+}
+<main>
+
+    <!-- TODO Update this ofc -->
+    <div class="campaign-overview">
+        <div class="header">
+
+            <!-- Title and searchbar -->
+            <nav class="navbar justify-content-between mb-4">
+                <h1>All Ad Groups</h1>
+
+                <!-- TODO This way of matching parameters is messy -->
+                <form class="form-inline" id="formSearchAdGroups">
+                    <input name="SearchQuery" class="form-control search" id="searchAdGroups" placeholder="Search" aria-label="Search" value="@Model.SearchQuery">
+                </form>
+            </nav>
+
+            <!-- Contains the tabs top bar -->
+            <ul class="nav nav-tabs">
+                <li class="nav-item">
+                    <a class="nav-link active" data-target="#tabAll" data-toggle="tab" id="tabAllCount">All (...)</a>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Contains the correct partial view for each tab. -->
+        <div class="content tab-content">
+
+            <!-- All the partial views, rendered upon document load. -->
+            <div class="tab-pane active" id="tabAll">
+                <div class="table-responsive tab-pane active" id="tabAll">
+                    <table class="table table-striped">
+                        <partial name="_TableHead" model="@Model" />
+                        <tbody id="tabAllTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</main>
+
+
+
+@section Scripts {
+    <script type="text/javascript">
+
+        // TODO This might not be the right way to do this
+        window.AdGroupOverviewColumn = '@Model.Column';
+        window.AdGroupOverviewOrder = '@Model.Order';
+
+        $(document).ready(function () {
+
+            // TODO Question Is this the right location for this functionality?
+            setMenuHighlight('@MenuItem.AdGroupOverview');
+
+            // Subscribe search ad group form submit
+            subscribeFormSubmit('#formSearchAdGroups', function () {
+                loadAdGroupOverviewTablesAsync();
+            });
+
+            // Subscribe open details / edit
+            // TODO Implement
+            subscribeClickable('.click-open-details', function (event) {
+                var adGroupId = $(event.currentTarget).attr('data-adgroup-id');
+                // TODO Make less strongly typed
+                location.href = '@Url.Action(nameof(AdGroupWizardController.ShowWizardAsEditor), "AdGroupWizard")' + '?adGroupId=' + adGroupId;
+            });
+
+            // Subscribe delete button functionality
+            // TODO Confirmation popup
+            // Reload all tables because deleted entry can exist in multiple tab tables
+            subscribeClickable('.click-delete-adgroup', function (event) {
+                var adGroupId = $(event.currentTarget).attr('data-adgroup-id');
+                doMethodAndProcess('@Url.Action("Delete", "AdGroupOverview")?' +
+                    new URLSearchParams({
+                        adGroupId: adGroupId,
+                    }), 'delete', loadAdGroupOverviewTablesAsync);
+            });
+
+            // Subscribe sorting button functionality
+            subscribeClickable('.clickSortAdGroup', function (event) {
+                window.AdGroupOverviewColumn = $(event.currentTarget).attr('data-column');
+                window.AdGroupOverviewOrder = $(event.currentTarget).attr('data-order');
+
+                highlightSortingIcons('.clickSortAdGroup', window.AdGroupOverviewColumn, window.AdGroupOverviewOrder);
+                loadAdGroupOverviewTablesAsync();
+            });
+
+            // Load all the tables upon page load
+            highlightSortingIcons('.clickSortAdGroup', window.AdGroupOverviewColumn, window.AdGroupOverviewOrder);
+            loadAdGroupOverviewTablesAsync();
+        });
+
+        // Loads all existing tables
+        function loadAdGroupOverviewTablesAsync() {
+            var searchString = $('#searchAdGroups')[0].value;
+            var column = window.AdGroupOverviewColumn;
+            var order = window.AdGroupOverviewOrder;
+
+            loadAdGroupOverviewTableAsync('@AdGroupOverviewTableType.All', '#tabAllTableBody', '#tabAllCount', 'All', searchString, column, order);
+        };
+
+        // Loads a single table
+        // TODO DRY with campaign overview
+        function loadAdGroupOverviewTableAsync(tableType, tableBodyId, countId, tableName, searchString, column, order) {
+            // Set count to ...
+            $(countId).html(tableName + ' (...)');
+
+            // Load view component async through controller fetch call
+            doGetAndReplaceHtml('@Url.Action(nameof(AdGroupOverviewController.GetAdGroupTableAsync)
+                , "AdGroupOverview")?'
+                + new URLSearchParams({
+                    table: tableType,
+                    searchString: searchString,
+                    column: column,
+                    order: order
+                }), tableBodyId);
+
+            // Load count component async through controller fetch call
+            doGetAndReplaceHtml('@Url.Action(nameof(AdGroupOverviewController.GetAdGroupCountAsync)
+                , "AdGroupOverview")?'
+                + new URLSearchParams({
+                    table: tableType,
+                    searchString: searchString,
+                    column: column,
+                    order: order
+                }), countId);
+        };
+
+
+    </script>
+}

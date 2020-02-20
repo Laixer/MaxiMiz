@@ -1,0 +1,193 @@
+﻿@*
+    Contains all scripts for our campaign details. This exists in its own partial
+    view because all campaign details views are partial. We can not load a scripts
+    section in a partial view, hence this functionality is imported in the
+    campaign overview.
+*@
+
+<!-- Import validation rules -->
+<partial name="~/Views/CampaignDetails/_DetailsValidationRules.cshtml" />
+
+<!-- Javascript functionality for our campaign details partial views -->
+<script type="text/javascript">
+
+    // All buttons
+    const buttonSaveCampaignDetails = '.buttonSaveCampaignDetails';
+
+    // All forms
+    const formAllTabs = '#formCampaignDetailsModifications';
+    const formTabAccount = '#formTabAccount';
+    const formTabMarketing = '#formTabMarketing';
+    const formTabTargeting = '#formTabTargeting';
+    const formTabSchedule = '#formTabSchedule';
+    const formTabAdGroups = '#formTabAdGroups';
+
+    // All form inputs
+    const inputCampaignNameSuffix = '#inputCampaignNameSuffix';
+    const inputBrandingText = '#inputBrandingText';
+    const inputUrl = '#inputUrl';
+    const inputUtmCustom = '#inputUtmCustom';
+    const checkboxAutopilot = '#checkboxAutopilot';
+    const checkboxCampaignActive = '#checkboxCampaignActive';
+    const inputCpc = '#inputCpc';
+    const selectBidStrategy = '#selectBidStrategy';
+    const radioDelivery = '.radioDelivery';
+    const inputBudget = '#inputBudget';
+    const selectBudgetModel = '#selectBudgetModel';
+    const inputBudgetDaily = '#inputBudgetDaily';
+    const checkboxBudgetDailyInfinite = '#checkboxBudgetDailyInfinite';
+    const checkboxLocation = '.checkboxLocation';
+    const checkboxDevice = '.checkboxDevice';
+    const checkboxOperatingSystem = '.checkboxOperatingSystem';
+    const datetimeStartDate = '#datetimeStartDate';
+    const datetimeEndDate = '#datetimeEndDate';
+    const checkboxIgnoreEndDate = '#checkboxIgnoreEndDate';
+    const inputAdGroupIds = '.hiddenAdGroupId';
+
+    // Explicitly define all elements that have to be validated for each section
+    // TODO These might be useful to indicate which tab is incorrect upon form validation
+    // The user might not be in the tab where our properties are invalid
+    const elementsAccount = [
+        inputCampaignNameSuffix,
+        inputBrandingText,
+        inputUrl,
+        inputUtmCustom
+    ];
+    const elementsMarketing = [
+        checkboxAutopilot,
+        checkboxCampaignActive,
+        inputCpc,
+        selectBidStrategy,
+        radioDelivery,
+        inputBudget,
+        selectBudgetModel,
+        inputBudgetDaily,
+        checkboxBudgetDailyInfinite
+    ];
+    const elementsTargeting = [
+        checkboxLocation,
+        checkboxDevice,
+        checkboxOperatingSystem
+    ];
+    const elementsSchedule = [
+        datetimeStartDate,
+        datetimeEndDate,
+        checkboxIgnoreEndDate
+    ];
+    const elementsAdgroups = [
+        inputAdGroupIds
+    ];
+
+    /**
+     * This function should be called when the campaign details modal has finished loading.
+     */
+    function SetupCampaignDetailsModal() {
+        try {
+            // Initialize our validator object
+            setupValidatorDefaults();
+            let validatorCampaignDetailsAccount = $(formTabAccount).validate();
+            let validatorCampaignDetailsMarketing = $(formTabMarketing).validate();
+            let validatorCampaignDetailsTargeting = $(formTabTargeting).validate();
+            let validatorCampaignDetailsSchedule = $(formTabSchedule).validate();
+            let validatorCampaignDetailsAdGroups = $(formTabAdGroups).validate();
+
+            // Setup validation rules
+            setupCampaignDetailsValidationRules();
+
+            // Do not post our forms by default ever
+            // TODO Maybe do this with a class? 
+            // TODO What is the function of these lines again?
+            subscribeFormSubmit(formAllTabs);
+            subscribeFormSubmit(formTabAccount);
+            subscribeFormSubmit(formTabMarketing);
+            subscribeFormSubmit(formTabTargeting);
+            subscribeFormSubmit(formTabSchedule);
+            subscribeFormSubmit(formTabAdGroups);
+
+            // Register our save buttons
+            subscribeClickable(buttonSaveCampaignDetails, function () {
+                // Do non-lazy evaluation to ensure all items are checked
+                // These can also be done with validateSet
+                if (validatorCampaignDetailsAccount.form() &
+                    validatorCampaignDetailsMarketing.form() &
+                    validatorCampaignDetailsTargeting.form() &
+                    validatorCampaignDetailsSchedule.form() &
+                    validatorCampaignDetailsAdGroups.form()) {
+                    postFormCampaignDetails();
+                }
+            });
+
+            // Link switches to their respective form controls
+            linkSwitches();
+
+            // Setup our ad groups section
+            setupCampaignDetailsAdGroupTab();
+
+        } catch (exception) {
+            console.log('Error while setting up campaign details modal functionality, ', e);
+        }
+    }
+
+    // Link switches to their respective form controls
+    function linkSwitches() {
+        linkSwitchToFormControlEnable(checkboxBudgetDailyInfinite, inputBudgetDaily, false);
+        linkSwitchToFormControlEnable(checkboxIgnoreEndDate, datetimeEndDate, true);
+    }
+
+    // Submit the form
+    function postFormCampaignDetails() {
+        // Visual feedback
+        var htmlOriginal = $(buttonSaveCampaignDetails).html();
+        $(buttonSaveCampaignDetails).attr('disabled', 'disabled');
+        setLoadingIconTo(buttonSaveCampaignDetails);
+
+        // Save original html
+        var originalForm = $(formAllTabs).html();
+
+        // Append all form pages to single form, to avoid messing with the validation tokens
+        $(formAllTabs).append($('#formTabAccount fieldset').clone());
+        $(formAllTabs).append($('#formTabMarketing fieldset').clone());
+        $(formAllTabs).append($('#formTabTargeting fieldset').clone());
+        $(formAllTabs).append($('#formTabSchedule fieldset').clone());
+        $(formAllTabs).append($('#formTabAdGroups fieldset').clone());
+
+        // Serialize before disabling elements
+        var jsonBody = $(formAllTabs).serializeFormJSON();
+
+        // TODO This is a beunfix
+        // Single items don't get put in an array and are not model bound correctly
+        // This is due to our form to json functionality (it seems)
+        makeArrayIfSingleString(jsonBody, 'Locations');
+        makeArrayIfSingleString(jsonBody, 'Devices');
+        makeArrayIfSingleString(jsonBody, 'OperatingSystems');
+        makeArrayIfSingleString(jsonBody, 'LinkedAdGroups');
+
+        // Restore form and disable elements
+        $(formAllTabs).html(originalForm);
+        updateEnabledSet(getAllElements(), false);
+
+        // Post the form and handle the response
+        var action = $(formAllTabs).get(0).action;
+        doPostAndProcess(action, jsonBody, function () {
+            $(buttonSaveCampaignDetails).html(htmlOriginal);
+            $(buttonSaveCampaignDetails).removeAttr('disabled');
+            updateEnabledSet(getAllElements(), true);
+            linkSwitches(); // Don't violate the switch-enable behaviour
+            showConfirmationPopup(true, 'Your changes have been saved');
+
+            // TODO How are we going to feedback success to the user?
+            // TODO What if we fail?
+            // TODO What if there is a timeout?
+        });
+    }
+
+    // Returns all present form elements
+    function getAllElements() {
+        return elementsAccount
+            .concat(elementsMarketing)
+            .concat(elementsTargeting)
+            .concat(elementsSchedule)
+            .concat(elementsAdgroups);
+    }
+
+</script>

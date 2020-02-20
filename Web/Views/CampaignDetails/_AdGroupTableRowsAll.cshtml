@@ -1,0 +1,24 @@
+﻿@*
+    Table rows for our all-adgroup table in the campaign details view.
+*@
+
+@model AdGroupTableAllViewModel
+<!-- Table entry for each item in our collection. -->
+@foreach (var adGroup in Model.AdGroupsAll)
+{
+    var id = Guid.NewGuid();
+    <tr class="row-unlink-adgroup">
+        <td>@adGroup.Name</td>
+        <td>@adGroup.CreateDate</td>
+        <td>@adGroup.AdItemCount</td>
+        <td>@adGroup.UpdateDate</td>
+        <td>
+            <div class="form-check form-check-inline">
+                <input class="checkboxSelectAdGroup form-check-input" type="checkbox" id="@id"
+                       data-adgroup-id="@adGroup.Id" data-adgroup-name="@adGroup.Name">
+                <label class="checkbox-no-label form-check-label" for="@id"></label>
+            </div>
+        </td>
+    </tr>
+}
+

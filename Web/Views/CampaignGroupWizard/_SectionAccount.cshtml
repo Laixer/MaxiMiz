@@ -1,0 +1,122 @@
+﻿@*
+    Campaign group creation wizard section for account settings.
+*@
+
+@model WizardCollectionsViewModel
+
+<!-- Fieldset for our account properties -->
+<fieldset id="fieldsetAccount">
+    <!-- Main title -->
+    <legend class="font-weight-bolder">Account</legend>
+
+    <!-- Side title, publisher and account -->
+    <div class="campaign form-group">
+
+        <!-- Side title -->
+        <div class="section">
+            <h2>Campaign</h2>
+        </div>
+
+        <!-- Publisher and account -->
+        <div class="form-subgroup mb-3">
+
+            <!-- Publisher -->
+            <label for="campaign">Publisher</label>
+            <div class="ml-0 containsErrorHolder">
+                @foreach (var publisher in new EnumViewModelService().GetPublisherOptions())
+                {
+                    var id = Guid.NewGuid();
+                    <div class="form-check form-check-inline">
+                        <input id="@id" class="checkboxPublisher form-check-input" type="checkbox"
+                               name="@nameof(CampaignGroupFormAllViewModel.Publishers)" value="@publisher">
+                        <label class="form-check-label font-weight-normal" for="@id">@EnumTranslator.TranslatePublisher(publisher)</label>
+                    </div>
+                }
+                <div class="errorHolder"></div>
+            </div>
+
+            <!-- Account -->
+            <div class="form-group mt-4 containsErrorHolder">
+                <label for="selectAccountTaboola">Account</label>
+                <select id="selectAccountTaboola" class="form-control"
+                        name="@nameof(CampaignGroupFormAllViewModel.AccountTaboolaId)">
+                    @foreach (var account in Model.AccountsTaboolaPublisher)
+                    {
+                        <option value="@account.Id">@account.Name</option>
+                    }
+                </select>
+                <div class="errorHolder"></div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Side title, campaign name, branding text, tracking code, url -->
+    <div class="info form-group mt-5">
+        <div>
+            <!-- Side title -->
+            <div class="section">
+                <h2>Info</h2>
+            </div>
+
+            <!-- Name, branding text, tracking code, url -->
+            <div class="form-subgroup">
+
+                <!-- Name, branding text -->
+                <div class="form-row">
+                    <!-- Name -->
+                    <div class="form-group col-md-6 containsErrorHolder">
+                        <label for="inputCampaignNameSuffix">Campaign name suffix</label>
+                        <input id="inputCampaignNameSuffix" class="form-control" type="text"
+                               name="@nameof(CampaignGroupFormAllViewModel.CampaignNameSuffix)" placeholder="My campaign" />
+                        <div class="errorHolder"></div>
+                    </div>
+
+                    <!-- Branding text -->
+                    <div class="form-group col-md-6 containsErrorHolder">
+                        <label for="inputBrandingText">Branding text</label>
+                        <input id="inputBrandingText" class="form-control" type="text"
+                               name="@nameof(CampaignGroupFormAllViewModel.BrandingText)" placeholder="My branding text" />
+                        <small id="brandingHelp" class="form-text text-muted"><i>Apears below headline</i></small>
+                        <div class="errorHolder"></div>
+                    </div>
+                </div>
+
+                <!-- Tracking code, url -->
+                <div class="form-row">
+                    <!-- Tracking code -->
+                    <div class="form-group col-md-6 containsErrorHolder">
+                        <label for="inputUtmCustom">Custom utm tags</label>
+                        <input id="inputUtmCustom" class="form-control" type="text"
+                               name="@nameof(CampaignGroupFormAllViewModel.UtmCustom)" placeholder="Custom utm tags" />
+                        <small id="brandingHelp" class="form-text text-muted">(Optional) <i>These get added to the existing utm</i></small>
+                        <div class="errorHolder"></div>
+                    </div>
+
+                    <!-- Url -->
+                    <div class="form-group col-md-6 containsErrorHolder">
+                        <label for="inputUrl">Target URL</label>
+                        <input id="inputUrl" class="form-control" type="url"
+                               name="@nameof(CampaignGroupFormAllViewModel.Url)" placeholder="https://www.targeturl.com" />
+                        <div class="errorHolder"></div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Save button, back button -->
+    <div class="form-group mt-5">
+
+        <!-- Save button -->
+        <div class="button-save">
+            <button id="buttonNextAccount" class="btn text-white btn-main btn-blue mt-5 float-right"
+                    data-targetSection="#sectionMarketing">
+                Next
+            </button>
+        </div>
+
+    </div>
+
+</fieldset>

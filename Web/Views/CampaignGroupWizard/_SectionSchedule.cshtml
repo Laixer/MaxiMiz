@@ -1,0 +1,76 @@
+﻿@*
+    Campaign group creation wizard section for schedule settings.
+*@
+
+<!-- Fieldset for our schedule properties -->
+<fieldset id="fieldsetSchedule">
+    <!-- Main title -->
+    <legend class="font-weight-bolder mb-4">Schedule</legend>
+
+    <!-- Side title, startdate, enddate + none -->
+    <div class="form-group">
+        <div class="form-group">
+
+            <!-- Title -->
+            <div class="section">
+                <h2>Dates</h2>
+            </div>
+
+            <!-- Startdate, enddate + none -->
+            <div class="form-subgroup">
+                <div class="form-row mt-5">
+                    <!-- Start date -->
+                    <div class="form-group col-md-6 containsErrorHolder">
+                        <label for="datetimeStartDate">Start date</label>
+                        <input id="datetimeStartDate" class="form-control"
+                               name="@nameof(CampaignGroupFormAllViewModel.StartDate)"
+                               type="datetime-local" value="@(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss").Replace(' ','T'))" />
+                        <div class="errorHolder"></div>
+                    </div>
+
+                    <!-- End date -->
+                    <div class="form-group col-md-4 containsErrorHolder">
+                        <label for="datetimeEndDate">End date</label>
+                        <input id="datetimeEndDate" class="form-control"
+                               name="@nameof(CampaignGroupFormAllViewModel.EndDate)"
+                               type="datetime-local"
+                               data-greaterThanElementId="#datetimeStartDate"/>
+                        <div class="errorHolder"></div>
+                    </div>
+                    <!-- None -->
+                    <div class="form-group col-md-2">
+                        <div class="material-switch pull-right">
+                            <p>None </p>
+                            <input id="checkboxIgnoreEndDate" type="checkbox" class="switchOption form-extra"
+                                   name="@nameof(CampaignGroupFormAllViewModel.IgnoreEndDate)" value="true" checked="checked" />
+                            <label for="checkboxIgnoreEndDate" class="label-primary"></label>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Save button, back button -->
+    <div class="form-group mt-5">
+
+        <!-- Back button -->
+        <div class="button-back">
+            <button class="buttonBack btn text-white btn-main btn-blue mt-5 float-left"
+                    data-targetSection="#sectionTargeting">
+                Back
+            </button>
+        </div>
+
+        <!-- Save button -->
+        <div class="button-save">
+            <button id="buttonNextSchedule" class="btn text-white btn-main btn-blue mt-5 float-right"
+                    data-targetSection="#sectionAdGroups">
+                Next
+            </button>
+        </div>
+
+    </div>
+
+</fieldset>

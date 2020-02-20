@@ -3,6 +3,12 @@ using System.Runtime.Serialization;
 
 namespace Poller.OAuth
 {
+
+    /// <summary>
+    /// Contains all our authorization parameters.
+    /// This is used to get access to our database
+    /// or event bus.
+    /// </summary>
     [DataContract]
     public class OAuthTicket
     {

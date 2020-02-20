@@ -1,0 +1,76 @@
+﻿@*
+    Contains our script functionality for the ad preview.
+*@
+
+<script type="text/javascript">
+
+    $(function () {
+
+        // Blur event for title adding or deleting
+        resubscribeTitleEntryBlurEvent();
+
+    });
+
+    /**
+     * Subscribes the blur event for all title entries to make sure we will
+     * always reload our random ad when changing a title.
+     * This is because the document.on function doesn't seem to work with blur.
+     * The reason for this is unknown.
+     */
+    function resubscribeTitleEntryBlurEvent() {
+        $('.titleEntry').off('blur');
+        $('.titleEntry').on('blur', function () {
+            tryGenerateRandomAd();
+        });
+    }
+
+    /**
+     * Generates a random ad if we have enough resources.
+     */
+    function tryGenerateRandomAd() {
+        // Get all non-null titles
+        let titlesAlsoNull = $('.titleEntry').serializeFormJSON()['@nameof(AdGroupFormViewModel.Titles)'];
+        if (titlesAlsoNull === "" || titlesAlsoNull === undefined) { return; }
+
+        titlesAlsoNull = makeArrayIfString(titlesAlsoNull); // Single item doesn't get parsed as array
+        let titles = []
+        for (let i = 0; i < titlesAlsoNull.length; i++) {
+            if (titlesAlsoNull[i] !== "" && titlesAlsoNull[i] !== undefined) {
+                titles.push(titlesAlsoNull[i]);
+            }
+        }
+
+        let imageUris = $('.hiddenImageUri').serializeFormJSON()['@nameof(AdGroupFormViewModel.ImageLinks)'];
+        imageUris = makeArrayIfString(imageUris);
+
+        // Don't do anything if we have no resources yet
+        if (titles.length === 0 || imageUris.length === null) { return; }
+
+        generateRandomAd(titles, imageUris);
+    };
+
+    /**
+     * Generates a random ad and displays it.
+     *
+     * @@param titles All titles to choose from
+     * @@param imageUris All image uris to choose from
+     */
+    function generateRandomAd(titles, imageUris) {
+        $('#generatedAdTitle').text(getRandomFromArray(titles));
+        $('#generatedAdImage').attr('src', getRandomFromArray(imageUris));
+    }
+
+    /**
+     * Gets a random item from an array.
+     *
+     * @@param array The array to choose from
+     */
+    function getRandomFromArray(array) {
+        if (array === null || array.length == 0) {
+            console.log('Could not pick item from empty array');
+            throw DOMException("Array can never be empty when selecting random item");
+        }
+        return array[Math.floor(Math.random()*array.length)];
+    }
+
+</script>

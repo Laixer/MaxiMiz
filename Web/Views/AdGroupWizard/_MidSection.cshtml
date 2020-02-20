@@ -1,0 +1,34 @@
+﻿@*
+    Contains our ad preview, our submit and our cancel button.
+*@
+
+<div class="adscontent">
+    <p class="text-center">Preview</p>
+    <div class="preview-section">
+
+        <!-- Our randomly selected image -->
+        <div class="image-container">
+            <img id="generatedAdImage" />
+        </div>
+
+        <!-- Title + adsense text -->
+        <div class="image-description">
+            <div class="form-group">
+                <label id="generatedAdTitle" class="ad-text m-0"></label>
+                <label class="lblAdGroup ad-tracking text-muted">Taboola Adsense</label>
+            </div>
+        </div>
+
+        <!-- Submit button for form -->
+        <div class="submit">
+            <button id="buttonSubmitWizardAdGroup" class="btn text-white btn-bluebg mt-5">Submit</button>
+        </div>
+
+        <!-- Popup message thingy -->
+        <div class="alert alert-success alert-dismissible fade show success-message">
+            <strong>Success!</strong> Advertisement has successfully been submitted.
+            <button type="button" class="close" data-dismiss="alert">&times;</button>
+        </div>
+
+    </div>
+</div>

@@ -1,0 +1,64 @@
+﻿@*
+    Settings wrapper, which eventually will contain all our tabs.
+*@
+
+@model SettingsViewModel
+<!-- Settings overview with tabs -->
+<main>
+
+    <!-- Tab navigation -->
+    <nav class="justify-content-between header">
+        <ul class="nav nav-tabs">
+            <li class="nav-item">
+                <span id="navAccount" class="nav-link" data-target="#tabAccount" data-toggle="tab">Account</span>
+            </li>
+            <li class="nav-item">
+                <span id="navIntegrations" class="nav-link" data-target="#tabIntegrations" data-toggle="tab">Integrations</span>
+            </li>
+        </ul>
+    </nav>
+
+    <!-- Tab contents with partial views for each tab -->
+    <div class="tab-content">
+        <div class="tab-pane active" id="tabAccount">
+            <partial name="_PageAccount" />
+        </div>
+        <div class="tab-pane" id="tabIntegrations">
+            <partial name="_PageIntegrations" />
+        </div>
+    </div>
+
+</main>
+
+@section Scripts {
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+
+            // TODO Fix
+            console.log('Fix tab selection upon load');
+
+            // Show the desired tab on page load
+            if ('@Model' != null && '@Model.SettingsTab' != null) {
+                switch ('@Model.SettingsTab') {
+                    case '@SettingsTab.Account':
+                        $('#navAccount').tab('show');
+                        break;
+                    case '@SettingsTab.Integrations':
+                        $('#navIntegrations').tab('show');
+                        break;
+                }
+            }
+
+            // Load our account details dynamically
+            let urlAccount = '@Url.Action(nameof(SettingsController.GetAccountDetailsPartialView), "Settings")';
+            doGetAndReplaceHtml(urlAccount, '#formSettingsAccount');
+
+            // Load our accounts dynamically
+            let urlLinked = '@Url.Action(nameof(SettingsController.GetListedAccountsPartialView), "Settings")';
+            doGetAndReplaceHtml(urlLinked, '#tableLinkedAccountsBody');
+
+        });
+
+    </script>
+}

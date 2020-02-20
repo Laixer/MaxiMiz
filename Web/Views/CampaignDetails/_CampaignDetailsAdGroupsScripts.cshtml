@@ -1,0 +1,181 @@
+﻿@*
+    Contains all scripts for our campaign details ad group parts. This exists in
+    its own partial view because all campaign details views are partial. We can
+    not load a scripts section in a partial view, hence this functionality is
+    imported in the campaign overview.
+*@
+
+<!-- JavaScript functionality for the campaign details ad groups section -->
+<script type="text/javascript">
+
+    // TODO Sorting icons
+
+    // TODO This is a workaround
+    let emptyHiddenAdGroupHtml = null;
+
+    /**
+     * Sets up the ad group tab for our campaign details modal. This should be
+     * called every time we reload the modal by selecting some campaign.
+     */
+    function setupCampaignDetailsAdGroupTab() {
+
+        // Save global variables
+        window.ColumnCampaignDetailsAdGroupLinked = '@ColumnAdGroupLinking.Name';
+        window.OrderCampaignDetailsAdGroupLinked = '@Order.Ascending';
+        window.ColumnCampaignDetailsAdGroupAll = '@ColumnAdGroupLinking.Name';
+        window.OrderCampaignDetailsAdGroupAll = '@Order.Ascending';
+
+        // Subscribe our search unit
+        subscribeFormSubmit('#formSearchAllAdGroups', loadAdGroupAllAsync);
+
+        // Subscribe checkbox functionality
+        subscribeCheckbox('.checkboxSelectAdGroup', onUpdateCheckBox);
+
+        // Trigger initial async view component load when our document is ready
+        loadAdGroupLinkedAsync();
+        loadAdGroupAllAsync();
+    };
+
+    // Loads the linked ad groups table
+    function loadAdGroupLinkedAsync() {
+        let query = null; // TODO Sending null, good idea or not?
+        let column = window.ColumnCampaignDetailsAdGroupLinked;
+        let order = window.OrderCampaignDetailsAdGroupLinked;
+        loadAdGroupTablePartAsync('@Url.Action(nameof(CampaignDetailsController.GetAdGroupsLinkedAsync), "CampaignDetails")',
+            '#tableAdGroupLinkedBody', query, column, order);
+    }
+
+    // Loads the all ad groups table
+    // TODO Should this take control over an element outside of this view? I think not, but I didn't want to build an entire component for this.
+    // TODO If this is the approach, maybe do the same for the campaign table count
+    function loadAdGroupAllAsync() {
+        // Count indicator is updated by the view returned by the all-table view component
+        $('#adGroupTotalCount').html('...');
+
+        let query = $('#searchAllAdGroups')[0].value;
+        let column = window.ColumnCampaignDetailsAdGroupAll;
+        let order = window.OrderCampaignDetailsAdGroupAll;
+        loadAdGroupTablePartAsync('@Url.Action(nameof(CampaignDetailsController.GetAdGroupsAllAsync), "CampaignDetails")',
+            '#tableAdGroupAllBody', query, column, order);
+        loadAdGroupTablePartAsync('@Url.Action(nameof(CampaignDetailsController.GetAdGroupsAllCountAsync), "CampaignDetails")',
+            '#adGroupTotalCount', query, column, order);
+    }
+
+    /**
+     * This grabs and removes the empty entry.
+     */
+    function onFirstLoad() {
+
+    }
+
+    /**
+     * Loads a given table for the ad groups overview.
+     *
+     * @@param url The url to fetch from
+     * @@param tableBodyId
+     * @@param query The search string
+     * @@param column The sorting column
+     * @@param order The sorting order
+     */
+    function loadAdGroupTablePartAsync(url, tableBodyId, searchString, column, order) {
+        doGetAndReplaceHtml(url + '?' + new URLSearchParams({
+            campaignId: $('#inputHiddenCampaignId').attr('value'),
+            searchString: searchString,
+            column: column,
+            order: order
+        }),
+            tableBodyId,
+            setCheckBoxesTableAll); // Success callback
+        // TODO This doesn't need to happen every single time
+    }
+
+    /**
+     * This checks the checkboxes for each item in the 'All' section based on
+     * all the hidden selected inputs.
+     * NOTE: This also affects the 'Linked' section but this doesn't matter at
+     * this moment.
+     */
+    function setCheckBoxesTableAll() {
+        $('.checkboxSelectAdGroup').each(function (index, item) {
+            if (getSelectedIds().includes($(item).attr('data-adgroup-id'))) {
+                setCheckBox(item, true);
+            }
+        });
+    }
+
+    /**
+     * Gets called when we click one of the checkboxes.
+     *
+     * @@param event The click event object
+     */
+    function onUpdateCheckBox(event) {
+        var adGroupId = $(event.target).attr('data-adgroup-id');
+        if ($(event.target).get(0).checked) {
+            onLinkAdGroup(adGroupId);
+        } else {
+            onUnlinkAdGroup(adGroupId);
+        }
+    }
+
+    function onLinkAdGroup(adGroupId) {
+        console.log('Link ', adGroupId);
+    }
+
+    function onUnlinkAdGroup(adGroupId) {
+        console.log('Unlink ', adGroupId);
+    }
+
+    /**
+     * Gets an array with all alreadly linked ad group ids.
+     */
+    function getSelectedIds() {
+        let ids = [];
+        $('.hiddenAdGroupId.notEmpty').each(function (index, item) {
+            var id = $(item).get(0).value;
+            if (id == null) { console.log('Error while getting guid from ', $(item)); }
+            else { selectedIds.push(id); }
+        });
+        return ids;
+    }
+
+
+
+
+    // Adds a hidden input entry for a given ad group id
+    function addAdGroupId(adGroupId, adGroupName) {
+        if (getSelectedIds().includes(adGroupId) === false) {
+            // We have to add the name to the input too, for display purposes
+
+            // TODO This can be cleaned up
+            let htmlEntry = "<input type='hidden' class='hiddenAdGroupId notEmpty' name='@nameof(CampaignGroupFormAllViewModel.SelectedAdGroupIds)' value='" + adGroupId + "' ";
+            htmlEntry = htmlEntry.concat("data-adgroup-name='", adGroupName, "' />");
+
+            $('#selectedAdGroupIds').append(htmlEntry);
+        } else {
+            console.log('Not appending ', adGroupId, ' to selected items, already exists');
+        }
+
+        // Remove the empty entry if it exists (we never want to send the empty entry)
+        if ($('#emptyHiddenAdGroup').length) {
+            $('#emptyHiddenAdGroup').remove();
+        }
+
+        // This explicitly removes the error message, because it bugs out
+        // TODO This is a workaround', the validator doesn't seem to understand inputs being removed
+        $('#emptyHiddenAdGroup-error').text('');
+    }
+
+    // Removes a hidden input entry for a given ad group id
+    function removeAdGroupId(adGroupId) {
+        $.each($('.hiddenAdGroupId'), function (index, item) {
+            if ($(item).get(0).value === adGroupId) { $(item).remove(); }
+        });
+
+        // If we have just removed the last item we should add the empty placeholder again
+        if ($('#selectedAdGroupIds .notEmpty').length == 0) {
+            $('#selectedAdGroupIds').append(emptyHiddenAdGroupHtml);
+        }
+    }
+
+
+</script>

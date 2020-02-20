@@ -1,0 +1,27 @@
+﻿@*
+    Contains our validation rules for the login page.
+*@
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+
+        // Email
+        $('#inputUserEmail').rules('add', {
+            required: true,
+            messages: {
+                required: 'Please enter your email address'
+            }
+        });
+
+        // Password
+        $('#inputUserPassword').rules('add', {
+            required: true,
+            messages: {
+                required: 'Please enter your password'
+            }
+        });
+
+    });
+
+</script>

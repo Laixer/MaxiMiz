@@ -1,0 +1,76 @@
+﻿@*
+    Contains our sidebar functionality for ad group creation.
+    TODO This might contain too much logic to double-function as AdGroup editing wizard
+*@
+
+@model AdGroupWizardViewModel
+
+<!-- Sidebar with form settings for our new ad group -->
+<section class="adsfield">
+    <form id="formWizardAdGroup" asp-controller="AdGroupWizard" asp-action="@nameof(AdGroupWizardController.SubmitForm)" method="post" class="pt-2">
+
+        <!-- Hidden fields for if we are using this page for modifications -->
+        @if (Model != null && Model.AdGroup != null)
+        {
+            <input type="hidden" name="@nameof(AdGroupFormViewModel.Id)" value="@Model.AdGroup.Id" />
+        }
+
+        <!-- Name -->
+        <form-group class="form-group containsErrorHolder">
+            <label for="inputAdGroupName">Ad group name</label><br />
+            <input id="inputAdgroupName" type="text" name="@nameof(AdGroupFormViewModel.Name)" class="form-control disableOnSubmitPending"
+                   placeholder="My ad group name" value="@((Model != null && Model.AdGroup != null) ? @Model.AdGroup.Name : "")" />
+            <div class="errorHolder"></div>
+        </form-group>
+
+        <!-- Titles -->
+        <div class="form-group containsErrorHolder">
+            <label>Titles</label>
+            <div id="divTitleList">
+                @if (Model != null && Model.AdGroup != null && Model.AdGroup.Titles != null && Model.AdGroup.Titles.Length > 0)
+                {
+                    @for (int i = 0; i < Model.AdGroup.Titles.Length; i++)
+                    {
+                        <partial name="_TitleEntry" model="@new TitleEntryViewModel {
+                            Title = Model.AdGroup.Titles[i],
+                            IsRemovable = (i > 0)
+                        }" />
+                    }
+                }
+                else
+                {
+                    <partial name="_TitleEntry" model="@null" />
+                }
+            </div>
+            <a href="" id="addTitleEntry"> + Add Title </a>
+            <div class="errorHolder"></div>
+        </div>
+
+        <!-- Images section -->
+        <div class="form-group">
+            <label for="uploadImage">Upload Images</label>
+            <a id="openImages" href="" data-toggle="modal" data-target="#modalCenter">
+                <div id="divSelectedImagesThumbnails" class="image-section">
+                    <!-- Added dynamically -->
+                </div>
+            </a>
+        </div>
+
+        <!-- Hidden input for selected image urls -->
+        <div id="hiddenImageUris" class="containsErrorHolder">
+            @if (Model != null && Model.AdGroup != null && Model.AdGroup.ImageLinks != null && Model.AdGroup.ImageLinks.ToList().Count > 0)
+            {
+                @foreach (var imageUri in Model.AdGroup.ImageLinks)
+                {
+                    <input type='hidden' class='hiddenImageUri disableOnSubmitPending' name='@nameof(AdGroupFormViewModel.ImageLinks)' value="@imageUri" />
+                }
+            }
+            else
+            {
+                <input type='hidden' class='hiddenImageUri disableOnSubmitPending' name='@nameof(AdGroupFormViewModel.ImageLinks)' />
+            }
+            <div class="errorHolder"></div>
+        </div>
+
+    </form>
+</section>

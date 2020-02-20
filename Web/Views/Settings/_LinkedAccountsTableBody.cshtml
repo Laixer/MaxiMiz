@@ -1,0 +1,15 @@
+﻿@*
+    Tab to display integrations.
+*@
+
+@model LinkedAccountsTableViewModel
+<!-- Displays all our known accounts -->
+@foreach (var account in Model.LinkedAccounts)
+{
+    <tr>
+        <td>@account.Name</td>
+        <!-- TODO Fix icon management dynamically -->
+        <td><img src="~/img/taboola_logo_xs.png" class="img-md" alt="taboola_logo"> @EnumTranslator.TranslatePublisher(account.Publisher)</td>
+        <td>@EnumTranslator.TranslateAccountType(account.Publisher, account.AccountTypeString)</td>
+    </tr>
+}

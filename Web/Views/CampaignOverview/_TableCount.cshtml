@@ -1,0 +1,9 @@
+﻿@*
+    Displays an amount of campaign items.    
+*@
+
+@model CampaignCountViewModel
+
+<div class="tableCount" data-total-items="@Model.CampaignCount" data-items-per-page="@Model.ItemsPerPage">
+    @Model.TableName (@Model.CampaignCount)
+</div>

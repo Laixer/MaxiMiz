@@ -1,0 +1,154 @@
+﻿@*
+    Contains some utility functionality.
+*@
+
+<script type="text/javascript">
+
+    /**
+     * Sets the inner html of some item to the loading icon.
+     * TODO This has to be implemented.
+     *
+     * @@param id The id of the element to replace
+     */
+    function setLoadingIconTo(id) {
+        $(id).html('Loading...');
+    }
+
+    /**
+     * Serializes a form to json.
+     */
+    (function ($) {
+        $.fn.serializeFormJSON = function () {
+
+            var o = {};
+            var a = this.serializeArray();
+            $.each(a, function () {
+                if (o[this.name]) {
+                    if (!o[this.name].push) {
+                        o[this.name] = [o[this.name]];
+                    }
+                    o[this.name].push(this.value || '');
+                } else {
+                    o[this.name] = this.value || '';
+                }
+            });
+            return o;
+        };
+    })(jQuery);
+
+
+    /**
+     * TODO This is a beunfix.
+     * Makes a single string item in a json object an array of size one. This
+     * will only happen if the item is an actual string instead of an array.
+     *
+     * @@param jsonBody The entire json object
+     * @@param key The key of the item to check
+     */
+    function makeArrayIfSingleString(jsonBody, key) {
+        if (key in jsonBody) {
+            if (jsonBody[key].constructor == "string".constructor) {
+                jsonBody[key] = [jsonBody[key]];
+            }
+        } else {
+            console.log('Could not find ', key, ' in ', jsonBody);
+        }
+    }
+
+    /**
+     * Makes a single string an array, does nothing if it already is an array.
+     * This returns and does not overwrite. (TODO Is this correct?)
+     * This returns an empty array if the input is undefined.
+     *
+     * @@param input The input string or array
+     */
+    function makeArrayIfString(input) {
+        if (input === undefined) { return []; }
+        if (input.constructor == "string".constructor) {
+            return [input];
+        } else {
+            return input;
+        }
+    }
+
+    /**
+     * Sets all elements in an array to enabled or disabled.
+     *
+     * @@param elementsArray The elements to update
+     * @@param enabled True if enabled, false if disabled
+     */
+    function updateEnabledSet(elementsArray, enabled) {
+        if (elementsArray == null) { console.log('No elements to enable or disable'); }
+        elementsArray.forEach(function (item) {
+            if (enabled) {
+                $(item).removeAttr('disabled');
+            } else {
+                $(item).attr('disabled', 'disabled');
+            }
+        });
+    }
+
+    /**
+     * Highlights all items in the iconSelector which match the given column and
+     * order. All other items get unhighlighted.
+     *      Based on attr: data-column
+     *      Based on attr: data-order
+     *
+     * @@param iconSelector jQuery icon selector
+     * @@param column The current selected column
+     * @@param order The current selected order
+     */
+    function highlightSortingIcons(iconSelector, column, order) {
+        $(iconSelector).each(function (index, item) {
+            if ($(item).attr('data-column') === column &&
+                $(item).attr('data-order') === order) {
+                $(item).addClass('active');
+            } else {
+                $(item).removeClass('active');
+            }
+        });
+    }
+
+    /**
+     * This links a switch to a form control. If the switch is enabled then the
+     * form control will either be enabled or disabled. This will also trigger
+     * once when setup to ensure consistency.
+     *
+     * @@param idSwitch The id of the switch
+     * @@param idFormControl The id of the form control
+     * @@param switchDisablesFormControl If set to true the switch disables the
+     * form control, if set to false this behaviour will invert.
+     */
+    function linkSwitchToFormControlEnable(idSwitch, idFormControl, switchDisablesFormControl) {
+        let onClickFunction = function () {
+            let checked = $(idSwitch).get(0).checked;
+            // XOR
+            if ((checked || switchDisablesFormControl) && !(checked && switchDisablesFormControl)) {
+                $(idFormControl).removeAttr('disabled');
+            } else {
+                $(idFormControl).attr('disabled', 'disabled');
+            }
+        };
+
+        $(document).off('click', idSwitch);
+        $(document).on('click', idSwitch, onClickFunction);
+
+        // Call once to ensure consistency
+        onClickFunction();
+    }
+
+    /**
+     * Sets a checkbox to checked or unchecked.
+     * 
+     * @@param selectorId The checkbox id
+     * @@param checked Boolean indicating checkbox checked status
+     */
+    function setCheckBox(selectorId, checked) {
+        if (checked === true || checked === false) {
+            $(selectorId).prop('checked', checked);
+        } else {
+            throw new DOMException("Checked must be a boolean");
+        }
+    }
+
+</script>

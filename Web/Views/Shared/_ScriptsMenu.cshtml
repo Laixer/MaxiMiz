@@ -1,0 +1,22 @@
+﻿@*
+    Contains functions that operate on our menu bars.    
+*@
+
+<script type="text/javascript">
+
+    // Highlights the correct menu item
+    function setMenuHighlight(menuItem) {
+        switch (menuItem) {
+            case '@MenuItem.AdGroupOverview':
+                $('#menuItemAdGroupOverview').addClass('active');
+                break;
+            case '@MenuItem.CampaignOverview':
+                $('#menuItemCampaignOverview').addClass('active');
+                break;
+            case '@MenuItem.Dashboard':
+                $('#menuItemDashboard').addClass('active');
+                break;
+        }
+    }
+
+</script>

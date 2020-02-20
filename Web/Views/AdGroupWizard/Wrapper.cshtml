@@ -1,0 +1,120 @@
+﻿@*
+    Wrapper for our advertisement creation page.
+*@
+
+@{
+    // This should not render the side menu as we require the entire screen
+    ViewData["RenderSideMenu"] = false;
+}
+
+@model AdGroupWizardViewModel
+<!-- Wrapper content -->
+<main class="adsmain">
+
+    <!-- Contains all our metadata functionality -->
+    <partial name="_Sidebar" model="@Model" />
+
+    <!-- Contains our previews -->
+    <partial name="_MidSection" />
+
+    <!-- Image picker modal -->
+    <div class="container centermodal">
+        <div class="modal center fade modal-center" id="modalCenter" tabindex="-1" role="dialog" aria-labelledby="modalCenterLabel" aria-hidden="true">
+            <div id="divModalImagePicker" class="modal-dialog" role="document">
+                <!-- Modal content gets rendered here -->
+                <partial name="~/Views/ImagePicker/_ImagePicker.cshtml" />
+            </div>
+        </div>
+    </div>
+
+</main>
+
+@section Styles  {
+    <!-- Load the styles for the image picker popup -->
+    <link rel="stylesheet" href="~/css/modal_center.css">
+}
+
+@section Scripts {
+
+    <!-- Load partial scripts  -->
+    <!-- TODO Might be sub-optimal because the link is too explicit -->
+    <partial name="~/Views/ImagePicker/_ImagePickerScripts.cshtml" />
+    <partial name="_AdPreviewScripts" />
+
+    <!-- Load validation rules -->
+    <partial name="_AdGroupWizardValidationRules" />
+
+    <script type="text/javascript">
+
+        // Initialize our validator object
+        setupValidatorDefaults();
+        let validatorWizardAdGroup = $('#formWizardAdGroup').validate();
+
+        $(document).ready(function () {
+
+            // Setup button functionality
+            subscribeClickable('#buttonBack', clickBack);
+            subscribeClickable('#buttonSubmitWizardAdGroup', clickSave);
+            subscribeClickable('.removeTitleEntry', clickDeleteTitleEntry);
+            subscribeClickable('#addTitleEntry', clickAddTitleEntry);
+
+            // Attempt to load images and preview ad
+            // This can also be used as an edit page
+            // TODO Do we want this?
+            refreshSelectedImagesThumbnails();
+            tryGenerateRandomAd();
+
+        });
+
+        // Takes us back to the previous browser page
+        function clickBack() {
+            history.back();
+        }
+
+        // Attempts to submit the form and gives user feedback
+        // TODO Remove debug calls
+        function clickSave() {
+            if (validatorWizardAdGroup.form()) {
+                let callbackSuccess = function () {
+                    // TODO User popup
+                    location.href = '@Url.Action(nameof(AdGroupOverviewController.Overview), "AdGroupOverview")';
+                }
+                let callbackFailure = function () {
+                    // TODO User popup
+                    $('.disableOnSubmitPending').removeAttr('disabled');
+                }
+
+                let url = $('#formWizardAdGroup').get(0).action;
+                let body = $('#formWizardAdGroup').serializeFormJSON();
+
+                // Make array if single, because our parser doesn't get this
+                makeArrayIfSingleString(body, '@nameof(AdGroupFormViewModel.Titles)');
+                makeArrayIfSingleString(body, '@nameof(AdGroupFormViewModel.ImageLinks)');
+
+                // Disable after body creation
+                $('.disableOnSubmitPending').attr('disabled', 'disabled');
+
+                doPostAndProcess(url, body, callbackSuccess, [], callbackFailure, []);
+            }
+        }
+
+        // When we add a text entry
+        function clickAddTitleEntry(event) {
+            event.preventDefault();
+            console.log('clicking add title entry');
+            doMethodAndProcess('@Url.Action(nameof(AdGroupWizardController.GetTitleEntryPartialView), "AdGroupWizard")', 'get', function (html) {
+                $('#divTitleList').append(html);
+
+                // TODO Circular reference sort of? Spaghetti?
+                resubscribeTitleEntryBlurEvent();
+            });
+        }
+
+        // When we delete a text entry
+        function clickDeleteTitleEntry(event) {
+            var id = $(event.target).attr('data-target-id');
+            $('#' + id).remove();
+        }
+
+    </script>
+}

@@ -1,0 +1,56 @@
+﻿@*
+    Contains our table head for a given ad group table.
+*@
+
+<!--Table head -->
+<thead class="thead-darkblue">
+    <tr>
+        <th scope="col">
+            Group name
+            <div class="filter-highlight">
+                <a class="click-sort-adgroup" data-column="@ColumnCampaignGroupWizardAdGroup.Name" data-order="@Order.Ascending">
+                    <span class="arrow arrow-up"><i class="fas fa-chevron-up"></i></span>
+                </a>
+                <a class="click-sort-adgroup" data-column="@ColumnCampaignGroupWizardAdGroup.Name" data-order="@Order.Descending">
+                    <span class="arrow arrow-down"><i class="fas fa-chevron-down"></i></span>
+                </a>
+            </div>
+        </th>
+        <th scope="col">
+            Created
+            <div class="filter-highlight">
+                <a class="click-sort-adgroup" data-column="@ColumnCampaignGroupWizardAdGroup.CreateDate" data-order="@Order.Ascending">
+                    <span class="arrow arrow-up"><i class="fas fa-chevron-up"></i></span>
+                </a>
+                <a class="click-sort-adgroup" data-column="@ColumnCampaignGroupWizardAdGroup.CreateDate" data-order="@Order.Descending">
+                    <span class="arrow arrow-down"><i class="fas fa-chevron-down"></i></span>
+                </a>
+            </div>
+        </th>
+        <th scope="col">
+            Ads
+            <div class="filter-highlight">
+                <a class="click-sort-adgroup" data-column="@ColumnCampaignGroupWizardAdGroup.AdCount" data-order="@Order.Ascending">
+                    <span class="arrow arrow-up"><i class="fas fa-chevron-up"></i></span>
+                </a>
+                <a class="click-sort-adgroup" data-column="@ColumnCampaignGroupWizardAdGroup.AdCount" data-order="@Order.Descending">
+                    <span class="arrow arrow-down"><i class="fas fa-chevron-down"></i></span>
+                </a>
+            </div>
+        </th>
+        <th scope="col">
+            Modified
+            <div class="filter-highlight">
+                <a class="click-sort-adgroup" data-column="@ColumnCampaignGroupWizardAdGroup.UpdateDate" data-order="@Order.Ascending">
+                    <span class="arrow arrow-up"><i class="fas fa-chevron-up"></i></span>
+                </a>
+                <a class="click-sort-adgroup" data-column="@ColumnCampaignGroupWizardAdGroup.UpdateDate" data-order="@Order.Descending">
+                    <span class="arrow arrow-down"><i class="fas fa-chevron-down"></i></span>
+                </a>
+            </div>
+        </th>
+        <th scope="col">
+            <!-- Checkbox column -->
+        </th>
+    </tr>
+</thead>

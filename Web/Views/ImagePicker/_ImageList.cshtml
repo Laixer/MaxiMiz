@@ -1,0 +1,13 @@
+﻿@*
+    Partial view containing a list of images.
+*@
+
+@model ImageListViewModel
+
+@foreach (var uri in Model.ImageUris)
+{
+    <div class="img-section section1 imageSelectable" data-image-uri="@uri.AbsoluteUri">
+        <img src="@uri.AbsoluteUri" alt="@uri.AbsoluteUri">
+        @*<p>@uri.OriginalString</p>*@
+    </div>
+}

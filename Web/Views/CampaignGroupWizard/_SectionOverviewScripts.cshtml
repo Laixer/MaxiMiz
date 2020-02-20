@@ -1,0 +1,239 @@
+﻿@*
+    Contains our script functionality for the overview panel.
+    TODO Do we want this here?
+*@
+
+@inject ICurrencyViewModelService currencyService
+
+<script type="text/javascript">
+
+    // Define some constants
+    const divSubmitFeedback = '#divSubmitFeedback'
+    const buttonSubmitWizard = '#buttonSubmitWizard';
+
+    $(document).ready(function () {
+
+        // Register our post button
+        subscribeClickable('#buttonSubmitWizard', clickSubmit);
+
+        // Subscribe event for entering the overview tab
+        $(document).off('click', '.clickToRefreshOverview');
+        $(document).on('click', '.clickToRefreshOverview', onEnterOverviewTab);
+
+    });
+
+    // Gets all values from the form and displays them in the correct format
+    function onEnterOverviewTab(event) {
+        // If we click a locked icon, don't continue
+        if ($(event.currentTarget).hasClass('selector') &&
+            !$(event.currentTarget).find('.icon').hasClass('iconUnlocked')) {
+            return;
+        }
+
+        retrieveAllFormValues();
+        if (validateEntireWizard() === true) {
+            updateSubmitFeedback(true);
+        } else {
+            updateSubmitFeedback(false);
+        }
+    }
+
+    // Function for the submit wizard click event
+    function clickSubmit() {
+        if (validateEntireWizard() === true) {
+            submitWizard();
+        } else {
+            updateSubmitFeedback(false);
+        }
+    };
+
+    // Submit the form
+    function submitWizard() {
+        // Visual feedback
+        let htmlOriginal = $(buttonSubmitWizard).html();
+        $(buttonSubmitWizard).attr('disabled', 'disabled');
+        setLoadingIconTo(buttonSubmitWizard);
+        $('.buttonBack').attr('disabled', 'disabled');
+        $('.icon').attr('disabled', 'disabled'); // TODO Check
+
+        // We must make non-array items array
+        // TODO This is a workaround
+        let jsonBody = $('#formWizard').serializeFormJSON();
+        makeArrayIfSingleString(jsonBody, 'Publishers');
+        makeArrayIfSingleString(jsonBody, 'Locations');
+        makeArrayIfSingleString(jsonBody, 'Devices');
+        makeArrayIfSingleString(jsonBody, 'OperatingSystems');
+        makeArrayIfSingleString(jsonBody, 'SelectedAdGroupIds');
+
+        let action = $('#formWizard').get(0).action;
+
+        // Post the form and handle the response
+        let callbackSuccess = () => {
+            $(buttonSubmitWizard).html(htmlOriginal);
+            $(buttonSubmitWizard).removeAttr('disabled');
+            $('.buttonBack').removeAttr('disabled');
+            $('.icon').removeAttr('disabled'); // TODO Check
+            linkSwitches(); // Don't violate enable checkbox states
+
+            window.location.href = '@Url.Action("CampaignOverview", nameof(CampaignOverviewController.Overview))'
+            showConfirmationPopup(true, 'Campaign group was created successfully and is pending external creation')
+        };
+        let callbackFailure = () => {
+            $(buttonSubmitWizard).html(htmlOriginal);
+            $(buttonSubmitWizard).removeAttr('disabled');
+            $('.buttonBack').removeAttr('disabled');
+            $('.icon').removeAttr('disabled'); // TODO Check
+            linkSwitches(); // Don't violate enable checkbox states
+
+            showConfirmationPopup(false, 'Could not create campaign group, please check your settings');
+
+            // TODO DRY
+            $(divSubmitFeedback).text('Something went wrong submitting the campaign group. Please check your fields.');
+            $(divSubmitFeedback).removeClass('text-success');
+            $(divSubmitFeedback).addClass('text-danger');
+        };
+
+        doPostAndProcess(action, jsonBody, callbackSuccess, [], callbackFailure, []);
+    }
+
+    // Sets our feedback div text and submit button state according to the current form validity.
+    // TODO This is beun, but don't implement unwanted features. Will be updated!
+    function updateSubmitFeedback(valid) {
+        if (valid === true) {
+            $(buttonSubmitWizard).removeAttr('disabled');
+            $(divSubmitFeedback).text('Looks good, ready to submit.');
+            $(divSubmitFeedback).addClass('text-success');
+            $(divSubmitFeedback).removeClass('text-danger');
+        } else if (valid === false) {
+            $(buttonSubmitWizard).attr('disabled', 'disabled');
+            $(divSubmitFeedback).text('Specified values are invalid, please check your tabs.');
+            $(divSubmitFeedback).removeClass('text-success');
+            $(divSubmitFeedback).addClass('text-danger');
+        } else {
+            // TODO Question Is it correct to log like this?
+            console.log('Invalid parameter specified for "valid", must be a boolean');
+        }
+    }
+
+    function retrieveAllFormValues() {
+        // Account tab
+        $('#displayPublishers').html(extractFromCheckableGroup('.checkboxPublisher'));
+        $('#displayAccountName').html(extractFromSelect('#selectAccountTaboola'));
+        $('#displayCampaignNameSuffix').html(extractFromLabel('#inputCampaignNameSuffix'));
+        $('#displayBrandingText').html(extractFromLabel('#inputBrandingText'));
+        $('#displayUrl').html(extractFromLabel('#inputUrl'));
+        $('#displayUtm').html(extractFromLabel('#inputUtmCustom'));
+
+        // Marketing tab
+        $('#displayAutoPilot').html(extractFromCheckbox('#checkboxAutopilot'));
+        $('#displayCpc').html('@currencyService.GetGlobalCurrencySymbol() ' + extractFromLabel('#inputCpc'));
+        $('#displayBidStrategy').html(extractFromSelect('#selectBidStrategy'));
+        $('#displayDelivery').html(extractFromCheckableGroup('.radioDelivery'));
+        $('#displayBudget').html(extractBudget('#inputBudget', '#selectBudgetModel'));
+        $('#displayBudgetDaily').html(extractBudgetDaily('#inputBudgetDaily', '#checkboxBudgetDailyInfinite'));
+
+        // Targeting tab
+        $('#displayLocations').html(extractFromCheckableGroup('.checkboxLocation'));
+        $('#displayDevices').html(extractFromCheckableGroup('.checkboxDevice'));
+        $('#displayOperatingSystems').html(extractFromCheckableGroup('.checkboxOperatingSystem'));
+
+        // Schedule tab
+        $('#displayStartDate').html(extractFromDatePicker('#datetimeStartDate'));
+        $('#displayEndDate').html(extractEndDate('#datetimeEndDate', '#checkboxIgnoreEndDate'));
+
+        // Ad Groups
+        $('#displayAdGroups').html(extractAdGroups('.hiddenAdGroupId'));
+    }
+
+    // Extracts the text from a select
+    function extractFromSelect(id) {
+        var index = $(id).get(0).selectedIndex;
+        var options = $($(id).get(0).options);
+        return $(options[index]).get(0).label;
+    }
+
+    // Extracts the text from a checkbox group
+    function extractFromCheckableGroup(id) {
+        let selectedLabels = [];
+        $.each($(id), function (index, item) {
+            if (item.checked) { selectedLabels.push(item.value); }
+        });
+        return formatStringArray(selectedLabels);
+    }
+
+    // Extracts the text from a label
+    function extractFromLabel(id) {
+        return $(id).get(0).value;
+    }
+
+    // Extracts active or inactive from a checkbox
+    function extractFromCheckbox(id) {
+        if ($(id).get(0).checked) {
+            return "Active";
+        } else {
+            return "Inactive";
+        }
+    }
+
+    // Extracts and formats our budget
+    function extractBudget(idBudget, idBudgetModel) {
+        let budget = extractFromLabel(idBudget);
+        let model = extractFromSelect(idBudgetModel);
+        return '@currencyService.GetGlobalCurrencySymbol() ' + budget + " " + model;
+    }
+
+    // Extracts and formats our daily budget
+    function extractBudgetDaily(idBudgetDaily, idBudgetDailyInfinite) {
+        if (!$(idBudgetDailyInfinite).get(0).checked) {
+            return "None";
+        } else {
+            return '@currencyService.GetGlobalCurrencySymbol() ' + extractFromLabel(idBudgetDaily);
+        }
+    }
+
+    // Extracts a date from a date picker
+    function extractFromDatePicker(id) {
+        let epoch = $(id).get(0).valueAsNumber;
+        return new Date(epoch).toLocaleString();
+    }
+
+    // Extracts and formats our end date
+    function extractEndDate(idEndDate, idIgnoreEndDate) {
+        if ($(idIgnoreEndDate).get(0).checked) {
+            return "None";
+        } else {
+            return extractFromDatePicker(idEndDate);
+        }
+    }
+
+    // Extracts and formats our ad group names
+    function extractAdGroups(id) {
+        let names = [];
+        $.each($(id), function (index, item) {
+            let name = $(item).attr('data-adgroup-name');
+            if (name === null) { console.log('Error while getting name from ', item); }
+            else { names.push(name); }
+        });
+        console.log(formatStringArray(names));
+        return formatStringArray(names);
+    }
+
+    // Formats a collection of strings
+    function formatStringArray(array, noneString) {
+        if (array.length > 1) {
+            let result = ""
+            for (let i = 0; i < array.length; i++) {
+                result += array[i];
+                if (i < array.length - 1) { result += ', '; }
+            }
+            return result;
+        } else if (array.length == 1) {
+            return array[0];
+        } else if (noneString === null) {
+            return "None";
+        } else {
+            return noneString;
+        }
+    }
+
+</script>

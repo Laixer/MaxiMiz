@@ -1,0 +1,84 @@
+﻿@*
+    Contains our table head for a given ad group table.
+*@
+
+@model AdGroupTableHeadViewModel
+
+<!--Table head -->
+<thead class="thead-darkblue" data-tabletype="@Model.TableType">
+    <tr>
+        <th scope="col">
+            Group name
+            <a class="click-sort-adgroup" data-column="@ColumnAdGroupLinking.Name" data-order="@Order.Ascending">
+                <span class="arrow arrow-up"><i class="fas fa-chevron-up"></i></span>
+            </a>
+            <a class="click-sort-adgroup" data-column="@ColumnAdGroupLinking.Name" data-order="@Order.Descending">
+                <span class="arrow arrow-down"><i class="fas fa-chevron-down"></i></span>
+            </a>
+
+        </th>
+        <th scope="col">
+            Created
+            <a class="click-sort-adgroup" data-column="@ColumnAdGroupLinking.CreateDate" data-order="@Order.Ascending">
+                <span class="arrow arrow-up"><i class="fas fa-chevron-up"></i></span>
+            </a>
+            <a class="click-sort-adgroup" data-column="@ColumnAdGroupLinking.CreateDate" data-order="@Order.Descending">
+                <span class="arrow arrow-down"><i class="fas fa-chevron-down"></i></span>
+            </a>
+
+        </th>
+        <th scope="col">
+            Ads
+            <a class="click-sort-adgroup" data-column="@ColumnAdGroupLinking.AdCount" data-order="@Order.Ascending">
+                <span class="arrow arrow-up"><i class="fas fa-chevron-up"></i></span>
+            </a>
+            <a class="click-sort-adgroup" data-column="@ColumnAdGroupLinking.AdCount" data-order="@Order.Descending">
+                <span class="arrow arrow-down"><i class="fas fa-chevron-down"></i></span>
+            </a>
+
+        </th>
+        <th scope="col">
+            Modified
+            <a class="click-sort-adgroup" data-column="@ColumnAdGroupLinking.UpdateDate" data-order="@Order.Ascending">
+                <span class="arrow arrow-up"><i class="fas fa-chevron-up"></i></span>
+            </a>
+            <a class="click-sort-adgroup" data-column="@ColumnAdGroupLinking.UpdateDate" data-order="@Order.Descending">
+                <span class="arrow arrow-down"><i class="fas fa-chevron-down"></i></span>
+            </a>
+
+        </th>
+        <th scope="col">
+            <!-- Button column -->
+        </th>
+    </tr>
+</thead>
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+
+        // Subscribe sorting button functionality
+        subscribeClickable('.click-sort-adgroup', function (event) {
+            // Query is stored in the search bar, might want to do this differently?
+            var column = $(this).attr('data-column');
+            var order = $(this).attr('data-order');
+
+            // Get the table type stored in the thead html element, because @@Model doesnt work on $this.
+            var type = $(event.currentTarget).closest('thead').attr('data-tabletype')
+
+            // Storing global
+            if (type == '@AdGroupLinkingTableType.All') {
+                window.ColumnAdGroupAll = column;
+                window.OrderAdGroupAll = order;
+                loadAdGroupAllAsync();
+            } else {
+                window.ColumnAdGroupLinked = column;
+                window.OrderAdGroupLinked = order;
+                loadAdGroupLinkedAsync();
+            }
+        });
+
+
+    });
+
+</script>

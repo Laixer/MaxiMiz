@@ -1,0 +1,200 @@
+﻿@*
+    Campaign group creation wizard section for our overview.
+*@
+
+<!-- Campaign group wizard overview tab -->
+<fieldset id="divOverview">
+    <!-- Main title -->
+    <legend class="font-weight-bolder mb-4">Overview</legend>
+
+    <!-- Contains all overview properties -->
+    <div class="overview form-group">
+
+        <!-- Account and targeting -->
+        <div class="container">
+            <div class="row">
+
+                <!-- Account section -->
+                <div class="col col-account">
+                    <div>
+                        <h2><img src="~/img/profile-icon-black.svg" alt="profile-icon"> Account</h2>
+                    </div>
+
+                    <!-- Publishers -->
+                    <div class="row">
+                        <h3 class="m-0">Publisher</h3>
+                        <p id="displayPublishers" class="m-0"></p>
+                    </div>
+
+                    <!-- Account name -->
+                    <div class="row">
+                        <h3 class="m-0">Account</h3>
+                        <p id="displayAccountName" class="m-0"></p>
+                    </div>
+
+                    <!-- Campaign name suffic -->
+                    <div class="row">
+                        <h3 class="m-0">Campaign Name Suffix</h3>
+                        <p id="displayCampaignNameSuffix" class="m-0"></p>
+                    </div>
+
+                    <!-- Branding text -->
+                    <div class="row">
+                        <h3 class="m-0">Branding Text</h3>
+                        <p id="displayBrandingText" class="m-0"></p>
+                    </div>
+
+                    <!-- Tracking code -->
+                    <div class="row">
+                        <h3 class="m-0">Tracking Code</h3>
+                        <p id="displayUtm" class="m-0"></p>
+                    </div>
+
+                    <!-- Url -->
+                    <div class="row">
+                        <h3 class="m-0">Target url</h3>
+                        <p id="displayUrl" class="m-0"></p>
+                    </div>
+                </div>
+
+                <!-- Targeting section -->
+                <div class="col col-targeting">
+                    <div>
+                        <h2><img src="~/img/target-icon.svg" alt="targeting-icon"> Targeting</h2>
+                    </div>
+
+                    <!-- Locations -->
+                    <div class="row">
+                        <h3 class="m-0">Locations</h3>
+                        <p id="displayLocations" class="m-0"></p>
+                    </div>
+
+                    <!-- Devices -->
+                    <div class="row">
+                        <h3 class="m-0">Devices</h3>
+                        <p id="displayDevices" class="m-0"></p>
+                    </div>
+
+                    <!-- Operating systems -->
+                    <div class="row">
+                        <h3 class="m-0">Operating Systems</h3>
+                        <p id="displayOperatingSystems" class="m-0"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Marketing and schedule -->
+        <div class="container mt-5">
+            <div class="row">
+
+                <!-- Marketing section -->
+                <div class="col col-marketing">
+                    <div>
+                        <h2><img src="~/img/marketing-icon-dark.svg" alt="marketing-icon"> Marketing</h2>
+                    </div>
+
+                    <!--  -->
+                    <div class="row">
+                        <h3 class="m-0">Autopilot</h3>
+                        <p id="displayAutoPilot" class="m-0"></p>
+                    </div>
+
+                    <!-- Cpc -->
+                    <div class="row">
+                        <h3 class="m-0">Cpc</h3>
+                        <p id="displayCpc" class="m-0"></p>
+                    </div>
+
+                    <!-- Bid Strategy -->
+                    <div class="row">
+                        <h3 class="m-0">Bid Strategy</h3>
+                        <p id="displayBidStrategy" class="m-0"></p>
+                    </div>
+
+                    <!-- Delivery -->
+                    <div class="row">
+                        <h3 class="m-0">Ad Delivery</h3>
+                        <p id="displayDelivery" class="m-0"></p>
+                    </div>
+
+                    <!-- Budget -->
+                    <div class="row">
+                        <h3 class="m-0">Budget</h3>
+                        <p id="displayBudget" class="m-0"></p>
+                    </div>
+
+                    <!-- Budget daily -->
+                    <div class="row">
+                        <h3 class="m-0">Daily Budget</h3>
+                        <p id="displayBudgetDaily" class="m-0"></p>
+                    </div>
+
+                </div>
+
+                <!-- Schedule section -->
+                <div class="col col-schedule">
+                    <div>
+                        <h2><img src="~/img/calendar-icon.svg" alt="calendar-icon"> Schedule</h2>
+                    </div>
+
+                    <!-- Start date -->
+                    <div class="row">
+                        <h3 class="m-0">Start date</h3>
+                        <p id="displayStartDate" class="m-0"></p>
+                    </div>
+
+                    <!-- End date -->
+                    <div class="row">
+                        <h3 class="m-0">End date</h3>
+                        <p id="displayEndDate" class="m-0"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Ad Groups -->
+        <div class="container mt-5">
+            <div class="row">
+                <div class="col col-adgroups">
+                    <div>
+                        <h2><img src="~/img/adgroups-icon.svg" alt="adgroups-icon"> Ad Groups</h2>
+                    </div>
+
+                    <!-- Ad groups -->
+                    <div class="row">
+                        <h3 class="m-0">Linked Ad Groups</h3>
+                        <p id="displayAdGroups" class="m-0"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Feedback text -->
+    <div class="form-group mt-5">
+        <label id="divSubmitFeedback"></label>
+    </div>
+
+    <!-- Save button, back button -->
+    <div class="form-group mt-1">
+
+        <!-- Back button -->
+        <div class="button-back">
+            <button class="buttonBack btn text-white btn-main btn-blue mt-5 float-left"
+                    data-targetSection="#sectionAdGroups">
+                Back
+            </button>
+        </div>
+
+        <!-- Save button -->
+        <div class="button-save">
+            <button id="buttonSubmitWizard" class="btn text-white btn-main btn-blue mt-5 float-right">
+                Submit
+            </button>
+        </div>
+
+    </div>
+
+</fieldset>

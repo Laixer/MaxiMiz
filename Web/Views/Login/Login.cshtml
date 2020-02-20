@@ -1,0 +1,110 @@
+﻿@*
+    Login page.
+*@
+
+@{
+    // Disable regular layout
+    ViewData["RenderSideMenu"] = false;
+    ViewData["RenderNavigationBar"] = false;
+}
+
+@model LoginViewModel
+<body>
+
+    <div id="login">
+        <div class="login-form">
+
+            <!-- Actual login form -->
+            <form id="formLogin" asp-controller="Login" asp-action="@nameof(LoginController.AttemptLogin)" method="post">
+                <h2 class="text-center">Log in</h2>
+
+                <!-- Email -->
+                <div class="input-group mb-3 containsErrorHolder">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text" id="inputGroupEmail">📧</span>
+                    </div>
+                    <input id="inputUserEmail" type="email" class="form-control" aria-describedby="inputGroupEmail"
+                           name="@nameof(LoginViewModel.Email)" placeholder="Email" />
+                    <div class="errorHolder"></div>
+                </div>
+
+                <!-- Password -->
+                <div class="input-group mb-4 containsErrorHolder">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text" id="inputGroupPassword">🔐</span>
+                    </div>
+                    <input id="inputUserPassword" type="password" class="form-control" aria-describedby="inputGroupPassword"
+                           name="@nameof(LoginViewModel.Password)" placeholder="Password" />
+                    <div class="errorHolder"></div>
+                </div>
+
+                <!-- Log in button -->
+                <div class="form-group">
+                    <button id="buttonLogin" type="submit" class="btn btn-primary btn-block">Log in</button>
+                </div>
+
+                <!-- Login feedback text, added dynamically -->
+                <div id="loginFeedbackText"></div>
+
+                <!-- Create account / forgot password -->
+                <div class="clearfix">
+                    <a href="#" class="pull-right">Forgot Password?</a>
+                    <p><a href="#">Create an Account</a></p>
+                </div>
+            </form>
+        </div>
+    </div>
+
+</body>
+
+
+
+@section Scripts {
+
+    <!-- Import validation rules -->
+    <partial name="_LoginValidationRules" />
+
+    <script type="text/javascript">
+
+        const loginFeedbackTextId = '#loginFeedbackText';
+
+        // Initialize our validator object
+        setupValidatorDefaults();
+        var validatorLogin = $('#formLogin').validate();
+
+        $(document).ready(function () {
+
+            // Never post our form explicitly
+            subscribeFormSubmit('#formLogin');
+            subscribeClickable('#buttonLogin', function () {
+
+                $(loginFeedbackTextId).text('');
+
+                if (validatorLogin.form()) {
+
+                    // Visual feedback and double submit disabling
+                    $('#buttonLogin').attr('disabled', 'disabled');
+
+                    let callbackSuccess = function () {
+                        console.log('Login succeeded');
+                        window.location.href = '@Url.Action(nameof(HomeController.Index), "Home")';
+                        $(loginFeedbackTextId).text('Login succeeded, please wait...');
+                    }
+                    let callbackFailure = function () {
+                        // TODO Feedback
+                        console.log('Login failed');
+                        $('#buttonLogin').removeAttr('disabled');
+                        $(loginFeedbackTextId).text('Login attempt failed');
+                    }
+
+                    doPostAndProcess($('#formLogin').get(0).action, $('#formLogin').serializeFormJSON(),
+                        callbackSuccess, [], callbackFailure, []);
+                }
+            });
+
+        });
+
+
+
+    </script>
+}

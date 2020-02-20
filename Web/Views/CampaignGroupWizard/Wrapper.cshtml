@@ -1,0 +1,119 @@
+﻿@*
+    Contains all partial views and sections for the creation of a new campaign group.
+*@
+
+@model WizardCollectionsViewModel
+
+<main>
+    <div class="ncg ncg_advanced-account container-fluid">
+        <div class="header row">
+
+            <!-- Title -->
+            <div>
+                <h1 class="mb-0">New Campaign Group</h1>
+                <p class="font-weight-normal">Creation wizard</p>
+            </div>
+
+            <!-- Top bar icons -->
+            <div class="row form-steps">
+                <!-- Account -->
+                <a id="selectorAccount" class="selector selectorActive" data-progress="1" data-targetSection="#sectionAccount">
+                    <div class="selectorIconBackground icon">
+                        <img src="~/img/profile-icon-white.svg" alt="profile-icon">
+                    </div>
+                    <p>Account</p>
+                </a>
+                <div class="step-spacing">
+                    <div class="hr"></div>
+                </div>
+
+                <!-- Marketing -->
+                <a id="selectorMarketing" class="selector" data-progress="2" data-targetSection="#sectionMarketing">
+                    <div class="selectorIconBackground icon">
+                        <img src="~/img/marketing-icon.svg" alt="marketing-icon">
+                    </div>
+                    <p>Marketing</p>
+                </a>
+                <div class="step-spacing">
+                    <div class="hr"></div>
+                </div>
+
+                <!-- Targeting -->
+                <div id="selectorTargeting" class="selector" data-progress="3" data-targetSection="#sectionTargeting">
+                    <div class="selectorIconBackground icon">
+                        <img src="~/img/target-icon-grey.svg" alt="targeting-icon">
+                    </div>
+                    <p>Targeting</p>
+                </div>
+                <div class="step-spacing">
+                    <div class="hr"></div>
+                </div>
+
+                <!-- Schedule -->
+                <div id="selectorSchedule" class="selector" data-progress="4" data-targetSection="#sectionSchedule">
+                    <div class="selectorIconBackground icon">
+                        <img src="~/img/calendar-icon-grey.svg" alt="calendar-icon">
+                    </div>
+                    <p>Schedule</p>
+                </div>
+                <div class="step-spacing">
+                    <div class="hr"></div>
+                </div>
+
+                <!-- Ad groups -->
+                <div id="selectorAdGroups" class="selector" data-progress="5" data-targetSection="#sectionAdGroups">
+                    <div class="selectorIconBackground icon">
+                        <img src="~/img/adgroups-icon-grey.svg" alt="adgroups-icon">
+                    </div>
+                    <p>Ad Groups</p>
+                </div>
+                <div class="step-spacing">
+                    <div class="hr"></div>
+                </div>
+
+                <!-- Overview -->
+                <div id="selectorOverview" class="selector clickToRefreshOverview" data-progress="6" data-targetSection="#sectionOverview">
+                    <div class="selectorIconBackground icon">
+                        <img src="~/img/adgroups-icon-grey.svg" alt="adgroups-icon">
+                    </div>
+                    <p>Overview</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="form">
+            <!-- One giant form with fieldsets for each tab -->
+            <form id="formWizard" asp-controller="CampaignGroupWizard" asp-action="@nameof(CampaignGroupWizardController.PostForm)" method="post">
+                @{ var formModel = new CampaignGroupFormAllViewModel(); }
+                <div id="divTabs" class="tab-content">
+                    <div class="tab-pane active" id="sectionAccount"><partial name="_SectionAccount" model="Model" /></div>
+                    <div class="tab-pane" id="sectionMarketing"><partial name="_SectionMarketing" /></div>
+                    <div class="tab-pane" id="sectionTargeting"><partial name="_SectionTargeting" /></div>
+                    <div class="tab-pane" id="sectionSchedule"><partial name="_SectionSchedule" /></div>
+                    <div class="tab-pane" id="sectionAdGroups"><partial name="_SectionAdGroups" /></div>
+                    <div class="tab-pane" id="sectionOverview"><partial name="_SectionOverview" /></div>
+                </div>
+            </form>
+
+            <!-- Debug form, see if this works -->
+            @*<form id="formWizardSubmit" asp-controller="CampaignGroupWizard" asp-action="@nameof(CampaignGroupWizardController.PostForm)" method="post">*@
+            @*</form>*@
+        </div>
+    </div>
+</main>
+
+@section Scripts {
+
+    <!-- Import partial view with validation rules for each section -->
+    <partial name="_CampaignGroupWizardValidationRules" />
+
+    <!-- Import ad group functionality -->
+    <partial name="_SectionAdGroupsScripts" />
+
+    <!-- Import overivew functionality -->
+    <partial name="_SectionOverviewScripts" />
+
+    <!-- Import campaign group wizard main functionality -->
+    <partial name="_CampaignGroupWizardScripts" />
+
+}

@@ -1,0 +1,22 @@
+﻿@*
+    Contains the sidebar as a partial view.
+*@
+
+<header class="sidebar">
+    <div class="sidebar-wrapper">
+        <ul class="nav flex-column mt-5">
+            <!-- TODO class="active" op <a/> -->
+            <li>
+                <a id="menuItemDashboard" asp-controller="Home" asp-action="Index">
+                    <p><i class="fas fa-tachometer-alt"> </i>Dashboard</p>
+                </a>
+            </li>
+            <li>
+                <a id="menuItemCampaignOverview" asp-controller="CampaignOverview" asp-action="Overview"><p><i class="far fa-paper-plane"> </i>Campaigns </p></a>
+            </li>
+            <li>
+                <a id="menuItemAdGroupOverview" asp-controller="AdGroupOverview" asp-action="Overview"><p><i class="fas fa-rocket"> </i>Ad Groups</p></a>
+            </li>
+        </ul>
+    </div>
+</header>

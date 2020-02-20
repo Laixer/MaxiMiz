@@ -1,0 +1,432 @@
+﻿@*
+    Displays an overview of all campaigns in our viewmodel.
+*@
+
+@model CampaignOverviewViewModel
+@{
+    ViewData["Title"] = "Campaigns";
+
+    // Global identifiers
+    const string PageSelectorAll = "pageSelectorAll";
+    const string PageSelectorActive = "pageSelectorActive";
+    const string PageSelectorInactive = "pageSelectorInactive";
+    const string PageSelectorPending = "pageSelectorPending";
+}
+<main>
+
+    <div class="campaign-overview">
+        <div class="header">
+
+            <!-- Title and searchbar -->
+            <nav class="navbar justify-content-between mb-4">
+                <h1>All Campaigns</h1>
+
+                <!-- TODO This way of matching parameters is messy -->
+                <form class="form-inline" id="formSearchCampaigns">
+                    <input name="SearchQuery" class="form-control search" id="searchCampaigns" placeholder="Search" aria-label="Search" value="@Model.SearchQuery">
+                </form>
+            </nav>
+
+            <!-- Contains the tabs top bar -->
+            <ul class="nav nav-tabs">
+                <li class="nav-item">
+                    <a class="nav-link active" data-target="#tabAll" data-toggle="tab" id="tabAllCount">All (...)</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-target="#tabActive" data-toggle="tab" id="tabActiveCount">Active (...)</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-target="#tabInactive" data-toggle="tab" id="tabInactiveCount">Inactive (...)</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-target="#tabPending" data-toggle="tab" id="tabPendingCount">Pending (...)</a>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Contains the correct partial view for each tab. -->
+        <div class="content tab-content">
+
+            <!-- All the partial views, rendered upon document load. -->
+            <div class="tab-pane active" id="tabAll">
+                <div class="table-responsive tab-pane active" id="tabAll">
+                    <table class="table table-striped">
+                        <partial name="_TableHead" model="@Model" />
+                        <tbody id="tabAllTableBody"></tbody>
+                    </table>
+                </div>
+
+                <partial name="_PageSelector" model="@(new PageSelectorViewModel { TableType = CampaignTableType.All, Identifier = PageSelectorAll })" />
+
+            </div>
+            <div class="tab-pane" id="tabActive">
+                <div class="table-responsive tab-pane active" id="tabActive">
+                    <table class="table table-striped">
+                        <partial name="_TableHead" model="@Model" />
+                        <tbody id="tabActiveTableBody"></tbody>
+                    </table>
+                </div>
+
+                <partial name="_PageSelector" model="@(new PageSelectorViewModel { TableType = CampaignTableType.Active, Identifier = PageSelectorActive })" />
+
+            </div>
+            <div class="tab-pane" id="tabInactive">
+                <div class="table-responsive tab-pane active" id="tabInactive">
+                    <table class="table table-striped">
+                        <partial name="_TableHead" model="@Model" />
+                        <tbody id="tabInactiveTableBody"></tbody>
+                    </table>
+                </div>
+
+                <partial name="_PageSelector" model="@(new PageSelectorViewModel { TableType = CampaignTableType.Inactive, Identifier = PageSelectorInactive })" />
+
+            </div>
+            <div class="tab-pane" id="tabPending">
+                <div class="table-responsive tab-pane active" id="tabPending">
+                    <table class="table table-striped">
+                        <partial name="_TableHead" model="@Model" />
+                        <tbody id="tabPendingTableBody"></tbody>
+                    </table>
+                </div>
+
+                <partial name="_PageSelector" model="@(new PageSelectorViewModel { TableType = CampaignTableType.Pending, Identifier = PageSelectorPending })" />
+
+            </div>
+        </div>
+
+        <!-- Div in which our details partial view will open -->
+        <div class="container sidemodal">
+            <div class="modal right fade modal-right" id="modalRight" tabindex="-1" role="dialog" aria-labelledby="modalRightLabel" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content" id="modal-details-content">
+                        <!-- Empty to load partial view dynamically -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+</main>
+
+@section Styles  {
+    <!-- Load the stylesheet for the campaign details modal -->
+    <link rel="stylesheet" href="~/css/modal_right.css">
+}
+
+@section Scripts  {
+
+    <!-- Import campaign details scripts because partial view scripts won't be loaded otherwise -->
+    <partial name="~/Views/CampaignDetails/_CampaignDetailsScripts.cshtml" />
+    <partial name="~/Views/CampaignDetails/_CampaignDetailsAdGroupsScripts.cshtml" />
+
+    <!-- Script functionality for the campaign overview -->
+    <script type="text/javascript">
+
+        // Global variables to ensure consistent sorting and searc query display across operations
+        window.ColumnCampaignOverview = '@Model.Column';
+        window.OrderCampaignOverview = '@Model.Order';
+
+        window.PageCampaignOverviewAll = 1;
+        window.PageCampaignOverviewActive = 1;
+        window.PageCampaignOverviewInactive = 1;
+        window.PageCampaignOverviewPending = 1;
+        window.PageCampaignOverviewAllTotalPages = 1;
+        window.PageCampaignOverviewActiveTotalPages = 1;
+        window.PageCampaignOverviewInactiveTotalPages = 1;
+        window.PageCampaignOverviewPendingTotalPages = 1;
+
+        $(document).ready(function () {
+
+            // TODO Is this the right location for this functionality?
+            setMenuHighlight('@MenuItem.CampaignOverview');
+
+            // Subscribe search campaign form submit
+            subscribeFormSubmit('#formSearchCampaigns', loadTablesAsync);
+
+            // Handles our model opening for the campaign details
+            subscribeClickable('.click-open-details', function (event) {
+                var campaignId = $(event.currentTarget).attr('data-campaign-id');
+                doMethodAndProcess('@Url.Action("ShowCampaign", "CampaignDetails")?' +
+                    new URLSearchParams({
+                        id: campaignId
+                    }), 'get', function (html) {
+                        // TODO This might take a while, first show then fill?
+                        $('#modal-details-content').html(html);
+                        $('#modalRight').modal({ show: true });
+
+                        // We must setup all modal forms, but only after they were loaded
+                        console.log('Setting up modal forms from Overview.cshtml');
+                        SetupCampaignDetailsModal();
+                    });
+            });
+
+            // Subscribe delete button functionality
+            subscribeClickable('.click-delete-campaign', function (event) {
+                var campaignId = $(event.currentTarget).attr('data-campaign-id');
+                $('.click-delete-campaign').attr('disabled, disabled');
+                doMethodAndProcess('@Url.Action("Delete", "CampaignOverview")?' +
+                    new URLSearchParams({
+                        campaignId: campaignId,
+                    }), 'delete', function () {
+                        // Reload all tables because deleted entry can exist in multiple tab tables
+                        // TODO Confirmation popup
+                        loadTablesAsync();
+                    });
+            });
+
+            // Sets up our sorting arrow buttons
+            subscribeClickable('.click-sort', function (event) {
+                // Storing global
+                window.ColumnCampaignOverview = $(event.currentTarget).attr('data-column');
+                window.OrderCampaignOverview = $(event.currentTarget).attr('data-order');
+
+                highlightSortingIcons('.click-sort', window.ColumnCampaignOverview, window.OrderCampaignOverview);
+                loadTablesAsync();
+            });
+
+            // Make us load all tables with default values
+            loadTablesAsync();
+            highlightSortingIcons('.click-sort', window.ColumnCampaignOverview, window.OrderCampaignOverview);
+
+            // Setup our page selector icon click functionality
+            // TODO This might a confusing location for this function call
+            subscribeClickable('.page-link', onClickPageSelector);
+
+        });
+
+        /**
+         * Gets called when we click a page icon.
+         *
+         * @@param event The click event
+         */
+        function onClickPageSelector(event) {
+            event.preventDefault();
+
+            let tableType = $(event.currentTarget).attr('data-table-type');
+            let pageNumber = $(event.currentTarget).attr('data-page-number');
+            switch (tableType) {
+                case '@CampaignTableType.All.ToString()':
+                    window.PageCampaignOverviewAll = pageNumber;
+                case '@CampaignTableType.Active.ToString()':
+                    window.PageCampaignOverviewActive = pageNumber;
+                case '@CampaignTableType.Inactive.ToString()':
+                    window.PageCampaignOverviewInactive = pageNumber;
+                case '@CampaignTableType.Pending.ToString()':
+                    window.PageCampaignOverviewPending = pageNumber;
+            };
+
+            // Construct the new selector right away
+            // After loading the table it will be constructed as well (which is not a problem)
+            // TODO Do we want this?
+            console.log('our totals: ', tableType, getTotalPageCountFromTableType(tableType));
+            constructPageSelector(getPageSelectorIdFromTableType(tableType), pageNumber, getTotalPageCountFromTableType(tableType), tableType);
+            loadTableFromTypeAsync(tableType);
+        }
+
+        /**
+         * Loads all tables at once in an asynchronous manner.
+         */
+        function loadTablesAsync() {
+            resetStoredPageNumbers();
+            loadTableFromTypeAsync('@CampaignTableType.All.ToString()');
+            loadTableFromTypeAsync('@CampaignTableType.Active.ToString()');
+            loadTableFromTypeAsync('@CampaignTableType.Inactive.ToString()');
+            loadTableFromTypeAsync('@CampaignTableType.Pending.ToString()');
+        }
+
+        /**
+         * This loads a table of a given table type. If an invalid table type
+         * is specified this will throw an exception.
+         *
+         * @@param tableType The table type from enum
+         */
+        function loadTableFromTypeAsync(tableType) {
+            if (tableType == null) { throw new DOMException("Table type can't be null"); }
+
+            switch (tableType) {
+                case '@CampaignTableType.All.ToString()':
+                    loadTableAsync('@CampaignTableType.All', '#tabAllTableBody', '#tabAllCount', window.PageCampaignOverviewAll);
+                    return;
+                case '@CampaignTableType.Active.ToString()':
+                    loadTableAsync('@CampaignTableType.Active', '#tabActiveTableBody', '#tabActiveCount', window.PageCampaignOverviewActive);
+                    return;
+                case '@CampaignTableType.Inactive.ToString()':
+                    loadTableAsync('@CampaignTableType.Inactive', '#tabInactiveTableBody', '#tabInactiveCount', window.PageCampaignOverviewInactive);
+                    return;
+                case '@CampaignTableType.Pending.ToString()':
+                    loadTableAsync('@CampaignTableType.Pending', '#tabPendingTableBody', '#tabPendingCount', window.PageCampaignOverviewPending);
+                    return;
+                default:
+                    throw new DOMException("Can't load table type = " + tableType);
+            }
+        }
+
+        /**
+         * Loads a single table.
+         *
+         * @@param tableType The table type
+         * @@param tableBodyId The table body identifier
+         * @@param tableCountId The table count identifier
+         * @@param page The page we want to load
+         */
+        function loadTableAsync(tableType, tableBodyId, tableCountId, page) {
+            if (tableType == null) { throw new DOMException("Table type can't be null"); }
+            if (tableBodyId == null) { throw new DOMException("Table body identifier can't be null"); }
+            if (tableCountId == null) { throw new DOMException("Table count identifier can't be null"); }
+            if (page == null) { throw new DOMException("Page can't be null"); }
+            if (page < 1) { throw new DOMException("Page can't be smaller than 1"); }
+
+            let searchString = $('#searchCampaigns')[0].value; // TODO Maybe null check?
+            let column = window.ColumnCampaignOverview;
+            let order = window.OrderCampaignOverview;
+            let tableName = getTableNameFromTableType(tableType);
+            if (column == null) { throw new DOMException("Stored column can't be null"); }
+            if (order == null) { throw new DOMException("Stored order can't be null"); }
+
+            // Set count to "..."
+            $(tableCountId).html(tableName + ' (...)');
+
+            // Load view component async through controller html request
+            doGetAndReplaceHtml('@Url.Action("GetCampaignTableViewComponent", "CampaignOverview")?'
+                + new URLSearchParams({
+                    table: tableType,
+                    searchString: searchString,
+                    column: column,
+                    order: order,
+                    page: page
+                }), tableBodyId);
+
+            // Load count component and extract data for the page selector
+            // Then load the page selector
+            let url = '@Url.Action("GetCampaignCountViewComponent", "CampaignOverview")?'
+                + new URLSearchParams({
+                    table: tableType,
+                    searchString: searchString,
+                    column: column,
+                    order: order
+                });
+            let callbackSuccess = function (html) {
+                $(tableCountId).html(html);
+                let totalItems = $(tableCountId + ' .tableCount').attr('data-total-items');
+                let itemsPerPage = $(tableCountId + ' .tableCount').attr('data-items-per-page');
+                let totalPages = Math.ceil(totalItems / itemsPerPage);
+                let pageSelectorId = getPageSelectorIdFromTableType(tableType);
+
+                saveTotalPageCountFromTableType(tableType, totalPages);
+                constructPageSelector(pageSelectorId, page, totalPages, tableType);
+            }
+            doMethodAndProcess(url, 'get', callbackSuccess);
+        };
+
+        /**
+         * Gets the page selector identifier based on a table type. This will
+         * throw an exception if we can't translate the table type.
+         *
+         * @@param tableType The table type enum
+         */
+        function getPageSelectorIdFromTableType(tableType) {
+            if (tableType == null) { throw new DOMException("Table type can't be null"); }
+
+            switch (tableType) {
+                case ('@CampaignTableType.All.ToString()'):
+                    return "#@PageSelectorAll";
+                case ('@CampaignTableType.Active.ToString()'):
+                    return "#@PageSelectorActive";
+                case ('@CampaignTableType.Inactive.ToString()'):
+                    return "#@PageSelectorInactive";
+                case ('@CampaignTableType.Pending.ToString()'):
+                    return "#@PageSelectorPending";
+            };
+
+            throw new DOMException("Can't get page selector id for tabletype = " + tableType);
+        }
+
+        /**
+         * Gets a table name from a table type. This will throw an exception
+         * if we can't translate the table type.
+         *
+         * @@param tableType The table type
+         */
+        function getTableNameFromTableType(tableType) {
+            if (tableType == null) { throw new DOMException("Table type can't be null"); }
+
+            switch (tableType) {
+                case ('@CampaignTableType.All.ToString()'):
+                    return "All";
+                case ('@CampaignTableType.Active.ToString()'):
+                    return "Active";
+                case ('@CampaignTableType.Inactive.ToString()'):
+                    return "Inactive";
+                case ('@CampaignTableType.Pending.ToString()'):
+                    return "Pending";
+            };
+
+            throw new DOMException("Can't get table name for tabletype = " + tableType);
+        }
+
+        /**
+         * Saves the retreived total page count for a specified table.
+         *
+         * @@param tabletype The table type
+         * @@param pageCount The retreived total page count
+         */
+        function saveTotalPageCountFromTableType(tableType, pageCount) {
+            if (tableType == null) { throw new DOMException("Table type can't be null"); }
+            if (pageCount == null) { throw new DOMException("Page count can't be null"); }
+
+            switch (tableType) {
+                case ('@CampaignTableType.All.ToString()'):
+                    window.PageCampaignOverviewAllTotalPages = pageCount;
+                    return;
+                case ('@CampaignTableType.Active.ToString()'):
+                    window.PageCampaignOverviewActiveTotalPages = pageCount;
+                    return;
+                case ('@CampaignTableType.Inactive.ToString()'):
+                    window.PageCampaignOverviewInactiveTotalPages = pageCount;
+                    return;
+                case ('@CampaignTableType.Pending.ToString()'):
+                    window.PageCampaignOverviewPendingTotalPages = pageCount;
+                    return;
+            };
+
+            throw new DOMException("Can't save total page count for tabletype = " + tableType);
+        }
+
+        /**
+         * Gets the stored total page count for a specified table.
+         *
+         * @@param tabletype The table type
+         */
+        function getTotalPageCountFromTableType(tableType) {
+            if (tableType == null) { throw new DOMException("Table type can't be null"); }
+
+            switch (tableType) {
+                case ('@CampaignTableType.All.ToString()'):
+                    return window.PageCampaignOverviewAllTotalPages;
+                case ('@CampaignTableType.Active.ToString()'):
+                    return window.PageCampaignOverviewActiveTotalPages;
+                case ('@CampaignTableType.Inactive.ToString()'):
+                    return window.PageCampaignOverviewInactiveTotalPages;
+                case ('@CampaignTableType.Pending.ToString()'):
+                    return window.PageCampaignOverviewPendingTotalPages;
+            };
+
+            throw new DOMException("Can't get total page count for tabletype = " + tableType);
+        }
+
+        /**
+         * Sets all saved page numbers and totals back to one.
+         */
+        function resetStoredPageNumbers() {
+            window.PageCampaignOverviewAll = 1;
+            window.PageCampaignOverviewActive = 1;
+            window.PageCampaignOverviewInactive = 1;
+            window.PageCampaignOverviewPending = 1;
+            window.PageCampaignOverviewAllTotalPages = 1;
+            window.PageCampaignOverviewActiveTotalPages = 1;
+            window.PageCampaignOverviewInactiveTotalPages = 1;
+            window.PageCampaignOverviewPendingTotalPages = 1;
+        }
+
+    </script>
+
+}

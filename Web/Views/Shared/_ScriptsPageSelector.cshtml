@@ -1,0 +1,241 @@
+﻿@*
+    Contains the script functionality for our page selector.
+*@
+
+<script type="text/javascript">
+
+    // Declare constants for page selectors
+    const pageMargin = 3;
+
+    /**
+     * Constructs our page selector section.
+     *
+     * @@param selectorId The id of the div to build in
+     * @@param page The currently selected page
+     * @@param total The total amount of pages
+     * @@param tableType The table type enum as string
+     */
+    function constructPageSelector(selectorId, page, total, tableType) {
+        if (selectorId == null) { throw new DOMException("Selector id can't be null"); }
+        if (page == null) { throw new DOMException("Selected page can't be null"); }
+        if (total == null) { throw new DOMException("Total pages can't be null"); }
+        if (tableType == null) { throw new DOMException("Table type can't be null"); }
+
+        page = Math.round(page); // TODO Beunfix?
+        if (page < 1) { throw new DOMException("Selected page can't be negative"); }
+        if (page > total) { throw new DOMException("Selected page can't be greater than total pages") }
+
+        clearPagination(selectorId);
+
+        // Not that many pages? Just show them all
+        if (total <= (2 * pageMargin) + 1) { constructShowAll(selectorId, page, total, tableType); }
+        else {
+            if (page < pageMargin + 1) {
+                constructLeftBreak(selectorId, page, total, tableType);
+            } else if (page > total - pageMargin) {
+                constructRightBreak(selectorId, page, total, tableType);
+            } else {
+                constructDoubleBreak(selectorId, page, total, tableType);
+            }
+        }
+
+        setupArrowIcons(selectorId, page, total, tableType);
+
+
+
+        /* Internal functions part */
+        /* TODO Is this the right way to do this? */
+
+
+
+        /**
+         * Resets the pagination of choice.
+         *
+         * @@param selectorId The pagination selector id
+         */
+        function clearPagination(selectorId) {
+            if (selectorId == null) { throw new DOMException("Selector id can't be null"); }
+
+            let count = $(selectorId).find('li').length;
+            for (let i = 1; i < count - 1; i++) {
+                $(selectorId + ' li:eq(1)').remove();
+            }
+        }
+
+        /**
+         * Sets up the arrows to go to the previous and next page.
+         *
+         * @@param selectorId The id of the div to build in
+         * @@param page The currently selected page
+         * @@param total The total amount of pages
+         * @@param tableType The table type enum as string
+         */
+        function setupArrowIcons(selectorId, page, total, tableType) {
+            if (selectorId == null) { throw new DOMException("Selector id can't be null"); }
+            if (page == null) { throw new DOMException("Selected page can't be null"); }
+            if (total == null) { throw new DOMException("Total pages can't be null"); }
+            if (tableType == null) { throw new DOMException("Table type can't be null"); }
+
+            // Disable if we are at page 1
+            if (page == 1) {
+                $(selectorId + ' .pagePrevious').closest('li').addClass('disabled');
+            } else {
+                $(selectorId + ' .pagePrevious').closest('li').removeClass('disabled');
+                $(selectorId + ' .pagePrevious').attr('data-table-type', tableType);
+                $(selectorId + ' .pagePrevious').attr('data-page-number', Math.max(1, page - 1));
+            }
+
+            // Disable if we are at the last page
+            if (page == total) {
+                $(selectorId + ' .pageNext').closest('li').addClass('disabled');
+            } else {
+                $(selectorId + ' .pageNext').closest('li').removeClass('disabled');
+                $(selectorId + ' .pageNext').attr('data-table-type', tableType);
+                $(selectorId + ' .pageNext').attr('data-page-number', Math.min(total, page + 1));
+            }
+        }
+
+        /**
+         * Shows a double break.
+         *
+         * @@param selectorId The id of the div to build in
+         * @@param page The currently selected page
+         * @@param total The total amount of pages
+         * @@param tableType The table type enum as string
+         */
+        function constructShowAll(selectorId, page, total, tableType) {
+            if (selectorId == null) { throw new DOMException("Selector id can't be null"); }
+            if (page == null) { throw new DOMException("Selected page can't be null"); }
+            if (total == null) { throw new DOMException("Total pages can't be null"); }
+            if (tableType == null) { throw new DOMException("Table type can't be null"); }
+            if (total > (2 * pageMargin) + 1) { throw new DOMException("Incorrect amount of total pages for showing all"); }
+
+            for (let i = 1; i <= total; i++) {
+                $(selectorId + ' li:eq(' + (i - 1) + ')').after(htmlPageMarker(i, i === page, tableType));
+            }
+        }
+
+        /**
+         * Shows all pages.
+         *
+         * @@param selectorId The id of the div to build in
+         * @@param page The currently selected page
+         * @@param total The total amount of pages
+         * @@param tableType The table type enum as string
+         */
+        function constructDoubleBreak(selectorId, page, total, tableType) {
+            if (selectorId == null) { throw new DOMException("Selector id can't be null"); }
+            if (page == null) { throw new DOMException("Selected page can't be null"); }
+            if (total == null) { throw new DOMException("Total pages can't be null"); }
+            if (tableType == null) { throw new DOMException("Table type can't be null"); }
+            if (total <= (2 * pageMargin) + 1) { throw new DOMException("Incorrect amount of total pages for double break"); }
+            if ((page < pageMargin + 1) || (page > (total) - pageMargin)) { throw new DOMException("Incorrect page for double break"); }
+
+            // First page
+            $(selectorId + ' li:eq(0)').after(htmlPageMarker(1, false, tableType));
+            $(selectorId + ' li:eq(1)').after(htmlPageSeparator());
+
+            let i = 2;
+            for (i = i; i <= 4; i++) {
+                $(selectorId + ' li:eq(' + (i) + ')').after(htmlPageMarker(page + (i - 3), page + (i - 3) === page, tableType));
+            }
+
+            // Last page
+            $(selectorId + ' li:eq(' + (i) + ')').after(htmlPageSeparator());
+            $(selectorId + ' li:eq(' + (i + 1) + ')').after(htmlPageMarker(total, false, tableType));
+        }
+
+        /**
+         * Shows a left break.
+         *
+         * @@param selectorId The id of the div to build in
+         * @@param page The currently selected page
+         * @@param total The total amount of pages
+         * @@param tableType The table type enum as string
+         */
+        function constructLeftBreak(selectorId, page, total, tableType) {
+            if (selectorId == null) { throw new DOMException("Selector id can't be null"); }
+            if (page == null) { throw new DOMException("Selected page can't be null"); }
+            if (total == null) { throw new DOMException("Total pages can't be null"); }
+            if (tableType == null) { throw new DOMException("Table type can't be null"); }
+            if (total <= (2 * pageMargin) + 1) { throw new DOMException("Incorrect amount of total pages for left break"); }
+            if (page >= pageMargin + 1) { throw new DOMException("Incorrect page for left break"); }
+
+            // First page
+            let i = 1;
+            for (i = i; i <= page + 1; i++) {
+                $(selectorId + ' li:eq(' + (i - 1) + ')').after(htmlPageMarker(i, i === page, tableType));
+            }
+
+            // Last page
+            $(selectorId + ' li:eq(' + (i - 1) + ')').after(htmlPageSeparator());
+            $(selectorId + ' li:eq(' + (i) + ')').after(htmlPageMarker(total, false, tableType));
+        }
+
+        /**
+         * Shows a right break.
+         *
+         * @@param selectorId The id of the div to build in
+         * @@param page The currently selected page
+         * @@param total The total amount of pages
+         * @@param tableType The table type enum as string
+         */
+        function constructRightBreak(selectorId, page, total, tableType) {
+            if (selectorId == null) { throw new DOMException("Selector id can't be null"); }
+            if (page == null) { throw new DOMException("Selected page can't be null"); }
+            if (total == null) { throw new DOMException("Total pages can't be null"); }
+            if (tableType == null) { throw new DOMException("Table type can't be null"); }
+            if (total <= (2 * pageMargin) + 1) { throw new DOMException("Incorrect amount of total pages for right break"); }
+            if (page <= (total) - pageMargin) { throw new DOMException("Incorrect page for right break"); }
+
+            // First page
+            $(selectorId + ' li:eq(0)').after(htmlPageMarker(1, false, tableType));
+            $(selectorId + ' li:eq(1)').after(htmlPageSeparator());
+
+            for (let i = page - 1; i <= total; i++) {
+                $(selectorId + ' li:eq(' + (i - (page - 3)) + ')').after(htmlPageMarker(i, i === page, tableType));
+            }
+        }
+
+        function htmlPageMarker(number, selected, tableType) {
+            if (number == null) { throw new DOMException("Selected page can't be null"); }
+            if (selected == null) { throw new DOMException("Selected can't be null"); }
+            if (tableType == null) { throw new DOMException("Table type can't be null"); }
+            if (!Number.isInteger(number)) { throw new DOMException("Selected page must be an integer"); }
+            if (typeof selected !== "boolean") { throw new DOMException("Selected must be a boolean"); }
+
+            // TODO Fix this ugly formatting
+            let result = '<li class="page-item';
+
+            if (selected === true) { result += ' active' }
+
+            result += '">';
+            result += '<a class="page-link"';
+            result += ' data-page-number="';
+            result += number;
+            result += '" data-table-type="';
+            result += tableType;
+            result += '"';
+            result += ' href="">';
+            result += number;
+            result += '</a></li>';
+
+            return result;
+        }
+
+        function htmlPageSeparator() {
+            // TODO Fix this ugly formatting
+            let result = '<li class="page-item disabled">';
+            result += '<a class="page-link';
+            result += '" ';
+            result += '"';
+            result += 'href="">';
+            result += '...';
+            result += '</a></li>';
+
+            return result;
+        }
+
+    }
+
+</script>

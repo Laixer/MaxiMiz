@@ -1,0 +1,67 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.2</TargetFramework>
+    <RuntimeFrameworkVersion>2.1.5</RuntimeFrameworkVersion>
+    <AspNetCoreHostingModel>InProcess</AspNetCoreHostingModel>
+    <StartupObject>Maximiz.Program</StartupObject>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Creation\**" />
+    <Content Remove="Creation\**" />
+    <EmbeddedResource Remove="Creation\**" />
+    <None Remove="Creation\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Remove="appsettings - Copy.development.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="Views\_Kaan\view\ads\new_advertisement.html" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Views\_Kaan\view\ads\new_advertisement.html">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+  </ItemGroup>
+
+
+  <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="9.0.0" />
+    <PackageReference Include="Dapper" Version="2.0.30" />
+    <PackageReference Include="Laixer.Identity.Dapper" Version="0.9.12" />
+    <PackageReference Include="Microsoft.AspNetCore.App">
+      <PrivateAssets Condition="'%(PackageReference.Version)' == ''">all</PrivateAssets>
+      <Publish Condition="'%(PackageReference.Version)' == ''">true</Publish>
+    </PackageReference>
+    <PackageReference Include="Microsoft.AspNetCore.Razor.Design" Version="2.2.0" PrivateAssets="All" />
+    <PackageReference Include="Microsoft.Azure.ServiceBus" Version="4.1.1" />
+    <PackageReference Include="Microsoft.Azure.Storage.Blob" Version="11.1.1" />
+    <PackageReference Include="Microsoft.Azure.Storage.Common" Version="11.1.1" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="2.2.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="2.2.0" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="3.1.0-preview3.19558.8" />
+    <PackageReference Include="Npgsql" Version="4.1.2" />
+    <PackageReference Include="System.Drawing.Common" Version="4.6.1" />
+  </ItemGroup>
+
+
+  <ItemGroup>
+    <ProjectReference Include="..\Maximiz.Core\Maximiz.Core.csproj" />
+    <ProjectReference Include="..\Maximiz.Helper\Maximiz.Helper.csproj" />
+    <ProjectReference Include="..\Maximiz.Infrastructure\Maximiz.Infrastructure.csproj" />
+    <ProjectReference Include="..\Model\Maximiz.Model.csproj" />
+    <ProjectReference Include="..\Poller\Poller\Poller.csproj" />
+  </ItemGroup>
+
+
+  <ItemGroup>
+    <Folder Include="Mapper\Enum\" />
+    <Folder Include="ViewModels\Columns\Translation\" />
+  </ItemGroup>
+
+</Project>

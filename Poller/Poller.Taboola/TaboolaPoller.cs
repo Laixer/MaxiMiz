@@ -1,168 +1,388 @@
+﻿using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Logging;
+using Poller.Database;
+using Poller.Extensions;
+using Poller.OAuth;
+using Poller.Poller;
+using Poller.Taboola.Traffic;
 using System;
-using System.Net.Http;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Web;
-using System.Linq;
-using System.Data.Common;
-using Microsoft.Extensions.Options;
-using Microsoft.Extensions.Logging;
-using Poller.OAuth;
-using Poller.Publisher;
-using Poller.Model;
-using Poller.Model.Response;
-using Dapper;
+using AccountInternal = Maximiz.Model.Entity.Account;
+using AdItemInternal = Maximiz.Model.Entity.AdItem;
+using CampaignInternal = Maximiz.Model.Entity.Campaign;
 
 namespace Poller.Taboola
 {
-    [Publisher("Taboola")]
-    public class TaboolaPoller : RemotePublisher, IDisposable
+
+    /// <summary>
+    /// Implementation of our Taboola poller.
+    /// </summary>
+    public class TaboolaPoller : IPollerRefreshAdvertisementData,
+        IPollerDataSyncback, IPollerCreateOrUpdateObjects, IDisposable
     {
-        private readonly Lazy<HttpManager> _client;
-        private readonly DbConnection connection;
-        private readonly TaboolaPollerOptions options;
-
-        protected HttpManager HttpManager { get => _client.Value; }
+        private readonly ILogger _logger;
+        private readonly HttpWrapper _httpWrapper;
 
         /// <summary>
-        /// Creates a TaboolaPoller for fetching Data from Taboola.
+        /// Used to perform all operations with our internal database.
         /// </summary>
-        /// <param name="logger">A logger for this poller.</typeparam>
-        /// <param name="options">An instance of options required for requests.</param>
-        /// <param name="connection">The database connections to use for inserting fetched data.</param>
-        public TaboolaPoller(ILogger<TaboolaPoller> logger, IOptions<TaboolaPollerOptions> options, DbConnection connection)
-            : base(logger)
-        {
-            this.options = options?.Value;
-            this.connection = connection;
+        private readonly CrudInternal _crudInternal;
 
-            // Lazy initialization prevent performance hit on process start.
-            _client = new Lazy<HttpManager>(() =>
-            {
-                return new HttpManager(this.options.BaseUrl)
-                {
-                    TokenUri = "oauth/token",
-                    RefreshUri = "oauth/token",
-                    AuthorizationProvider = new OAuthAuthorizationProvider
+        /// <summary>
+        /// Used to perform all operations with the external Taboola API.
+        /// </summary>
+        private readonly CrudExternal _crudExternal;
+
+        /// <summary>
+        /// Constructor with dependency injection.
+        /// </summary>
+        /// <param name="logger">The logger</param>
+        /// <param name="options">The options</param>
+        /// <param name="provider">The database provider</param>
+        /// <param name="cache">The cache</param>
+        public TaboolaPoller(ILoggerFactory logger, TaboolaPollerOptions options,
+            DbProvider provider, IMemoryCache cache)
+        {
+            if (logger == null) { throw new ArgumentNullException(nameof(ILoggerFactory)); }
+            if (options == null) { throw new ArgumentNullException(nameof(TaboolaPollerOptions)); }
+            if (provider == null) { throw new ArgumentNullException(nameof(DbProvider)); }
+            if (cache == null) { throw new ArgumentNullException(nameof(IMemoryCache)); }
+
+            _logger = logger.CreateLogger(typeof(TaboolaPoller).FullName);
+
+            // Create our http wrapper with client
+            _httpWrapper = new HttpWrapper(
+                _logger,
+                new HttpManager(
+                    new Uris(options.BaseUrl, "oauth/token", "oauth/token"),
+                    new OAuthAuthorizationProvider
                     {
-                        ClientId = this.options.OAuth2.ClientId,
-                        ClientSecret = this.options.OAuth2.ClientSecret,
-                        Username = this.options.OAuth2.Username,
-                        Password = this.options.OAuth2.Password,
+                        ClientId = options.OAuth2.ClientId,
+                        ClientSecret = options.OAuth2.ClientSecret,
+                        Username = options.OAuth2.Username,
+                        Password = options.OAuth2.Password,
+                    })
+                );
+
+            // Create all our crud objects
+            _crudInternal = new CrudInternal(_logger, provider, cache);
+            _crudExternal = new CrudExternal(_logger, _httpWrapper);
+
+            // Log version
+            _logger.LogInformation($"Poller {Constants.ApplicationName} created with {Constants.ApplicationVersion}.");
+        }
+
+        /// <summary>
+        /// Implementation of our data refresh interface. This function calls 
+        /// the Taboola API and retrieves data about the performance of our ad
+        /// items. This is used to retreive metrics, not to validate that all
+        /// data we have is is still up to date.
+        /// </summary>
+        /// <param name="context">The poller context</param>
+        /// <param name="token">Cancellation token</param>
+        /// <returns>Task</returns>
+        public async Task RefreshAdvertisementDataAsync(PollerContext context,
+            CancellationToken token)
+        {
+            if (context == null) { throw new ArgumentNullException(nameof(PollerContext)); }
+            if (token == null) { throw new ArgumentNullException(nameof(CancellationToken)); }
+
+            // Get accounts
+            var accounts = await _crudInternal.GetAdvertiserAccountsCachedAsync(token);
+
+            // Prevents spamming because of parallel
+            var delay = 0;
+            var delayIncrement = 250;
+
+            // Process each account parallel
+            foreach (var account in accounts.ToList().Shuffle())
+            {
+                await Task.Delay(delay);
+                delay += delayIncrement;
+
+                var adItems = await _crudExternal.GetAdItemsReportFromAccountAsync(account, token);
+                await _crudInternal.CommitAdItemReportsBulk(adItems, token);
+            }
+        }
+
+        /// <summary>
+        /// Used for testing.
+        /// TODO Should we do this?
+        /// </summary>
+        /// <param name="context"></param>
+        /// <param name="token"></param>
+        /// <returns></returns>
+        public Task DataSyncbackAsync(PollerContext context, CancellationToken token)
+        {
+            return DataSyncbackAsync(context, token, null, null, null);
+        }
+
+        /// <summary>
+        /// Implements our data syncback interface. This is used to check if any
+        /// values have been changed in Taboola's own interface. With this we will
+        /// always remain up to date.
+        /// 
+        /// 
+        /// TODO Maybe split?
+        /// TODO Take parallel into account
+        /// TODO Clean up
+        /// </summary>
+        /// <remarks>
+        /// This contains three list pointers. The fetched entities get added
+        /// to their respective list, so we can verify the behaviour of this
+        /// interface during testing. Only the randomly selected entities get
+        /// assigned to the list.
+        /// </remarks>
+        /// <param name="context">The poller context</param>
+        /// <param name="token">Cancellation token</param>
+        /// <param name="pointerAccounts">Here we store our accounts</param>
+        /// <param name="pointerCampaigns">Here we store our campaigns</param>
+        /// <param name="pointerAdItems">Here we store our ad items</param>
+        /// <returns>Task</returns>
+        public async Task DataSyncbackAsync(PollerContext context, CancellationToken token,
+            List<AccountInternal> pointerAccounts, List<CampaignInternal> pointerCampaigns,
+            List<AdItemInternal> pointerAdItems)
+        {
+            if (context == null) { throw new ArgumentNullException(nameof(PollerContext)); }
+            if (token == null) { throw new ArgumentNullException(nameof(CancellationToken)); }
+
+            // Accounts almost never change, only do this once every 30 iterations.
+            if ((context.RunCount + 1) % 30 == 0)
+            {
+                _logger.LogDebug("Syncback account information");
+                var accountsInternal = await _crudExternal.GetAllAccounts(token);
+                await _crudInternal.CommitAccountBulk(accountsInternal, token);
+            }
+
+            // Get local accounts and extract some campaign data.
+            _logger.LogDebug("Syncback campaigns and ad items");
+            var accounts = await _crudInternal.GetAdvertiserAccountsCachedAsync(token);
+
+            var selectedAccounts = accounts.ToList().Shuffle().Take(2).ToList();
+            if (pointerAccounts != null) { pointerAccounts.AddRange(selectedAccounts); }
+
+            foreach (var account in selectedAccounts.AsParallel())
+            {
+                await SyncbackAccountCampaignsAsync(account, pointerCampaigns,
+                    pointerAdItems, token, context, 5);
+            }
+        }
+
+        /// <summary>
+        /// Syncs back all campaigns for a given account. Also syncs back a 
+        /// given amount of campaign items through <see cref="SyncbackCampaignAdItemsAsync"/>.
+        /// </summary>
+        /// <param name="account">The account to syncback</param>
+        /// <param name="pointerCampaigns">Where to store the campaigns</param>
+        /// <param name="pointerAdItems">Where to store the campaign ad items</param>
+        /// <param name="token">The cancellation token</param>
+        /// <param name="context">The poller context</param>
+        /// <param name="campaignProcessCount">How many campaigns to process</param>
+        /// <returns>Task</returns>
+        private async Task SyncbackAccountCampaignsAsync(AccountInternal account,
+            List<CampaignInternal> pointerCampaigns, List<AdItemInternal> pointerAdItems,
+            CancellationToken token, PollerContext context, int campaignProcessCount)
+        {
+            // Get and commit all account campaigns
+            var campaigns = await _crudExternal.GetAllCampaignsFromAccountAsync(account, token);
+            await _crudInternal.CommitCampaignBulk(campaigns, token);
+
+            // Process campaign items for a select amount.
+            var selectedCampaigns = campaigns.ToList().Shuffle().Take(campaignProcessCount).ToList();
+            if (pointerCampaigns != null) { pointerCampaigns.AddRange(selectedCampaigns); }
+
+            // Also prevent spam
+            var delay = 0;
+            var delayIncrement = 200;
+            foreach (var campaign in selectedCampaigns)
+            {
+                // Prevent spamming
+                await Task.Delay(delay);
+                delay += delayIncrement;
+
+                // Process campaign
+                await SyncbackCampaignAdItemsAsync(account, campaign, pointerAdItems, token);
+
+                // Mark our progress
+                context.MarkProgress(token);
+            }
+        }
+
+        /// <summary>
+        /// Processes syncback for one campaign. This will syncback all ad items 
+        /// for this given campaign.
+        /// </summary>
+        /// <param name="account">The campaign account</param>
+        /// <param name="campaign">The campaign</param>
+        /// <param name="pointerAdItems">Where to add the ad items to</param>
+        /// <param name="token">The cancellation token</param>
+        /// <returns>Task</returns>
+        private async Task SyncbackCampaignAdItemsAsync(AccountInternal account,
+            CampaignInternal campaign, List<AdItemInternal> pointerAdItems, CancellationToken token)
+        {
+            // We always need a campaign guid
+            if (campaign.Id == null || campaign.Id == Guid.Empty)
+            {
+                campaign.Id = (await _crudInternal.GetCampaignFromExternalIdAsync(campaign.SecondaryId, token)).Id;
+            }
+
+            // Retreive and commit
+            var adItems = await _crudExternal.GetAdItemsFromCampaignAsync(account, campaign.SecondaryId, token);
+            await _crudInternal.CommitAdItemBulk(adItems, campaign.Id, token, true);
+
+            // Add to list if present, for testing purposes
+            if (pointerAdItems != null) { pointerAdItems.AddRange(adItems); }
+        }
+
+        /// <summary>
+        /// Implements our CRUD interface. This handles CRUD operations on given
+        /// objects. The type of operation and the objects are specified within
+        /// the context.
+        /// 
+        /// TODO This explicit assignment of entity is ugly, fix.
+        /// </summary>
+        /// <param name="context">CRUD context</param>
+        /// <param name="token">Cancellation token</param>
+        /// <returns>Task</returns>
+        public async Task CreateOrUpdateObjectsAsync(
+            CreateOrUpdateObjectsContext context, CancellationToken token)
+        {
+            // Throws if invalid
+            ValidateCrudContext(context);
+
+            var account = (AccountInternal)context.Entity[0];
+            var entity = context.Entity[1];
+            switch (context.Action)
+            {
+                // Create an entity
+                // The entity must aleady exist in our own database
+                case Maximiz.Model.CrudAction.Create:
+                    switch (entity)
+                    {
+                        case CampaignInternal campaign:
+                            campaign = await _crudExternal.CreateCampaignAsync(account, campaign, token);
+                            await _crudInternal.UpdateCampaignAsync(campaign, token);
+                            context.Entity[1] = campaign;
+                            return;
+
+                        case AdItemInternal adItem:
+                            var campaignId = (await _crudInternal.GetCampaignFromGuidAsync(adItem.CampaignGuid, token)).SecondaryId; // TODO Use join or view? Can be optimized
+                            adItem = await _crudExternal.CreateAdItemAsync(account, adItem, campaignId, token);
+                            await _crudInternal.UpdateAdItemAsync(adItem, token);
+                            context.Entity[1] = adItem;
+                            return;
                     }
-                };
-            });
+                    break;
+
+                // Update an entity
+                case Maximiz.Model.CrudAction.Update:
+                    switch (entity)
+                    {
+                        case CampaignInternal campaign:
+                            campaign = await _crudExternal.UpdateCampaignAsync(account, campaign, token);
+                            await _crudInternal.UpdateCampaignAsync(campaign, token);
+                            context.Entity[1] = campaign;
+                            return;
+
+                        case AdItemInternal adItem:
+                            var campaignId = (await _crudInternal.GetCampaignFromGuidAsync(adItem.CampaignGuid, token)).SecondaryId;
+                            adItem = await _crudExternal.UpdateAdItemAsync(account, adItem, campaignId, token);
+                            await _crudInternal.UpdateAdItemAsync(adItem, token);
+                            context.Entity[1] = adItem;
+                            return;
+                    }
+                    break;
+
+                // Delete an entity
+                case Maximiz.Model.CrudAction.Delete:
+                    switch (entity)
+                    {
+                        // TODO Do we want to delete this or update this to some delete status? I'd say delete the thing.
+                        case CampaignInternal campaign:
+                            campaign = await _crudExternal.DeleteCampaignAsync(account, campaign, token);
+                            await _crudInternal.DeleteCampaignAsync(campaign, token);
+                            context.Entity[1] = campaign;
+                            return;
+
+                        case AdItemInternal adItem:
+                            var campaignId = (await _crudInternal.GetCampaignFromGuidAsync(adItem.CampaignGuid, token)).SecondaryId;
+                            adItem = await _crudExternal.DeleteAdItemAsync(account, adItem, campaignId, token);
+                            await _crudInternal.DeleteAdItemAsync(adItem, token);
+                            context.Entity[1] = adItem;
+                            return;
+                    }
+                    break;
+
+                // Syncback for campaign
+                case Maximiz.Model.CrudAction.Syncback:
+                    switch (entity)
+                    {
+                        case CampaignInternal campaign:
+                            // First refresh the campaign
+                            var campaignFetched = await _crudExternal.GetCampaignAsync(account, campaign.SecondaryId, token);
+                            campaignFetched.Id = campaign.Id; // TODO Explicit assignment is bad
+                            await _crudInternal.UpdateCampaignAsync(campaignFetched, token);
+
+                            // Then refresh all the ad items
+                            var adItems = await _crudExternal.GetAdItemsFromCampaignAsync(account, campaign.SecondaryId, token);
+                            await _crudInternal.CommitAdItemBulk(adItems, campaign.Id, token);
+                            break;
+                    }
+                    break;
+            }
         }
 
         /// <summary>
-        /// Run the remote query and catch all exceptions where before letting
-        /// them propagate upwards.
+        /// Validates if our CRUD context has the correct format.
         /// </summary>
-        /// <typeparam name="TResult"></typeparam>
-        /// <param name="method"></param>
-        /// <param name="url"></param>
-        /// <returns>Object of TResult.</returns>
-        protected async Task<TResult> RemoteQueryAndLogAsync<TResult>(HttpMethod method, string url, CancellationToken cancellationToken = default)
-            where TResult : class
+        /// <exception cref="InvalidOperationException">Invalid format</exception>
+        /// <param name="context">The CRUD context</param>
+        private void ValidateCrudContext(CreateOrUpdateObjectsContext context)
         {
-            try
-            {
-                Logger.LogTrace($"Executing {method} {url}");
+            var account = context.Entity[0];
+            var entity = context.Entity[1];
+            var action = context.Action;
 
-                return await HttpManager.RemoteQueryAsync<TResult>(method, url);
+            // Check format
+            if (context.Entity.Length != 2)
+            {
+                throw new InvalidOperationException("Two entities expected");
             }
-            catch (Exception e)
+            if (!(account is AccountInternal))
             {
-                Logger.LogError($"{url}: {e.Message}");
-                throw e;
-            }
-        }
-
-        public async Task GetAllAccounts()
-        {
-            var url = $"api/1.0/users/current/allowed-accounts/";
-
-            var accounts = await RemoteQueryAndLogAsync<AllowedAccounts>(HttpMethod.Get, url);
-            if (accounts == null || accounts.Items.Count() <= 0)
-            {
-                return;
+                throw new InvalidOperationException("Account entity is expected as first in array");
             }
 
-            try
+            // Check type
+            if (!(entity is CampaignInternal || entity is AdItemInternal))
             {
-                await connection.OpenAsync();
-                await connection.ExecuteAsync(
-                    @"INSERT INTO public.account_integration(publisher_id, name, type, currency, account)
-                          VALUES (@Id, @Name, @Type, @Currency, @AccountId)", accounts.Items);
+                throw new InvalidOperationException(
+                    "Entity is invalid for this operation");
             }
-            finally
+
+            // Check operation
+            if (action == Maximiz.Model.CrudAction.Read)
             {
-                // TODO: This should not be required
-                connection.Close();
+                throw new InvalidOperationException(
+                    "Read is invalid for this operation");
+            }
+
+            // Check syncback
+            if (action == Maximiz.Model.CrudAction.Syncback &&
+                !(entity is CampaignInternal))
+            {
+                throw new InvalidOperationException(
+                    "Can only syncback for campaigns");
             }
         }
 
         /// <summary>
-        /// Gets the Top Campaign Reports for a specific date as specified
-        /// in the Backstage documentation, deserializes them and  inserts them into the database
+        /// Called upon graceful shutdown.
         /// </summary>
-        public async override Task GetTopCampaignReportAsync()
-        {
-            var query = HttpUtility.ParseQueryString(string.Empty);
-            query["start_date"] = query["end_date"] = DateTime.Now.ToString("yyyy-MM-dd");
-
-            var url = $"api/1.0/{options.AccountId}/reports/top-campaign-content/dimensions/item_breakdown?{query}";
-
-            var result = await RemoteQueryAndLogAsync<TopCampaignReport>(HttpMethod.Get, url);
-            if (result == null || result.RecordCount <= 0)
-            {
-                return;
-            }
-
-            try
-            {
-                await connection.OpenAsync();
-                await connection.ExecuteAsync(
-                    @"INSERT INTO public.item(ad_group, campaign, clicks, impressions, spent, currency, publisher_id, content_url, url)
-                      VALUES (1, @Campaign, @Clicks, @Impressions, @Spent, @Currency, @PublisherItemId, @ContentUrl, @Url)
-                      ON CONFLICT (publisher_id) DO UPDATE
-                      SET
-                        clicks = @Clicks,
-                        impressions = @Impressions,
-                        spent = @Spent", result.Items);
-            }
-            finally
-            {
-                // TODO: This should not be required
-                connection.Close();
-            }
-        }
-
-        public async Task GetAllCampaigns()
-        {
-            var url = $"api/1.0/{options.AccountId}/campaigns";
-
-            var campaigns = await RemoteQueryAndLogAsync<Campaign>(HttpMethod.Get, url);
-        }
-
-        public async Task GetCampaign()
-        {
-            var campaign = "2162154";
-            var url = $"api/1.0/{options.AccountId}/campaigns/{campaign}";
-
-            var campaigns = await RemoteQueryAndLogAsync<TopCampaignReport>(HttpMethod.Get, url);
-        }
-
-        public async Task CreateCampaign()
-        {
-            var url = $"api/1.0/{options.AccountId}/campaigns/";
-
-            await RemoteQueryAndLogAsync<TopCampaignReport>(HttpMethod.Post, url);
-        }
-
-        public void Dispose()
-        {
-            _client?.Value?.Dispose();
-        }
+        /// 
+        public void Dispose() => _httpWrapper.Dispose();
     }
 }

@@ -1,0 +1,74 @@
+﻿@*
+    Partial view containing the account details for a single campaign.
+*@
+
+@model CampaignDetailsViewModel
+
+<!-- Campaign details account tab -->
+<form id="formTabAccount" class="mt-3">
+    <fieldset id="fieldsetAccount">
+
+        <!-- Account information display -->
+        <div class="campaign form-group">
+            <div class="form-subgroup mb-3">
+                <h1 class="mb-4">Account</h1>
+                <label for="campaign">Publisher</label>
+                <p>@EnumTranslator.TranslatePublisher(Model.Campaign.Publisher)</p>
+                <div class="form-group my-4">
+                    <label for="campaignAccount">Account name</label>
+                    <p>@Model.Account.Name</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="info form-group">
+            <div>
+                <div class="form-subgroup">
+
+                    <div class="form-row">
+                        <!-- Campaign name -->
+                        <div class="form-group col-md-6 containsErrorHolder">
+                            <label for="inputCampaignNameSuffix">Campaign Name</label>
+                            <input id="inputCampaignNameSuffix" type="text" class="form-control"
+                                   name="@nameof(FormCampaignDetailsViewModel.CampaignNameSuffix)" value="@Model.Campaign.Name">
+                            <div class="errorHolder"></div>
+                        </div>
+
+                        <!-- Branding text -->
+                        <div class="form-group col-md-6 containsErrorHolder">
+                            <label for="inputBrandingText">Branding</label>
+                            <input id="inputBrandingText" type="text" class="form-control"
+                                   name="@nameof(FormCampaignDetailsViewModel.BrandingText)" value="@Model.Campaign.BrandingText">
+                            <small id="brandingHelp" class="form-text text-muted"><i>Apears below headline</i></small>
+                            <div class="errorHolder"></div>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <!-- Custom UTM -->
+                        <div class="form-group col-md-6 containsErrorHolder">
+                            <label for="inputTrackingCode">Tracking Code</label>
+                            <input id="inputUtmCustom" type="text" class="form-control"
+                                   name="@nameof(FormCampaignDetailsViewModel.UtmCustom)" placeholder="Put your custom utm tags here">
+                            <div class="errorHolder"></div>
+                        </div>
+
+                        <!-- Target url -->
+                        <div class="form-group col-md-6 containsErrorHolder">
+                            <label for="inputURL">URL</label>
+                            <input id="inputUrl" name="@nameof(FormCampaignDetailsViewModel.Url)" type="text"
+                                   class="form-control" value="@Model.Campaign.TargetUrl">
+                            <!--<small id="URLHelp" class="form-text text-muted">(optional)</i></small>-->
+                            <div class="errorHolder"></div>
+                        </div>
+                    </div>
+
+                    <!-- Submit button -->
+                    <button class="buttonSaveCampaignDetails btn text-white btn-main btn-blue mt-5 float-right">Save</button>
+
+                </div>
+            </div>
+        </div>
+
+    </fieldset>
+</form>

@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Poller.GoogleAds;
+using Poller.Scheduler.Activator;
 using Poller.Taboola;
 
 namespace Poller.Host
@@ -28,20 +29,17 @@ namespace Poller.Host
                 .ConfigureAppConfiguration((hostContext, configApp) =>
                 {
                     hostContext.HostingEnvironment.ApplicationName = "Poller.Host";
-
                     configApp.AddJsonFile($"appsettings.{hostContext.HostingEnvironment.EnvironmentName}.json", optional: true);
                 })
                 .ConfigureServices((hostContext, services) =>
                 {
-                    // services.AddRemotePublisher<GooglePoller>();
-                    services.AddRemotePublisher<TaboolaPoller, TaboolaPollerOptions>();
+                    //services.AddRemotePublisher<GoogleAdsPoller, GoogleAdsPollerOptions>();
+                    services.AddRemotePublisher<TaboolaPublisher, TaboolaPollerOptions>();
                     services.AddHostedService<RemoteApplicationService>();
-                    services.AddNpgsql("MaxiMizDatabase");
-
-                    services.Configure<RemoteApplicationServiceOptions>(options =>
-                    {
-                        options.PublisherRefreshInterval = 15;
-                    });
+                    services.AddDbProvider("MaxiMizDatabase");
+                    services.AddEventBusProvider("MaxiMizServiceBus");
+                    services.AddActivatorFactory();
+                    services.AddMemoryCache();
                 })
                 .ConfigureLogging((hostContext, configLogging) =>
                 {
