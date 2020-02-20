@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Google.Ads.GoogleAds" Version="2.3.0" />
+    <PackageReference Include="Google.Ads.GoogleAds" Version="2.2.0" />
   </ItemGroup>
 
   <ItemGroup>
